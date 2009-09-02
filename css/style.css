@@ -1,25 +1,46 @@
+/* -------------------------------------------------------- */
+/* Globale Einstellungen */
+/* --------------------- */
 * {
 	font-family:verdana,tahoma,arial,sans-serif;
 	font-size:11px;
 }
-
 html, body {
 	margin:0px;
 	padding:0px;
 }
-
 body 	{
 	background-color:#FFFFFF;
-	margin:0px;
-	padding:0px;
 	text-align:center;
 }
+a:link {
+	text-decoration:none;
+}
+a:visited {
+	text-decoration:none;
+}
+a:hover	{
+	text-decoration:underline;
+}
+em {
+	font-weight:normal;
+	font-style:normal;
+}
 
+/* -------------------------------------------------------- */
+/* Layer für 100% Höhe */
+/* ------------------- */
+/* Eine Hommage an den unseligen Internet Explorer. Sacktreter, der! */
 div.fullheight {
 	float:right;
 	height:100%;
+	background-color:white;
 }
 
+
+/* -------------------------------------------------------- */
+/* Haupt-Layer */
+/* ----------- */
 div.main {
 	width:780px;
 	height:100%;
@@ -32,48 +53,75 @@ div.main {
 	border-right:2px solid #C0C0C0;
 }
 
+
+/* -------------------------------------------------------- */
+/* Header */
+/* ------ */
 div.header {
 	background-color:#FFFFFF;
 	background-image:url("../grafiken/mozilo.jpg");
-         background-repeat:no-repeat;
-         height:150px;
+	background-repeat:no-repeat;
+	height:150px;
 }
 
+
+/* -------------------------------------------------------- */
+/* Detailmenü und Seiteninhalt */
+/* --------------------------- */
 div.catcontent {
 	float:right;
 	width:620px;
 	overflow:hidden;
 }
 
+
+/* -------------------------------------------------------- */
+/* Hauptmenü */
+/* --------- */
 div.mainmenu {
 	float:left;
 	line-height:20px;
 	margin-top:8px;
+	text-align:center;
 }
 
+
+/* -------------------------------------------------------- */
+/* Detailmenü */
+/* ---------- */
 div.detailmenu {
 	padding:6px 8px 0px 8px;
 	line-height:30px;
 	text-align:left;
 }
 
+
+/* -------------------------------------------------------- */
+/* Seiteninhalt */
+/* ------------ */
 div.pagecontent {
 	padding:10px;
 	text-align:justify;
 }
-a {
-	color:#000077;
-	font-weight:bold;
+
+
+/* -------------------------------------------------------- */
+/* Letzte Änderung */
+/* --------------- */
+div.lastchange {
+	text-align:center;
+	line-height:18px;
+	margin:22px;
+	margin-bottom:-10px;
+	border-top:1px solid #C0C0C0;
+	color:#C0C0C0;
+	font-size:10px;
 }
-a:link {
-	text-decoration:none;
-}
-a:visited {
-	text-decoration:none;
-}
-a:hover	{
-	text-decoration:underline;
-}
+
+
+/* -------------------------------------------------------- */
+/* Hauptmenüpunkt */
+/* -------------- */
 a.menu {
 	display:block;
 	padding:3px;
@@ -83,6 +131,7 @@ a.menu {
 	border:1px solid #C0C0C0;
 	width:120px;
 	margin:2px 5px;
+	font-weight:bold;
 }
 a.menu:hover {
 	color:#000000;
@@ -90,6 +139,11 @@ a.menu:hover {
 	border:1px solid #C0C0C0;
 	background-color:#D0D0D0;
 }
+
+
+/* -------------------------------------------------------- */
+/* Aktiver Hauptmenüpunkt */
+/* ---------------------- */
 a.menuactive {
 	display:block;
 	padding:3px;
@@ -99,16 +153,22 @@ a.menuactive {
 	background-color:#D0D0D0;
 	width:120px;
 	margin:2px 5px;
+	font-weight:bold;
 }
 a.menuactive:hover {
 	text-decoration:none;
 }
 
+
+/* -------------------------------------------------------- */
+/* Detailmenüpunkt */
+/* --------------- */
 a.detailmenu {
 	padding:3px 5px;
 	color:#000000;
 	background-color:#FFFFFF;
 	border:1px solid #C0C0C0;
+	font-weight:bold;
 }
 a.detailmenu:hover {
 	color:#000000;
@@ -116,26 +176,81 @@ a.detailmenu:hover {
 	border:1px solid #C0C0C0;
 	background-color:#D0D0D0;
 }
+
+
+/* -------------------------------------------------------- */
+/* Aktiver Detailmenüpunkt */
+/* ----------------------- */
 a.detailmenuactive {
 	padding:3px 5px;
 	color:#000000;
 	border:1px solid #C0C0C0;
 	background-color:#D0D0D0;
+	font-weight:bold;
 }
 a.detailmenuactive:hover {
 	text-decoration:none;
 }
 
+
+/* -------------------------------------------------------- */
+/* Zuletzt geänderte Seite */
+/* ----------------------- */
+a.latestchangedlink {
+	text-decoration:none;
+	font-size:10px;
+	color:#a0a0a0;
+	font-weight:bold;
+}
+a.latestchangedlink:hover {
+	text-decoration:underline;
+}
+
+
+/* -------------------------------------------------------- */
+/* Fehler in Tag-Attribut oder -Wert */
+/* --------------------------------- */
+em.deadlink {
+	color:#ff4444;
+	text-decoration:line-through;
+	font-weight:bold;
+}
+
+
+
+
+/* -------------------------------------------------------- */
+/*                                                          */
+/* AB HIER: CMS-SYNTAX                                      */
+/*                                                          */
+/* -------------------------------------------------------- */
+
+
+/* -------------------------------------------------------- */
+/* [link|...]      */
+/* [mail|...]      */
+/* [seite|...]     */
+/* [kategorie|...] */
+/* [datei|...]     */
+/* [galerie|...]   */
+/* --------------- */
+a {
+	color:#000077;
+	font-weight:bold;
+}
+
+
+/* -------------------------------------------------------- */
+/* [bild|...] */
+/* ---------- */
 img {
 	border:none;
 }
-img.rightcontentimage {
-	margin:8px;
-	border:1px solid;
-	width:100px;
-	float:right;
-	margin-right:0px;
-}
+
+
+/* -------------------------------------------------------- */
+/* [bildlinks|...] */
+/* --------------- */
 img.leftcontentimage {
 	margin:8px;
 	border:1px solid;
@@ -144,46 +259,92 @@ img.leftcontentimage {
 	margin-left:0px;
 }
 
-em {
-	font-weight:normal;
-	font-style:normal;
+
+/* -------------------------------------------------------- */
+/* [bildrechts|...] */
+/* ---------------- */
+img.rightcontentimage {
+	margin:8px;
+	border:1px solid;
+	width:100px;
+	float:right;
+	margin-right:0px;
 }
-em.deadlink {
-	color:#ff4444;
-	text-decoration:line-through;
-	font-weight:bold;
-}
+
+
+/* -------------------------------------------------------- */
+/* [fett|...] */
+/* ---------- */
 em.bold {
 	font-weight:bold;
-         color:#000000;
-         }
+	color:#000000;
+}
+
+
+/* -------------------------------------------------------- */
+/* [kursiv|...] */
+/* ------------ */
 em.italic {
 	font-style:italic;
-	}
+}
+
+
+/* -------------------------------------------------------- */
+/* [fettkursiv|...] */
+/* ---------------- */
 em.bolditalic {
 	font-weight:bold;
 	font-style:italic;
-	}
+}
 
+
+/* -------------------------------------------------------- */
+/* [ueber1|...] */
+/* ------------ */
 h1 {
 	font-size:16px;
 	margin-top:10px;
 	margin-bottom:5px;
 }
+
+
+/* -------------------------------------------------------- */
+/* [ueber2|...] */
+/* ------------ */
 h2 {
 	font-size:12px;
 	margin-top:10px;
 	margin-bottom:5px;
 }
+
+
+/* -------------------------------------------------------- */
+/* [ueber3|...] */
+/* ------------ */
 h3 {
 	margin-top:10px;
 	margin-bottom:5px;
+}
+
+
+/* -------------------------------------------------------- */
+/* [liste1|...] */
+/* [liste2|...] */
+/* [liste3|...] */
+/* ------------ */
+ul {
+	margin-top:0px;
+	margin-bottom:0px;
 }
 li {
 	margin-top:0px;
 	margin-bottom:0px;
 }
-ul {
-	margin-top:0px;
-	margin-bottom:0px;
+
+
+/* -------------------------------------------------------- */
+/* [----] */
+/* ------ */
+hr {
+
 }

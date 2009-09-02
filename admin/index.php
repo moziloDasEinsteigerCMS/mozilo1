@@ -83,7 +83,9 @@ $ADMIN_TITLE = "moziloAdmin";
 	$html .= "</head>";
 	$html .= "<body onload=\"htmlOverlopen(document.documentElement,0)\">";
 	
-	/* DEEEEEEEEEEEBUG ;)
+	// DEEEEEEEEEEEBUG ;)
+	// Ausgabe aller übergebenen Werte zu Testzwecken
+	/*
 	echo "<h2>POST</h2>";
 	foreach ($_POST as $a => $b)
 		echo $a." -> ".$b."<br />";
@@ -378,35 +380,6 @@ echo $html;
 			$pagecontent .= "</table>";
 			$pagecontent .= "</form>";
 		}
-		
-		/*	if (isset($_GET["categoryname"]) && isset($_GET["position"]))
-			{
-				if(strlen($_GET["position"])<3)
-				{
-				rename("../inhalt/".$_GET["source"],"../inhalt/".$_GET["position"]."_".$specialchars->deleteSpecialChars($_GET["categoryname"]));
-				//rename("../inhalt/".$_GET["source"],"../inhalt/".$_GET["position"]."_".$specialchars->deleteSpecialChars($_GET["categoryname"]));
-				$pagecontent .= "<form action=\"index.php\" method=\"GET\"><input type=\"hidden\" name=\"action\" value=\"".$action."\">";
-				$pagecontent .= "<input type=\"hidden\" name=\"result\" value=\"true\">";
-				$pagecontent .= "</form>";
-				}
-				else
-				{
-				$pagecontent .= "<form action=\"index.php\" method=\"GET\"><input type=\"hidden\" name=\"action\" value=\"".$action."\">";
-				$pagecontent .= "<input type=\"hidden\" name=\"result\" value=\"false\">";
-				$pagecontent .= "<form>";
-				}
-			}
-			else
-			{
-				$pagecontent .= "HEUL DOCH!!!!";
-			}
-			$pagecontent .= "</form>";
-			
-		}
-		else
-		{
-			
-		}*/
 		return array(getLanguageValue("button_category_edit"), $pagecontent);
 	}
 
@@ -506,7 +479,7 @@ echo $html;
 				) 
 			) {
 			$pagecontent = "<h2>".getLanguageValue("button_site_new")."</h2>";
-			$pagecontent .= "<h3>".getLanguageValue("chosen_category")." ".substr($_POST['cat'], 3, strlen($_POST['cat'])-3)."</h3>";
+			$pagecontent .= "<h3>".getLanguageValue("chosen_category")." ".$specialchars->rebuildSpecialChars(substr($_POST['cat'], 3, strlen($_POST['cat'])-3))."</h3>";
 			if (isset($_POST['position']) && isset($_POST['name'])) {
 				if (strlen($_POST['name']) == 0)
 					$pagecontent .= returnMessage(false, getLanguageValue("page_empty"));
@@ -660,10 +633,13 @@ echo $html;
 		    	$pagecontent .= returnMessage(false, $_FILES['uploadfile']['name'].": ".getLanguageValue("gallery_uploadfile_wrongtype"));
 		    elseif (file_exists("../inhalt/".$_POST['cat']."/galerie/".$_FILES['uploadfile']['name']))
 		    	$pagecontent .= returnMessage(false, $_FILES['uploadfile']['name'].": ".getLanguageValue("gallery_uploadfile_exists"));
-		    else {
+		    elseif (!preg_match("/^[a-zA-Z0-9_\-äöüÄÖÜß.]+$/", $_FILES['uploadfile']['name'])) {
+		    	$pagecontent .= returnMessage(false, getLanguageValue("invalid_values"));
+		  	}
+		  	else {
 		    	move_uploaded_file($_FILES['uploadfile']['tmp_name'], "../inhalt/".$_POST['cat']."/galerie/".$_FILES['uploadfile']['name']);
 					$galleryconf = new Properties("../inhalt/".$_POST['cat']."/galerie/texte.conf");
-					$galleryconf->set($_FILES['uploadfile']['name'], htmlentities($_POST['comment']));
+					$galleryconf->set($_FILES['uploadfile']['name'], htmlentities(stripslashes($_POST['comment'])));
 		    	$pagecontent .= returnMessage(true, getLanguageValue("gallery_upload_success"));
 			  }
 			}
@@ -712,7 +688,7 @@ echo $html;
 			$pagecontent = "<h2>".getLanguageValue("button_gallery_edit")."</h2>";
 			// Wenn "Speichern" gedrückt wurde
 			if (isset($_GET['save'])) {
-				$galleryconf->set($_GET['image'], htmlentities($_GET['comment']));
+				$galleryconf->set($_GET['image'], htmlentities(stripslashes($_GET['comment'])));
 				$pagecontent .= returnMessage(true, getLanguageValue("changes_applied"));
 			} 
 			// Wenn "Löschen" gedrückt wurde
@@ -903,7 +879,15 @@ echo $html;
 		if (isset($_GET['apply']) && ($_GET['apply'] == "true")) {
 			$changesapplied = false;
 			if (isset($_GET['gmw']) && isset($_GET['gmh'])) {
-				if(preg_match("/^[0-9]+$/", $_GET['gmw']) && preg_match("/^[0-9]+$/", $_GET['gmh']) && ($_GET['title'] <> "") && ($_GET['template'] <> "") && ($_GET['css'] <> "") && ($_GET['favicon'] <> "") && ($_GET['dcat'] <> "")) {
+				if(
+					preg_match("/^[0-9]+$/", $_GET['gmw']) 
+					&& preg_match("/^[0-9]+$/", $_GET['gmh']) 
+					&& ($_GET['title'] <> "") 
+					&& ($_GET['template'] <> "") 
+					&& ($_GET['css'] <> "") 
+					&& ($_GET['favicon'] <> "") 
+					&& ($_GET['dcat'] <> "") 
+					) {
 					$CMS_CONF->set("gallerymaxwidth", $_GET['gmw']);
 					$CMS_CONF->set("gallerymaxheight", $_GET['gmh']);
 					$CMS_CONF->set("websitetitle", htmlentities($_GET['title']));
@@ -911,6 +895,10 @@ echo $html;
 					$CMS_CONF->set("cssfile", $_GET['css']);
 					$CMS_CONF->set("faviconfile", $_GET['favicon']);
 					$CMS_CONF->set("defaultcat", $specialchars->deleteSpecialChars($_GET['dcat']));
+					if ($_GET['usesyntax'] == "on")
+						$CMS_CONF->set("usecmssyntax", "true");
+					else
+						$CMS_CONF->set("usecmssyntax", "false");
 					$pagecontent .= returnMessage(true, getLanguageValue("changes_applied"));
 				}
 				else
@@ -967,6 +955,14 @@ echo $html;
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallerymaxheight_text")."</td>";
 		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"gmh\" value=\"".$CMS_CONF->get("gallerymaxheight")."\" /></td>";
+		$pagecontent .= "</tr>";
+		// Zeile "NUTZE CMS-SYNTAX"
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("usesyntax_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"checkbox\" ";
+		if ($CMS_CONF->get("usecmssyntax") == "true")
+			$pagecontent .= "checked=checked";
+		$pagecontent .= " name=\"usesyntax\">".getLanguageValue("usesyntax_text2")."</td>";
 		$pagecontent .= "</tr>";
 		// Zeile "ÜBERNEHMEN"
 		$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td><td class=\"config_row2\"><input type=\"submit\" class=\"submit\" value=\"".getLanguageValue("config_submit")."\"/></td></tr>";
@@ -1035,7 +1031,7 @@ echo $html;
 		$pagecontent .= "<h2>".getLanguageValue("button_config_loginadmin")."</h2>";
 		$adminconf = new Properties("conf/logindata.conf");
 		require_once("Crypt.php");
-		$pwcrypt = new Crypt("send \"i cracked the code\" to codecracked@azett.com");
+		$pwcrypt = new Crypt("send 'i cracked your silly code' to codecracked@azett.com");
 		// Übergebene Werte prüfen
 		if ($_POST['apply'] == "true") {
 			if (
@@ -1191,65 +1187,64 @@ echo $html;
 			return "<span class=\"fehler\">".$message."</span>";
 	}
 	
-	function returnToolbar()
-	{
-	$js .= "<script type=\"text/javascript\">";
-	$js .= "<!--";
-	$js .= "function insert(aTag, eTag) {";
-  $js .= "var input = document.forms['form'].elements['pagecontent'];";
-  $js .= "input.focus();";
-  /* für Internet Explorer */
-  $js .= "if(typeof document.selection != 'undefined') {";
-  /* Einfügen des Formatierungscodes */
-  $js .=  "var range = document.selection.createRange();";
-  $js .=  "var insText = range.text;";
-  $js .=  "range.text = aTag + insText + eTag;";
-    /* Anpassen der Cursorposition */
-  $js .=  "range = document.selection.createRange();";
-  $js .=  "if (insText.length == 0) {";
-  $js .=  "range.move('character', -eTag.length);";
-  $js .=  "} else {";
-  $js .=  "range.moveStart('character', aTag.length + insText.length + eTag.length);";
-  $js .=  "}";
-  $js .=  "range.select();";
-  $js .=  "}";
-  /* für neuere auf Gecko basierende Browser */
-  $js .=  "else if(typeof input.selectionStart != 'undefined')";
-  $js .=  "{";
-  /* Einfügen des Formatierungscodes */
-  $js .=  "var start = input.selectionStart;";
-  $js .=  "var end = input.selectionEnd;";
-  $js .=  "var insText = input.value.substring(start, end);";
-  $js .=  "input.value = input.value.substr(0, start) + aTag + insText + eTag + input.value.substr(end);";
-    /* Anpassen der Cursorposition */
-  $js .=  "var pos;";
-  $js .=  "if (insText.length == 0) {";
-  $js .=  "pos = start + aTag.length;";
-  $js .=  "} else {";
-  $js .=  "pos = start + aTag.length + insText.length + eTag.length;";
-  $js .=  "}";
-  $js .=  "input.selectionStart = pos;";
-  $js .=  "input.selectionEnd = pos;";
-  $js .=  "}";
-  /* für die übrigen Browser */
-  $js .=  "else";
-  $js .=  "{";
-  /* Abfrage der Einfügeposition */
-  $js .=  "var pos;";
-  $js .=  "var re = new RegExp('^[0-9]{0,3}$');";
-  $js .=  "while(!re.test(pos)) {";
-  $js .=  "pos = prompt(\"Einfügen an Position (0..\" + input.value.length + \"):\", \"0\");";
-  $js .=  "}";
-  $js .=  "if(pos > input.value.length) {";
-  $js .=  "pos = input.value.length;";
-  $js .=  "}";
-  /* Einfügen des Formatierungscodes */
-  $js .=  "var insText = prompt(\"Bitte geben Sie den zu formatierenden Text ein:\");";
-  $js .=  "input.value = input.value.substr(0, pos) + aTag + insText + eTag + input.value.substr(pos);";
-  $js .=  "}";
-	$js .=  "}";
-	$js .=  "//-->";
-  $js .=  "</script>";
-  
-  return $js;
+	function returnToolbar() {
+		$js .= "<script type=\"text/javascript\">";
+		$js .= "<!--";
+		$js .= "function insert(aTag, eTag) {";
+	  $js .= "var input = document.forms['form'].elements['pagecontent'];";
+	  $js .= "input.focus();";
+	  /* für Internet Explorer */
+	  $js .= "if(typeof document.selection != 'undefined') {";
+	  /* Einfügen des Formatierungscodes */
+	  $js .=  "var range = document.selection.createRange();";
+	  $js .=  "var insText = range.text;";
+	  $js .=  "range.text = aTag + insText + eTag;";
+	    /* Anpassen der Cursorposition */
+	  $js .=  "range = document.selection.createRange();";
+	  $js .=  "if (insText.length == 0) {";
+	  $js .=  "range.move('character', -eTag.length);";
+	  $js .=  "} else {";
+	  $js .=  "range.moveStart('character', aTag.length + insText.length + eTag.length);";
+	  $js .=  "}";
+	  $js .=  "range.select();";
+	  $js .=  "}";
+	  /* für neuere auf Gecko basierende Browser */
+	  $js .=  "else if(typeof input.selectionStart != 'undefined')";
+	  $js .=  "{";
+	  /* Einfügen des Formatierungscodes */
+	  $js .=  "var start = input.selectionStart;";
+	  $js .=  "var end = input.selectionEnd;";
+	  $js .=  "var insText = input.value.substring(start, end);";
+	  $js .=  "input.value = input.value.substr(0, start) + aTag + insText + eTag + input.value.substr(end);";
+	    /* Anpassen der Cursorposition */
+	  $js .=  "var pos;";
+	  $js .=  "if (insText.length == 0) {";
+	  $js .=  "pos = start + aTag.length;";
+	  $js .=  "} else {";
+	  $js .=  "pos = start + aTag.length + insText.length + eTag.length;";
+	  $js .=  "}";
+	  $js .=  "input.selectionStart = pos;";
+	  $js .=  "input.selectionEnd = pos;";
+	  $js .=  "}";
+	  /* für die übrigen Browser */
+	  $js .=  "else";
+	  $js .=  "{";
+	  /* Abfrage der Einfügeposition */
+	  $js .=  "var pos;";
+	  $js .=  "var re = new RegExp('^[0-9]{0,3}$');";
+	  $js .=  "while(!re.test(pos)) {";
+	  $js .=  "pos = prompt(\"Einfügen an Position (0..\" + input.value.length + \"):\", \"0\");";
+	  $js .=  "}";
+	  $js .=  "if(pos > input.value.length) {";
+	  $js .=  "pos = input.value.length;";
+	  $js .=  "}";
+	  /* Einfügen des Formatierungscodes */
+	  $js .=  "var insText = prompt(\"Bitte geben Sie den zu formatierenden Text ein:\");";
+	  $js .=  "input.value = input.value.substr(0, pos) + aTag + insText + eTag + input.value.substr(pos);";
+	  $js .=  "}";
+		$js .=  "}";
+		$js .=  "//-->";
+	  $js .=  "</script>";
+	  
+	  return $js;
 	}

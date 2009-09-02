@@ -55,6 +55,10 @@ INHALT
 	if ($FAVICON_FILE == "")
 		$FAVICON_FILE = "favicon.ico";
 
+	$USE_CMS_SYNTAX			= true;
+	if ($mainconfig->get("usecmssyntax") == "false")
+		$USE_CMS_SYNTAX = false;
+
 
 	$CONTENT_DIR_REL		= "inhalt";
 	$CONTENT_DIR_ABS 		= getcwd() . "/$CONTENT_DIR_REL";
@@ -118,6 +122,7 @@ INHALT
 		global $HTML;
 		global $FAVICON_FILE;
 		global $TEMPLATE_FILE;
+		global $USE_CMS_SYNTAX;
 		global $WEBSITE_TITLE;
 		// Template-Datei auslesen
     if (!$file = @fopen($TEMPLATE_FILE, "r"))
@@ -129,9 +134,13 @@ INHALT
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
     $HTML = preg_replace('/{WEBSITE_TITLE}/', $WEBSITE_TITLE, $HTML);
-    $HTML = preg_replace('/{CONTENT}/', convertContent(getContent(), true), $HTML);
+    if ($USE_CMS_SYNTAX)
+    	$HTML = preg_replace('/{CONTENT}/', convertContent(getContent(), true), $HTML);
+    else
+    	$HTML = preg_replace('/{CONTENT}/', getContent(), $HTML);
     $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
     $HTML = preg_replace('/{DETAILMENU}/', getDetailMenu(), $HTML);
+    $HTML = preg_replace('/{LASTCHANGE}/', getLastChangedContentPage(), $HTML);
 	}
 
 
@@ -289,6 +298,48 @@ INHALT
 	}
 
 
+
+// ------------------------------------------------------------------------------
+// Einlesen des Inhalts-Verzeichnisses, Rückgabe der zuletzt geänderten Datei
+// ------------------------------------------------------------------------------
+	function getLastChangedContentPage(){
+		global $specialchars;
+		$latestchanged = array("cat" => "catname", "file" => "filename", "time" => 0);
+		$currentdir = opendir("inhalt");
+		while ($file = readdir($currentdir)) {
+			if (($file <> ".") && ($file <> "..")) {
+				$latestofdir = getLastChangeOfCat("inhalt/".$file);
+				if ($latestofdir['time'] > $latestchanged['time']) {
+					$latestchanged['cat'] = $file;
+					$latestchanged['file'] = $latestofdir['file'];
+					$latestchanged['time'] = $latestofdir['time'];
+				}
+	    }
+		}
+		return "<a href=\"index.php?cat=".$latestchanged['cat']."&amp;page=".substr($latestchanged['file'], 0, strlen($latestchanged['file'])-4)."\" title=\"Inhaltsseite &quot;".$specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7))."&quot; anzeigen\" class=\"latestchangedlink\">".$specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7))."</a> (".strftime("%d.%m.%Y, %H:%M:%S", date($latestchanged['time'])).")";
+	}
+
+
+
+// ------------------------------------------------------------------------------
+// Einlesen eines Kategorie-Verzeichnisses, Rückgabe der zuletzt geänderten Datei
+// ------------------------------------------------------------------------------
+	function getLastChangeOfCat($dir){
+		$latestchanged = array("file" => "filename", "time" => 0);
+		$currentdir = opendir($dir);
+		while ($file = readdir($currentdir)) {
+			if (is_file($dir."/".$file)) {
+				if (filemtime($dir."/".$file) > $latestchanged['time']) {
+					$latestchanged['file'] = $file;
+					$latestchanged['time'] = filemtime($dir."/".$file);
+				}
+	    }
+		}
+		return $latestchanged;
+	}
+
+
+
 // ------------------------------------------------------------------------------
 // Umsetzung der übergebenen CMS-Syntax in HTML, Rückgabe als String
 // ------------------------------------------------------------------------------
@@ -296,6 +347,7 @@ INHALT
 		global $CONTENT_DIR_ABS;
 		global $CONTENT_DIR_REL;
 		global $CONTENT_FILES_DIR;
+		global $CONTENT_GALLERY_DIR;
 		global $CAT_REQUEST;
 		global $CONTENT_EXTENSION;
 		global $specialchars;
@@ -369,7 +421,14 @@ INHALT
 
 			// Galerie mit Bildern aus dem Galerieverzeichnis
 			elseif ($attribute == "galerie"){
-				$content = str_replace ($match, "<a href=\"galerie.php?cat=$CAT_REQUEST\" title=\"$value\" target=\"_blank\">$value</a>", $content);
+				$handle = opendir("./$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_GALLERY_DIR");
+				$i=0;
+				while ($file = readdir($handle)) {
+					if (is_file("./$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_GALLERY_DIR/".$file)) {
+	    			$i++;
+	    		}
+				}
+				$content = str_replace ($match, "<a href=\"galerie.php?cat=$CAT_REQUEST\" title=\"Galerie &quot;$value&quot; ($i Bilder) ansehen\" target=\"_blank\">$value</a>", $content);
 			}
 
 			// Bild aus dem Dateiverzeichnis (überprüfen, ob Bilddatei existiert)

@@ -9,7 +9,7 @@ session_start();
 
 // Überprüfen: Existiert ein Benutzer? Wenn nicht: admin:install anlegen
 $adminconf = new Properties("conf/logindata.conf");
-$pwcrypt = new Crypt("send \"i cracked the code\" to codecracked@azett.com");
+$pwcrypt = new Crypt("send 'i cracked your silly code' to codecracked@azett.com");
 if (($adminconf->get("name") == "") || ($adminconf->get("pw") == "")) {
 	$adminconf->set("name", "admin");
 	$adminconf->set("pw", $pwcrypt->encrypt("install"));

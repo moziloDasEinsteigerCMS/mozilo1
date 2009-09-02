@@ -904,7 +904,7 @@ div.fehler
 	top: 100px;
 	border: 1px solid red;
 	width: 350px;
-	/*margin-left: -175px;*/
+	margin-left: -175px;
 	padding: 10px;
 	left: 50%;
 	position: absolute;

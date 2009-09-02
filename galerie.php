@@ -72,7 +72,7 @@ function createGallery($mypics) {
 	global $mainconf;
 	$alldescriptions = new Properties($DIR_GALLERY."texte.conf");
 	$gallery = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"><html><head><style type=\"text/css\"> @import \"".$mainconf->get("cssfile")."\"; </style><title>".$mainconf->get("websitetitle")."</title><link rel=\"SHORTCUT ICON\" href=\"".$mainconf->get("faviconfile")."\" /></head><body>";
-	$gallery .= "<div class=\"main\"><div class=\"fullheight\"></div><div class=\"header\"></div><div class=\"catcontent\" style=\"width:100%;\">";
+	$gallery .= "<div class=\"main\" style=\"text-align:center;\"><div class=\"fullheight\"></div><div class=\"header\"></div><div class=\"catcontent\" style=\"width:99%;float:left;\">";
 	// Überprüfen, ob Galerie leer ist
 	if (count($mypics) == 0) {
 		$gallery .= "<div class=\"pagecontent\" style=\"text-align:center;\">Diese Galerie enth&auml;lt keine Bilder.</div>";
@@ -114,9 +114,10 @@ function createGallery($mypics) {
 		else
 			$linkclass = "detailmenu";
 		$gallery .= "<a href=\"galerie.php?cat=$CAT_REQUEST&amp;index=$last\" class=\"$linkclass\">Letztes Bild</a>";
-		
-		
 		$gallery .= "</div>";
+		
+		$gallery .= "<div class=\"detailmenu\" style=\"text-align:center;width:".$MAX_IMG_WIDTH."px;float:none;margin:0px auto;line-height:16px;\">".getPicNumberLinks($first, $index, $last, $CAT_REQUEST)."</div>";
+		
 		$gallery .= "<div class=\"pagecontent\" style=\"text-align:center;\"><a href=\"".$DIR_GALLERY.$mypics[$index-1]."\" target=\"_blank\" title=\"Vollbildanzeige: ".$mypics[$index-1]."\">";
 		// Bilder für die Anzeige verkleinern
 		if (extension_loaded('gd')) {
@@ -133,10 +134,10 @@ function createGallery($mypics) {
 				$h=$MAX_IMG_HEIGHT;
 				$w=round(($MAX_IMG_HEIGHT*$size[0])/$size[1]);
 			}
-			$gallery .= "<img class=\"gallery\" src=\"".$DIR_GALLERY.$mypics[$index-1]."\" alt=\"Galeriebild &quot;".$mypics[$index-1]."&quot;\"  style=\"width:".$w."px;height:".$h."px;\"/>";
+			$gallery .= "<img src=\"".$DIR_GALLERY.$mypics[$index-1]."\" alt=\"Galeriebild &quot;".$mypics[$index-1]."&quot;\"  style=\"width:".$w."px;height:".$h."px;\"/>";
 		}
 		else
-			$gallery .= "<img src=\"".$DIR_GALLERY.$mypics[$index-1]."\" alt=\"Galeriebild &quot;".$mypics[$index-1]."&quot;\"  style=\"max-width:".$MAX_IMG_WIDTH."px;max-height:".$MAX_IMG_HEIGHT."px;\"/>";
+			$gallery .= "<img src=\"".$DIR_GALLERY.$mypics[$index-1]."\" alt=\"Galeriebild &quot;".$mypics[$index-1]."&quot;\"  style=\"width:".$MAX_IMG_WIDTH."px;width:inherit;height:inherit;max-width:".$MAX_IMG_WIDTH."px;max-height:".$MAX_IMG_HEIGHT."px;\"/>";
 			$gallery .= "</a><br /><br />".$alldescriptions->get($mypics[$index-1])."<br /><br />(Bild $index von $last)</div>";
 	}
 	$gallery .= "</div>";
@@ -144,4 +145,20 @@ function createGallery($mypics) {
 	$gallery .= "</body>";
 	return $gallery;
 }
+
+
+// ------------------------------------------------------------------------------
+// Anzeige aller Bilder als Direktlinks; Kürzung der Anzeige, wenn zuviele
+// ------------------------------------------------------------------------------
+function getPicNumberLinks($first, $current, $last, $cat) {
+	$piclinks = "";
+	for ($i=$first; $i<=$last; $i++) {
+		if ($current == $i)
+			$piclinks .= "<em class=\"bold\">".$i."</em> | ";
+		else
+			$piclinks .= "<a href=\"galerie.php?cat=".$cat."&amp;index=".$i."\">".$i."</a> | ";
+	}
+	return substr($piclinks, 0, strlen($piclinks)-2);
+}
+
 ?>
