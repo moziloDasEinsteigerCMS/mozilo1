@@ -67,6 +67,7 @@ INHALT
 	$CONTENT_EXTENSION	= ".txt";
 	$CAT_REQUEST 				= $_GET['cat'];
 	$PAGE_REQUEST 			= $_GET['page'];
+	$ACTION_REQUEST 		= $_GET['action'];
 	
 	$CONTENT 						= "";
 	$HTML								= "";
@@ -89,6 +90,7 @@ INHALT
 		global $CONTENT_GALLERY_DIR;
 		global $CONTENT_EXTENSION;
 		global $DEFAULT_CATEGORY;
+		global $ACTION_REQUEST;
 		global $CAT_REQUEST;
 		global $PAGE_REQUEST;
 		// Überprüfung der gegebenen Parameter
@@ -111,6 +113,11 @@ INHALT
 		if (($PAGE_REQUEST == "") || (!file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$CONTENT_EXTENSION")))
 			//...erste Contentseite der Kategorie setzen
 			$PAGE_REQUEST = substr($pagesarray[0], 0, strlen($pagesarray[0]) - strlen($CONTENT_EXTENSION));
+		// Wenn ein Action-Parameter übergeben wurde: keine aktiven Kat./Inhaltts. anzeigen
+		if (isset($ACTION_REQUEST)) {
+			$CAT_REQUEST = "";
+			$PAGE_REQUEST = "";
+		}
 	}
 	
 	
@@ -124,6 +131,7 @@ INHALT
 		global $TEMPLATE_FILE;
 		global $USE_CMS_SYNTAX;
 		global $WEBSITE_TITLE;
+		global $ACTION_REQUEST;
 		// Template-Datei auslesen
     if (!$file = @fopen($TEMPLATE_FILE, "r"))
         die("'$TEMPLATE_FILE' fehlt! Bitte kontaktieren Sie den Administrator.");
@@ -134,13 +142,16 @@ INHALT
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
     $HTML = preg_replace('/{WEBSITE_TITLE}/', $WEBSITE_TITLE, $HTML);
-    if ($USE_CMS_SYNTAX)
+    if ($ACTION_REQUEST == "sitemap")
+    	$HTML = preg_replace('/{CONTENT}/', getSiteMap(), $HTML);
+    elseif ($USE_CMS_SYNTAX)
     	$HTML = preg_replace('/{CONTENT}/', convertContent(getContent(), true), $HTML);
     else
     	$HTML = preg_replace('/{CONTENT}/', getContent(), $HTML);
     $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
     $HTML = preg_replace('/{DETAILMENU}/', getDetailMenu(), $HTML);
     $HTML = preg_replace('/{LASTCHANGE}/', getLastChangedContentPage(), $HTML);
+    $HTML = preg_replace('/{SITEMAPLINK}/', "<a href=\"index.php?action=sitemap\" class=\"latestchangedlink\" title=\"Sitemap anzeigen\">Sitemap</a>", $HTML);
 	}
 
 
@@ -273,6 +284,9 @@ INHALT
 		global $PAGE_REQUEST;
 		global $CONTENT_EXTENSION;
 		global $specialchars;
+		// Wurde keine Kategorie übergeben, dann leeres Detailmenü ausgeben
+		if ($CAT_REQUEST == "")
+			return "<a href=\"index.php?action=sitemap\" class=\"detailmenuactive\">Sitemap</a>";
 		$detailmenu = "";
 		// Content-Verzeichnis der aktuellen Kategorie einlesen
 		$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR));
@@ -428,7 +442,7 @@ INHALT
 	    			$j++;
 	    		}
 				}
-				$content = str_replace ($match, "<a href=\"galerie.php?cat=$CAT_REQUEST\" title=\"Galerie &quot;$value&quot; ($j Bilder) ansehen\" target=\"_blank\">$value</a>", $content);
+				$content = str_replace ($match, "<a href=\"gallery.php?cat=$CAT_REQUEST\" title=\"Galerie &quot;$value&quot; ($j Bilder) ansehen\" target=\"_blank\">$value</a>", $content);
 			}
 
 			// Bild aus dem Dateiverzeichnis (überprüfen, ob Bilddatei existiert)
@@ -523,5 +537,43 @@ INHALT
 			
 		// Konvertierten Seiteninhalt zurückgeben
     return $content;
+	}
+
+
+
+// ------------------------------------------------------------------------------
+// Erzeugung einer Sitemap
+// ------------------------------------------------------------------------------
+	function getSiteMap() {
+		global $CONTENT_DIR_ABS;
+		global $CONTENT_EXTENSION;
+		global $CONTENT_FILES_DIR;
+		global $CONTENT_GALLERY_DIR;
+		global $specialchars;
+		$sitemap = "<h1>Sitemap</h1>";
+		// Kategorien-Verzeichnis einlesen
+		$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, array());
+		// Jedes Element des Arrays an die Sitemap anhängen
+		foreach ($categoriesarray as $currentcategory) {
+			// Wenn die Kategorie keine Contentseiten hat, zeige sie nicht an
+			if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR)) == "")
+				continue;
+			$sitemap .= "<h2>".substr($specialchars->rebuildSpecialChars($currentcategory), 3, strlen($currentcategory))."</h2><ul>";
+			// Alle Inhaltsseiten der aktuellen Kategorie auflisten...
+			$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR));
+			// Jedes Element des Arrays an die Sitemap anhängen
+			foreach ($contentarray as $currentcontent) {
+				$sitemap .= "<li><a href=\"index.php?cat=$currentcategory&amp;page=".
+													substr($currentcontent, 0, strlen($currentcontent) - strlen($CONTENT_EXTENSION)).
+													"\" title=\"Inhaltsseite &quot;".
+													substr($specialchars->rebuildSpecialChars($currentcontent), 3, strlen($currentcontent) - strlen($CONTENT_EXTENSION) - 3).
+													"&quot; anzeigen\">".
+													substr($specialchars->rebuildSpecialChars($currentcontent), 3, strlen($currentcontent) - strlen($CONTENT_EXTENSION) - 3).
+													"</a></li>";
+			}
+			$sitemap .= "</ul>";
+		}
+		// Rückgabe des Menüs
+		return $sitemap;
 	}
 ?>

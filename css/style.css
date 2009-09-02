@@ -76,6 +76,16 @@ div.catcontent {
 
 
 /* -------------------------------------------------------- */
+/* Detailmenü und Seiteninhalt (Galerie) */
+/* ------------------------------------- */
+div.gallerycontent {
+	width:99%;
+	overflow:hidden;
+	text-align:center;
+}
+
+
+/* -------------------------------------------------------- */
 /* Hauptmenü */
 /* --------- */
 div.mainmenu {
@@ -87,12 +97,35 @@ div.mainmenu {
 
 
 /* -------------------------------------------------------- */
+/* Hauptmenü (Galerie) */
+/* ------------------- */
+div.gallerymenu {
+	padding:6px 8px 0px 8px;
+	line-height:30px;
+	text-align:center;
+}
+
+
+/* -------------------------------------------------------- */
 /* Detailmenü */
 /* ---------- */
 div.detailmenu {
 	padding:6px 8px 0px 8px;
 	line-height:30px;
 	text-align:left;
+}
+
+
+/* -------------------------------------------------------- */
+/* Detailmenü (Galerie) */
+/* -------------------- */
+div.gallerynumbermenu {
+	padding:6px 8px 0px 8px;
+	line-height:30px;
+	text-align:center;width:99%;
+	float:none;
+	margin:0px auto;
+	line-height:16px;
 }
 
 

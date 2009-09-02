@@ -895,6 +895,7 @@ echo $html;
 					&& preg_match("/^[0-9]+$/", $_GET['gmh']) 
 					&& ($_GET['title'] <> "") 
 					&& ($_GET['template'] <> "") 
+					&& ($_GET['gallerytemplate'] <> "") 
 					&& ($_GET['css'] <> "") 
 					&& ($_GET['favicon'] <> "") 
 					&& ($_GET['dcat'] <> "") 
@@ -903,6 +904,7 @@ echo $html;
 					$CMS_CONF->set("gallerymaxheight", $_GET['gmh']);
 					$CMS_CONF->set("websitetitle", htmlentities($_GET['title']));
 					$CMS_CONF->set("templatefile", $_GET['template']);
+					$CMS_CONF->set("gallerytemplatefile", $_GET['gallerytemplate']);
 					$CMS_CONF->set("cssfile", $_GET['css']);
 					$CMS_CONF->set("faviconfile", $_GET['favicon']);
 					$CMS_CONF->set("defaultcat", $specialchars->deleteSpecialChars($_GET['dcat']));
@@ -928,6 +930,11 @@ echo $html;
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("template_text")."</td>";
 		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"template\" value=\"".$CMS_CONF->get("templatefile")."\" /></td>";
+		$pagecontent .= "</tr>";
+		// Zeile "GALERIE-TEMPLATE"
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallerytemplate_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"gallerytemplate\" value=\"".$CMS_CONF->get("gallerytemplatefile")."\" /></td>";
 		$pagecontent .= "</tr>";
 		// Zeile "CSS-DATEI"
 		$pagecontent .= "<tr>";
@@ -1070,7 +1077,7 @@ echo $html;
 		$pagecontent .= "<p>";
 		$pagecontent .= getLanguageValue("config_adminlogin_text");
 		$pagecontent .= "</p>";
-		$pagecontent .= "<form action=\"index.php\" method=\"post\"><input type=\"hidden\" name=\"action\" value=\"displayadminconfig\"><input type=\"hidden\" name=\"apply\" value=\"true\">";
+		$pagecontent .= "<form action=\"index.php\" method=\"post\"><input type=\"hidden\" name=\"apply\" value=\"true\">";
 		$pagecontent .= "<table class=\"data\">";
 		// Zeile "ALTER NAME"
 		$pagecontent .= "<tr>";
@@ -1107,6 +1114,7 @@ echo $html;
 	
 	// Anzeige der Editieransicht
 	function showEditPageForm($cat, $page, $action)	{
+		global $CMS_CONF;
 		global $specialchars;
 		$file = "../inhalt/".$cat."/".$page;
 		if (file_exists($file)) {
@@ -1117,26 +1125,28 @@ echo $html;
 		else
 			$pagecontent = "[ueber1|".substr($page, 3,strlen($page)-7)."]";
 		
-		// Toolbar
-		$content .="<p class=\"toolbar\"><img class=\"js\" title=\"[link| ... ]\" alt=\"Link\" src=\"gfx/jsToolbar/link.png\" onClick=\"insert('[link|', ']')\">";
-    $content .="<img class=\"js\" alt=\"eMail\" title=\"[mail| ... ]\" src=\"gfx/jsToolbar/mail.png\" onClick=\"insert('[mail|', ']')\">";
-    $content .="<img class=\"js\" alt=\"Seite\"	title=\"[seite| ... ]\" src=\"gfx/jsToolbar/seite.png\" onClick=\"insert('[seite|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Kategorie\"	title=\"[kategorie| ... ]\" src=\"gfx/jsToolbar/kategorie.png\" onClick=\"insert('[kategorie|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Datei\" title=\"[datei| ... ]\" src=\"gfx/jsToolbar/datei.png\" onClick=\"insert('[datei|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Galerie\"	title=\"[galerie| ... ]\" src=\"gfx/jsToolbar/galerie.png\" onClick=\"insert('[galerie|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Bild\" title=\"[bild| ... ]\" src=\"gfx/jsToolbar/bild.png\" onClick=\"insert('[bild|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Bildlinks\"	title=\"[bildlinks| ... ]\" src=\"gfx/jsToolbar/bildlinks.png\" onClick=\"insert('[bildlinks|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Bildrechts\" title=\"[bildrechts| ... ]\" src=\"gfx/jsToolbar/bildrechts.png\" onClick=\"insert('[bildrechts|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Fett\" title=\"[fett| ... ]\" src=\"gfx/jsToolbar/fett.png\" onClick=\"insert('[fett|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Kursiv\" title=\"[kursiv| ... ]\" src=\"gfx/jsToolbar/kursiv.png\" onClick=\"insert('[kursiv|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Fettkursiv\" title=\"[fettkursiv| ... ]\" src=\"gfx/jsToolbar/fettkursiv.png\" onClick=\"insert('[fettkursiv|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Überschrift1\" title=\"[ueber1| ... ]\" src=\"gfx/jsToolbar/ueber1.png\" onClick=\"insert('[ueber1|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Überschrift2\" title=\"[ueber2| ... ]\" src=\"gfx/jsToolbar/ueber2.png\" onClick=\"insert('[ueber2|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Überschrift3\" title=\"[ueber3| ... ]\" src=\"gfx/jsToolbar/ueber3.png\" onClick=\"insert('[ueber3|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Liste1\" title=\"[liste1| ... ]\" src=\"gfx/jsToolbar/liste1.png\" onClick=\"insert('[liste1|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Liste2\" title=\"[liste2| ... ]\" src=\"gfx/jsToolbar/liste2.png\" onClick=\"insert('[liste2|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Liste3\" title=\"[liste3| ... ]\" src=\"gfx/jsToolbar/liste3.png\" onClick=\"insert('[liste3|', ']')\">";
-  	$content .="<img class=\"js\" alt=\"Horizontale Linie\" title=\"[----]\" src=\"gfx/jsToolbar/linie.png\" onClick=\"insert('[----]', '')\"></p>";
+		if ($CMS_CONF->get("usecmssyntax") == "true") {
+			// Toolbar
+			$content .="<p class=\"toolbar\"><img class=\"js\" title=\"[link| ... ]\" alt=\"Link\" src=\"gfx/jsToolbar/link.png\" onClick=\"insert('[link|', ']')\">";
+	    $content .="<img class=\"js\" alt=\"eMail\" title=\"[mail| ... ]\" src=\"gfx/jsToolbar/mail.png\" onClick=\"insert('[mail|', ']')\">";
+	    $content .="<img class=\"js\" alt=\"Seite\"	title=\"[seite| ... ]\" src=\"gfx/jsToolbar/seite.png\" onClick=\"insert('[seite|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Kategorie\"	title=\"[kategorie| ... ]\" src=\"gfx/jsToolbar/kategorie.png\" onClick=\"insert('[kategorie|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Datei\" title=\"[datei| ... ]\" src=\"gfx/jsToolbar/datei.png\" onClick=\"insert('[datei|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Galerie\"	title=\"[galerie| ... ]\" src=\"gfx/jsToolbar/galerie.png\" onClick=\"insert('[galerie|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Bild\" title=\"[bild| ... ]\" src=\"gfx/jsToolbar/bild.png\" onClick=\"insert('[bild|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Bildlinks\"	title=\"[bildlinks| ... ]\" src=\"gfx/jsToolbar/bildlinks.png\" onClick=\"insert('[bildlinks|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Bildrechts\" title=\"[bildrechts| ... ]\" src=\"gfx/jsToolbar/bildrechts.png\" onClick=\"insert('[bildrechts|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Fett\" title=\"[fett| ... ]\" src=\"gfx/jsToolbar/fett.png\" onClick=\"insert('[fett|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Kursiv\" title=\"[kursiv| ... ]\" src=\"gfx/jsToolbar/kursiv.png\" onClick=\"insert('[kursiv|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Fettkursiv\" title=\"[fettkursiv| ... ]\" src=\"gfx/jsToolbar/fettkursiv.png\" onClick=\"insert('[fettkursiv|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Überschrift1\" title=\"[ueber1| ... ]\" src=\"gfx/jsToolbar/ueber1.png\" onClick=\"insert('[ueber1|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Überschrift2\" title=\"[ueber2| ... ]\" src=\"gfx/jsToolbar/ueber2.png\" onClick=\"insert('[ueber2|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Überschrift3\" title=\"[ueber3| ... ]\" src=\"gfx/jsToolbar/ueber3.png\" onClick=\"insert('[ueber3|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Liste1\" title=\"[liste1| ... ]\" src=\"gfx/jsToolbar/liste1.png\" onClick=\"insert('[liste1|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Liste2\" title=\"[liste2| ... ]\" src=\"gfx/jsToolbar/liste2.png\" onClick=\"insert('[liste2|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Liste3\" title=\"[liste3| ... ]\" src=\"gfx/jsToolbar/liste3.png\" onClick=\"insert('[liste3|', ']')\">";
+	  	$content .="<img class=\"js\" alt=\"Horizontale Linie\" title=\"[----]\" src=\"gfx/jsToolbar/linie.png\" onClick=\"insert('[----]', '')\"></p>";
+	  }
 
 		// Seiteninhalt
 		$content .= "<textarea name=\"pagecontent\">".$pagecontent."</textarea>";
