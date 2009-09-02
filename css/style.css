@@ -1,0 +1,189 @@
+* {
+	font-family:verdana,tahoma,arial,sans-serif;
+	font-size:11px;
+}
+
+html, body {
+	margin:0px;
+	padding:0px;
+}
+
+body 	{
+	background-color:#FFFFFF;
+	margin:0px;
+	padding:0px;
+	text-align:center;
+}
+
+div.fullheight {
+	float:right;
+	height:100%;
+}
+
+div.main {
+	width:780px;
+	height:100%;
+	height:inherit;
+	min-height:100%;
+	margin:0px auto;
+	background-color:#FFFFFF;
+	text-align:justify;
+	border-left:2px solid #C0C0C0;
+	border-right:2px solid #C0C0C0;
+}
+
+div.header {
+	background-color:#FFFFFF;
+	background-image:url("../grafiken/mozilo.jpg");
+         background-repeat:no-repeat;
+         height:150px;
+}
+
+div.catcontent {
+	float:right;
+	width:620px;
+	overflow:hidden;
+}
+
+div.mainmenu {
+	float:left;
+	line-height:20px;
+	margin-top:8px;
+}
+
+div.detailmenu {
+	padding:6px 8px 0px 8px;
+	line-height:30px;
+	text-align:left;
+}
+
+div.pagecontent {
+	padding:10px;
+	text-align:justify;
+}
+a {
+	color:#000077;
+	font-weight:bold;
+}
+a:link {
+	text-decoration:none;
+}
+a:visited {
+	text-decoration:none;
+}
+a:hover	{
+	text-decoration:underline;
+}
+a.menu {
+	display:block;
+	padding:3px;
+	color:#000000;
+	background-color:#FFFFFF;
+	text-align:center;
+	border:1px solid #C0C0C0;
+	width:120px;
+	margin:2px 5px;
+}
+a.menu:hover {
+	color:#000000;
+	text-decoration:none;
+	border:1px solid #C0C0C0;
+	background-color:#D0D0D0;
+}
+a.menuactive {
+	display:block;
+	padding:3px;
+	color:#000000;
+	text-align:center;
+	border:1px solid #C0C0C0;
+	background-color:#D0D0D0;
+	width:120px;
+	margin:2px 5px;
+}
+a.menuactive:hover {
+	text-decoration:none;
+}
+
+a.detailmenu {
+	padding:3px 5px;
+	color:#000000;
+	background-color:#FFFFFF;
+	border:1px solid #C0C0C0;
+}
+a.detailmenu:hover {
+	color:#000000;
+	text-decoration:none;
+	border:1px solid #C0C0C0;
+	background-color:#D0D0D0;
+}
+a.detailmenuactive {
+	padding:3px 5px;
+	color:#000000;
+	border:1px solid #C0C0C0;
+	background-color:#D0D0D0;
+}
+a.detailmenuactive:hover {
+	text-decoration:none;
+}
+
+img {
+	border:none;
+}
+img.rightcontentimage {
+	margin:8px;
+	border:1px solid;
+	width:100px;
+	float:right;
+	margin-right:0px;
+}
+img.leftcontentimage {
+	margin:8px;
+	border:1px solid;
+	width:100px;
+	float:left;
+	margin-left:0px;
+}
+
+em {
+	font-weight:normal;
+	font-style:normal;
+}
+em.deadlink {
+	color:#ff4444;
+	text-decoration:line-through;
+	font-weight:bold;
+}
+em.bold {
+	font-weight:bold;
+         color:#000000;
+         }
+em.italic {
+	font-style:italic;
+	}
+em.bolditalic {
+	font-weight:bold;
+	font-style:italic;
+	}
+
+h1 {
+	font-size:16px;
+	margin-top:10px;
+	margin-bottom:5px;
+}
+h2 {
+	font-size:12px;
+	margin-top:10px;
+	margin-bottom:5px;
+}
+h3 {
+	margin-top:10px;
+	margin-bottom:5px;
+}
+li {
+	margin-top:0px;
+	margin-bottom:0px;
+}
+ul {
+	margin-top:0px;
+	margin-bottom:0px;
+}
