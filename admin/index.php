@@ -457,17 +457,16 @@ echo $html;
 
 	function newSite() {
 		global $specialchars;
-		// Zuerst: Kategorie wählen
-		$pagecontent = "<h2>".getLanguageValue("button_site_new")."</h2>";
-		$pagecontent .= "<form action=\"index.php\" method=\"POST\"><input type=\"hidden\" name=\"action\" value=\"newsite\">";
-		$pagecontent .= "<table class=\"data\">";
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("choose_category_for_page")."</td>";
-		$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect()."</td></tr>";
-		$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"submit\" name=\"chosen\" class=\"submit\" value=\"".getLanguageValue("choose_category_button")."\" /></td></tr>";
-		$pagecontent .= "</table>";
-		$pagecontent .= "</form>";
+
+		// Wenn nach dem Editieren "Speichern" gedrückt wurde
+		if (isset($_POST['save'])) {
+			saveContentToPage($_POST['pagecontent'],"../inhalt/".$_POST['cat']."/".$_POST['page']);
+			$pagecontent = returnMessage(true, getLanguageValue("changes_applied"));
+		}
+		
+		// Wenn nach dem Editieren "Abbrechen" gedrückt wurde
+		elseif (isset($_POST['cancel']))
+			header("location:index.php?action=newsite");
 
 		// Wenn die Kategorie schon gewählt wurde oder im nächsten Schritt ein Fehler war
 		if ( isset($_POST['cat']) || 
@@ -478,7 +477,7 @@ echo $html;
 					&& (strlen($_POST['position'])>2)
 				) 
 			) {
-			$pagecontent = "<h2>".getLanguageValue("button_site_new")."</h2>";
+			$pagecontent .= "<h2>".getLanguageValue("button_site_new")."</h2>";
 			$pagecontent .= "<h3>".getLanguageValue("chosen_category")." ".$specialchars->rebuildSpecialChars(substr($_POST['cat'], 3, strlen($_POST['cat'])-3))."</h3>";
 			if (isset($_POST['position']) && isset($_POST['name'])) {
 				if (strlen($_POST['name']) == 0)
@@ -503,6 +502,19 @@ echo $html;
 			$pagecontent .= "</table>";
 			$pagecontent .= "</form>";
 		}
+		else {
+			// Zuerst: Kategorie wählen
+			$pagecontent = "<h2>".getLanguageValue("button_site_new")."</h2>";
+			$pagecontent .= "<form action=\"index.php\" method=\"POST\"><input type=\"hidden\" name=\"action\" value=\"newsite\">";
+			$pagecontent .= "<table class=\"data\">";
+			$pagecontent .= "<tr>";
+			$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("choose_category_for_page")."</td>";
+			$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect()."</td></tr>";
+			$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td>";
+			$pagecontent .= "<td class=\"config_row2\"><input type=\"submit\" name=\"chosen\" class=\"submit\" value=\"".getLanguageValue("choose_category_button")."\" /></td></tr>";
+			$pagecontent .= "</table>";
+			$pagecontent .= "</form>";
+		}
 		
 		// Wenn Name und Position der Seite schon gewählt wurde und korrekt sind
 		if (
@@ -517,16 +529,6 @@ echo $html;
 			$pagecontent .= showEditPageForm($_POST['cat'], $_POST['position']."_".$_POST['name'].".txt", "newsite");
 			$pagecontent .= "</form>";
 		}
-		
-		// Wenn nach dem Editieren "Speichern" gedrückt wurde
-		if (isset($_POST['save'])) {
-			saveContentToPage($_POST['pagecontent'],"../inhalt/".$_POST['cat']."/".$_POST['page']);
-			$pagecontent = returnMessage(true, getLanguageValue("changes_applied")).$pagecontent;
-		}
-		
-		// Wenn nach dem Editieren "Abbrechen" gedrückt wurde
-		elseif (isset($_POST['cancel']))
-			header("location:index.php?action=newsite");
 		return array(getLanguageValue("button_site_new"), $pagecontent);
 	}
 
@@ -553,6 +555,8 @@ echo $html;
 		
 		else {
 			$dirs = getDirs("../inhalt");
+			foreach ($dirs as $file)
+			sort($dirs);
 			$pagecontent .= "<p>".getLanguageValue("page_edit_text")."</p>";
 			foreach ($dirs as $file) {
 				$file = $file."_".specialNrDir("../inhalt", $file);
@@ -560,11 +564,14 @@ echo $html;
 						$pagecontent .= "<h3>".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3))."</h3>";
 						$hasdata = false;
 						$pagecontent .= "<table class=\"data\">";
-						while (($subfile = readdir($subhandle))) {
-							if (is_file("../inhalt/".$file."/".$subfile)) {
-								$pagecontent .= "<tr><td class=\"config_row1\">".$specialchars->rebuildSpecialChars(substr($subfile, 3, strlen($subfile)-7))."</td><td class=\"config_row2\"><a href=\"index.php?action=editsite&amp;cat=".$file."&amp;file=".$subfile."\">".getLanguageValue("button_edit")."</a></td></tr>";
-								$hasdata = true;
-							}
+						$catcontent = array();
+						while (($subfile = readdir($subhandle)))
+							if (is_file("../inhalt/".$file."/".$subfile))
+								array_push($catcontent, $subfile);
+						sort($catcontent);
+						foreach ($catcontent as $subfile) {
+							$pagecontent .= "<tr><td class=\"config_row1\">".$specialchars->rebuildSpecialChars(substr($subfile, 3, strlen($subfile)-7))."</td><td class=\"config_row2\"><a href=\"index.php?action=editsite&amp;cat=".$file."&amp;file=".$subfile."\">".getLanguageValue("button_edit")."</a></td></tr>";
+							$hasdata = true;
 						}
 						if (!$hasdata)
 						$pagecontent .= "<tr><td class=\"config_row1\">".getLanguageValue("page_no_data")."</td><td class=\"config_row2\">&nbsp;</td></tr>";
@@ -597,11 +604,15 @@ echo $html;
 				$pagecontent .= "<h3>".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3))."</h3>";
 				$hasdata = false;
 				$pagecontent .= "<table class=\"data\">";
-				while (($subfile = readdir($subhandle))) {
-					if (is_file("../inhalt/".$file."/".$subfile)) {
-						$pagecontent .= "<tr><td class=\"config_row1\">".$specialchars->rebuildSpecialChars(substr($subfile, 3, strlen($subfile)-7))."</td><td class=\"config_row2\"><a href=\"index.php?action=deletesite&amp;cat=".$file."&amp;file=".$subfile."\">".getLanguageValue("button_delete")."</a></td></tr>";
-						$hasdata = true;
-					}
+				
+				$catcontent = array();
+				while (($subfile = readdir($subhandle)))
+					if (is_file("../inhalt/".$file."/".$subfile))
+						array_push($catcontent, $subfile);
+				sort($catcontent);
+				foreach ($catcontent as $subfile) {
+					$pagecontent .= "<tr><td class=\"config_row1\">".$specialchars->rebuildSpecialChars(substr($subfile, 3, strlen($subfile)-7))."</td><td class=\"config_row2\"><a href=\"index.php?action=deletesite&amp;cat=".$file."&amp;file=".$subfile."\">".getLanguageValue("button_delete")."</a></td></tr>";
+					$hasdata = true;
 				}
 				if (!$hasdata)
 				$pagecontent .= "<tr><td class=\"config_row1\">".getLanguageValue("page_no_data")."</td><td class=\"config_row2\">&nbsp;</td></tr>";

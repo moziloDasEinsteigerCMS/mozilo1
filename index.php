@@ -422,13 +422,13 @@ INHALT
 			// Galerie mit Bildern aus dem Galerieverzeichnis
 			elseif ($attribute == "galerie"){
 				$handle = opendir("./$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_GALLERY_DIR");
-				$i=0;
+				$j=0;
 				while ($file = readdir($handle)) {
-					if (is_file("./$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_GALLERY_DIR/".$file)) {
-	    			$i++;
+					if (is_file("./$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_GALLERY_DIR/".$file) && ($file <> "texte.conf")) {
+	    			$j++;
 	    		}
 				}
-				$content = str_replace ($match, "<a href=\"galerie.php?cat=$CAT_REQUEST\" title=\"Galerie &quot;$value&quot; ($i Bilder) ansehen\" target=\"_blank\">$value</a>", $content);
+				$content = str_replace ($match, "<a href=\"galerie.php?cat=$CAT_REQUEST\" title=\"Galerie &quot;$value&quot; ($j Bilder) ansehen\" target=\"_blank\">$value</a>", $content);
 			}
 
 			// Bild aus dem Dateiverzeichnis (überprüfen, ob Bilddatei existiert)
