@@ -154,6 +154,7 @@ INHALT
     $HTML = preg_replace('/{DETAILMENU}/', getDetailMenu(), $HTML);
     $HTML = preg_replace('/{LASTCHANGE}/', getLastChangedContentPage(), $HTML);
     $HTML = preg_replace('/{SITEMAPLINK}/', "<a href=\"index.php?action=sitemap\" class=\"latestchangedlink\" title=\"Sitemap anzeigen\">Sitemap</a>", $HTML);
+    $HTML = preg_replace('/{CMSINFO}/', getCmsInfo(), $HTML);
 	}
 
 
@@ -435,13 +436,30 @@ INHALT
 					$content = str_replace ($match, "<em class=\"deadlink\" title=\"Kategorie &quot;$value&quot; nicht vorhanden\">$value</em>", $content);
 			}
 
-			// Link auf Inhaltsseite in aktueller Kategorie (überprüfen, ob Inhaltsseite existiert)
+			// Link auf Inhaltsseite in aktueller oder anderer Kategorie (überprüfen, ob Inhaltsseite existiert)
 			elseif ($attribute == "seite"){
-				$requestedpage = nameToPage($specialchars->deleteSpecialChars($value), $CAT_REQUEST);
-				if ((!$requestedpage=="") && (file_exists("./$CONTENT_DIR_REL/$CAT_REQUEST/$requestedpage")))
-					$content = str_replace ($match, "<a href=\"index.php?cat=$CAT_REQUEST&amp;page=".substr($requestedpage, 0, strlen($requestedpage) - strlen($CONTENT_EXTENSION))."\" title=\"Inhaltsseite &quot;$value&quot; anzeigen\">$value</a>", $content);
-				else
-					$content = str_replace ($match, "<em class=\"deadlink\" title=\"Inhaltsseite &quot;$value&quot; nicht vorhanden\">$value</em>", $content);
+				$valuearray = explode(":", $value);
+				// Inhaltsseite in aktueller Kategorie
+				if (count($valuearray) == 1) {
+					$requestedpage = nameToPage($specialchars->deleteSpecialChars($value), $CAT_REQUEST);
+					if ((!$requestedpage=="") && (file_exists("./$CONTENT_DIR_REL/$CAT_REQUEST/$requestedpage")))
+						$content = str_replace ($match, "<a href=\"index.php?cat=$CAT_REQUEST&amp;page=".substr($requestedpage, 0, strlen($requestedpage) - strlen($CONTENT_EXTENSION))."\" title=\"Inhaltsseite &quot;$value&quot; anzeigen\">$value</a>", $content);
+					else
+						$content = str_replace ($match, "<em class=\"deadlink\" title=\"Inhaltsseite &quot;$value&quot; nicht vorhanden\">$value</em>", $content);
+				}
+				// Inhaltsseite in anderer Kategorie
+				else {
+					$requestedcat = nameToCategory($specialchars->deleteSpecialChars($valuearray[0]));
+					if ((!$requestedcat=="") && (file_exists("./$CONTENT_DIR_REL/$requestedcat"))) {
+						$requestedpage = nameToPage($specialchars->deleteSpecialChars($valuearray[1]), $requestedcat);
+						if ((!$requestedpage=="") && (file_exists("./$CONTENT_DIR_REL/$requestedcat/$requestedpage")))
+							$content = str_replace ($match, "<a href=\"index.php?cat=$requestedcat&amp;page=".substr($requestedpage, 0, strlen($requestedpage) - strlen($CONTENT_EXTENSION))."\" title=\"Inhaltsseite &quot;".$valuearray[1]."&quot; der Kategorie &quot;".$valuearray[0]."&quot; anzeigen\">".$valuearray[1]."</a>", $content);
+						else
+							$content = str_replace ($match, "<em class=\"deadlink\" title=\"Inhaltsseite &quot;".$valuearray[1]."&quot; in der Kategorie &quot;".$valuearray[0]."&quot; nicht vorhanden\">$value</em>", $content);	
+					}
+					else
+						$content = str_replace ($match, "<em class=\"deadlink\" title=\"Kategorie &quot;".$valuearray[0]."&quot; nicht vorhanden\">$value</em>", $content);
+				}
 			}
 
 			// Datei aus dem Dateiverzeichnis (überprüfen, ob Datei existiert)
@@ -600,4 +618,15 @@ INHALT
 		// Rückgabe des Menüs
 		return $sitemap;
 	}
+
+
+
+// ------------------------------------------------------------------------------
+// Anzeige der Informationen zum System
+// ------------------------------------------------------------------------------
+	function getCmsInfo() {
+		return "<a href=\"http://www.moziloCMS.de.vu/\" target=\"_blank\" class=\"latestchangedlink\" title=\"moziloCMS.de.vu\">moziloCMS</a> 1.4";
+	}
+
+
 ?>
