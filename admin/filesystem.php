@@ -24,6 +24,8 @@
 	function getLastBackup() 
 	{
 		$BASIC_CONFIG 		= new Properties("conf/basic.conf");
+		if ($BASIC_CONFIG->get("lastbackup") == "")
+			$BASIC_CONFIG->set("lastbackup",time());
 		return $BASIC_CONFIG->get("lastbackup");
 	}
 	

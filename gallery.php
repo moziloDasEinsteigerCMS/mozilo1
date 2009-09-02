@@ -230,7 +230,7 @@ echo $HTML;
 			return "Diese Galerie enth&auml;lt keine Bilder.";
 		// Texte einlesen
 		$alldescriptions = new Properties($DIR_GALLERY."texte.conf");
-		return $alldescriptions->get($PICARRAY[$INDEX-1]);
+		return htmlentities($alldescriptions->get($PICARRAY[$INDEX-1]));
 	}
 
 

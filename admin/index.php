@@ -72,7 +72,6 @@ $ADMIN_TITLE = "moziloAdmin";
 	
 	
 /* Aufbau der gesamten Seite */
-	
 	$html = "<!doctype html public \"-//W3C//DTD HTML 4.01 Transitional//EN\">";
 	$html .= "<html>";
 	$html .= "<head>";
@@ -294,8 +293,7 @@ echo $html;
 		return array(getLanguageValue("button_category_new"), $pagecontent);
 	}
 
-	function editCategory() 
-	{
+	function editCategory() {
 		global $action;
 		global $specialchars;
 		$pagecontent .= "<h2>".getLanguageValue("button_category_edit")."</h2>";
@@ -439,7 +437,6 @@ echo $html;
 			}
 		}
 		$pagecontent .= "</table>";
-		closedir($handle);
 		return array(getLanguageValue("button_category_delete"), $pagecontent);
 	}
 
@@ -460,7 +457,14 @@ echo $html;
 
 		// Wenn nach dem Editieren "Speichern" gedrückt wurde
 		if (isset($_POST['save'])) {
-			saveContentToPage($_POST['pagecontent'],"../inhalt/".$_POST['cat']."/".$_POST['page']);
+			// Entwurf speichern
+			if ($_POST['draft'] == "on") {
+				saveContentToPage($_POST['pagecontent'],"../inhalt/".$_POST['cat']."/".substr($_POST['page'], 0, strlen($_POST['page'])-4).".tmp");
+			}
+			// Veröffentlichen
+			else {
+				saveContentToPage($_POST['pagecontent'],"../inhalt/".$_POST['cat']."/".$_POST['page']);
+			}
 			$pagecontent = returnMessage(true, getLanguageValue("changes_applied"));
 		}
 		
@@ -537,10 +541,18 @@ echo $html;
 		$pagecontent = "<h2>".getLanguageValue("button_site_edit")."</h2>";
 		// Wenn nach dem Editieren "Speichern" gedrückt wurde
 		if (isset($_POST['save'])) {
-			$newpagename = substr($_POST['page'],0,2)."_".$specialchars->deleteSpecialChars($_POST['newpage']).".txt";
-			if ($newpagename <> $_POST['page'])
-				unlink("../inhalt/".$_POST['cat']."/".$_POST['page']);
-			saveContentToPage($_POST['pagecontent'],"../inhalt/".$_POST['cat']."/".$newpagename);
+			// Entwurf speichern
+			if ($_POST['draft'] == "on") {
+				$newpagename = substr($_POST['page'],0,2)."_".$specialchars->deleteSpecialChars($_POST['newpage']).".tmp";
+				saveContentToPage($_POST['pagecontent'],"../inhalt/".$_POST['cat']."/".$newpagename);
+			}
+			// Veröffentlichen
+			else {
+				$newpagename = substr($_POST['page'],0,2)."_".$specialchars->deleteSpecialChars($_POST['newpage']).".txt";
+				if ($newpagename <> $_POST['page'])
+					unlink("../inhalt/".$_POST['cat']."/".$_POST['page']);
+				saveContentToPage($_POST['pagecontent'],"../inhalt/".$_POST['cat']."/".$newpagename);
+			}
 			$pagecontent = returnMessage(true, getLanguageValue("changes_applied")).$pagecontent;
 		}
 		// Wenn nach dem Editieren "Abbrechen" gedrückt wurde
@@ -548,7 +560,10 @@ echo $html;
 			header("location:index.php?action=editsite");
 		if (isset($_GET['file']) && isset($_GET['cat'])) {
 			$pagecontent .= "<form name=\"form\" method=\"post\" action=\"index.php\">";
-			$pagecontent .= "<p>".getLanguageValue("site_name").": "."<input class=\"text2\" type=\"text\" name=\"newpage\" value=\"".$specialchars->rebuildSpecialChars(substr($_GET['file'],3,strlen($_GET['file'])-7))."\" /></p>";
+			$draft = "";
+			if (substr($_GET['file'], strlen($_GET['file'])-4, strlen($_GET['file'])) == ".tmp")
+				$draft = " (".getLanguageValue("draft").")";
+			$pagecontent .= "<p>".getLanguageValue("site_name").": "."<input class=\"text2\" type=\"text\" name=\"newpage\" value=\"".$specialchars->rebuildSpecialChars(substr($_GET['file'],3,strlen($_GET['file'])-7))."\" />$draft</p>";
 			$pagecontent .= showEditPageForm($_GET['cat'], $_GET['file'], "editsite");
 			$pagecontent .= "</form>";
 		}
@@ -570,7 +585,16 @@ echo $html;
 								array_push($catcontent, $subfile);
 						sort($catcontent);
 						foreach ($catcontent as $subfile) {
-							$pagecontent .= "<tr><td class=\"config_row1\">".$specialchars->rebuildSpecialChars(substr($subfile, 3, strlen($subfile)-7))."</td><td class=\"config_row2\"><a href=\"index.php?action=editsite&amp;cat=".$file."&amp;file=".$subfile."\">".getLanguageValue("button_edit")."</a></td></tr>";
+							$draft = "";
+							$draftaction = "";
+							if (substr($subfile, strlen($subfile)-4, strlen($subfile)) == ".tmp") {
+								$draft = " (".getLanguageValue("draft").")";
+								$draftaction = "&amp;action=draft";
+							}
+							$pagecontent .= "<tr><td class=\"config_row1\">".$specialchars->rebuildSpecialChars(substr($subfile, 3, strlen($subfile)-7))."$draft</td><td class=\"config_row2\">";
+							$pagecontent .= "<a href=\"../index.php?cat=".$file."&amp;page=".substr($subfile, 0, strlen($subfile)-4)."$draftaction\" target=\"_blank\">".getLanguageValue("button_preview")."</a>";
+							$pagecontent .= " - <a href=\"index.php?action=editsite&amp;cat=".$file."&amp;file=".$subfile."\">".getLanguageValue("button_edit")."</a>";
+							$pagecontent .= "</td></tr>";
 							$hasdata = true;
 						}
 						if (!$hasdata)
@@ -611,7 +635,16 @@ echo $html;
 						array_push($catcontent, $subfile);
 				sort($catcontent);
 				foreach ($catcontent as $subfile) {
-					$pagecontent .= "<tr><td class=\"config_row1\">".$specialchars->rebuildSpecialChars(substr($subfile, 3, strlen($subfile)-7))."</td><td class=\"config_row2\"><a href=\"index.php?action=deletesite&amp;cat=".$file."&amp;file=".$subfile."\">".getLanguageValue("button_delete")."</a></td></tr>";
+					$draft ="";
+					$draftaction = "";
+					if (substr($subfile, strlen($subfile)-4, strlen($subfile)) == ".tmp") {
+						$draft = " (".getLanguageValue("draft").")";
+						$draftaction = "&amp;action=draft";
+					}
+					$pagecontent .= "<tr><td class=\"config_row1\">".$specialchars->rebuildSpecialChars(substr($subfile, 3, strlen($subfile)-7))."$draft</td><td class=\"config_row2\">";
+					$pagecontent .= "<a href=\"../index.php?cat=".$file."&amp;page=".substr($subfile, 0, strlen($subfile)-4)."$draftaction\" target=\"_blank\">".getLanguageValue("button_preview")."</a>";
+					$pagecontent .= " - <a href=\"index.php?action=deletesite&amp;cat=".$file."&amp;file=".$subfile."\">".getLanguageValue("button_delete")."</a>";
+					$pagecontent .= "</td></tr>";
 					$hasdata = true;
 				}
 				if (!$hasdata)
@@ -650,7 +683,7 @@ echo $html;
 		  	else {
 		    	move_uploaded_file($_FILES['uploadfile']['tmp_name'], "../inhalt/".$_POST['cat']."/galerie/".$_FILES['uploadfile']['name']);
 					$galleryconf = new Properties("../inhalt/".$_POST['cat']."/galerie/texte.conf");
-					$galleryconf->set($_FILES['uploadfile']['name'], htmlentities(stripslashes($_POST['comment'])));
+					$galleryconf->set($_FILES['uploadfile']['name'], stripslashes($_POST['comment']));
 		    	$pagecontent .= returnMessage(true, getLanguageValue("gallery_upload_success"));
 			  }
 			}
@@ -699,7 +732,7 @@ echo $html;
 			$pagecontent = "<h2>".getLanguageValue("button_gallery_edit")."</h2>";
 			// Wenn "Speichern" gedrückt wurde
 			if (isset($_GET['save'])) {
-				$galleryconf->set($_GET['image'], htmlentities(stripslashes($_GET['comment'])));
+				$galleryconf->set($_GET['image'], stripslashes($_GET['comment']));
 				$pagecontent .= returnMessage(true, getLanguageValue("changes_applied"));
 			} 
 			// Wenn "Löschen" gedrückt wurde
@@ -719,18 +752,22 @@ echo $html;
 			$handle = opendir("../inhalt/".$_GET['cat']."/galerie");
 			// alle Bilder der Galerie auflisten
 			$counter = 0;
+			$gallerypics = array();
 			while (($file = readdir($handle))) {
-				if (is_file("../inhalt/".$_GET['cat']."/galerie/".$file) && ($file <> "texte.conf")) {
-					$counter++;
-					$pagecontent .= "<form action=\"index.php\" method=\"GET\"><input type=\"hidden\" name=\"action\" value=\"editgallery\"><input type=\"hidden\" name=\"cat\" value=\"".$_GET['cat']."\"><input type=\"hidden\" name=\"image\" value=\"".$file."\">";
-					$pagecontent .= "<table class=\"data\">";
-					$pagecontent .= "<tr>";
-					$pagecontent .= "<td class=\"config_row1\"><img src=\"../inhalt/".$_GET['cat']."/galerie/".$file."\" alt=\"$file\" style=\"width:100px;\" /><br />".$file."</td>";
-					$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"comment\" value=\"".$galleryconf->get($file)."\" /><input type=\"submit\" name=\"save\" value=\"".getLanguageValue("button_save")."\" class=\"submit\" /> <input type=\"submit\" name=\"delete\" value=\"".getLanguageValue("button_delete")."\" class=\"submit\" /></td>";
-					$pagecontent .= "</tr>";
-					$pagecontent .= "</table>";
-					$pagecontent .= "</form>";
-				}
+				if (is_file("../inhalt/".$_GET['cat']."/galerie/".$file) && ($file <> "texte.conf")) 
+					array_push($gallerypics, $file);
+			}
+			sort($gallerypics);
+			foreach ($gallerypics as $file) {
+				$counter++;
+				$pagecontent .= "<form action=\"index.php\" method=\"GET\"><input type=\"hidden\" name=\"action\" value=\"editgallery\"><input type=\"hidden\" name=\"cat\" value=\"".$_GET['cat']."\"><input type=\"hidden\" name=\"image\" value=\"".$file."\">";
+				$pagecontent .= "<table class=\"data\">";
+				$pagecontent .= "<tr>";
+				$pagecontent .= "<td class=\"config_row1\"><img src=\"../inhalt/".$_GET['cat']."/galerie/".$file."\" alt=\"$file\" style=\"width:100px;\" /><br />".$file."</td>";
+				$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"comment\" value=\"".htmlentities($galleryconf->get($file))."\" /><input type=\"submit\" name=\"save\" value=\"".getLanguageValue("button_save")."\" class=\"submit\" /> <input type=\"submit\" name=\"delete\" value=\"".getLanguageValue("button_delete")."\" class=\"submit\" /></td>";
+				$pagecontent .= "</tr>";
+				$pagecontent .= "</table>";
+				$pagecontent .= "</form>";
 			}
 			if ($counter == 0)
 				{
@@ -793,26 +830,24 @@ echo $html;
 	}
 
 	function newFile() {
+		global $ADMIN_CONF;
 		global $specialchars;
 		$pagecontent = "<h2>".getLanguageValue("button_data_new")."</h2>";
 		// Datei hochladen
-		if ($_SERVER["REQUEST_METHOD"] == "POST")
-		{
-		  if (isset($_FILES['uploadfile']) and !$_FILES['uploadfile']['error']) 
-		  {
-		    if (file_exists("../inhalt/".$specialchars->deleteSpecialChars($_POST['cat'])."/dateien/".$_FILES['uploadfile']['name']))
-		    {
+		if ($_SERVER["REQUEST_METHOD"] == "POST") {
+		  if (isset($_FILES['uploadfile']) and !$_FILES['uploadfile']['error']) {
+		    if (file_exists("../inhalt/".$specialchars->deleteSpecialChars($_POST['cat'])."/dateien/".$_FILES['uploadfile']['name'])) {
 		    	$pagecontent .= returnMessage(false, $_FILES['uploadfile']['name'].": ".getLanguageValue("data_uploadfile_exists"));
 		    }
-		    else 
-		    {
-		    	if(preg_match("/^[a-zA-Z0-9_\-äöüÄÖÜß.]+$/", $_FILES['uploadfile']['name']))
-		    	{
+		    elseif (fileHasExtension($_FILES['uploadfile']['name'], explode(",", $ADMIN_CONF->get("noupload")))) {
+		    	$pagecontent .= returnMessage(false, $_FILES['uploadfile']['name'].": ".getLanguageValue("data_uploadfile_wrongext"));
+		    }
+		    else {
+		    	if(preg_match("/^[a-zA-Z0-9_\-äöüÄÖÜß.]+$/", $_FILES['uploadfile']['name'])) {
 			    	move_uploaded_file($_FILES['uploadfile']['tmp_name'], "../inhalt/".$_POST['cat']."/dateien/".$_FILES['uploadfile']['name']);
 			    	$pagecontent .= returnMessage(true, getLanguageValue("data_upload_success"));
 		    	}
-			    else
-			    {
+			    else {
 			    	$pagecontent .= returnMessage(false, getLanguageValue("invalid_values"));
 			    }
 			  }
@@ -1004,6 +1039,10 @@ echo $html;
 				$ADMIN_CONF->set("language", $_GET['lang']);
 				$changesmade = true;
 			}
+			if (isset($_GET['noupload'])) {
+				$ADMIN_CONF->set("noupload", $_GET['noupload']);
+				$changesmade = true;
+			}
 		}
 		$pagecontent .= "<h2>".getLanguageValue("button_config_displayadmin")."</h2>";
 		if ($changesmade)
@@ -1038,6 +1077,11 @@ echo $html;
 			closedir($handle);
 		}
 		$pagecontent .= "</select></td></tr>";
+		// Zeile "UPLOAD-FILTER"
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("uploadfilter_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"noupload\" value=\"".$ADMIN_CONF->get("noupload")."\" /></td>";
+		$pagecontent .= "</tr>";
 		// Zeile "ÜBERNEHMEN"
 		$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td><td class=\"config_row2\"><input type=\"submit\" class=\"submit\" value=\"".getLanguageValue("config_submit")."\"/></td></tr>";
 		$pagecontent .= "</table>";
@@ -1119,7 +1163,7 @@ echo $html;
 		$file = "../inhalt/".$cat."/".$page;
 		if (file_exists($file)) {
 			$handle=fopen($file, "r");
-			$pagecontent = fread($handle, filesize($file));
+			$pagecontent = htmlentities(fread($handle, filesize($file)));
 			fclose($handle);
 		}
 		else
@@ -1145,7 +1189,8 @@ echo $html;
 	  	$content .="<img class=\"js\" alt=\"Liste1\" title=\"[liste1| ... ]\" src=\"gfx/jsToolbar/liste1.png\" onClick=\"insert('[liste1|', ']')\">";
 	  	$content .="<img class=\"js\" alt=\"Liste2\" title=\"[liste2| ... ]\" src=\"gfx/jsToolbar/liste2.png\" onClick=\"insert('[liste2|', ']')\">";
 	  	$content .="<img class=\"js\" alt=\"Liste3\" title=\"[liste3| ... ]\" src=\"gfx/jsToolbar/liste3.png\" onClick=\"insert('[liste3|', ']')\">";
-	  	$content .="<img class=\"js\" alt=\"Horizontale Linie\" title=\"[----]\" src=\"gfx/jsToolbar/linie.png\" onClick=\"insert('[----]', '')\"></p>";
+	  	$content .="<img class=\"js\" alt=\"Horizontale Linie\" title=\"[----]\" src=\"gfx/jsToolbar/linie.png\" onClick=\"insert('[----]', '')\">";
+	  	$content .="<img class=\"js\" alt=\"HTML\" title=\"[html| ... ]\" src=\"gfx/jsToolbar/html.png\" onClick=\"insert('[html|', ']')\"></p>";
 	  }
 
 		// Seiteninhalt
@@ -1153,8 +1198,12 @@ echo $html;
 		$content .= "<input type=\"hidden\" name=\"page\" value=\"$page\" />";
 		$content .= "<input type=\"hidden\" name=\"action\" value=\"$action\" />";
 		$content .= "<input type=\"hidden\" name=\"cat\" value=\"$cat\" />";
-		$content .= "<input type=\"submit\" name=\"save\" value=\"".getLanguageValue("button_save")."\" accesskey=\"s\" />&nbsp;";
-		$content .= "<input type=\"submit\" name=\"cancel\" value=\"".getLanguageValue("button_cancel")."\" accesskey=\"a\" />";
+		$content .= "<input type=\"submit\" name=\"cancel\" value=\"".getLanguageValue("button_cancel")."\" accesskey=\"a\" /> ";
+		$content .= "<input type=\"submit\" name=\"save\" value=\"".getLanguageValue("button_save")."\" accesskey=\"s\" /> ";
+		$checked = "";
+		if (substr($page, strlen($page)-4, 4) == ".tmp")
+			$checked = " checked";
+		$content .= "<input type=\"checkbox\"$checked name=\"draft\" /> ".getLanguageValue("draft_checkbox");
 		return $content;
 	}
 	

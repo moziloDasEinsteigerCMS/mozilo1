@@ -60,15 +60,17 @@ INHALT
 		$USE_CMS_SYNTAX = false;
 
 
+	$CAT_REQUEST 				= $_GET['cat'];
+	$PAGE_REQUEST 			= $_GET['page'];
+	$ACTION_REQUEST 		= $_GET['action'];
+	
 	$CONTENT_DIR_REL		= "inhalt";
 	$CONTENT_DIR_ABS 		= getcwd() . "/$CONTENT_DIR_REL";
 	$CONTENT_FILES_DIR	= "dateien";
 	$CONTENT_GALLERY_DIR= "galerie";
 	$CONTENT_EXTENSION	= ".txt";
-	$CAT_REQUEST 				= $_GET['cat'];
-	$PAGE_REQUEST 			= $_GET['page'];
-	$ACTION_REQUEST 		= $_GET['action'];
-	
+	if ($ACTION_REQUEST == "draft")
+		$CONTENT_EXTENSION	= ".tmp";
 	$CONTENT 						= "";
 	$HTML								= "";
 	
@@ -100,7 +102,7 @@ INHALT
 				// ...oder eine nicht existente Kategorie...
 				|| (!file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST")) 
 				// ...oder eine Kategorie ohne Contentseiten...
-				|| (getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR)) == "")
+				|| (getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true) == "")
 				// ...oder eine nicht existente Content-Seite...
 				|| (($PAGE_REQUEST <> "") && (!file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$CONTENT_EXTENSION")))
 			)
@@ -108,13 +110,13 @@ INHALT
 			$CAT_REQUEST = $DEFAULT_CATEGORY;
 		
 		// Kategorie-Verzeichnis einlesen
-		$pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR));
+		$pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true);
 		// Wenn Contentseite nicht explizit angefordert wurde oder nicht vorhanden ist...
 		if (($PAGE_REQUEST == "") || (!file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$CONTENT_EXTENSION")))
 			//...erste Contentseite der Kategorie setzen
 			$PAGE_REQUEST = substr($pagesarray[0], 0, strlen($pagesarray[0]) - strlen($CONTENT_EXTENSION));
 		// Wenn ein Action-Parameter übergeben wurde: keine aktiven Kat./Inhaltts. anzeigen
-		if (isset($ACTION_REQUEST)) {
+		if ($ACTION_REQUEST == "sitemap") {
 			$CAT_REQUEST = "";
 			$PAGE_REQUEST = "";
 		}
@@ -161,7 +163,7 @@ INHALT
 	function nameToCategory($catname) {
 		global $CONTENT_DIR_ABS;
 		// Content-Verzeichnis einlesen
-		$dircontent = getDirContentAsArray("$CONTENT_DIR_ABS", array());
+		$dircontent = getDirContentAsArray("$CONTENT_DIR_ABS", array(), false);
 		// alle vorhandenen Kategorien durchgehen...
 		foreach ($dircontent as $currentelement) {
 			// ...und wenn eine auf den Namen paßt...
@@ -184,7 +186,7 @@ INHALT
 		global $CONTENT_GALLERY_DIR;
 		global $CONTENT_EXTENSION;
 		// Kategorie-Verzeichnis einlesen
-		$dircontent = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcat", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR));
+		$dircontent = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcat", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true);
 		// alle vorhandenen Inhaltsdateien durchgehen...
 		foreach ($dircontent as $currentelement) {
 			// ...und wenn eine auf den Namen paßt...
@@ -210,7 +212,7 @@ INHALT
 		global $CAT_REQUEST;
 		global $PAGE_REQUEST;
 		// Contentseiten der angeforderten Kategorie in Array einlesen
-		$pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR));
+		$pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true);
 		// Das Array der Contentseiten elementweise prüfen...
 		foreach ($pagesarray as $currentelement) {
 			// ...und bei einem Treffer den Inhalt der Content-Datei zurückgeben
@@ -221,17 +223,29 @@ INHALT
 	}
 	
 	
+
 // ------------------------------------------------------------------------------
 // Auslesen des Content-Verzeichnisses unter Berücksichtigung 
 // des auszuschließenden File-Verzeichnisses, Rückgabe als Array
 // ------------------------------------------------------------------------------
-	function getDirContentAsArray($dir, $excludes) {
+	function getDirContentAsArray($dir, $iscatdir) {
+		global $CONTENT_EXTENSION;
+		global $CONTENT_FILES_DIR; 
+		global $CONTENT_GALLERY_DIR;
 		$currentdir = opendir($dir);
 		$i=0;
 		// Einlesen des gesamten Content-Verzeichnisses außer dem 
 		// auszuschließenden Verzeichnis und den Elementen . und ..
 		while ($file = readdir($currentdir)) {
-			if (($file <> ".") && ($file <> "..") && (!in_array($file, $excludes))) {
+			if (
+					// wenn Kategorieverzeichnis: Alle Dateien auslesen, die auf $CONTENT_EXTENSION enden...
+					((substr($file, strlen($file)-4, strlen($file)) == $CONTENT_EXTENSION) || (!$iscatdir))
+					// ...und nicht $CONTENT_FILES_DIR oder $CONTENT_GALLERY_DIR
+					&& ((($file <> $CONTENT_FILES_DIR) && ($file <> $CONTENT_GALLERY_DIR))  || (!$iscatdir))
+					// nicht "." und ".."
+					&& ($file <> ".") 
+					&& ($file <> "..")
+					) {
 	    	$files[$i] = $file;
 	    	$i++;
 	    }
@@ -255,11 +269,11 @@ INHALT
 		global $specialchars;
 		$mainmenu = "";
 		// Kategorien-Verzeichnis einlesen
-		$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, array());
+		$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, array(), false);
 		// Jedes Element des Arrays ans Menü anhängen
 		foreach ($categoriesarray as $currentcategory) {
 			// Wenn die Kategorie keine Contentseiten hat, zeige sie nicht an
-			if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR)) == "")
+			if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true) == "")
 				$mainmenu .= "";
 			// Aktuelle Kategorie als aktiven Menüpunkt anzeigen...
 			elseif ($currentcategory == $CAT_REQUEST)
@@ -277,6 +291,7 @@ INHALT
 // Aufbau des Detailmenüs, Rückgabe als String
 // ------------------------------------------------------------------------------
 	function getDetailMenu(){
+		global $ACTION_REQUEST;
 		global $CONTENT_DIR_ABS;
 		global $CONTENT_FILES_DIR;
 		global $CONTENT_GALLERY_DIR;
@@ -285,11 +300,13 @@ INHALT
 		global $CONTENT_EXTENSION;
 		global $specialchars;
 		// Wurde keine Kategorie übergeben, dann leeres Detailmenü ausgeben
-		if ($CAT_REQUEST == "")
+		if ($ACTION_REQUEST == "sitemap")
 			return "<a href=\"index.php?action=sitemap\" class=\"detailmenuactive\">Sitemap</a>";
+		if ($ACTION_REQUEST == "draft")
+			return "<a href=\"index.php?action=draft\" class=\"detailmenuactive\">".substr($specialchars->rebuildSpecialChars($PAGE_REQUEST), 3, strlen($PAGE_REQUEST) - 3)." (Entwurf)</a>";
 		$detailmenu = "";
 		// Content-Verzeichnis der aktuellen Kategorie einlesen
-		$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR));
+		$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true);
 		// Jedes Element des Arrays ans Menü anhängen
 		foreach ($contentarray as $currentcontent) {
 			// Aktuelle Kategorie als aktiven Menüpunkt anzeigen...
@@ -339,10 +356,11 @@ INHALT
 // Einlesen eines Kategorie-Verzeichnisses, Rückgabe der zuletzt geänderten Datei
 // ------------------------------------------------------------------------------
 	function getLastChangeOfCat($dir){
+		global $CONTENT_EXTENSION;
 		$latestchanged = array("file" => "filename", "time" => 0);
 		$currentdir = opendir($dir);
 		while ($file = readdir($currentdir)) {
-			if (is_file($dir."/".$file)) {
+			if (is_file($dir."/".$file) && (substr($file, strlen($file)-strlen($CONTENT_EXTENSION), strlen($CONTENT_EXTENSION)) == $CONTENT_EXTENSION)) {
 				if (filemtime($dir."/".$file) > $latestchanged['time']) {
 					$latestchanged['file'] = $file;
 					$latestchanged['time'] = filemtime($dir."/".$file);
@@ -375,7 +393,8 @@ INHALT
 		}
 		
 		// Nach Texten in eckigen Klammern suchen
-		preg_match_all("/\[([\w]+)\|([^\[\]\|]+)\]/", $content, $matches);
+//		preg_match_all("/\[([\w]+)\|([^\[\]\|]+)\]/", $content, $matches);
+		preg_match_all("/\[([\w]+)\|([^\[\]]+)\]/", $content, $matches);
 		$i = 0;
 		// Für jeden Treffer...
 		foreach ($matches[0] as $match) {
@@ -392,7 +411,7 @@ INHALT
 						// ip-adresse (ipv4)		([\d]{1,3}\.){3}[\d]{1,3}
 						// port									\:[\d]{1,5}
 						// subdirs|files				(\w)+
-			if (preg_match("/(http|https|ftp|gopher|telnet|mms)\:\/\/((\w)+\:(\w)+\@)?[((\w)+\.)?(\w)+\.[a-zA-Z]{2,4}|([\d]{1,3}\.){3}[\d]{1,3}](\:[\d]{1,5})?((\w)+)?$/", $value))
+			if (preg_match("/^(http|https|ftp|gopher|telnet|mms)\:\/\/((\w)+\:(\w)+\@)?[((\w)+\.)?(\w)+\.[a-zA-Z]{2,4}|([\d]{1,3}\.){3}[\d]{1,3}](\:[\d]{1,5})?((\w)+)?$/", $value))
 					$content = str_replace ($match, "<a href=\"$value\" title=\"Webseite &quot;$value&quot; besuchen\" target=\"_blank\">$value</a>", $content);
 				else
 					$content = str_replace ($match, "<em class=\"deadlink\" title=\"Fehlerhafte Link-Adresse &quot;$value&quot;\">$value</em>", $content);
@@ -514,6 +533,11 @@ INHALT
 				$content = str_replace ("$match", "<ul><ul><ul><li>$value</li></ul></ul></ul>", $content);
 			}
 			
+			// HTML
+			elseif ($attribute == "html"){
+				$content = str_replace ("$match", html_entity_decode($value), $content);
+			}
+
 			// Attribute, die nicht zugeordnet werden können
 			else
 					$content = str_replace ($match, "<em class=\"deadlink\" title=\"Falsche Syntax: Unbekanntes Attribut &quot;$attribute&quot;\">$value</em>", $content);
@@ -552,15 +576,15 @@ INHALT
 		global $specialchars;
 		$sitemap = "<h1>Sitemap</h1>";
 		// Kategorien-Verzeichnis einlesen
-		$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, array());
+		$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, array(), false);
 		// Jedes Element des Arrays an die Sitemap anhängen
 		foreach ($categoriesarray as $currentcategory) {
 			// Wenn die Kategorie keine Contentseiten hat, zeige sie nicht an
-			if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR)) == "")
+			if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true) == "")
 				continue;
 			$sitemap .= "<h2>".substr($specialchars->rebuildSpecialChars($currentcategory), 3, strlen($currentcategory))."</h2><ul>";
 			// Alle Inhaltsseiten der aktuellen Kategorie auflisten...
-			$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR));
+			$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true);
 			// Jedes Element des Arrays an die Sitemap anhängen
 			foreach ($contentarray as $currentcontent) {
 				$sitemap .= "<li><a href=\"index.php?cat=$currentcategory&amp;page=".
