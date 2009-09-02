@@ -278,10 +278,10 @@ INHALT
 				$mainmenu .= "";
 			// Aktuelle Kategorie als aktiven Menüpunkt anzeigen...
 			elseif ($currentcategory == $CAT_REQUEST)
-				$mainmenu .= "<a href=\"index.php?cat=$currentcategory\" class=\"menuactive\">".substr($specialchars->rebuildSpecialChars($currentcategory), 3, strlen($currentcategory))."</a>";
+				$mainmenu .= "<a href=\"index.php?cat=$currentcategory\" class=\"menuactive\">".substr($specialchars->rebuildSpecialChars($currentcategory, false), 3, strlen($currentcategory))."</a>";
 			// ...alle anderen als normalen Menüpunkt.
 			else
-					$mainmenu .= "<a href=\"index.php?cat=$currentcategory\" class=\"menu\">".substr($specialchars->rebuildSpecialChars($currentcategory), 3, strlen($currentcategory))."</a>";
+					$mainmenu .= "<a href=\"index.php?cat=$currentcategory\" class=\"menu\">".substr($specialchars->rebuildSpecialChars($currentcategory, false), 3, strlen($currentcategory))."</a>";
 		}
 		// Rückgabe des Menüs
 		return $mainmenu;
@@ -304,7 +304,7 @@ INHALT
 		if ($ACTION_REQUEST == "sitemap")
 			return "<a href=\"index.php?action=sitemap\" class=\"detailmenuactive\">Sitemap</a>";
 		if ($ACTION_REQUEST == "draft")
-			return "<a href=\"index.php?action=draft\" class=\"detailmenuactive\">".substr($specialchars->rebuildSpecialChars($PAGE_REQUEST), 3, strlen($PAGE_REQUEST) - 3)." (Entwurf)</a>";
+			return "<a href=\"index.php?action=draft\" class=\"detailmenuactive\">".substr($specialchars->rebuildSpecialChars($PAGE_REQUEST, true), 3, strlen($PAGE_REQUEST) - 3)." (Entwurf)</a>";
 		$detailmenu = "";
 		// Content-Verzeichnis der aktuellen Kategorie einlesen
 		$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true);
@@ -315,14 +315,14 @@ INHALT
 				$detailmenu .= "<a href=\"index.php?cat=$CAT_REQUEST&amp;page=".
 												substr($currentcontent, 0, strlen($currentcontent) - strlen($CONTENT_EXTENSION)).
 												"\" class=\"detailmenuactive\">".
-												substr($specialchars->rebuildSpecialChars($currentcontent), 3, strlen($currentcontent) - strlen($CONTENT_EXTENSION) - 3).
+												$specialchars->rebuildSpecialChars(substr($currentcontent, 3, strlen($currentcontent) - strlen($CONTENT_EXTENSION) - 3), false).
 												"</a> ";
 			// ...alle anderen als normalen Menüpunkt.
 			else
 				$detailmenu .= "<a href=\"index.php?cat=$CAT_REQUEST&amp;page=".
 												substr($currentcontent, 0, strlen($currentcontent) - strlen($CONTENT_EXTENSION)).
 												"\" class=\"detailmenu\">".
-												substr($specialchars->rebuildSpecialChars($currentcontent), 3, strlen($currentcontent) - strlen($CONTENT_EXTENSION) - 3).
+												$specialchars->rebuildSpecialChars(substr($currentcontent, 3, strlen($currentcontent) - strlen($CONTENT_EXTENSION) - 3), false).
 												"</a> ";
 		}
 		// Rückgabe des Menüs
@@ -348,7 +348,7 @@ INHALT
 				}
 	    }
 		}
-		return "<a href=\"index.php?cat=".$latestchanged['cat']."&amp;page=".substr($latestchanged['file'], 0, strlen($latestchanged['file'])-4)."\" title=\"Inhaltsseite &quot;".$specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7))."&quot; anzeigen\" class=\"latestchangedlink\">".$specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7))."</a> (".strftime("%d.%m.%Y, %H:%M:%S", date($latestchanged['time'])).")";
+		return "<a href=\"index.php?cat=".$latestchanged['cat']."&amp;page=".substr($latestchanged['file'], 0, strlen($latestchanged['file'])-4)."\" title=\"Inhaltsseite &quot;".$specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true)."&quot; anzeigen\" class=\"latestchangedlink\">".$specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true)."</a> (".strftime("%d.%m.%Y, %H:%M:%S", date($latestchanged['time'])).")";
 	}
 
 
@@ -394,8 +394,7 @@ INHALT
 		}
 		
 		// Nach Texten in eckigen Klammern suchen
-//		preg_match_all("/\[([\w]+)\|([^\[\]\|]+)\]/", $content, $matches);
-		preg_match_all("/\[([\w]+)\|([^\[\]]+)\]/", $content, $matches);
+		preg_match_all("/\[([\w|=]+)\|([^\[\]]+)\]/", $content, $matches);
 		$i = 0;
 		// Für jeden Treffer...
 		foreach ($matches[0] as $match) {
@@ -479,7 +478,7 @@ INHALT
 	    			$j++;
 	    		}
 				}
-				$content = str_replace ($match, "<a href=\"gallery.php?cat=$CAT_REQUEST\" title=\"Galerie &quot;$value&quot; ($j Bilder) ansehen\" target=\"_blank\">$value</a>", $content);
+				$content = str_replace ($match, "<a href=\"gallery.php?cat=$CAT_REQUEST\" title=\"Galerie &quot;".substr($specialchars->rebuildSpecialChars($CAT_REQUEST, true), 3, strlen($CAT_REQUEST) - 3)."&quot; ($j Bilder) ansehen\" target=\"_blank\">$value</a>", $content);
 			}
 
 			// Bild aus dem Dateiverzeichnis (überprüfen, ob Bilddatei existiert)
@@ -521,6 +520,11 @@ INHALT
 				$content = str_replace ($match, "<em class=\"bolditalic\">$value</em>", $content);
 			}
 
+			// Text unterstrichen
+			elseif ($attribute == "unter"){
+				$content = str_replace ($match, "<em class=\"underlined\">$value</em>", $content);
+			}
+
 			// Überschrift groß
 			elseif ($attribute == "ueber1"){
 				$content = str_replace ("$match", "<h1>$value</h1>", $content);
@@ -554,6 +558,15 @@ INHALT
 			// HTML
 			elseif ($attribute == "html"){
 				$content = str_replace ("$match", html_entity_decode($value), $content);
+			}
+
+			// Farbige Elemente
+			elseif (substr($attribute,0,6) == "farbe=") {
+				// Überprüfung auf korrekten Hexadezimalwert
+				if (preg_match("/^([a-f]|\d){6}$/i", substr($attribute, 6, strlen($attribute)-6))) 
+					$content = str_replace ("$match", "<em style=\"color:#".substr($attribute, 6, strlen($attribute)-6).";\">".$value."</em>", $content);
+				else
+					$content = str_replace ("$match", "<em class=\"deadlink\" title=\"Fehlerhafter Farbwert: &quot;".substr($attribute, 6, strlen($attribute)-6)."&quot;\">$value</em>", $content);
 			}
 
 			// Attribute, die nicht zugeordnet werden können
@@ -600,7 +613,7 @@ INHALT
 			// Wenn die Kategorie keine Contentseiten hat, zeige sie nicht an
 			if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true) == "")
 				continue;
-			$sitemap .= "<h2>".substr($specialchars->rebuildSpecialChars($currentcategory), 3, strlen($currentcategory))."</h2><ul>";
+			$sitemap .= "<h2>".substr($specialchars->rebuildSpecialChars($currentcategory, true), 3, strlen($currentcategory))."</h2><ul>";
 			// Alle Inhaltsseiten der aktuellen Kategorie auflisten...
 			$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true);
 			// Jedes Element des Arrays an die Sitemap anhängen
@@ -608,9 +621,9 @@ INHALT
 				$sitemap .= "<li><a href=\"index.php?cat=$currentcategory&amp;page=".
 													substr($currentcontent, 0, strlen($currentcontent) - strlen($CONTENT_EXTENSION)).
 													"\" title=\"Inhaltsseite &quot;".
-													substr($specialchars->rebuildSpecialChars($currentcontent), 3, strlen($currentcontent) - strlen($CONTENT_EXTENSION) - 3).
+													substr($specialchars->rebuildSpecialChars($currentcontent, true), 3, strlen($currentcontent) - strlen($CONTENT_EXTENSION) - 3).
 													"&quot; anzeigen\">".
-													substr($specialchars->rebuildSpecialChars($currentcontent), 3, strlen($currentcontent) - strlen($CONTENT_EXTENSION) - 3).
+													substr($specialchars->rebuildSpecialChars($currentcontent, true), 3, strlen($currentcontent) - strlen($CONTENT_EXTENSION) - 3).
 													"</a></li>";
 			}
 			$sitemap .= "</ul>";
@@ -625,7 +638,7 @@ INHALT
 // Anzeige der Informationen zum System
 // ------------------------------------------------------------------------------
 	function getCmsInfo() {
-		return "<a href=\"http://www.moziloCMS.de.vu/\" target=\"_blank\" class=\"latestchangedlink\" title=\"moziloCMS.de.vu\">moziloCMS</a> 1.4";
+		return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" class=\"latestchangedlink\" title=\"cms.mozilo.de\">moziloCMS</a> 1.5";
 	}
 
 

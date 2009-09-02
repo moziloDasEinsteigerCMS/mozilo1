@@ -1,7 +1,7 @@
 [ueber1|Willkommen]
-...in Ihrem moziloCMS! Passen Sie alles an Ihre Bedürfnisse und Ziele an: Rufen Sie dafür die index.php aus dem Unterverzeichnis "admin" auf und loggen Sie sich in moziloAdmin, der moziloCMS-Konfigurationsoberfläche, ein. Die Standard-Zugangsdaten sind admin/install - bitte ändern Sie diese Daten als erstes!
+...in Ihrem moziloCMS! Passen Sie alles an Ihre Bedürfnisse und Ziele an: Loggen Sie sich dafür in die moziloCMS-Konfigurationsoberfläche [html|<a href="./admin/" target="_blank">moziloAdmin</a>] ein. Bitte vergessen Sie nicht, dort als erstes die Zugangsdaten zu ändern!
 
-Wie alles hier im moziloCMS funktioniert, ist auf [link|http://www.moziloCMS.de.vu/] beschrieben.
+Wie alles hier im moziloCMS funktioniert, ist auf [link|http://cms.mozilo.de] beschrieben.
 
 Hier noch als kleine Demonstration ein Bild, eine Datei und der Link auf eine Galerie:
 [bild|mozilo.jpg]

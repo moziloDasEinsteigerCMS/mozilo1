@@ -27,6 +27,12 @@ em {
 	font-style:normal;
 }
 
+img.thumbnail {
+	margin:5px;
+	border:1px solid #C0C0C0;
+}
+
+
 /* -------------------------------------------------------- */
 /* Layer für 100% Höhe */
 /* ------------------- */
@@ -328,6 +334,13 @@ em.italic {
 em.bolditalic {
 	font-weight:bold;
 	font-style:italic;
+}
+
+/* -------------------------------------------------------- */
+/* [unter|...] */
+/* ------------ */
+em.underlined {
+	text-decoration:underline;
 }
 
 

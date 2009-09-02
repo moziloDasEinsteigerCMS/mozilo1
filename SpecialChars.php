@@ -54,7 +54,7 @@ class SpecialChars {
 // ------------------------------------------------------------------------------    
 // Umlaute in Inhaltsseiten/Kategorien für Anzeige 
 // ------------------------------------------------------------------------------
-	function rebuildSpecialChars($text) {
+	function rebuildSpecialChars($text, $rebuildnbsp) {
 		$text = preg_replace("/-auml-/", "&auml;", $text);
 		$text = preg_replace("/-ouml-/", "&ouml;", $text);
 		$text = preg_replace("/-uuml-/", "&uuml;", $text);
@@ -62,7 +62,10 @@ class SpecialChars {
 		$text = preg_replace("/-Ouml-/", "&Ouml;", $text);
 		$text = preg_replace("/-Uuml-/", "&Uuml;", $text);
 		$text = preg_replace("/-szlig-/", "&szlig;", $text);
-		$text = preg_replace("/-nbsp-/", "&nbsp;", $text);
+		if ($rebuildnbsp)
+			$text = preg_replace("/-nbsp-/", "&nbsp;", $text);
+		else
+			$text = preg_replace("/-nbsp-/", " ", $text);
 		return $text;
 	}
 

@@ -23,6 +23,14 @@ require_once("SpecialChars.php");
 $mainconf = new Properties("main.conf");
 $specialchars = new SpecialChars();
 
+// Vorschaubilder nach Benutzereinstellung und wenn GDlib installiert
+if (!extension_loaded("gd"))
+	$mainconf->set("galleryusethumbs", "false");
+if ($mainconf->get("galleryusethumbs") == "true")
+	$USETHUMBS = true;
+else
+	$USETHUMBS = false;
+
 $MAX_IMG_WIDTH 			= $mainconf->get("gallerymaxwidth");
 if ($MAX_IMG_WIDTH == "")
 	$MAX_IMG_WIDTH = 500;
@@ -50,6 +58,7 @@ if ($FAVICON_FILE == "")
 // Übergebene Parameter überprüfen
 $CAT_REQUEST = $_GET['cat'];
 $DIR_GALLERY = "inhalt/".$CAT_REQUEST."/galerie/";
+$DIR_THUMBS = $DIR_GALLERY."vorschau/";
 if (($CAT_REQUEST == "") || (!file_exists($DIR_GALLERY)))
 	die ("FEHLER: Keine g&uuml;ltige Kategorie angegeben oder fehlendes Galerieverzeichnis!");
 $CURRENTCATEGORY = substr($CAT_REQUEST,3);
@@ -76,6 +85,11 @@ if (!in_array($INDEX+1, $ALLINDEXES))
 	$NEXT = 1;
 else
 	$NEXT = $INDEX+1;
+	
+if ($USETHUMBS) {
+	checkThumbs();
+	$THUMBARRAY = getPicsAsArray($DIR_THUMBS, array("jpg", "jpeg", "jpe", "gif", "png"));
+}
 
 // Galerie aufbauen und ausgeben
 $HTML = "";
@@ -93,9 +107,11 @@ echo $HTML;
 		global $CURRENTCATEGORY;
 		global $HTML;
 		global $FAVICON_FILE;
+		global $PICARRAY;
 		global $specialchars;
 		global $TEMPLATE_FILE;
 		global $USE_CMS_SYNTAX;
+		global $USETHUMBS;
 		global $WEBSITE_TITLE;
 		// Template-Datei auslesen
     if (!$file = @fopen($TEMPLATE_FILE, "r"))
@@ -107,12 +123,23 @@ echo $HTML;
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
     $HTML = preg_replace('/{WEBSITE_TITLE}/', $WEBSITE_TITLE, $HTML);
-    $HTML = preg_replace('/{CURRENTCATEGORY}/', $specialchars->rebuildSpecialChars($CURRENTCATEGORY), $HTML);
-    $HTML = preg_replace('/{GALLERYMENU}/', getGalleryMenu(), $HTML);
-    $HTML = preg_replace('/{NUMBERMENU}/', getNumberMenu(), $HTML);
-    $HTML = preg_replace('/{CURRENTPIC}/', getCurrentPic(), $HTML);
-    $HTML = preg_replace('/{CURRENTDESCRIPTION}/', getCurrentDescription(), $HTML);
-    $HTML = preg_replace('/{XOUTOFY}/', getXoutofY(), $HTML);
+    $HTML = preg_replace('/{CURRENTCATEGORY}/', $specialchars->rebuildSpecialChars($CURRENTCATEGORY, true), $HTML);
+    if (count($PICARRAY) == 0)
+    	$HTML = preg_replace('/{NUMBERMENU}/', "Diese Galerie enth&auml;lt keine Bilder.", $HTML);
+		if ($USETHUMBS) {
+	    $HTML = preg_replace('/{GALLERYMENU}/', "&nbsp;", $HTML);
+    	$HTML = preg_replace('/{NUMBERMENU}/', getThumbnails(), $HTML);
+	    $HTML = preg_replace('/{CURRENTPIC}/', "&nbsp;", $HTML);
+	    $HTML = preg_replace('/{CURRENTDESCRIPTION}/', "&nbsp;", $HTML);
+	    $HTML = preg_replace('/{XOUTOFY}/', "&nbsp;", $HTML);
+		}
+		else {
+	    $HTML = preg_replace('/{GALLERYMENU}/', getGalleryMenu(), $HTML);
+	    $HTML = preg_replace('/{NUMBERMENU}/', getNumberMenu(), $HTML);
+	    $HTML = preg_replace('/{CURRENTPIC}/', getCurrentPic(), $HTML);
+	    $HTML = preg_replace('/{CURRENTDESCRIPTION}/', getCurrentDescription(), $HTML);
+	    $HTML = preg_replace('/{XOUTOFY}/', getXoutofY(), $HTML);
+		}
 	}
 	
 	
@@ -157,11 +184,13 @@ echo $HTML;
 // Nummernmenü erzeugen
 // ------------------------------------------------------------------------------
 	function getNumberMenu() {
+		global $mainconf;
 		global $CAT_REQUEST;
 		global $FIRST;
 		global $INDEX;
 		global $LAST;
 		global $PICARRAY;
+
 		// Keine Bilder im Galerieverzeichnis?
 		if (count($PICARRAY) == 0)
 			return "&nbsp;";
@@ -169,12 +198,30 @@ echo $HTML;
 		$numbermenu = "";
 		for ($i=$FIRST; $i<=$LAST; $i++) {
 			if ($INDEX == $i)
-				$numbermenu .= "<em class=\"bold\">".$i."</em> | ";
+					$numbermenu .= "<em class=\"bold\">".$i."</em> | ";
 			else
-				$numbermenu .= "<a href=\"gallery.php?cat=".$CAT_REQUEST."&amp;index=".$i."\">".$i."</a> | ";
+					$numbermenu .= "<a href=\"gallery.php?cat=".$CAT_REQUEST."&amp;index=".$i."\">".$i."</a> | ";
 		}
 		// Rückgabe des Menüs
 		return substr($numbermenu, 0, strlen($numbermenu)-2);
+	}
+	
+
+// ------------------------------------------------------------------------------
+// Nummernmenü erzeugen
+// ------------------------------------------------------------------------------
+	function getThumbnails() {
+		global $DIR_GALLERY;
+		global $DIR_THUMBS;
+		global $PICARRAY;
+		global $THUMBARRAY;
+		
+		$thumbs = "";
+		for ($i=0; $i<count($THUMBARRAY); $i++) {
+			$thumbs .= "<a href=\"".$DIR_GALLERY.$PICARRAY[$i]."\" target=\"_blank\" title=\"Vollbildanzeige: ".$PICARRAY[$i]."\"><img src=\"".$DIR_THUMBS.$THUMBARRAY[$i]."\" alt=\"".$THUMBARRAY[$i]."\" class=\"thumbnail\" /></a>";
+		}
+		// Rückgabe des Menüs
+		return $thumbs;
 	}
 	
 	
@@ -227,7 +274,7 @@ echo $HTML;
 		global $PICARRAY;
 		// Keine Bilder im Galerieverzeichnis?
 		if (count($PICARRAY) == 0)
-			return "Diese Galerie enth&auml;lt keine Bilder.";
+			return "&nbsp;";
 		// Texte einlesen
 		$alldescriptions = new Properties($DIR_GALLERY."texte.conf");
 		return htmlentities($alldescriptions->get($PICARRAY[$INDEX-1]));
@@ -267,4 +314,26 @@ function getPicsAsArray($dir, $filetypes) {
 }
 
 
+// ------------------------------------------------------------------------------
+// Prüfen, ob alle Thumbnails vorhanden sind; evtl. anlegen
+// ------------------------------------------------------------------------------
+function checkThumbs() {
+	// Thumbnail-Funktionalität
+	require_once("Thumbnail.php");
+	$thumbnailfunction = new Thumbnail();
+
+	global $DIR_GALLERY;
+	global $DIR_THUMBS;
+	global $PICARRAY;
+	
+	// Vorschauverzeichnis prüfen
+	if (!file_exists($DIR_THUMBS))
+		die ("FEHLER: Fehlendes Vorschauverzeichnis!");
+	// alle Bilder überprüfen: Vorschau dazu vorhanden?
+	foreach($PICARRAY as $pic) {
+		// Vorschaubild anlegen, wenn nicht vorhanden
+		if (!file_exists($DIR_THUMBS.$pic))
+			$thumbnailfunction->createThumb($pic, $DIR_GALLERY, $DIR_THUMBS);
+	}
+}
 ?>

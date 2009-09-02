@@ -24,8 +24,6 @@
 	function getLastBackup() 
 	{
 		$BASIC_CONFIG 		= new Properties("conf/basic.conf");
-		if ($BASIC_CONFIG->get("lastbackup") == "")
-			$BASIC_CONFIG->set("lastbackup",time());
 		return $BASIC_CONFIG->get("lastbackup");
 	}
 	
@@ -81,7 +79,7 @@
 	    	else
 	    	{
 	    		$content .= "<option style=\"color:lightgrey;\">";
-					$content .= addFrontZero($pos)." ".$specialchars->rebuildSpecialChars(specialNrDir($dir, $pos));
+					$content .= addFrontZero($pos)." ".$specialchars->rebuildSpecialChars(specialNrDir($dir, $pos), true);
 					$content .= "</option>";		
 	    	}
 	    
@@ -112,7 +110,7 @@
 	    	else
 	    	{
 	    		$content .= "<option style=\"color:lightgrey;\">";
-	    		$fullname = $specialchars->rebuildSpecialChars(specialNrDir($dir, $pos));
+	    		$fullname = $specialchars->rebuildSpecialChars(specialNrDir($dir, $pos), true);
 					$content .= addFrontZero($pos)." ".substr($fullname, 0, strlen($fullname)-strlen(".txt"));
 					$content .= "</option>";		
 	    	}
@@ -200,6 +198,7 @@
 		mkdir ("../inhalt/".$_GET["position"]."_".$betterString, 0777);
 		mkdir ("../inhalt/".$_GET["position"]."_".$betterString."/dateien", 0777);
 		mkdir ("../inhalt/".$_GET["position"]."_".$betterString."/galerie", 0777);
+		mkdir ("../inhalt/".$_GET["position"]."_".$betterString."/galerie/vorschau", 0777);
 		$filename = "../inhalt/".$_GET["position"]."_".$betterString."/galerie/texte.conf";
 		$fp = fopen ($filename, "w");
 		chmod ($filename, 0777);
@@ -234,7 +233,7 @@
 		sort($dirs);
 		$select = "<select name=\"cat\">";
 			foreach ($dirs as $file)
-				$select .= "<option value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3))."</option>";
+				$select .= "<option value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</option>";
 		$select .= "</select>";
 		return $select;
 	}
