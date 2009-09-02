@@ -869,7 +869,7 @@ echo $html;
 	function deleteFile() {
 		global $specialchars;
 		$pagecontent = "<h2>".getLanguageValue("button_data_delete")."</h2>";
-		// Löschen der Datein nach Auswertung der übergebenen Parameter
+		// Löschen der Dateien nach Auswertung der übergebenen Parameter
 		if (isset($_GET['cat']) && isset($_GET['file']) && file_exists("../inhalt/".$_GET['cat']) && file_exists("../inhalt/".$_GET['cat']."/dateien/".$_GET['file'])) {
 			if (isset($_GET['confirm']) && ($_GET['confirm'] == "true")) {
 				if (unlink("../inhalt/".$_GET['cat']."/dateien/".$_GET['file']))
@@ -880,8 +880,6 @@ echo $html;
 			else
 				$pagecontent .= returnMessage(false, $_GET['file'].": ".getLanguageValue("data_file_delete_confirm")." <a href=\"index.php?action=deletefile&amp;cat=".$_GET['cat']."&amp;file=".$_GET['file']."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=deletefile\">".getLanguageValue("no")."</a>");
 		}
-		
-		
 		$pagecontent .= "<p>".getLanguageValue("data_delete_text")."</p>";
 		$dirs = getDirs("../inhalt");
 		foreach ($dirs as $file) {
@@ -890,7 +888,12 @@ echo $html;
 				$pagecontent .= "<h3>".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3))."</h3>";
 				$hasdata = false;
 				$pagecontent .= "<table class=\"data\">";
+				$mysubfiles = array();
 				while (($subfile = readdir($subhandle))) {
+					array_push($mysubfiles, $subfile);
+				}
+				sort($mysubfiles);
+				foreach ($mysubfiles as $subfile) {
 					if (($subfile <> ".") && ($subfile <> "..")) {
 						$pagecontent .= "<tr><td class=\"config_row1\">$subfile</td><td class=\"config_row2\"><a href=\"../inhalt/".$file."/dateien/".$subfile."\" target=\"_blank\">".getLanguageValue("data_download")."</a> - <a href=\"index.php?action=deletefile&amp;cat=".$file."&amp;file=".$subfile."\">".getLanguageValue("button_delete")."</a></td></tr>";
 						$hasdata = true;
