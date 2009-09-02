@@ -1,18 +1,27 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
 		<style type="text/css"> @import "{CSS_FILE}"; </style>
 		<link rel="SHORTCUT ICON" href="{FAVICON_FILE}" />
 		<title>{WEBSITE_TITLE}</title>
+		<script type="text/javascript"><!--
+			function setSearchFocus() {
+				if (document.search) {
+  				document.search.query.focus();
+  				document.search.query.select();
+  			}
+			}
+		--></script>
 	</head>
-	<body>
+	<body onLoad="setSearchFocus();">
 		<div class="main">
-			<div class="fullheight">
-			</div>
 			<div class="header">
 			</div>
 			<div class="mainmenu">
 				{MAINMENU}<br />
+				Inhaltssuche:
+				{SEARCH}<br />
+				<br />
 				<a href="http://cms.mozilo.de/" target="_blank" title="moziloCMS - Das CMS für Einsteiger">
 					<img src="grafiken/mozilocmsbanner105x40.png" alt="Banner moziloCMS" />
 				</a>
@@ -29,7 +38,7 @@
 					</div>
 				</div>
 			</div>
-			<br style="clear:both;">
+			<br style="clear:both;" />
 		</div>
 	</body>
 </html>

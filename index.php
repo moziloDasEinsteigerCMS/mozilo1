@@ -116,7 +116,7 @@ INHALT
 			//...erste Contentseite der Kategorie setzen
 			$PAGE_REQUEST = substr($pagesarray[0], 0, strlen($pagesarray[0]) - strlen($CONTENT_EXTENSION));
 		// Wenn ein Action-Parameter übergeben wurde: keine aktiven Kat./Inhaltts. anzeigen
-		if ($ACTION_REQUEST == "sitemap") {
+		if (($ACTION_REQUEST == "sitemap") || ($ACTION_REQUEST == "search")) {
 			$CAT_REQUEST = "";
 			$PAGE_REQUEST = "";
 		}
@@ -144,14 +144,25 @@ INHALT
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
     $HTML = preg_replace('/{WEBSITE_TITLE}/', $WEBSITE_TITLE, $HTML);
+    $pagecontent = "";
     if ($ACTION_REQUEST == "sitemap")
-    	$HTML = preg_replace('/{CONTENT}/', getSiteMap(), $HTML);
+    	$pagecontent = getSiteMap();
+    elseif ($ACTION_REQUEST == "search")
+    	$pagecontent = getSearchResult();
     elseif ($USE_CMS_SYNTAX)
-    	$HTML = preg_replace('/{CONTENT}/', convertContent(getContent(), true), $HTML);
+    	$pagecontent = convertContent(getContent(), true);
     else
-    	$HTML = preg_replace('/{CONTENT}/', getContent(), $HTML);
+    	$pagecontent = getContent();
+
+		// Gesuchte Phrasen hervorheben
+		if ((isset($_GET['highlight'])) &&  ($_GET['highlight'] <> ""))
+			$pagecontent = highlight($pagecontent, htmlentities($_GET['highlight']));
+		
+		$HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
+
     $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
     $HTML = preg_replace('/{DETAILMENU}/', getDetailMenu(), $HTML);
+    $HTML = preg_replace('/{SEARCH}/', getSearchForm(), $HTML);
     $HTML = preg_replace('/{LASTCHANGE}/', getLastChangedContentPage(), $HTML);
     $HTML = preg_replace('/{SITEMAPLINK}/', "<a href=\"index.php?action=sitemap\" class=\"latestchangedlink\" title=\"Sitemap anzeigen\">Sitemap</a>", $HTML);
     $HTML = preg_replace('/{CMSINFO}/', getCmsInfo(), $HTML);
@@ -176,7 +187,7 @@ INHALT
 		// Wenn kein Verzeichnis paßt: Leerstring zurückgeben
 		return "";
 	}
-
+	
 
 // ------------------------------------------------------------------------------    
 // Zu einer Inhaltsseite passende Datei suchen und zurückgeben
@@ -200,6 +211,26 @@ INHALT
 		// Wenn keine Datei paßt: Leerstring zurückgeben
 		return "";
 	}
+
+
+// ------------------------------------------------------------------------------    
+// Seitennamen aus komplettem Dateinamen einer Inhaltsseite zurückgeben
+// ------------------------------------------------------------------------------
+	function pageToName($page, $rebuildnbsp) {
+		global $CONTENT_EXTENSION;
+		global $specialchars;
+		return $specialchars->rebuildSpecialChars(substr($page, 3, strlen($page) - 3 - strlen($CONTENT_EXTENSION)), $rebuildnbsp);
+	}	
+
+
+// ------------------------------------------------------------------------------    
+// Kategorienamen aus komplettem Verzeichnisnamen einer Kategorie zurückgeben
+// ------------------------------------------------------------------------------
+	function catToName($cat, $rebuildnbsp) {
+		global $CONTENT_EXTENSION;
+		global $specialchars;
+		return $specialchars->rebuildSpecialChars(substr($cat, 3, strlen($cat)), $rebuildnbsp);
+	}	
 
 
 // ------------------------------------------------------------------------------
@@ -303,7 +334,9 @@ INHALT
 		// Wurde keine Kategorie übergeben, dann leeres Detailmenü ausgeben
 		if ($ACTION_REQUEST == "sitemap")
 			return "<a href=\"index.php?action=sitemap\" class=\"detailmenuactive\">Sitemap</a>";
-		if ($ACTION_REQUEST == "draft")
+		elseif ($ACTION_REQUEST == "search")
+			return "<a href=\"index.php?action=search&amp;query=".htmlentities($_GET['query'])."\" class=\"detailmenuactive\">Suchergebnisse f&uuml;r &quot;".htmlentities($_GET['query'])."&quot;</a>";
+		elseif ($ACTION_REQUEST == "draft")
 			return "<a href=\"index.php?action=draft\" class=\"detailmenuactive\">".substr($specialchars->rebuildSpecialChars($PAGE_REQUEST, true), 3, strlen($PAGE_REQUEST) - 3)." (Entwurf)</a>";
 		$detailmenu = "";
 		// Content-Verzeichnis der aktuellen Kategorie einlesen
@@ -330,6 +363,18 @@ INHALT
 	}
 
 
+// ------------------------------------------------------------------------------
+// Einlesen des Inhalts-Verzeichnisses, Rückgabe der zuletzt geänderten Datei
+// ------------------------------------------------------------------------------
+	function getSearchForm(){
+		$form = "<form method=\"get\" action=\"index.php\" name=\"search\" class=\"searchform\">"
+		."<input type=\"hidden\" name=\"action\" value=\"search\" />"
+		."<input type=\"text\" name=\"query\" value=\"\" class=\"searchtextfield\" />"
+		."<input type=\"image\" name=\"action\" value=\"search\" src=\"grafiken/searchicon.gif\" alt=\"Suchen\" class=\"searchbutton\" title=\"Suchen\" />"
+		."</form>";
+		return $form;
+	}
+
 
 // ------------------------------------------------------------------------------
 // Einlesen des Inhalts-Verzeichnisses, Rückgabe der zuletzt geänderten Datei
@@ -348,7 +393,7 @@ INHALT
 				}
 	    }
 		}
-		return "<a href=\"index.php?cat=".$latestchanged['cat']."&amp;page=".substr($latestchanged['file'], 0, strlen($latestchanged['file'])-4)."\" title=\"Inhaltsseite &quot;".$specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true)."&quot; anzeigen\" class=\"latestchangedlink\">".$specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true)."</a> (".strftime("%d.%m.%Y, %H:%M:%S", date($latestchanged['time'])).")";
+		return "<a href=\"index.php?cat=".$latestchanged['cat']."&amp;page=".substr($latestchanged['file'], 0, strlen($latestchanged['file'])-4)."\" title=\"Inhaltsseite &quot;".$specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true)."&quot; in der Kategorie &quot;".$specialchars->rebuildSpecialChars(substr($latestchanged['cat'], 3, strlen($latestchanged['cat'])-3), true)."&quot; anzeigen\" class=\"latestchangedlink\">".$specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true)."</a> (".strftime("%d.%m.%Y, %H:%M:%S", date($latestchanged['time'])).")";
 	}
 
 
@@ -394,7 +439,7 @@ INHALT
 		}
 		
 		// Nach Texten in eckigen Klammern suchen
-		preg_match_all("/\[([\w|=]+)\|([^\[\]]+)\]/", $content, $matches);
+		preg_match_all("/\[([\w|=]+)\|([^\[\]]+)\]/U", $content, $matches);
 		$i = 0;
 		// Für jeden Treffer...
 		foreach ($matches[0] as $match) {
@@ -464,7 +509,7 @@ INHALT
 			// Datei aus dem Dateiverzeichnis (überprüfen, ob Datei existiert)
 			elseif ($attribute == "datei"){
 				if (file_exists("./$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/$value"))
-					$content = str_replace ($match, "<a href=\"$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/$value\" title=\"Datei &quot;$value&quot; herunterladen\" target=\"_blank\">$value</a>", $content);
+					$content = str_replace ($match, "<a href=\"$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/".preg_replace("'\s'", "%20", $value)."\" title=\"Datei &quot;$value&quot; herunterladen\" target=\"_blank\">$value</a>", $content);
 				else
 					$content = str_replace ($match, "<em class=\"deadlink\" title=\"Datei &quot;$value&quot; nicht vorhanden\">$value</em>", $content);
 			}
@@ -481,28 +526,48 @@ INHALT
 				$content = str_replace ($match, "<a href=\"gallery.php?cat=$CAT_REQUEST\" title=\"Galerie &quot;".substr($specialchars->rebuildSpecialChars($CAT_REQUEST, true), 3, strlen($CAT_REQUEST) - 3)."&quot; ($j Bilder) ansehen\" target=\"_blank\">$value</a>", $content);
 			}
 
-			// Bild aus dem Dateiverzeichnis (überprüfen, ob Bilddatei existiert)
+			// Bild aus dem Dateiverzeichnis (überprüfen, ob Bilddatei existiert - sonst wird ein externer Pfad angenommen)
 			elseif ($attribute == "bild"){
 				if (file_exists("./$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/$value"))
-					$content = str_replace ($match, "<img src=\"$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/$value\" alt=\"Bild &quot;$value&quot;\" />", $content);
+					$content = str_replace ($match, "<img src=\"$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/".preg_replace("'\s'", "%20", $value)."\" alt=\"Bild &quot;$value&quot;\" />", $content);
 				else
-					$content = str_replace ($match, "<em class=\"deadlink\" title=\"Bilddatei &quot;$value&quot; nicht vorhanden\">$value</em>", $content);
+					$content = str_replace ($match, "<img src=\"$value\" alt=\"Bild &quot;$value&quot;\" />", $content);
 			}
 
 			// Bild links ausgerichtet
 			elseif ($attribute == "bildlinks"){
 				if (file_exists("./$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/$value"))
-					$content = str_replace ($match, "<img src=\"$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/$value\" class=\"leftcontentimage\" alt=\"Bild &quot;$value&quot;\" />", $content);
+					$content = str_replace ($match, "<img src=\"$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/".preg_replace("'\s'", "%20", $value)."\" class=\"leftcontentimage\" alt=\"Bild &quot;$value&quot;\" />", $content);
 				else
-					$content = str_replace ($match, "<em class=\"deadlink\" title=\"Bilddatei &quot;$value&quot; nicht vorhanden\">$value</em>", $content);
+					$content = str_replace ($match, "<img src=\"$value\" class=\"leftcontentimage\" alt=\"Bild &quot;$value&quot;\" />", $content);
 			}
 
 			// Bild rechts ausgerichtet
 			elseif ($attribute == "bildrechts"){
 				if (file_exists("./$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/$value"))
-					$content = str_replace ($match, "<img src=\"$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/$value\" class=\"rightcontentimage\" alt=\"Bild &quot;$value&quot;\" />", $content);
+					$content = str_replace ($match, "<img src=\"$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/".preg_replace("'\s'", "%20", $value)."\" class=\"rightcontentimage\" alt=\"Bild &quot;$value&quot;\" />", $content);
 				else
-					$content = str_replace ($match, "<em class=\"deadlink\" title=\"Bilddatei &quot;$value&quot; nicht vorhanden\">$value</em>", $content);
+					$content = str_replace ($match, "<img src=\"$value\" class=\"rightcontentimage\" alt=\"Bild &quot;$value&quot;\" />", $content);
+			}
+
+			// linksbündiger Text
+			if ($attribute == "links"){
+				$content = str_replace ("$match", "<div style=\"text-align:left;\">".$value."</div>", $content);
+			}
+
+			// zentrierter Text
+			elseif ($attribute == "zentriert"){
+				$content = str_replace ("$match", "<div style=\"text-align:center;\">".$value."</div>", $content);
+			}
+
+			// Text im Blocksatz
+			elseif ($attribute == "block"){
+				$content = str_replace ("$match", "<div style=\"text-align:justified;\">".$value."</div>", $content);
+			}
+
+			// rechtsbündiger Text
+			elseif ($attribute == "rechts"){
+				$content = str_replace ("$match", "<div style=\"text-align:right;\">".$value."</div>", $content);
 			}
 
 			// Text fett
@@ -557,7 +622,8 @@ INHALT
 			
 			// HTML
 			elseif ($attribute == "html"){
-				$content = str_replace ("$match", html_entity_decode($value), $content);
+				$nobrvalue = preg_replace('/(\r\n|\r|\n)?/m', '', $value);
+				$content = str_replace ("$match", html_entity_decode($nobrvalue), $content);
 			}
 
 			// Farbige Elemente
@@ -633,12 +699,91 @@ INHALT
 	}
 
 
+// ------------------------------------------------------------------------------
+// Anzeige der Suchergebnisse
+// ------------------------------------------------------------------------------
+	function getSearchResult() {
+		global $CONTENT_DIR_ABS;
+		global $CONTENT_DIR_REL;
+		global $CONTENT_EXTENSION;
+		global $CONTENT_FILES_DIR;
+		global $CONTENT_GALLERY_DIR;
+		global $USE_CMS_SYNTAX;
+		global $specialchars;
+		
+		$query = htmlentities(trim($_GET['query']));
+		$searchresults = "<h1>Suchergebnisse f&uuml;r &quot;".$query."&quot;</h1>";
+		// Kategorien-Verzeichnis einlesen
+		$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, array(), false);
+		// Alle Kategorien durchsuchen
+		$matchesoverall = 0;
+		foreach ($categoriesarray as $currentcategory) {
+			// Wenn die Kategorie keine Contentseiten hat, zur nächsten springen
+			if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true) == "")
+				continue;
+			// Alle Inhaltsseiten der aktuellen Kategorie sammeln, die das Suchwort enthalten...
+			$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true);
+			$matchingpages = array();
+			$i = 0;
+			foreach ($contentarray as $currentcontent) {
+				$pagename = substr($specialchars->rebuildSpecialChars($currentcontent, true), 3, strlen($currentcontent) - strlen($CONTENT_EXTENSION) - 3);
+				$filepath = $CONTENT_DIR_REL."/".$currentcategory."/".$currentcontent;
+				if (filesize($filepath) > 0) {
+					$handle = fopen($filepath, "r");
+					$content = fread($handle, filesize($filepath));
+					fclose($handle);
+					if (
+						($query == "") 
+						|| (substr_count(strtolower($content), strtolower(html_entity_decode($query))) > 0) 
+						|| (substr_count(strtolower($pagename), strtolower($query)) > 0)) {
+						$matchingpages[$i] = $currentcontent;
+						$i++;
+					}
+				}
+			}
+			// die gesammelten Seiten ausgeben
+			if (count($matchingpages) > 0) {
+				$categoryname = $specialchars->rebuildSpecialChars(substr($currentcategory, 3, strlen($currentcategory)-3), true);
+				$searchresults .= "<h2>$categoryname</h2><ul>";
+				foreach ($matchingpages as $matchingpage) {
+					$pagename = substr($specialchars->rebuildSpecialChars($matchingpage, true), 3, strlen($matchingpage) - strlen($CONTENT_EXTENSION) - 3);
+					$filepath = $CONTENT_DIR_REL."/".$currentcategory."/".$matchingpage;
+					$searchresults .= "<li><a href=\"index.php?cat=$currentcategory&amp;page=".
+												substr($matchingpage, 0, strlen($matchingpage) - strlen($CONTENT_EXTENSION)).
+												"&amp;highlight=$query\" title=\"Inhaltsseite &quot;$pagename&quot; ".
+												"in der Kategorie &quot;".$categoryname."&quot; anzeigen\">".
+												$pagename.
+												"</a></li>";
+				}
+				$searchresults .= "</ul>";
+				$matchesoverall += count($matchingpages);
+			}
+		}
+		// Keine Inhalte gefunden?
+		if ($matchesoverall == 0)
+			$searchresults .= "Keine passenden Inhalte gefunden.";
+		// Rückgabe des Menüs
+		return $searchresults;
+	}
+	
+	
+// ------------------------------------------------------------------------------
+// Phrasen in Inhalt hervorheben
+// ------------------------------------------------------------------------------
+	function highlight($content, $phrase) {
+		$phrase = preg_quote($phrase);
+		// nicht ersetzen zwischen < und > sowie zwischen & und ;
+		$content = preg_replace("/((<[^>]*|&[^;]*)|$phrase)/ie", '"\2"=="\1"? "\1":"<em class=\"highlight\">\1</em>"', $content);
+		return $content;
+	}
+
+
 
 // ------------------------------------------------------------------------------
 // Anzeige der Informationen zum System
 // ------------------------------------------------------------------------------
 	function getCmsInfo() {
-		return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" class=\"latestchangedlink\" title=\"cms.mozilo.de\">moziloCMS</a> 1.5";
+		return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" class=\"latestchangedlink\" title=\"cms.mozilo.de\">moziloCMS 1.6</a>";
 	}
 
 

@@ -108,6 +108,7 @@ echo $HTML;
 		global $HTML;
 		global $FAVICON_FILE;
 		global $PICARRAY;
+		global $INDEX;
 		global $specialchars;
 		global $TEMPLATE_FILE;
 		global $USE_CMS_SYNTAX;
@@ -137,7 +138,7 @@ echo $HTML;
 	    $HTML = preg_replace('/{GALLERYMENU}/', getGalleryMenu(), $HTML);
 	    $HTML = preg_replace('/{NUMBERMENU}/', getNumberMenu(), $HTML);
 	    $HTML = preg_replace('/{CURRENTPIC}/', getCurrentPic(), $HTML);
-	    $HTML = preg_replace('/{CURRENTDESCRIPTION}/', getCurrentDescription(), $HTML);
+	    $HTML = preg_replace('/{CURRENTDESCRIPTION}/', getCurrentDescription($PICARRAY[$INDEX-1]), $HTML);
 	    $HTML = preg_replace('/{XOUTOFY}/', getXoutofY(), $HTML);
 		}
 	}
@@ -215,12 +216,36 @@ echo $HTML;
 		global $DIR_THUMBS;
 		global $PICARRAY;
 		global $THUMBARRAY;
+		global $mainconf;
 		
-		$thumbs = "";
+		// Aus Config auslesen: Wieviele Bilder pro Tabellenzeile?
+		$picsperrow = $mainconf->get("gallerypicsperrow");
+		if (($picsperrow == "") || ($picsperrow == 0))
+			$picsperrow = 4;
+
+		$thumbs = "<table class=\"gallerytable\"><tr>";
+		$i = 0;
 		for ($i=0; $i<count($THUMBARRAY); $i++) {
-			$thumbs .= "<a href=\"".$DIR_GALLERY.$PICARRAY[$i]."\" target=\"_blank\" title=\"Vollbildanzeige: ".$PICARRAY[$i]."\"><img src=\"".$DIR_THUMBS.$THUMBARRAY[$i]."\" alt=\"".$THUMBARRAY[$i]."\" class=\"thumbnail\" /></a>";
+			// Bildbeschreibung holen
+			$description = getCurrentDescription($THUMBARRAY[$i]);
+			if ($description == "")
+				$description = "&nbsp;";
+			// Neue Tabellenzeile aller picsperrow Zeichen
+			if (($i > 0) && ($i % $picsperrow == 0))
+				$thumbs .= "</tr><tr>";
+			$thumbs .= "<td class=\"gallerytd\" style=\"width:".floor(100 / $picsperrow)."%;\">"
+			."<a href=\"".$DIR_GALLERY.$PICARRAY[$i]."\" target=\"_blank\" title=\"Vollbildanzeige: ".$PICARRAY[$i]."\">"
+			."<img src=\"".$DIR_THUMBS.$THUMBARRAY[$i]."\" alt=\"".$THUMBARRAY[$i]."\" class=\"thumbnail\" />"
+			."</a><br />"
+			.$description
+			."</td>";
 		}
-		// Rückgabe des Menüs
+		while ($i % $picsperrow > 0) {
+			$thumbs .= "<td class=\"gallerytd\">&nbsp;</td>";
+			$i++;
+		}
+		$thumbs .= "</tr></table>";
+		// Rückgabe der Thumbnails
 		return $thumbs;
 	}
 	
@@ -257,7 +282,7 @@ echo $HTML;
 			$currentpic .= "<img src=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" alt=\"Galeriebild &quot;".$PICARRAY[$INDEX-1]."&quot;\"  style=\"width:".$w."px;height:".$h."px;\"/>";
 		}
 		else
-			$currentpic .= "<img src=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" alt=\"Galeriebild &quot;".$PICARRAY[$INDEX-1]."&quot;\"  style=\"width:".$MAX_IMG_WIDTH."px;width:inherit;height:inherit;max-width:".$MAX_IMG_WIDTH."px;max-height:".$MAX_IMG_HEIGHT."px;\"/>";
+			$currentpic .= "<img src=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" alt=\"Galeriebild &quot;".$PICARRAY[$INDEX-1]."&quot;\"  style=\"max-width:".$MAX_IMG_WIDTH."px;max-height:".$MAX_IMG_HEIGHT."px;\"/>";
 			// Link zur Vollbildansicht schließen
 			$currentpic .= "</a>";
 		// Rückgabe des Bildes
@@ -268,7 +293,7 @@ echo $HTML;
 // ------------------------------------------------------------------------------
 // Beschreibung zum aktuellen Bild anzeigen
 // ------------------------------------------------------------------------------
-	function getCurrentDescription() {
+	function getCurrentDescription($picname) {
 		global $DIR_GALLERY;
 		global $INDEX;
 		global $PICARRAY;
@@ -277,7 +302,7 @@ echo $HTML;
 			return "&nbsp;";
 		// Texte einlesen
 		$alldescriptions = new Properties($DIR_GALLERY."texte.conf");
-		return htmlentities($alldescriptions->get($PICARRAY[$INDEX-1]));
+		return htmlentities($alldescriptions->get($picname));
 	}
 
 

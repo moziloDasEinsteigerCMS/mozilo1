@@ -6,8 +6,8 @@ $ADMIN_TITLE = "moziloAdmin";
 	if (!$_SESSION['login_okay'])
 		header("location:login.php?logout=true");
 
-	require("filesystem.php");
-	require("string.php");
+	require_once("filesystem.php");
+	require_once("string.php");
 	$ADMIN_CONF	= new Properties("conf/basic.conf");
 	$CMS_CONF	= new Properties("../main.conf");
 
@@ -17,11 +17,8 @@ $ADMIN_TITLE = "moziloAdmin";
 		$action = $_POST['action'];
 	$functionreturn = array();
 	
-	// Startseite
-	if($action=="home")
-		$functionreturn = home();
 	// Kategorien
-	elseif ($action=="category")
+	if ($action=="category")
 		$functionreturn = category();
 	elseif ($action=="newcategory")
 		$functionreturn = newCategory();
@@ -63,7 +60,7 @@ $ADMIN_TITLE = "moziloAdmin";
 		$functionreturn = configAdminDisplay();
 	elseif ($action=="loginadminconfig")
 		$functionreturn = configAdminLogin();
-	// Bei unbekanntem oder leerem action-Parameter
+	// Bei unbekanntem oder leerem action-Parameter: Startseite
 	else
 		$functionreturn = home();
 
@@ -97,6 +94,7 @@ $ADMIN_TITLE = "moziloAdmin";
 	$html .= "<div id=\"main_div\">";
 	// Titelleiste
 	$html .= "<div id=\"design_Title\">";
+	$html .= "<a href=\"login.php?logout=true\" accesskey=\"x\"></a>";
 	$html .= "<div id=\"design_Titletext\">$ADMIN_TITLE - $pagetitle</div>";
 	$html .= "<a href=\"login.php?logout=true\" accesskey=\"".createNormalTooltip("button_home_logout", "button_home_logout_tooltip", 150)."\"><span id=\"design_Logout\"></span></a>";
 	$html .= "</div>";
@@ -151,7 +149,7 @@ $ADMIN_TITLE = "moziloAdmin";
 /* Seiteninhalt */
 	$html .= "<div id=\"div_content\">";
 	$loginconf = new Properties("conf/logindata.conf");
-	if ($loginconf->get("initialpw") == "true")
+	if (($loginconf->get("initialpw") == "true") && ($action <> "loginadminconfig"))
 		$html .= returnMessage(false, getLanguageValue("warning_initial_pw"));
 	$html .= $pagecontent;
 	$html .= "</div>";
@@ -174,8 +172,9 @@ echo $html;
 	function home() {
 		$pagecontent .= "<h2>".getLanguageValue("button_home")."</h2>";
 		$pagecontent .= "<p>";
+		
 		$month = getLastBackup() + 2592000;
-		if( $month < time())
+		if($month < time())
 		{
 			$pagecontent .= returnMessage(false, getLanguageValue("reminder_backup"));
 			setLastBackup();
@@ -954,45 +953,75 @@ echo $html;
 		$changesmade = false;
 		if (isset($_GET['apply']) && ($_GET['apply'] == "true")) {
 			$changesapplied = false;
-			if (isset($_GET['gmw']) && isset($_GET['gmh'])) {
-				if(
-					preg_match("/^[0-9]+$/", $_GET['gmw']) 
-					&& preg_match("/^[0-9]+$/", $_GET['gmh']) 
-					&& ($_GET['title'] <> "") 
-					&& ($_GET['template'] <> "") 
-					&& ($_GET['gallerytemplate'] <> "") 
-					&& ($_GET['gthumbs'] <> "")
-					&& ($_GET['css'] <> "") 
-					&& ($_GET['favicon'] <> "") 
-					&& ($_GET['dcat'] <> "") 
-					) {
-					$CMS_CONF->set("gallerymaxwidth", $_GET['gmw']);
-					$CMS_CONF->set("gallerymaxheight", $_GET['gmh']);
-					$CMS_CONF->set("websitetitle", htmlentities($_GET['title']));
-					$CMS_CONF->set("templatefile", $_GET['template']);
-					$CMS_CONF->set("gallerytemplatefile", $_GET['gallerytemplate']);
-					$CMS_CONF->set("galleryusethumbs", $_GET['gthumbs']);
-					$CMS_CONF->set("cssfile", $_GET['css']);
-					$CMS_CONF->set("faviconfile", $_GET['favicon']);
-					$CMS_CONF->set("defaultcat", $specialchars->deleteSpecialChars($_GET['dcat']));
-					if ($_GET['usesyntax'] == "on")
-						$CMS_CONF->set("usecmssyntax", "true");
-					else
-						$CMS_CONF->set("usecmssyntax", "false");
-					$pagecontent .= returnMessage(true, getLanguageValue("changes_applied"));
-				}
+			if (
+				isset($_GET['gmw']) && preg_match("/^[0-9]+$/", $_GET['gmw'])
+				&& isset($_GET['gmh']) && preg_match("/^[0-9]+$/", $_GET['gmh']) 
+				&& isset($_GET['title']) && ($_GET['title'] <> "") 
+				&& isset($_GET['template']) && ($_GET['template'] <> "") 
+				&& isset($_GET['gallerytemplate']) && ($_GET['gallerytemplate'] <> "") 
+				&& isset($_GET['gthumbs']) && ($_GET['gthumbs'] <> "")
+				&& isset($_GET['gppr']) && (($_GET['gppr'] <> "") && preg_match("/^[0-9]+$/", $_GET['gppr']))
+				&& isset($_GET['css']) && ($_GET['css'] <> "") 
+				&& isset($_GET['favicon']) && ($_GET['favicon'] <> "") 
+				&& isset($_GET['dcat']) && ($_GET['dcat'] <> "") 
+				) {
+				$CMS_CONF->set("websitetitle", htmlentities($_GET['title']));
+				$CMS_CONF->set("templatefile", $_GET['template']);
+				$CMS_CONF->set("gallerytemplatefile", $_GET['gallerytemplate']);
+				$CMS_CONF->set("galleryusethumbs", $_GET['gthumbs']);
+				$CMS_CONF->set("gallerypicsperrow", $_GET['gppr']);
+				$CMS_CONF->set("gallerymaxwidth", $_GET['gmw']);
+				$CMS_CONF->set("gallerymaxheight", $_GET['gmh']);
+				$CMS_CONF->set("cssfile", $_GET['css']);
+				$CMS_CONF->set("faviconfile", $_GET['favicon']);
+				$CMS_CONF->set("defaultcat", $specialchars->deleteSpecialChars($_GET['dcat']));
+				if ($_GET['usesyntax'] == "on")
+					$CMS_CONF->set("usecmssyntax", "true");
 				else
-					$pagecontent .= returnMessage(false, getLanguageValue("invalid_values"));
+					$CMS_CONF->set("usecmssyntax", "false");
+				$pagecontent .= returnMessage(true, getLanguageValue("changes_applied"));
 			}
+			else
+				$pagecontent .= returnMessage(false, getLanguageValue("invalid_values"));
 		}
 		$pagecontent .= "<p>".getLanguageValue("config_cmsdisplay_text")."</p>";
 		$pagecontent .= "<form action=\"index.php\" method=\"get\"><input type=\"hidden\" name=\"action\" value=\"displaycmsconfig\"><input type=\"hidden\" name=\"apply\" value=\"true\">";
+		$pagecontent .= "<h3>".getLanguageValue("config_cmsglobal_headline")."</h3>";
 		$pagecontent .= "<table>";
 		// Zeile "WEBSITE-TITEL"
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("websitetitle_text")."</td>";
 		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"title\" value=\"".$CMS_CONF->get("websitetitle")."\" /></td>";
 		$pagecontent .= "</tr>";
+		// Zeile "STANDARD-KATEGORIE"
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("defaultcat_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\">";
+		$dirs = array();
+		$dirs = getDirs("../inhalt");
+		$pagecontent .= "<select name=\"dcat\">";
+		foreach ($dirs as $element) {
+			$myfiles = getFiles("../inhalt/".$element."_".specialNrDir("../inhalt", $element));
+			if (count($myfiles) == 0)
+				continue;
+			$selected = "";
+			if ($element."_".$specialchars->rebuildSpecialChars(specialNrDir("../inhalt", $element), true) == $CMS_CONF->get("defaultcat"))
+				$selected = "selected ";
+			$pagecontent .= "<option ".$selected."value=\"".$element."_".$specialchars->rebuildSpecialChars(specialNrDir("../inhalt", $element), true)."\">".$specialchars->rebuildSpecialChars(specialNrDir("../inhalt", $element), true)."</option>";
+		}
+		$pagecontent .= "</select></td>";
+		$pagecontent .= "</tr>";
+		// Zeile "NUTZE CMS-SYNTAX"
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("usesyntax_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"checkbox\" ";
+		if ($CMS_CONF->get("usecmssyntax") == "true")
+			$pagecontent .= "checked=checked";
+		$pagecontent .= " name=\"usesyntax\">".getLanguageValue("usesyntax_text2")."</td>";
+		$pagecontent .= "</tr>";
+		$pagecontent .= "</table>";
+		$pagecontent .= "<h3>".getLanguageValue("config_cmsdetail_headline")."</h3>";
+		$pagecontent .= "<table>";
 		// Zeile "HTML-TEMPLATE"
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("template_text")."</td>";
@@ -1013,35 +1042,10 @@ echo $html;
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("favicon_text")."</td>";
 		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"favicon\" value=\"".$CMS_CONF->get("faviconfile")."\" /></td>";
 		$pagecontent .= "</tr>";
-		// Zeile "STANDARD-KATEGORIE"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("defaultcat_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\">";
-		$dirs = array();
-		$dirs = getDirs("../inhalt");
-		$pagecontent .= "<select name=\"dcat\">";
-		foreach ($dirs as $element) {
-			$myfiles = getFiles("../inhalt/".$element."_".specialNrDir("../inhalt", $element));
-			if (count($myfiles) == 0)
-				continue;
-			$selected = "";
-			if ($element."_".$specialchars->rebuildSpecialChars(specialNrDir("../inhalt", $element), true) == $CMS_CONF->get("defaultcat"))
-				$selected = "selected ";
-			$pagecontent .= "<option ".$selected."value=\"".$element."_".$specialchars->rebuildSpecialChars(specialNrDir("../inhalt", $element), true)."\">".$specialchars->rebuildSpecialChars(specialNrDir("../inhalt", $element), true)."</option>";
-		}
-		$pagecontent .= "</select></td>";
-		$pagecontent .= "</tr>";
-		// Zeile "MAXIMALE BILDBREIE GALERIE"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallerymaxwidth_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"gmw\" value=\"".$CMS_CONF->get("gallerymaxwidth")."\" /></td>";
-		$pagecontent .= "</tr>";
-		// Zeile "MAXIMALE BILDHÖHE GALERIE"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallerymaxheight_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"gmh\" value=\"".$CMS_CONF->get("gallerymaxheight")."\" /></td>";
-		$pagecontent .= "</tr>";
-		// Zeile "VORSCHAUBILDER IN GALERIE" (nur, wenn GDlib installiert ist)
+		$pagecontent .= "</table>";
+		$pagecontent .= "<h3>".getLanguageValue("config_cmsgallery_headline")."</h3>";
+		$pagecontent .= "<table>";
+		// Zeile "GALERIE IM EINZEL- ODER ÜBERSICHT-MODUS" (nur, wenn GDlib installiert ist)
 		if (extension_loaded("gd")) {
 			if ($CMS_CONF->get("galleryusethumbs") == "true")
 				$checked1 = "checked=\"checked\" ";
@@ -1052,16 +1056,33 @@ echo $html;
 			$pagecontent .= "<td class=\"config_row2\"><input type=\"radio\" name=\"gthumbs\" value=\"true\"$checked1 />".getLanguageValue("galleryusethumbs_yes")."<br /><input type=\"radio\" name=\"gthumbs\" value=\"false\"$checked2 />".getLanguageValue("galleryusethumbs_no")."</td>";
 			$pagecontent .= "</tr>";
 		}
-		else
-			$CMS_CONF->set("galleryusethumbs", "false");
-		// Zeile "NUTZE CMS-SYNTAX"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("usesyntax_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"checkbox\" ";
-		if ($CMS_CONF->get("usecmssyntax") == "true")
-			$pagecontent .= "checked=checked";
-		$pagecontent .= " name=\"usesyntax\">".getLanguageValue("usesyntax_text2")."</td>";
-		$pagecontent .= "</tr>";
+			
+		if (extension_loaded("gd") && ($CMS_CONF->get("galleryusethumbs") == "true")) {
+			// "ANZAHL VORSCHAUBILDER IN EINER ZEILE" 
+			$pagecontent .= "<tr>";
+			$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallerypicsperrow_text");
+			$pagecontent .= "<input type=\"hidden\" name=\"gmw\" value=\"".$CMS_CONF->get("gallerymaxwidth")."\">";
+			$pagecontent .= "<input type=\"hidden\" name=\"gmh\" value=\"".$CMS_CONF->get("gallerymaxheight")."\">";
+			$pagecontent .= "</td>";
+			$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"gppr\" value=\"".$CMS_CONF->get("gallerypicsperrow")."\" /></td>";
+			$pagecontent .= "</tr>";
+		}
+		
+		// wenn GDlib nicht installiert ist oder Benutzer Einzelmodus gewählt hat
+		if (!extension_loaded("gd") || ($CMS_CONF->get("galleryusethumbs") != "true")) {
+			// Zeile "MAXIMALE BILDBREIE GALERIE"
+			$pagecontent .= "<tr>";
+			$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallerymaxwidth_text");
+			$pagecontent .= "<input type=\"hidden\" name=\"gppr\" value=\"".$CMS_CONF->get("gallerypicsperrow")."\">";
+			$pagecontent .= "</td>";
+			$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"gmw\" value=\"".$CMS_CONF->get("gallerymaxwidth")."\" /></td>";
+			$pagecontent .= "</tr>";
+			// Zeile "MAXIMALE BILDHÖHE GALERIE"
+			$pagecontent .= "<tr>";
+			$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallerymaxheight_text")."</td>";
+			$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"gmh\" value=\"".$CMS_CONF->get("gallerymaxheight")."\" /></td>";
+			$pagecontent .= "</tr>";
+		}
 		// Zeile "ÜBERNEHMEN"
 		$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td><td class=\"config_row2\"><input type=\"submit\" class=\"submit\" value=\"".getLanguageValue("config_submit")."\"/></td></tr>";
 		$pagecontent .= "</table>";
@@ -1137,67 +1158,110 @@ echo $html;
 	function configAdminLogin() {
 		$pagecontent .= "<h2>".getLanguageValue("button_config_loginadmin")."</h2>";
 		$adminconf = new Properties("conf/logindata.conf");
+		$erroroccured = false;
 		require_once("Crypt.php");
 		$pwcrypt = new Crypt("send 'i cracked your silly code' to codecracked@azett.com");
 		// Übergebene Werte prüfen
 		if ($_POST['apply'] == "true") {
-			if (
 			// Alle Felder übergeben...
-			isset($_POST['oldname']) && isset($_POST['oldpw']) && isset($_POST['newname']) && isset($_POST['newpw']) && isset($_POST['newpwrepeat'])
+			if(!$erroroccured)
+				if (isset($_POST['oldname']) && isset($_POST['oldpw']) && isset($_POST['newname']) && isset($_POST['newpw']) && isset($_POST['newpwrepeat']))
+					$erroroccured = false;
+				else {
+					$erroroccured = true;
+					$pagecontent .= returnMessage(false, getLanguageValue("config_admin_missingvalues"));
+				}
+				
 			// ...und keines leer?
-			&& ($_POST['oldname'] <> "" ) && ($_POST['oldpw'] <> "" ) && ($_POST['newname'] <> "" ) && ($_POST['newpw'] <> "" ) && ($_POST['newpwrepeat'] <> "" )
+			if(!$erroroccured)
+				if (($_POST['oldname'] <> "" ) && ($_POST['oldpw'] <> "" ) && ($_POST['newname'] <> "" ) && ($_POST['newpw'] <> "" ) && ($_POST['newpwrepeat'] <> "" ))
+					$erroroccured = false;
+				else {
+					$erroroccured = true;
+					$pagecontent .= returnMessage(false, getLanguageValue("config_admin_missingvalues"));
+				}
+			
 			// Alte Zugangsdaten korrekt? 
-			&& ($_POST['oldname'] == $adminconf->get("name")) && ($_POST['oldpw'] == $pwcrypt->decrypt($adminconf->get("pw")))
-			// Neuer Name wenigstens 5 Zeichen lang?
-			&& (strlen($_POST['newname']) >= 5)
-			// Neues Paßwort zweimal exakt gleich eingegeben?
-			&& ($_POST['newpw'] == $_POST['newpwrepeat'])
-			// Neues Paßwort wenigstens sechs Zeichen lang und mindestens aus kleinen und großen Buchstaben sowie Zahlen bestehend?
-			&& (strlen($_POST['newpw']) >= 6) && preg_match("/[0-9]/", $_POST['newpw']) && preg_match("/[a-z]/", $_POST['newpw']) && preg_match("/[A-Z]/", $_POST['newpw'])
-			) {
-			$adminconf->set("name", $_POST['newname']);
-			$adminconf->set("pw", $pwcrypt->encrypt($_POST['newpw']));
-			$adminconf->set("initialpw", "false");
-			$pagecontent .= returnMessage(true, getLanguageValue("config_userdata_changed"));
-			}
-			else
-				$pagecontent .= returnMessage(false, getLanguageValue("invalid_values"));
-		}
-		$pagecontent .= "<p>";
-		$pagecontent .= getLanguageValue("config_adminlogin_text");
-		$pagecontent .= "</p>";
-		$pagecontent .= "<form action=\"index.php\" method=\"post\"><input type=\"hidden\" name=\"apply\" value=\"true\">";
-		$pagecontent .= "<table class=\"data\">";
-		// Zeile "ALTER NAME"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("config_oldname_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"oldname\" /></td>";
-		$pagecontent .= "</tr>";
-		// Zeile "ALTES PASSWORT"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("config_oldpw_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"password\" class=\"text1\" name=\"oldpw\" /></td>";
-		$pagecontent .= "</tr>";
-		// Zeile "NEUER NAME"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("config_newname_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"newname\" /></td>";
-		$pagecontent .= "</tr>";
-		// Zeile "NEUES PASSWORT"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("config_newpw_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"password\" class=\"text1\" name=\"newpw\" /></td>";
-		$pagecontent .= "</tr>";
-		// Zeile "NEUES PASSWORT - WIEDERHOLUNG"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("config_newpwrepeat_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"password\" class=\"text1\" name=\"newpwrepeat\" /></td>";
-		$pagecontent .= "</tr>";
-		// Zeile "ÜBERNEHMEN"
-		$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td><td class=\"config_row2\"><input type=\"hidden\" name=\"action\" value=\"loginadminconfig\" /><input type=\"submit\" class=\"submit\" value=\"".getLanguageValue("config_submit")."\"/></td></tr>";
+			if(!$erroroccured)
+				if (($_POST['oldname'] == $adminconf->get("name")) && ($_POST['oldpw'] == $pwcrypt->decrypt($adminconf->get("pw"))))
+					$erroroccured = false;
+				else {
+					$erroroccured = true;
+					$pagecontent .= returnMessage(false, getLanguageValue("config_admin_wronglogindata"));
+				}
 
-		$pagecontent .= "</table>";
-		$pagecontent .= "</form>";
+			// Neuer Name wenigstens 5 Zeichen lang?
+			if(!$erroroccured)
+				if (strlen($_POST['newname']) >= 5)
+					$erroroccured = false;
+				else {
+					$erroroccured = true;
+					$pagecontent .= returnMessage(false, getLanguageValue("config_admin_tooshortname"));
+				}
+
+			// Neues Paßwort zweimal exakt gleich eingegeben?
+			if(!$erroroccured)
+				if ($_POST['newpw'] == $_POST['newpwrepeat'])
+					$erroroccured = false;
+				else {
+					$erroroccured = true;
+					$pagecontent .= returnMessage(false, getLanguageValue("config_admin_newpwmismatch"));
+				}
+
+			// Neues Paßwort wenigstens sechs Zeichen lang und mindestens aus kleinen und großen Buchstaben sowie Zahlen bestehend?
+			if(!$erroroccured)
+				if ((strlen($_POST['newpw']) >= 6) && preg_match("/[0-9]/", $_POST['newpw']) && preg_match("/[a-z]/", $_POST['newpw']) && preg_match("/[A-Z]/", $_POST['newpw']))
+					$erroroccured = false;
+				else {
+					$erroroccured = true;
+					$pagecontent .= returnMessage(false, getLanguageValue("config_admin_newpwerror"));
+				}
+
+			if (!$erroroccured){
+				$adminconf->set("name", $_POST['newname']);
+				$adminconf->set("pw", $pwcrypt->encrypt($_POST['newpw']));
+				$adminconf->set("initialpw", "false");
+				$pagecontent .= returnMessage(true, getLanguageValue("config_userdata_changed"));
+			}
+		}
+		$pagecontent .= "<p>"
+		.getLanguageValue("config_adminlogin_text")
+		."<br />"
+		."<br />"
+		.getLanguageValue("config_adminlogin_rules_text")
+		."</p>"
+		."<form action=\"index.php\" method=\"post\"><input type=\"hidden\" name=\"apply\" value=\"true\">"
+		."<table class=\"data\">"
+		// Zeile "ALTER NAME"
+		."<tr>"
+		."<td class=\"config_row1\">".getLanguageValue("config_oldname_text")."</td>"
+		."<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"oldname\" value=\"".$_POST['oldname']."\" /></td>"
+		."</tr>"
+		// Zeile "ALTES PASSWORT"
+		."<tr>"
+		."<td class=\"config_row1\">".getLanguageValue("config_oldpw_text")."</td>"
+		."<td class=\"config_row2\"><input type=\"password\" class=\"text1\" name=\"oldpw\" /></td>"
+		."</tr>"
+		// Zeile "NEUER NAME"
+		."<tr>"
+		."<td class=\"config_row1\">".getLanguageValue("config_newname_text")."</td>"
+		."<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"newname\" value=\"".$_POST['newname']."\" /></td>"
+		."</tr>"
+		// Zeile "NEUES PASSWORT"
+		."<tr>"
+		."<td class=\"config_row1\">".getLanguageValue("config_newpw_text")."</td>"
+		."<td class=\"config_row2\"><input type=\"password\" class=\"text1\" name=\"newpw\" /></td>"
+		."</tr>"
+		// Zeile "NEUES PASSWORT - WIEDERHOLUNG"
+		."<tr>"
+		."<td class=\"config_row1\">".getLanguageValue("config_newpwrepeat_text")."</td>"
+		."<td class=\"config_row2\"><input type=\"password\" class=\"text1\" name=\"newpwrepeat\" /></td>"
+		."</tr>"
+		// Zeile "ÜBERNEHMEN"
+		."<tr><td class=\"config_row1\">&nbsp;</td><td class=\"config_row2\"><input type=\"hidden\" name=\"action\" value=\"loginadminconfig\" /><input type=\"submit\" class=\"submit\" value=\"".getLanguageValue("config_submit")."\"/></td></tr>"
+
+		."</table>"
+		."</form>";
 		return array(getLanguageValue("button_config_loginadmin"), $pagecontent);
 	}
 	
@@ -1215,32 +1279,7 @@ echo $html;
 			$pagecontent = "[ueber1|".substr($page, 3,strlen($page)-7)."]";
 		
 		if ($CMS_CONF->get("usecmssyntax") == "true") {
-			$content = "<p class=\"toolbar\">"
-			// show user information if javascript inactive
-			."<noscript><span class=\"fehler\">".getLanguageValue("toolbar_nojs_text")."</span></noscript>"
-			// toolbar
-			."<img class=\"js\" title=\"[link| ... ]\" alt=\"Link\" src=\"gfx/jsToolbar/link.png\" onClick=\"insert('[link|', ']')\">"
-	    ."<img class=\"js\" alt=\"eMail\" title=\"[mail| ... ]\" src=\"gfx/jsToolbar/mail.png\" onClick=\"insert('[mail|', ']')\">"
-	    ."<img class=\"js\" alt=\"Seite\"	title=\"[seite| ... ]\" src=\"gfx/jsToolbar/seite.png\" onClick=\"insert('[seite|', ']')\">"
-	  	."<img class=\"js\" alt=\"Kategorie\"	title=\"[kategorie| ... ]\" src=\"gfx/jsToolbar/kategorie.png\" onClick=\"insert('[kategorie|', ']')\">"
-	  	."<img class=\"js\" alt=\"Datei\" title=\"[datei| ... ]\" src=\"gfx/jsToolbar/datei.png\" onClick=\"insert('[datei|', ']')\">"
-	  	."<img class=\"js\" alt=\"Galerie\"	title=\"[galerie| ... ]\" src=\"gfx/jsToolbar/galerie.png\" onClick=\"insert('[galerie|', ']')\">"
-	  	."<img class=\"js\" alt=\"Bild\" title=\"[bild| ... ]\" src=\"gfx/jsToolbar/bild.png\" onClick=\"insert('[bild|', ']')\">"
-	  	."<img class=\"js\" alt=\"Bildlinks\"	title=\"[bildlinks| ... ]\" src=\"gfx/jsToolbar/bildlinks.png\" onClick=\"insert('[bildlinks|', ']')\">"
-	  	."<img class=\"js\" alt=\"Bildrechts\" title=\"[bildrechts| ... ]\" src=\"gfx/jsToolbar/bildrechts.png\" onClick=\"insert('[bildrechts|', ']')\">"
-	  	."<img class=\"js\" alt=\"Fett\" title=\"[fett| ... ]\" src=\"gfx/jsToolbar/fett.png\" onClick=\"insert('[fett|', ']')\">"
-	  	."<img class=\"js\" alt=\"Kursiv\" title=\"[kursiv| ... ]\" src=\"gfx/jsToolbar/kursiv.png\" onClick=\"insert('[kursiv|', ']')\">"
-	  	."<img class=\"js\" alt=\"Fettkursiv\" title=\"[fettkursiv| ... ]\" src=\"gfx/jsToolbar/fettkursiv.png\" onClick=\"insert('[fettkursiv|', ']')\">"
-	  	."<img class=\"js\" alt=\"Unterstrichen\" title=\"[unter| ... ]\" src=\"gfx/jsToolbar/unter.png\" onClick=\"insert('[unter|', ']')\">"
-	  	."<img class=\"js\" alt=\"Farbe\" title=\"[farbe=RRGGBB| ... ]\" src=\"gfx/jsToolbar/farbe.png\" onClick=\"insert('[farbe=AA0000|', ']')\">"
-	  	."<img class=\"js\" alt=\"Überschrift1\" title=\"[ueber1| ... ]\" src=\"gfx/jsToolbar/ueber1.png\" onClick=\"insert('[ueber1|', ']')\">"
-	  	."<img class=\"js\" alt=\"Überschrift2\" title=\"[ueber2| ... ]\" src=\"gfx/jsToolbar/ueber2.png\" onClick=\"insert('[ueber2|', ']')\">"
-	  	."<img class=\"js\" alt=\"Überschrift3\" title=\"[ueber3| ... ]\" src=\"gfx/jsToolbar/ueber3.png\" onClick=\"insert('[ueber3|', ']')\">"
-	  	."<img class=\"js\" alt=\"Liste1\" title=\"[liste1| ... ]\" src=\"gfx/jsToolbar/liste1.png\" onClick=\"insert('[liste1|', ']')\">"
-	  	."<img class=\"js\" alt=\"Liste2\" title=\"[liste2| ... ]\" src=\"gfx/jsToolbar/liste2.png\" onClick=\"insert('[liste2|', ']')\">"
-	  	."<img class=\"js\" alt=\"Liste3\" title=\"[liste3| ... ]\" src=\"gfx/jsToolbar/liste3.png\" onClick=\"insert('[liste3|', ']')\">"
-	  	."<img class=\"js\" alt=\"Horizontale Linie\" title=\"[----]\" src=\"gfx/jsToolbar/linie.png\" onClick=\"insert('[----]', '')\">"
-	  	."<img class=\"js\" alt=\"HTML\" title=\"[html| ... ]\" src=\"gfx/jsToolbar/html.png\" onClick=\"insert('[html|', ']')\"></p>";
+			$content = returnFormatToolbar();
 	  }
 
 		// Seiteninhalt
@@ -1253,7 +1292,7 @@ echo $html;
 		$checked = "";
 		if (substr($page, strlen($page)-4, 4) == ".tmp")
 			$checked = " checked";
-		$content .= "<input type=\"checkbox\"$checked name=\"draft\" /> ".getLanguageValue("draft_checkbox");
+		$content .= "<input type=\"checkbox\"$checked name=\"draft\" accesskey=\"e\" /> ".getLanguageValue("draft_checkbox");
 		return $content;
 	}
 	
@@ -1307,64 +1346,41 @@ echo $html;
 			return "<span class=\"fehler\">".$message."</span>";
 	}
 	
-	function returnToolbar() {
-		$js .= "<script type=\"text/javascript\">";
-		$js .= "<!--";
-		$js .= "function insert(aTag, eTag) {";
-	  $js .= "var input = document.forms['form'].elements['pagecontent'];";
-	  $js .= "input.focus();";
-	  /* für Internet Explorer */
-	  $js .= "if(typeof document.selection != 'undefined') {";
-	  /* Einfügen des Formatierungscodes */
-	  $js .=  "var range = document.selection.createRange();";
-	  $js .=  "var insText = range.text;";
-	  $js .=  "range.text = aTag + insText + eTag;";
-	    /* Anpassen der Cursorposition */
-	  $js .=  "range = document.selection.createRange();";
-	  $js .=  "if (insText.length == 0) {";
-	  $js .=  "range.move('character', -eTag.length);";
-	  $js .=  "} else {";
-	  $js .=  "range.moveStart('character', aTag.length + insText.length + eTag.length);";
-	  $js .=  "}";
-	  $js .=  "range.select();";
-	  $js .=  "}";
-	  /* für neuere auf Gecko basierende Browser */
-	  $js .=  "else if(typeof input.selectionStart != 'undefined')";
-	  $js .=  "{";
-	  /* Einfügen des Formatierungscodes */
-	  $js .=  "var start = input.selectionStart;";
-	  $js .=  "var end = input.selectionEnd;";
-	  $js .=  "var insText = input.value.substring(start, end);";
-	  $js .=  "input.value = input.value.substr(0, start) + aTag + insText + eTag + input.value.substr(end);";
-	    /* Anpassen der Cursorposition */
-	  $js .=  "var pos;";
-	  $js .=  "if (insText.length == 0) {";
-	  $js .=  "pos = start + aTag.length;";
-	  $js .=  "} else {";
-	  $js .=  "pos = start + aTag.length + insText.length + eTag.length;";
-	  $js .=  "}";
-	  $js .=  "input.selectionStart = pos;";
-	  $js .=  "input.selectionEnd = pos;";
-	  $js .=  "}";
-	  /* für die übrigen Browser */
-	  $js .=  "else";
-	  $js .=  "{";
-	  /* Abfrage der Einfügeposition */
-	  $js .=  "var pos;";
-	  $js .=  "var re = new RegExp('^[0-9]{0,3}$');";
-	  $js .=  "while(!re.test(pos)) {";
-	  $js .=  "pos = prompt(\"Einfügen an Position (0..\" + input.value.length + \"):\", \"0\");";
-	  $js .=  "}";
-	  $js .=  "if(pos > input.value.length) {";
-	  $js .=  "pos = input.value.length;";
-	  $js .=  "}";
-	  /* Einfügen des Formatierungscodes */
-	  $js .=  "var insText = prompt(\"Bitte geben Sie den zu formatierenden Text ein:\");";
-	  $js .=  "input.value = input.value.substr(0, pos) + aTag + insText + eTag + input.value.substr(pos);";
-	  $js .=  "}";
-		$js .=  "}";
-		$js .=  "//-->";
-	  $js .=  "</script>";
+	function returnFormatToolbar() {
+			$content = "<p class=\"toolbar\">"
+			// show user information if javascript inactive
+			."<noscript><span class=\"fehler\">".getLanguageValue("toolbar_nojs_text")."</span></noscript>"
+			// syntax elements
+			.getLanguageValue("toolbar_syntaxelements")."<br />"
+			."<img class=\"js\" title=\"[link| ... ]\" alt=\"Link\" src=\"gfx/jsToolbar/link.png\" onClick=\"insert('[link|', ']')\">"
+	    ."<img class=\"js\" alt=\"eMail\" title=\"[mail| ... ]\" src=\"gfx/jsToolbar/mail.png\" onClick=\"insert('[mail|', ']')\">"
+	    ."<img class=\"js\" alt=\"Seite\"	title=\"[seite| ... ]\" src=\"gfx/jsToolbar/seite.png\" onClick=\"insert('[seite|', ']')\">"
+	  	."<img class=\"js\" alt=\"Kategorie\"	title=\"[kategorie| ... ]\" src=\"gfx/jsToolbar/kategorie.png\" onClick=\"insert('[kategorie|', ']')\">"
+	  	."<img class=\"js\" alt=\"Datei\" title=\"[datei| ... ]\" src=\"gfx/jsToolbar/datei.png\" onClick=\"insert('[datei|', ']')\">"
+	  	."<img class=\"js\" alt=\"Galerie\"	title=\"[galerie| ... ]\" src=\"gfx/jsToolbar/galerie.png\" onClick=\"insert('[galerie|', ']')\">"
+	  	."<img class=\"js\" alt=\"Bild\" title=\"[bild| ... ]\" src=\"gfx/jsToolbar/bild.png\" onClick=\"insert('[bild|', ']')\">"
+	  	."<img class=\"js\" alt=\"Bildlinks\"	title=\"[bildlinks| ... ]\" src=\"gfx/jsToolbar/bildlinks.png\" onClick=\"insert('[bildlinks|', ']')\">"
+	  	."<img class=\"js\" alt=\"Bildrechts\" title=\"[bildrechts| ... ]\" src=\"gfx/jsToolbar/bildrechts.png\" onClick=\"insert('[bildrechts|', ']')\">"
+	  	."<img class=\"js\" alt=\"Überschrift1\" title=\"[ueber1| ... ]\" src=\"gfx/jsToolbar/ueber1.png\" onClick=\"insert('[ueber1|', ']')\">"
+	  	."<img class=\"js\" alt=\"Überschrift2\" title=\"[ueber2| ... ]\" src=\"gfx/jsToolbar/ueber2.png\" onClick=\"insert('[ueber2|', ']')\">"
+	  	."<img class=\"js\" alt=\"Überschrift3\" title=\"[ueber3| ... ]\" src=\"gfx/jsToolbar/ueber3.png\" onClick=\"insert('[ueber3|', ']')\">"
+	  	."<img class=\"js\" alt=\"Liste1\" title=\"[liste1| ... ]\" src=\"gfx/jsToolbar/liste1.png\" onClick=\"insert('[liste1|', ']')\">"
+	  	."<img class=\"js\" alt=\"Liste2\" title=\"[liste2| ... ]\" src=\"gfx/jsToolbar/liste2.png\" onClick=\"insert('[liste2|', ']')\">"
+	  	."<img class=\"js\" alt=\"Liste3\" title=\"[liste3| ... ]\" src=\"gfx/jsToolbar/liste3.png\" onClick=\"insert('[liste3|', ']')\">"
+	  	."<img class=\"js\" alt=\"Horizontale Linie\" title=\"[----]\" src=\"gfx/jsToolbar/linie.png\" onClick=\"insert('[----]', '')\">"
+	  	."<img class=\"js\" alt=\"HTML\" title=\"[html| ... ]\" src=\"gfx/jsToolbar/html.png\" onClick=\"insert('[html|', ']')\">"
+	  	."<br />"
+			// text formatting
+			.getLanguageValue("toolbar_textformatting")."<br />"
+	  	."<img class=\"js\" alt=\"Linksbündig\" title=\"[links| ... ]\" src=\"gfx/jsToolbar/links.png\" onClick=\"insert('[links|', ']')\">"
+	  	."<img class=\"js\" alt=\"Zentriert\" title=\"[zentriert| ... ]\" src=\"gfx/jsToolbar/zentriert.png\" onClick=\"insert('[zentriert|', ']')\">"
+	  	."<img class=\"js\" alt=\"Blocksatz\" title=\"[block| ... ]\" src=\"gfx/jsToolbar/block.png\" onClick=\"insert('[block|', ']')\">"
+	  	."<img class=\"js\" alt=\"Rechtsbündig\" title=\"[rechts| ... ]\" src=\"gfx/jsToolbar/rechts.png\" onClick=\"insert('[rechts|', ']')\">"
+	  	."<img class=\"js\" alt=\"Fett\" title=\"[fett| ... ]\" src=\"gfx/jsToolbar/fett.png\" onClick=\"insert('[fett|', ']')\">"
+	  	."<img class=\"js\" alt=\"Kursiv\" title=\"[kursiv| ... ]\" src=\"gfx/jsToolbar/kursiv.png\" onClick=\"insert('[kursiv|', ']')\">"
+	  	."<img class=\"js\" alt=\"Fettkursiv\" title=\"[fettkursiv| ... ]\" src=\"gfx/jsToolbar/fettkursiv.png\" onClick=\"insert('[fettkursiv|', ']')\">"
+	  	."<img class=\"js\" alt=\"Unterstrichen\" title=\"[unter| ... ]\" src=\"gfx/jsToolbar/unter.png\" onClick=\"insert('[unter|', ']')\">"
+	  	."<img class=\"js\" alt=\"Farbe\" title=\"[farbe=RRGGBB| ... ]\" src=\"gfx/jsToolbar/farbe.png\" onClick=\"insert('[farbe=AA0000|', ']')\"></p>";
 	  
-	  return $js;
+	  return $content;
 	}

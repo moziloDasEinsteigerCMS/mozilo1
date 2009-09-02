@@ -8,6 +8,8 @@
 html, body {
 	margin:0px;
 	padding:0px;
+	height:inherit;
+	height:100%;
 }
 body 	{
 	background-color:#FFFFFF;
@@ -23,24 +25,7 @@ a:hover	{
 	text-decoration:underline;
 }
 em {
-	font-weight:normal;
-	font-style:normal;
-}
-
-img.thumbnail {
-	margin:5px;
-	border:1px solid #C0C0C0;
-}
-
-
-/* -------------------------------------------------------- */
-/* Layer für 100% Höhe */
-/* ------------------- */
-/* Eine Hommage an den unseligen Internet Explorer. Sacktreter, der! */
-div.fullheight {
-	float:right;
-	height:100%;
-	background-color:white;
+	font:inherit;
 }
 
 
@@ -49,8 +34,7 @@ div.fullheight {
 /* ----------- */
 div.main {
 	width:780px;
-	height:100%;
-	height:inherit;
+	min-height:inherit;
 	min-height:100%;
 	margin:0px auto;
 	background-color:#FFFFFF;
@@ -132,6 +116,23 @@ div.gallerynumbermenu {
 	float:none;
 	margin:0px auto;
 	line-height:16px;
+}
+
+
+/* -------------------------------------------------------- */
+/* Galerie-Tabelle (Übersichtsmodus) */
+/* --------------------------------- */
+table.gallerytable {
+	margin:0px auto;
+	border:1px solid #C0C0C0;
+	border-collapse:collapse;
+}
+td.gallerytd {
+	vertical-align:top;
+	border:1px solid #C0C0C0;
+}
+img.thumbnail {
+	margin:5px;
 }
 
 
@@ -256,6 +257,59 @@ em.deadlink {
 }
 
 
+/* -------------------------------------------------------- */
+/* Suchwort-Hervorhebungen */
+/* ----------------------- */
+em.highlight {
+	padding:0px 1px;
+	font-size:inherit;
+	background-color:#dd0000;
+	color:#ffffff;
+	font-size:inherit;
+}
+
+
+/* -------------------------------------------------------- */
+/* Suchformular */
+/* ------------ */
+form.searchform {
+	display:block;
+	padding:3px;
+	color:#000000;
+	background-color:#FFFFFF;
+	text-align:center;
+	border:1px solid #C0C0C0;
+	width:120px;
+	margin:2px 5px;
+	font-weight:bold;
+}
+form.searchform:hover {
+	color:#000000;
+	text-decoration:none;
+	border:1px solid #C0C0C0;
+	background-color:#D0D0D0;
+}
+
+
+
+/* -------------------------------------------------------- */
+/* Suchfeld */
+/* -------- */
+input.searchtextfield {
+	border:1px solid #C0C0C0;
+	width:85px;
+	margin:0px;
+	margin:4px 1px;
+}
+
+
+/* -------------------------------------------------------- */
+/* Suchbutton */
+/* ---------- */
+input.searchbutton {
+}
+
+
 
 
 /* -------------------------------------------------------- */
@@ -276,6 +330,7 @@ em.deadlink {
 a {
 	color:#000077;
 	font-weight:bold;
+	font-size:inherit;
 }
 
 
@@ -293,7 +348,7 @@ img {
 img.leftcontentimage {
 	margin:8px;
 	border:1px solid;
-	width:100px;
+	max-width:100px;
 	float:left;
 	margin-left:0px;
 }
@@ -305,7 +360,7 @@ img.leftcontentimage {
 img.rightcontentimage {
 	margin:8px;
 	border:1px solid;
-	width:100px;
+	max-width:100px;
 	float:right;
 	margin-right:0px;
 }
