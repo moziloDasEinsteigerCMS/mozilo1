@@ -1,5 +1,14 @@
 <?php
 
+/* 
+* 
+* $Revision: 19 $
+* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+* $Author: arvid $
+*
+*/
+
+
 /*
 ######
 INHALT
@@ -37,20 +46,21 @@ INHALT
 	$syntax = new Syntax();
 	$smileys = new Smileys("smileys");
 	
+	// Dateiendungen für Inhaltsseiten
+	$EXT_PAGE 	= ".txt";
+	$EXT_HIDDEN = ".hid";
+	$EXT_DRAFT 	= ".tmp";
+	
 	// Config-Parameter auslesen
+	$layoutdir 					= "layouts/".$mainconfig->get("cmslayout");
+	$TEMPLATE_FILE			= "$layoutdir/template.html";
+	$CSS_FILE						= "$layoutdir/css/style.css";
+	$FAVICON_FILE				= "$layoutdir/favicon.ico";
 	
-	$WEBSITE_TITLE			= $mainconfig->get("websitetitle");
-	if ($WEBSITE_TITLE == "")
-		$WEBSITE_TITLE = "Titel der Website";
+	$WEBSITE_NAME			= $mainconfig->get("websitetitle");
+	if ($WEBSITE_NAME == "")
+		$WEBSITE_NAME = "Titel der Website";
 	
-	$TEMPLATE_FILE			= $mainconfig->get("templatefile");
-	if ($TEMPLATE_FILE == "")
-		$TEMPLATE_FILE = "template.html";
-
-	$CSS_FILE						= $mainconfig->get("cssfile");
-	if ($CSS_FILE == "")
-		$CSS_FILE = "css/style.css";
-
 	$DEFAULT_CATEGORY		= $mainconfig->get("defaultcat");
 	if ($DEFAULT_CATEGORY == "")
 		$DEFAULT_CATEGORY = "10_Willkommen";
@@ -58,10 +68,6 @@ INHALT
 	$DEFAULT_PAGE				= $mainconfig->get("defaultpage");
 	if ($DEFAULT_PAGE == "")
 		$DEFAULT_PAGE = "10_Willkommen";
-
-	$FAVICON_FILE				= $mainconfig->get("faviconfile");
-	if ($FAVICON_FILE == "")
-		$FAVICON_FILE = "favicon.ico";
 
 	$USE_CMS_SYNTAX			= true;
 	if ($mainconfig->get("usecmssyntax") == "false")
@@ -86,10 +92,6 @@ INHALT
 	$CONTENT_DIR_ABS 		= getcwd() . "/$CONTENT_DIR_REL";
 	$CONTENT_FILES_DIR	= "dateien";
 	$GALLERIES_DIR			= "galerien";
-	$DEFAULT_CONTENT_EXT= ".txt";
-	$CONTENT_EXTENSION	= $DEFAULT_CONTENT_EXT;
-	if ($ACTION_REQUEST == "draft")
-		$CONTENT_EXTENSION	= ".tmp";
 	$CONTENT 						= "";
 	$HTML								= "";
 
@@ -103,8 +105,10 @@ INHALT
 			}
 		}
 	}
-	
-	
+
+	// Dateiname der aktuellen Inhaltsseite (wird in getContent() gesetzt)
+	$PAGE_FILE = "";
+
 	// Zuerst: Übergebene Parameter überprüfen
 	checkParameters();
 	// Dann: HTML-Template einlesen und mit Inhalt füllen
@@ -119,11 +123,14 @@ INHALT
 	function checkParameters() {
 		global $CONTENT_DIR_ABS;
 		global $CONTENT_FILES_DIR;
-		global $CONTENT_EXTENSION;
 		global $DEFAULT_CATEGORY;
 		global $ACTION_REQUEST;
 		global $CAT_REQUEST;
 		global $PAGE_REQUEST;
+		global $EXT_DRAFT;
+		global $EXT_HIDDEN;
+		global $EXT_PAGE;
+		
 		// Überprüfung der gegebenen Parameter
 		if (
 				// Wenn keine Kategorie übergeben wurde...
@@ -131,18 +138,24 @@ INHALT
 				// ...oder eine nicht existente Kategorie...
 				|| (!file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST")) 
 				// ...oder eine Kategorie ohne Contentseiten...
-				|| (getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST", true) == "")
+				|| (getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST", true, true) == "")
 			)
 			// ...dann verwende die Standardkategorie
 			$CAT_REQUEST = $DEFAULT_CATEGORY;
 
 		
 		// Kategorie-Verzeichnis einlesen
-		$pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true);
+		$pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true, true);
+
 		// Wenn Contentseite nicht explizit angefordert wurde oder nicht vorhanden ist...
-		if (($PAGE_REQUEST == "") || (!file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$CONTENT_EXTENSION")))
+		if (
+			($PAGE_REQUEST == "") 
+			|| (!file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_PAGE") && !file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_HIDDEN") && !file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_DRAFT"))
+			) {
 			//...erste Contentseite der Kategorie setzen
-			$PAGE_REQUEST = substr($pagesarray[0], 0, strlen($pagesarray[0]) - strlen($CONTENT_EXTENSION));
+			$PAGE_REQUEST = substr($pagesarray[0], 0, strlen($pagesarray[0]) - 4);
+		}
+		
 		// Wenn ein Action-Parameter übergeben wurde: keine aktiven Kat./Inhaltts. anzeigen
 		if (($ACTION_REQUEST == "sitemap") || ($ACTION_REQUEST == "search")) {
 			$CAT_REQUEST = "";
@@ -160,8 +173,9 @@ INHALT
 		global $FAVICON_FILE;
 		global $TEMPLATE_FILE;
 		global $USE_CMS_SYNTAX;
-		global $WEBSITE_TITLE;
+		global $WEBSITE_NAME;
 		global $ACTION_REQUEST;
+		global $CAT_REQUEST;
 		global $language;
 		global $syntax;
 		global $mainconfig;
@@ -197,7 +211,7 @@ INHALT
     }
     elseif ($USE_CMS_SYNTAX) {
     	$pagecontentarray = getContent();
-	    $pagecontent	= $syntax->convertContent($pagecontentarray[0], true);
+	    $pagecontent	= $syntax->convertContent($pagecontentarray[0], $CAT_REQUEST, true);
 	    $cattitle 		= $pagecontentarray[1];
   	  $pagetitle 		= $pagecontentarray[2];
   	}
@@ -215,20 +229,35 @@ INHALT
 		// Gesuchte Phrasen hervorheben
 		if ((isset($_GET['highlight'])) &&  ($_GET['highlight'] <> ""))
 			$pagecontent = highlight($pagecontent, $_GET['highlight']);
-		
+
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
-    $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_TITLE, $cattitle, $pagetitle), $HTML);
+		
+		// Platzhalter ersetzen
+		$HTML = replacePlaceholders($HTML);
+    $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle), $HTML);
+
+		// Meta-Tag "keywords" (nur ersetzen, wenn nicht leer)
+		if ($mainconfig->get("websitekeywords") == "")
+    	$HTML = preg_replace('/{WEBSITE_KEYWORDS}/', "", $HTML);
+    else
+    	$HTML = preg_replace('/{WEBSITE_KEYWORDS}/', "<meta name=\"keywords\" content=\"".$mainconfig->get("websitekeywords")."\" />", $HTML);
+
+    // Meta-Tag "description" (nur ersetzen, wenn nicht leer)
+		if ($mainconfig->get("websitekeywords") == "")
+    	$HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', "", $HTML);
+    else
+    	$HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', "<meta name=\"description\" content=\"".$mainconfig->get("websitedescription")."\" />", $HTML);
+
 		$HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
     $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
+
 		// Detailmenü nicht zeigen, wenn Submenüs aktiviert sind
-		if ($mainconfig->get("usesubmenu") == "true") {
+		if ($mainconfig->get("usesubmenu") > 0) {
 			$HTML = preg_replace('/{DETAILMENU}/', "", $HTML);
-			$HTML = preg_replace('/{SUBMENU}/', getDetailMenu(), $HTML);
 		}
 		else {
-    	$HTML = preg_replace('/{DETAILMENU}/', "<div class=\"detailmenu\">".getDetailMenu()."</div>", $HTML);
-    	$HTML = preg_replace('/{SUBMENU}/', "", $HTML);
+    	$HTML = preg_replace('/{DETAILMENU}/', "<div class=\"detailmenu\">".getDetailMenu($CAT_REQUEST)."</div>", $HTML);
     }
     $HTML = preg_replace('/{SEARCH}/', getSearchForm(), $HTML);
     $HTML = preg_replace('/{LASTCHANGE}/', getLastChangedContentPage(), $HTML);
@@ -244,7 +273,7 @@ INHALT
 	function nameToCategory($catname) {
 		global $CONTENT_DIR_ABS;
 		// Content-Verzeichnis einlesen
-		$dircontent = getDirContentAsArray("$CONTENT_DIR_ABS", false);
+		$dircontent = getDirContentAsArray("$CONTENT_DIR_ABS", false, false);
 		// alle vorhandenen Kategorien durchgehen...
 		foreach ($dircontent as $currentelement) {
 			// ...und wenn eine auf den Namen paßt...
@@ -265,24 +294,25 @@ INHALT
 	function nameToPage($pagename, $currentcat) {
 		global $CONTENT_DIR_ABS;
 		global $CONTENT_FILES_DIR;
-		global $CONTENT_EXTENSION;
-		global $DEFAULT_CONTENT_EXT;
+		global $EXT_DRAFT;
+		global $EXT_HIDDEN;
+		global $EXT_PAGE;
 		
-		$temp = $CONTENT_EXTENSION;
-		$CONTENT_EXTENSION = $DEFAULT_CONTENT_EXT;
 		// Kategorie-Verzeichnis einlesen
-		$dircontent = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcat", true);
+		$dircontent = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcat", true, true);
 		// alle vorhandenen Inhaltsdateien durchgehen...
 		foreach ($dircontent as $currentelement) {
 			// ...und wenn eine auf den Namen paßt...
-			if (substr($currentelement, 3, strlen($currentelement) - 3 - strlen($CONTENT_EXTENSION)) == $pagename) {
+			if (
+				(substr($currentelement, 3, strlen($currentelement) - 3 - strlen($EXT_PAGE)) == $pagename)
+				|| (substr($currentelement, 3, strlen($currentelement) - 3 - strlen($EXT_HIDDEN)) == $pagename)
+				|| (substr($currentelement, 3, strlen($currentelement) - 3 - strlen($EXT_DRAFT)) == $pagename)
+				) {
 				// ...den vollen Seitennamen zurückgeben
-				$CONTENT_EXTENSION = $temp;
 				return $currentelement;
 			}
 		}
 		// Wenn keine Datei paßt: Leerstring zurückgeben
-		$CONTENT_EXTENSION = $temp;
 		return "";
 	}
 
@@ -292,7 +322,6 @@ INHALT
 // 00_Alle-nbsp-K-uuml-he => Alle Kühe
 // ------------------------------------------------------------------------------
 	function catToName($cat, $rebuildnbsp) {
-		global $CONTENT_EXTENSION;
 		global $specialchars;
 		return $specialchars->rebuildSpecialChars(substr($cat, 3, strlen($cat)), $rebuildnbsp);
 	}	
@@ -303,9 +332,8 @@ INHALT
 // 00_M-uuml-llers-nbsp-Kuh.txt => Müllers Kuh
 // ------------------------------------------------------------------------------
 	function pageToName($page, $rebuildnbsp) {
-		global $CONTENT_EXTENSION;
 		global $specialchars;
-		return $specialchars->rebuildSpecialChars(substr($page, 3, strlen($page) - 3 - strlen($CONTENT_EXTENSION)), $rebuildnbsp);
+		return $specialchars->rebuildSpecialChars(substr($page, 3, strlen($page) - 7), $rebuildnbsp);
 	}	
 
 
@@ -315,17 +343,45 @@ INHALT
 	function getContent() {
 		global $CONTENT_DIR_ABS;
 		global $CONTENT_FILES_DIR;
-		global $CONTENT_EXTENSION;
 		global $CAT_REQUEST;
 		global $PAGE_REQUEST;
+		global $EXT_HIDDEN;
+		global $EXT_PAGE;
+		global $EXT_DRAFT;
+		global $PAGE_FILE;
+		global $ACTION_REQUEST;
 		global $specialchars;
 		
-		if (file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$CONTENT_EXTENSION"))
+		// Entwurf
+		if (
+				($ACTION_REQUEST == "draft") && 
+				(file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_DRAFT"))
+			) {
+			$PAGE_FILE = $PAGE_REQUEST.$EXT_HIDDEN;
 			return array (
-										implode("", file("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$CONTENT_EXTENSION")), 
+										implode("", file("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_DRAFT")), 
 										catToName($CAT_REQUEST, true),
-										pageToName($PAGE_REQUEST.$CONTENT_EXTENSION, true)
+										pageToName($PAGE_REQUEST.$EXT_DRAFT, true)
 										);
+		}
+		// normale Inhaltsseite
+		elseif (file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_PAGE")) {
+			$PAGE_FILE = $PAGE_REQUEST.$EXT_PAGE;
+			return array (
+										implode("", file("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_PAGE")), 
+										catToName($CAT_REQUEST, true),
+										pageToName($PAGE_REQUEST.$EXT_PAGE, true)
+										);
+		}
+		// Versteckte Inhaltsseite
+		elseif (file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_HIDDEN")) {
+			$PAGE_FILE = $PAGE_REQUEST.$EXT_HIDDEN;
+			return array (
+										implode("", file("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_HIDDEN")), 
+										catToName($CAT_REQUEST, true),
+										pageToName($PAGE_REQUEST.$EXT_HIDDEN, true)
+										);
+		}
 		else
 			return "";
 	}
@@ -336,17 +392,25 @@ INHALT
 // Auslesen des Content-Verzeichnisses unter Berücksichtigung 
 // des auszuschließenden File-Verzeichnisses, Rückgabe als Array
 // ------------------------------------------------------------------------------
-	function getDirContentAsArray($dir, $iscatdir) {
-		global $CONTENT_EXTENSION;
+	function getDirContentAsArray($dir, $iscatdir, $showhidden) {
 		global $CONTENT_FILES_DIR; 
+		global $EXT_DRAFT;
+		global $EXT_HIDDEN;
+		global $EXT_PAGE;
+		
 		$currentdir = opendir($dir);
 		$i=0;
+		$files = "";
 		// Einlesen des gesamten Content-Verzeichnisses außer dem 
 		// auszuschließenden Verzeichnis und den Elementen . und ..
 		while ($file = readdir($currentdir)) {
 			if (
-					// wenn Kategorieverzeichnis: Alle Dateien auslesen, die auf $CONTENT_EXTENSION enden...
-					((substr($file, strlen($file)-strlen($CONTENT_EXTENSION), strlen($file)) == $CONTENT_EXTENSION) || (!$iscatdir))
+					// wenn Kategorieverzeichnis: Alle Dateien auslesen, die auf $EXT_PAGE oder $EXT_HIDDEN enden...
+					(
+						(!$iscatdir) 
+						|| (substr($file, strlen($file)-4, strlen($file)) == $EXT_PAGE) 
+						|| ($showhidden && (substr($file, strlen($file)-4, strlen($file)) == $EXT_HIDDEN))
+					)
 					// ...und nicht $CONTENT_FILES_DIR
 					&& (($file <> $CONTENT_FILES_DIR) || (!$iscatdir))
 					// nicht "." und ".."
@@ -369,41 +433,38 @@ INHALT
 // ------------------------------------------------------------------------------
 	function getMainMenu() {
 		global $CONTENT_DIR_ABS;
-		global $CONTENT_EXTENSION;
 		global $CONTENT_FILES_DIR;
 		global $CAT_REQUEST;
-		global $DEFAULT_CONTENT_EXT;
 		global $PAGE_REQUEST;
 		global $specialchars;
 		global $mainconfig;
 
 		$mainmenu = "";
-		$temp = $CONTENT_EXTENSION;
-		$CONTENT_EXTENSION = $DEFAULT_CONTENT_EXT;
 		// Kategorien-Verzeichnis einlesen
-		$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false);
+		$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false, false);
 		// numerische Accesskeys für angezeigte Menüpunkte
 		$currentaccesskey = 0;
 		// Jedes Element des Arrays ans Menü anhängen
 		foreach ($categoriesarray as $currentcategory) {
 			// Wenn die Kategorie keine Contentseiten hat, zeige sie nicht an
-			if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true) == "")
+			if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true, false) == "")
 				$mainmenu .= "";
 			// Aktuelle Kategorie als aktiven Menüpunkt anzeigen...
 			elseif ($currentcategory == $CAT_REQUEST) {
 				$currentaccesskey++;
 				$mainmenu .= "<a href=\"index.php?cat=$currentcategory\" class=\"menuactive\" accesskey=\"$currentaccesskey\">".catToName($currentcategory, false)."</a> ";
-				if ($mainconfig->get("usesubmenu") == "true")
-					$mainmenu .= "{SUBMENU}";
+				if ($mainconfig->get("usesubmenu") > 0)
+					$mainmenu .= getDetailMenu($currentcategory);
 			}
 			// ...alle anderen als normalen Menüpunkt.
 			else {
 				$currentaccesskey++;
 				$mainmenu .= "<a href=\"index.php?cat=$currentcategory\" class=\"menu\" accesskey=\"$currentaccesskey\">".catToName($currentcategory, false)."</a> ";
+				if ($mainconfig->get("usesubmenu") == 2)
+					$mainmenu .= getDetailMenu($currentcategory);
 			}
 		}
 		// Rückgabe des Menüs
-		$CONTENT_EXTENSION = $temp;
 		return $mainmenu;
 	}
 
@@ -411,49 +472,55 @@ INHALT
 // ------------------------------------------------------------------------------
 // Aufbau des Detailmenüs, Rückgabe als String
 // ------------------------------------------------------------------------------
-	function getDetailMenu(){
+	function getDetailMenu($cat){
 		global $ACTION_REQUEST;
 		global $CONTENT_DIR_ABS;
 		global $CONTENT_FILES_DIR;
 		global $CAT_REQUEST;
 		global $PAGE_REQUEST;
-		global $CONTENT_EXTENSION;
+		global $EXT_DRAFT;
 		global $language;
 		global $specialchars;
 		global $mainconfig;
 		
-		if ($mainconfig->get("usesubmenu") == "true")
+		if ($mainconfig->get("usesubmenu") > 0)
 			$cssprefix = "submenu";
 		else
 			$cssprefix = "detailmenu";
 		
 		// Wurde keine Kategorie übergeben, dann leeres Detailmenü ausgeben
-		if ($ACTION_REQUEST == "sitemap")
+		if (($ACTION_REQUEST == "sitemap") && ($mainconfig->get("usesubmenu") == 0))
 			return "<a href=\"index.php?action=sitemap\" class=\"".$cssprefix."active\">".$language->getLanguageValue0("message_sitemap_0")."</a>";
-		elseif ($ACTION_REQUEST == "search")
+		elseif (($ACTION_REQUEST == "search") && ($mainconfig->get("usesubmenu") == 0))
 			return "<a href=\"index.php?action=search&amp;query=".htmlentities($_GET['query'])."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", htmlentities($_GET['query']))."</a>";
-		elseif ($ACTION_REQUEST == "draft")
-			return "<a href=\"index.php?cat=$CAT_REQUEST&amp;page=$PAGE_REQUEST&amp;action=draft\" class=\"".$cssprefix."active\">".pageToName($PAGE_REQUEST.$CONTENT_EXTENSION, false)." (".$language->getLanguageValue0("message_draft_0").")</a>";
+		elseif (($ACTION_REQUEST == "draft") && ($mainconfig->get("usesubmenu") == 0))
+			return "<a href=\"index.php?cat=$cat&amp;page=$PAGE_REQUEST&amp;action=draft\" class=\"".$cssprefix."active\">".pageToName($PAGE_REQUEST.$EXT_DRAFT, false)." (".$language->getLanguageValue0("message_draft_0").")</a>";
 		$detailmenu = "";
 		// Content-Verzeichnis der aktuellen Kategorie einlesen
-		$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST", true);
+		$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$cat", true, false);
+		
+		// Kategorie, die nur versteckte Seiten enthält: kein Detailmenü zeigen
+		if ($contentarray == "") {
+			return "";
+		}
+			
 		// alphanumerische Accesskeys (über numerischen ASCII-Code) für angezeigte Menüpunkte
 		$currentaccesskey = 0;
 		// Jedes Element des Arrays ans Menü anhängen
 		foreach ($contentarray as $currentcontent) {
 			$currentaccesskey++;
 			// Aktuelle Inhaltsseite als aktiven Menüpunkt anzeigen...
-			if (substr($currentcontent, 0, strlen($currentcontent) - strlen($CONTENT_EXTENSION)) == $PAGE_REQUEST) {
-				$detailmenu .= "<a href=\"index.php?cat=$CAT_REQUEST&amp;page=".
-												substr($currentcontent, 0, strlen($currentcontent) - strlen($CONTENT_EXTENSION)).
+			if (substr($currentcontent, 0, strlen($currentcontent) - 4) == $PAGE_REQUEST) {
+				$detailmenu .= "<a href=\"index.php?cat=$cat&amp;page=".
+												substr($currentcontent, 0, strlen($currentcontent) - 4).
 												"\" class=\"".$cssprefix."active\" accesskey=\"".chr($currentaccesskey+96)."\">".
 												pageToName($currentcontent, false).
 												"</a> ";
 			}
 			// ...alle anderen als normalen Menüpunkt.
 			else {
-				$detailmenu .= "<a href=\"index.php?cat=$CAT_REQUEST&amp;page=".
-												substr($currentcontent, 0, strlen($currentcontent) - strlen($CONTENT_EXTENSION)).
+				$detailmenu .= "<a href=\"index.php?cat=$cat&amp;page=".
+												substr($currentcontent, 0, strlen($currentcontent) - 4).
 												"\" class=\"".$cssprefix."\" accesskey=\"".chr($currentaccesskey+96)."\">".
 												pageToName($currentcontent, false).
 												"</a> ";
@@ -469,10 +536,12 @@ INHALT
 // ------------------------------------------------------------------------------
 	function getSearchForm(){
 		global $language;
+		global $mainconfig;
+		
 		$form = "<form method=\"get\" action=\"index.php\" name=\"search\" class=\"searchform\">"
 		."<input type=\"hidden\" name=\"action\" value=\"search\" />"
 		."<input type=\"text\" name=\"query\" value=\"\" class=\"searchtextfield\" accesskey=\"s\" />"
-		."<input type=\"image\" name=\"action\" value=\"search\" src=\"grafiken/searchicon.gif\" alt=\"".$language->getLanguageValue0("message_search_0")."\" class=\"searchbutton\" title=\"".$language->getLanguageValue0("message_search_0")."\" />"
+		."<input type=\"image\" name=\"action\" value=\"search\" src=\"layouts/".$mainconfig->get("cmslayout")."/grafiken/searchicon.gif\" alt=\"".$language->getLanguageValue0("message_search_0")."\" class=\"searchbutton\" title=\"".$language->getLanguageValue0("message_search_0")."\" />"
 		."</form>";
 		return $form;
 	}
@@ -483,13 +552,8 @@ INHALT
 // ------------------------------------------------------------------------------
 	function getLastChangedContentPage(){
 		global $CONTENT_DIR_REL;
-		global $CONTENT_EXTENSION;
-		global $DEFAULT_CONTENT_EXT;
 		global $language;
 		global $specialchars;
-
-		$temp = $CONTENT_EXTENSION;
-		$CONTENT_EXTENSION = $DEFAULT_CONTENT_EXT;
 
 		$latestchanged = array("cat" => "catname", "file" => "filename", "time" => 0);
 		$currentdir = opendir($CONTENT_DIR_REL);
@@ -503,7 +567,6 @@ INHALT
 				}
 	    }
 		}
-		$CONTENT_EXTENSION = $temp;
 		return $language->getLanguageValue0("message_lastchange_0")." <a href=\"index.php?cat=".$latestchanged['cat']."&amp;page=".substr($latestchanged['file'], 0, strlen($latestchanged['file'])-4)."\" title=\"".$language->getLanguageValue2("tooltip_link_page_2", $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true), $specialchars->rebuildSpecialChars(substr($latestchanged['cat'], 3, strlen($latestchanged['cat'])-3), true))."\" class=\"latestchangedlink\">".$specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true)."</a> (".strftime($language->getLanguageValue0("_dateformat_0"), date($latestchanged['time'])).")";
 	}
 
@@ -513,11 +576,18 @@ INHALT
 // Einlesen eines Kategorie-Verzeichnisses, Rückgabe der zuletzt geänderten Datei
 // ------------------------------------------------------------------------------
 	function getLastChangeOfCat($dir){
-		global $CONTENT_EXTENSION;
+		global $EXT_HIDDEN;
+		global $EXT_PAGE;
+		
 		$latestchanged = array("file" => "filename", "time" => 0);
 		$currentdir = opendir($dir);
 		while ($file = readdir($currentdir)) {
-			if (is_file($dir."/".$file) && (substr($file, strlen($file)-strlen($CONTENT_EXTENSION), strlen($CONTENT_EXTENSION)) == $CONTENT_EXTENSION)) {
+			if (is_file($dir."/".$file) 
+					&& (
+						(substr($file, strlen($file)-4, 4) == $EXT_HIDDEN)
+						|| (substr($file, strlen($file)-4, 4) == $EXT_PAGE)
+					)
+				) {
 				if (filemtime($dir."/".$file) > $latestchanged['time']) {
 					$latestchanged['file'] = $file;
 					$latestchanged['time'] = filemtime($dir."/".$file);
@@ -534,25 +604,25 @@ INHALT
 // ------------------------------------------------------------------------------
 	function getSiteMap() {
 		global $CONTENT_DIR_ABS;
-		global $CONTENT_EXTENSION;
 		global $CONTENT_FILES_DIR;
 		global $language;
 		global $specialchars;
 		$sitemap = "<h1>".$language->getLanguageValue0("message_sitemap_0")."</h1>";
 		// Kategorien-Verzeichnis einlesen
-		$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false);
+		$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false, false);
 		// Jedes Element des Arrays an die Sitemap anhängen
 		foreach ($categoriesarray as $currentcategory) {
 			// Wenn die Kategorie keine Contentseiten hat, zeige sie nicht an
-			if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true) == "")
+			$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true, true);
+			if ($contentarray == "")
 				continue;
+			
 			$sitemap .= "<h2>".catToName($currentcategory, false)."</h2><ul>";
 			// Alle Inhaltsseiten der aktuellen Kategorie auflisten...
-			$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true);
 			// Jedes Element des Arrays an die Sitemap anhängen
 			foreach ($contentarray as $currentcontent) {
 				$sitemap .= "<li><a href=\"index.php?cat=$currentcategory&amp;page=".
-													substr($currentcontent, 0, strlen($currentcontent) - strlen($CONTENT_EXTENSION)).
+													substr($currentcontent, 0, strlen($currentcontent) - 4).
 													"\" title=\"".$language->getLanguageValue2("tooltip_link_page_2", pageToName($currentcontent, false), catToName($currentcategory, false))."\">".
 													pageToName($currentcontent, false).
 													"</a></li>";
@@ -570,7 +640,6 @@ INHALT
 	function getSearchResult() {
 		global $CONTENT_DIR_ABS;
 		global $CONTENT_DIR_REL;
-		global $CONTENT_EXTENSION;
 		global $CONTENT_FILES_DIR;
 		global $USE_CMS_SYNTAX;
 		global $language;
@@ -586,16 +655,16 @@ INHALT
 			$searchresults .= "<h1>".$language->getLanguageValue1("message_searchresult_1", htmlentities(trim($_GET['query'])))."</h1>";
 
 			// Kategorien-Verzeichnis einlesen
-			$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false);
+			$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false, false);
 
 			// Alle Kategorien durchsuchen
 			foreach ($categoriesarray as $currentcategory) {
 
 				// Wenn die Kategorie keine Contentseiten hat, direkt zur nächsten springen
-				if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true) == "")
+				$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true, true);
+				if ($contentarray == "")
 					continue;
 
-				$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true);
 				$matchingpages = array();
 				$i = 0;
 
@@ -649,7 +718,7 @@ INHALT
 						$searchresults .= "<li>".
 							highlight(
 								"<a href=\"index.php?cat=$currentcategory&amp;page=".
-								substr($matchingpage, 0, strlen($matchingpage) - strlen($CONTENT_EXTENSION)).
+								substr($matchingpage, 0, strlen($matchingpage) - 4).
 								"&amp;highlight=$highlightparameter\" title=\"".$language->getLanguageValue2("tooltip_link_page_2", $pagename, $categoryname)."\">".
 								$pagename.
 								"</a>", 
@@ -745,6 +814,14 @@ INHALT
 
 
 // ------------------------------------------------------------------------------
+// Überprüfung auf 
+// ------------------------------------------------------------------------------
+	function hasValidContentExtension($filename) {
+	}
+
+
+
+// ------------------------------------------------------------------------------
 // Anzeige der Informationen zum System
 // ------------------------------------------------------------------------------
 	function getCmsInfo() {
@@ -752,6 +829,34 @@ INHALT
 		global $language;
 		return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" class=\"latestchangedlink\" title=\"".$language->getLanguageValue1("tooltip_link_extern_1", "http://cms.mozilo.de")."\">moziloCMS ".$mainconfig->get("cmsversion")."</a>";
 	}
+	
+	
+// ------------------------------------------------------------------------------
+// Platzhalter im übergebenen String ersetzen
+// ------------------------------------------------------------------------------
+	function replacePlaceholders($content) {
+		global $mainconfig;
+		global $CAT_REQUEST;
+		global $PAGE_REQUEST;
+		global $PAGE_FILE;
+		global $EXT_PAGE;
+
+		// Titel der Website
+    $content = preg_replace('/{WEBSITE_NAME}/', $mainconfig->get("websitetitle"), $content);
+    // "unbehandelter" Name der aktuellen Kategorie ("10_M-uuml-llers-nbsp-Kuh")
+    $content = preg_replace('/{CATEGORY}/', $CAT_REQUEST, $content);
+    // "sauberer" Name der aktuellen Kategorie ("Müllers Kuh")
+    $content = preg_replace('/{CATEGORY_NAME}/', catToName($CAT_REQUEST, true), $content);
+    // "unbehandelter" Name der aktuellen Inhaltsseite ("10_M-uuml-llers-nbsp-Kuh")
+    $content = preg_replace('/{PAGE}/', $PAGE_REQUEST, $content);
+    // Dateiname der aktuellen Inhaltsseite ("10_M-uuml-llers-nbsp-Kuh.txt")
+    $content = preg_replace('/{PAGE_FILE}/', $PAGE_FILE, $content);
+    // "sauberer" Name der aktuellen Inhaltsseite ("Müllers Kuh")
+    $content = preg_replace('/{PAGE_NAME}/', pageToName($PAGE_FILE, true), $content);
+    // ...und zurückgeben
+    return $content;
+	}
+
 
 
 ?>

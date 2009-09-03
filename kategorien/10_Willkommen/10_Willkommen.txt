@@ -1,14 +1,13 @@
 [ueber1|Willkommen]
 ...in Ihrem moziloCMS! Passen Sie alles an Ihre Bedürfnisse und Ziele an: Loggen Sie sich dafür in die moziloCMS-Konfigurationsoberfläche [html|<a href="./admin/" target="_blank">moziloAdmin</a>] ein. Bitte vergessen Sie nicht, dort als erstes die Zugangsdaten zu ändern!
 
-Wie alles hier im moziloCMS funktioniert, ist auf [link|http://cms.mozilo.de] beschrieben.
-
-Hier noch als kleine Demonstration ein Bild, eine Datei und der Link auf eine Galerie:
-[bild|mozilo.jpg]
-[datei|text.txt]
-[galerie|moziloCMS]
-
-
+Wie alles hier im moziloCMS funktioniert, ist auf [link|http://cms.mozilo.de] beschrieben; für Fragen und Anregungen steht Ihnen das [link=mozilo-Supportforum|http://www.mozilo.de/forum] zur Verfügung.
 
 [fett|Viel Spaß mit moziloCMS!]
 Ihr [link=mozilo-Team|http://www.mozilo.de]
+
+[----]
+Hier noch als kleine Demonstration ein Bild, eine Datei und der Link zu einer Galerie:
+[bild|mozilo.jpg]
+- eine [datei=Datei|text.txt] zum Herunterladen
+- ein [galerie=Link zu einer Galerie|moziloCMS]

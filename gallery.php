@@ -1,4 +1,13 @@
 <?php
+
+/* 
+* 
+* $Revision: 19 $
+* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+* $Author: arvid $
+*
+*/
+
 /*
 ######
 INHALT
@@ -47,17 +56,10 @@ $WEBSITE_TITLE			= $mainconf->get("websitetitle");
 if ($WEBSITE_TITLE == "")
 	$WEBSITE_TITLE = "Titel der Website";
 
-$TEMPLATE_FILE			= $mainconf->get("gallerytemplatefile");
-if ($TEMPLATE_FILE == "")
-	$TEMPLATE_FILE = "gallerytemplate.html";
-
-$CSS_FILE						= $mainconf->get("cssfile");
-if ($CSS_FILE == "")
-	$CSS_FILE = "css/style.css";
-
-$FAVICON_FILE				= $mainconf->get("faviconfile");
-if ($FAVICON_FILE == "")
-	$FAVICON_FILE = "favicon.ico";
+$layoutdir 			= "layouts/".$mainconf->get("cmslayout");
+$TEMPLATE_FILE	= "$layoutdir/gallerytemplate.html";
+$CSS_FILE				= "$layoutdir/css/style.css";
+$FAVICON_FILE		= "$layoutdir/favicon.ico";
 
 // Übergebene Parameter überprüfen
 $GAL_REQUEST = $_GET['gal'];
@@ -68,7 +70,7 @@ if (($GAL_REQUEST == "") || (!file_exists($DIR_GALLERY)))
 $GAL_NAME = $specialchars->rebuildSpecialChars($GAL_REQUEST, true);
 
 // Galerieverzeichnis einlesen
-$PICARRAY = getPicsAsArray($DIR_GALLERY, array("jpg", "jpeg", "jpe", "gif", "png"));
+$PICARRAY = getPicsAsArray($DIR_GALLERY, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
 $ALLINDEXES = array();
 for ($i=1; $i<=count($PICARRAY); $i++) 
 	array_push($ALLINDEXES, $i);
@@ -92,7 +94,7 @@ else
 	
 if ($USETHUMBS) {
 	checkThumbs();
-	$THUMBARRAY = getPicsAsArray($DIR_THUMBS, array("jpg", "jpeg", "jpe", "gif", "png"));
+	$THUMBARRAY = getPicsAsArray($DIR_THUMBS, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
 }
 
 // Galerie aufbauen und ausgeben

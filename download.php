@@ -1,5 +1,14 @@
 <?php
-	require_once("Properties.php");
+
+/* 
+* 
+* $Revision: 19 $
+* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+* $Author: arvid $
+*
+*/
+
+require_once("Properties.php");
 	$DOWNLOADS = new Properties("conf/downloads.conf");
 
 	$CAT 	= $_REQUEST['cat'];

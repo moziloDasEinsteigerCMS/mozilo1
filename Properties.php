@@ -1,4 +1,13 @@
 <?php
+
+/* 
+* 
+* $Revision: 19 $
+* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+* $Author: arvid $
+*
+*/
+
 /**
  * 
  *  Copyright (c) 2000-2001 David Giffin
@@ -7,9 +16,9 @@
  * 
  *  Properties - reads java style properties files.
  * 
- *  $Id: Properties.php,v 1.2 2003/12/16 20:08:53 pierre Exp $
+ *  $Id: Properties.php 19 2008-03-12 17:06:54Z arvid $
  *
- * @version   $Id: Properties.php,v 1.2 2003/12/16 20:08:53 pierre Exp $
+ * @version   $Id: Properties.php 19 2008-03-12 17:06:54Z arvid $
  * @package Combine
  * @author   David Giffin <david@giffin.org>
  * @since    PHP 4.0
@@ -59,7 +68,7 @@ class Properties {
 	 */
 	function Properties($file = null) {
 		if ($file == "")
-			die("Properties: No file given");
+			die("Properties: Keine Datei angegeben!");
 		$this->file = $file;
 		$this->loadProperties();
 	}
@@ -72,7 +81,7 @@ class Properties {
 	function loadProperties() {
 		if (!file_exists($this->file)) {
 			if (!@fopen($this->file, "w")) 
-            die("Properties.php: Could not write $this->file.");
+            die("Properties.php: Kann ".$this->file." nicht schreiben - bitte Existenz der Datei und vergebene Dateirechte prüfen.");
 		}
 
 		$lines = file($this->file);
@@ -94,7 +103,7 @@ class Properties {
 	 */
 	function saveProperties() {
    	if (!$file = @fopen($this->file, "w")) 
-    	die("Properties.php: Could not write to $file");
+    	die("Properties.php: Kann ".$this->file." nicht schreiben - bitte Existenz der Datei und vergebene Dateirechte prüfen.");
     $content = "";
     // alphabetisch sortieren
     if (!$this->properties == null)

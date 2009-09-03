@@ -1,3 +1,10 @@
+/* 
+* 
+* $Revision: 19 $
+* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+* $Author: arvid $
+*
+*/
 table 
 {
 	font-size: 12px;	
@@ -14,9 +21,9 @@ BODY
 {
 	/* Positionierung */
 	min-height: 500px;
-	width: 795px;
+	width: 950px;
 	left: 50%;
-	margin-left: -390px;
+	margin-left: -475px;
 	padding: 0px;
 	top: 10px;
 	position: absolute; /* Design */
@@ -24,9 +31,9 @@ BODY
 	border-width: 1px;
 	border-style: solid;
 	border-color: #C0C0C0;
-	background-position: 250px 150px;
+	background-position: 320px 150px;
 	background-repeat: no-repeat;
-	background-image: url(gfx/mozilo_puzzle.gif);
+	background-image: url('gfx/mozilo_puzzle.gif');
 }
 
 #design_Icon 
@@ -102,7 +109,7 @@ background-color: #DEB3AF;
 {
 	/* Positionierung */
 	height: 45px;
-	width: 755px;
+	width: 910px;
 	padding-left: 5px;
 	top: 21px;
 	left: 0px;
@@ -388,7 +395,7 @@ TD.config_row2
 {
 	padding-top: 10px;
 	padding-bottom: 10px;
-	width: 200px;
+	width: 270px;
 	vertical-align: middle;
 	padding-left: 10px;
 	border-top-color: #D1D1D1;
@@ -806,7 +813,7 @@ TD.title
 {
 	position: relative;
 	float: right;
-	width: 665px;
+	width: 820px;
 	background-color: transparent;
 }
 
@@ -836,13 +843,17 @@ select
 	
 }
 select.overviewselect {
-	width:90px;
-	max-width:90px;
-	font-size:0.8em;
+	margin-top: 1px;
+	margin-bottom: 1px;
 }
 select.maxwidth {
-	width:170px;
-	max-width:170px;
+	width:270px;
+	max-width:260px;
+}
+option.noaction {
+	font-weight:bold;
+}
+option.hasaction {
 }
 
 Input.submit
@@ -858,8 +869,8 @@ Input.submit
 	border: 1px solid #C0C0C0;
 	margin-top: 10px;
 	margin-bottom: 10px;
-	width:170px;
-	max-width:170px;
+	width:260px;
+	max-width:260px;
 }
 .text2
 {
@@ -870,21 +881,21 @@ Input.submit
 	border: 1px solid #C0C0C0;
 	margin-top: 10px;
 	margin-bottom: 0px;
-	width:170px;
-	max-width:170px;
+	width:260px;
+	max-width:260px;
 }
 
 textarea {
-	width:645px;
+	width:810px;
 	border: 1px solid #C0C0C0;
-	margin: 10px;
+	margin: 10px 0px;
 	background-color:#ffffff;
 }
 textarea.usersyntaxarea {
 	border: 1px solid #C0C0C0;
 	margin:10px 0px;
-	width:95%;
-	height:100px;
+	width:99%;
+	height:120px;
 	max-width:inherit;
 }
 .erfolg
@@ -979,7 +990,7 @@ img.js
 	height: 24px;
 	padding: 1px;
 	background-color: #FFFFFF;
-	margin:1px 2px 5px 1px;
+	margin:1px 2px 5px 2px;
 }
 
 img.js:hover

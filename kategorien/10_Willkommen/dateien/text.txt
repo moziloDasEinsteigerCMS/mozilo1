@@ -1,1 +1,1 @@
-TEXT.TXT
+Diese Textdatei kam mit moziloCMS.

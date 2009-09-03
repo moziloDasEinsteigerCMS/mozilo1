@@ -1,5 +1,14 @@
 <?php
-	
+
+/* 
+* 
+* $Revision: 19 $
+* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+* $Author: arvid $
+*
+*/
+
+
 	require_once("../Properties.php");
 	require_once("../SpecialChars.php");
 	
@@ -99,6 +108,10 @@
 	function show_files($dir, $currentfile, $includedrafts)
 	{
 		global $specialchars;
+		global $EXT_PAGE;
+		global $EXT_HIDDEN;
+		global $EXT_DRAFT;
+		
 		$content = "<select name=\"position\" class=\"select1\" size=1>";
 		if ($includedrafts)
 			$vergeben = getFiles($dir, "");
@@ -115,7 +128,7 @@
     	}
     	else
     	{
-    		if ((specialNrDir($dir, $pos) == $currentfile.".txt") || (specialNrDir($dir, $pos) == $currentfile.".tmp"))
+    		if ((specialNrDir($dir, $pos) == $currentfile.$EXT_PAGE) || (specialNrDir($dir, $pos) == $currentfile.$EXT_HIDDEN) || (specialNrDir($dir, $pos) == $currentfile.$EXT_DRAFT))
     			$selected = "selected=\"selected\" ";
     		else
     			$selected = " ";
@@ -162,6 +175,7 @@
 	--------------------------------------------------------------------------------*/
 	function getFiles($dir, $excludeextension)
 	{
+		$dir = stripslashes($dir);
 		$files = array();
 		$handle = opendir($dir);
 		while($file = readdir($handle)) {
@@ -185,7 +199,8 @@
 	--------------------------------------------------------------------------------*/
 	function specialNrDir($dir, $nr)
 	{
-	    if (!is_file($dir)){
+		$dir = stripslashes($dir);
+		if (!is_file($dir)){
 	        $handle = opendir($dir);
 	        $file = readdir($handle);
 	        $vergeben = array();
@@ -207,11 +222,11 @@
 	@author: Oliver Lorenz
 	Legt die Ordnerstuktur für eine neue Kategorie an
 	--------------------------------------------------------------------------------*/
-  function createInhalt()
+  function createCategory()
   {
   	global $specialchars;
   	global $CMS_CONF;
-  	$betterString = $specialchars->deleteSpecialChars($_GET["name"]);
+  	$betterString = $specialchars->replaceSpecialChars($_GET["name"]);
 		mkdir ("../kategorien/".$_GET["position"]."_".$betterString, 0777);
 		mkdir ("../kategorien/".$_GET["position"]."_".$betterString."/dateien", 0777);
 		// chmod, wenn so eingestellt

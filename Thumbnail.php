@@ -1,4 +1,13 @@
 <?php
+
+/* 
+* 
+* $Revision: 19 $
+* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+* $Author: arvid $
+*
+*/
+
 /*
 ######
 INHALT
@@ -60,6 +69,12 @@ class Thumbnail {
 		  ImageCopyResized($resizedpic,$originalpic,0,0,0,0,$newwidth,$newheight,$width,$height); 
 		  ImagePNG($resizedpic, $dir_target.$pic); 
 	  } 
+	  
+	  // sonstige Formate
+	  else {
+	  	// einfach kopieren
+	  	copy($dir_origin.$pic, $dir_target.$pic);
+	  }
 	}
 }
 ?>
