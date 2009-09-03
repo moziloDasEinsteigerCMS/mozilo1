@@ -11,8 +11,8 @@
 require_once("Properties.php");
 	$DOWNLOADS = new Properties("conf/downloads.conf");
 
-	$CAT 	= preg_replace('/(\/|\\\)/', "", $_REQUEST['cat']);
-	$FILE = preg_replace('/(\/|\\\)/', "", $_REQUEST['file']);
+	$CAT 	= preg_replace('/(\/|\\\)/', "", htmlspecialchars($_REQUEST['cat']));
+	$FILE = preg_replace('/(\/|\\\)/', "", htmlspecialchars($_REQUEST['file']));
 	$PATH = "kategorien/$CAT/dateien/$FILE";
 
 	// Abbruch bei fehlerhaften Parametern

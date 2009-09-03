@@ -722,7 +722,7 @@ INHALT
 								"&amp;highlight=$highlightparameter\" title=\"".$language->getLanguageValue2("tooltip_link_page_2", $pagename, $categoryname)."\">".
 								$pagename.
 								"</a>", 
-								$_GET['query']).
+								htmlentities(trim($_GET['query']))).
 							"</li>";
 					}
 					$searchresults .= "</ul>";

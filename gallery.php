@@ -62,7 +62,7 @@ $CSS_FILE				= "$layoutdir/css/style.css";
 $FAVICON_FILE		= "$layoutdir/favicon.ico";
 
 // Übergebene Parameter überprüfen
-$GAL_REQUEST = $_GET['gal'];
+$GAL_REQUEST = htmlentities($_GET['gal']);
 $DIR_GALLERY = "./galerien/".$GAL_REQUEST."/";
 $DIR_THUMBS = $DIR_GALLERY."vorschau/";
 if (($GAL_REQUEST == "") || (!file_exists($DIR_GALLERY)))

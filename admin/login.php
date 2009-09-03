@@ -83,7 +83,7 @@ function login_formular()
 	$form = "<div id=\"mozilo_Logo\"></div>";
 	$form .= "<div class=\"loginform_shadowdiv\"></div>";
 	$form .= "<div class=\"loginform_maindiv\">";
-	$form .= "<form name=\"loginform\" action=\"".$_SERVER['PHP_SELF']."\" method=\"POST\">";
+	$form .= "<form name=\"loginform\" action=\"".htmlentities($_SERVER['PHP_SELF'])."\" method=\"POST\">";
   $form .= "<table>";
   $form .= "<tr>";
   $form .= "<td class=\"loginImage\" rowspan=\"2\">";

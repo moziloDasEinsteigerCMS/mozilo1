@@ -27,7 +27,14 @@ $ADMIN_TITLE = "moziloAdmin";
 		header("location:login.php?logout=true");
 		die("");
 	}
-
+	
+	// Session Fixation durch Vergabe einer neuen Session-ID beim ersten Login verhindern
+	if (!isset($_SESSION['PHPSESSID'])) {
+		//session_destroy();
+		session_regenerate_id(true);
+		$_SESSION['PHPSESSID'] = true;
+	}
+	
 	require_once("filesystem.php");
 	require_once("string.php");
 	require_once("../Smileys.php");
