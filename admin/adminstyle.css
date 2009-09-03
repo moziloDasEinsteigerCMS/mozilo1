@@ -390,18 +390,35 @@ TD.config_row2
 	padding-bottom: 10px;
 	width: 200px;
 	vertical-align: middle;
-	padding-left: 15px;
+	padding-left: 10px;
 	border-top-color: #D1D1D1;
 	border-top-style: solid;
 	border-top-width: 1px;
+	vertical-align:top;
+	text-align:left;
 }
 TD.config_row1
 {
 	padding-top: 10px;
 	padding-bottom: 10px;
+	padding-right: 10px;
 	border-top-color: #D1D1D1;
 	border-top-style: solid;
 	border-top-width: 1px;
+	vertical-align:top;
+	text-align:left;
+}
+TD.config_row0
+{
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-right:20px;
+	border-top-color: #D1D1D1;
+	border-top-style: solid;
+	border-top-width: 1px;
+	width:65%;
+	vertical-align:top;
+	text-align:left;
 }
 
 TD.title

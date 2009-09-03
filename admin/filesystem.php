@@ -210,9 +210,16 @@
   function createInhalt()
   {
   	global $specialchars;
+  	global $CMS_CONF;
   	$betterString = $specialchars->deleteSpecialChars($_GET["name"]);
 		mkdir ("../kategorien/".$_GET["position"]."_".$betterString, 0777);
 		mkdir ("../kategorien/".$_GET["position"]."_".$betterString."/dateien", 0777);
+		// chmod, wenn so eingestellt
+	    if ($CMS_CONF->get("chmodnewfiles") == "true") {
+	    	chmod ("../kategorien/".$_GET["position"]."_".$betterString, octdec($CMS_CONF->get("chmodnewfilesatts")));
+	    	chmod ("../kategorien/".$_GET["position"]."_".$betterString."/dateien", octdec($CMS_CONF->get("chmodnewfilesatts")));
+		}
+
   }
   
   function getFreeDirs($dir)

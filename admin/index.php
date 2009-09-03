@@ -785,6 +785,7 @@ echo $html;
 		global $GALLERIES_DIR_REL;
 		global $PREVIEW_DIR_NAME;
 		global $ALLOWED_SPECIALCHARS_REGEX;
+		global $CMS_CONF;
 		
 		$pagecontent = "<h2>".getLanguageValue("button_gallery_new")."</h2>";
 
@@ -794,9 +795,16 @@ echo $html;
 				// Galerieverzeichnis schon vorhanden? Wenn nicht: anlegen!
 				if (!file_exists("$GALLERIES_DIR_REL/".$dirname)) {
 					if (@mkdir($GALLERIES_DIR_REL."/".$dirname, 0777) && @mkdir($GALLERIES_DIR_REL."/".$dirname."/".$PREVIEW_DIR_NAME, 0777)) {
+						// chmod, wenn so eingestellt
+	    				if ($CMS_CONF->get("chmodnewfiles") == "true") {
+	    					chmod ($GALLERIES_DIR_REL."/".$dirname, octdec($CMS_CONF->get("chmodnewfilesatts")));
+	    					chmod ($GALLERIES_DIR_REL."/".$dirname."/".$PREVIEW_DIR_NAME, octdec($CMS_CONF->get("chmodnewfilesatts")));
+						}
 						$filename = "$GALLERIES_DIR_REL/".$dirname."/texte.conf";
 						$fp = fopen ($filename, "w");
-						chmod ($filename, 0777);
+						// chmod, wenn so eingestellt
+	    				if ($CMS_CONF->get("chmodnewfiles") == "true")
+	    					chmod ($filename, octdec($CMS_CONF->get("chmodnewfilesatts")));
 						fclose($fp);
 						$pagecontent .= returnMessage(true, htmlentities($_POST['galleryname']).": ".getLanguageValue("gallery_create_success"));
 					}
@@ -1151,13 +1159,23 @@ echo $html;
 						if ($downloads == "")
 							$downloads = "0";
 						// Downloads pro Tag berechnen
-						$dayscounted = ceil((time() - $DOWNLOAD_COUNTS->get("_downloadcounterstarttime")) / (60*60*24));
+						$uploadtime = filemtime("$CONTENT_DIR_REL/$file/dateien/$subfile");
+						$counterstart = $DOWNLOAD_COUNTS->get("_downloadcounterstarttime");
+						// Berechnungsgrundlage für "Downloads pro Tag": 
+						// Entweder Upload-Zeitpunkt oder Beginn der Statistik - genommen wird der spätere Zeitpunkt
+						if ($uploadtime > $counterstart)
+							$starttime = $uploadtime;
+						else
+							$starttime = $counterstart;
+						$dayscounted = ceil((time() - $starttime) / (60*60*24));
 						$downloadsperday = round(($downloads/$dayscounted), 2);
 						if ($downloads > 0)
-							$downloadsperdaytext = " (".$downloadsperday." ".getLanguageValue("data_downloadsperday").")";
+							$downloadsperdaytext = "<br />(".$downloadsperday." ".getLanguageValue("data_downloadsperday").")";
 						else
 							$downloadsperdaytext = "";
-						$pagecontent .= "<tr><td class=\"config_row1\">$subfile</td><td class=\"config_row2\">".$downloads." ".$countword.$downloadsperdaytext."</td></tr>";
+						$pagecontent .= "<tr><td class=\"config_row0\">$subfile</td>"
+							."<td class=\"config_row1\">".strftime(getLanguageValue("_dateformat"), $uploadtime)."</td>"
+							."<td class=\"config_row2\">".$downloads." ".$countword.$downloadsperdaytext."</td></tr>";
 						$hasdata = true;
 					}
 				}
@@ -1252,7 +1270,6 @@ echo $html;
 				&& isset($_GET['syntaxslinks']) && ($_GET['syntaxslinks'] <> "")
 				&& isset($_GET['lang']) && ($_GET['lang'] <> "")
 				&& isset($_GET['titlebarformat']) && ($_GET['titlebarformat'] <> "")
-				&& (!isset($_GET['chmodnewfiles']) || preg_match("/^[0-7]{3}$/", $_GET['chmodnewfilesatts']))
 				
 				) {
 				$CMS_CONF->set("websitetitle", htmlentities(stripslashes($_GET['title'])));
@@ -1287,15 +1304,6 @@ echo $html;
 				else
 					$CMS_CONF->set("usesubmenu", "false");
 					
-				if (isset($_GET['chmodnewfiles']) && ($_GET['chmodnewfiles'] == "on")) {
-					$CMS_CONF->set("chmodnewfiles", "true");
-					$CMS_CONF->set("chmodnewfilesatts", $_GET['chmodnewfilesatts']);
-				}
-				else {
-					$CMS_CONF->set("chmodnewfiles", "false");
-					$CMS_CONF->set("chmodnewfilesatts", "");
-				}
-				
 				// Speichern der benutzerdefinierten Syntaxelemente -> ERWEITERN UM PRÜFUNG!	
 				$handle = @fopen($USER_SYNTAX_FILE, "w");
 				fputs($handle, stripcslashes($_GET['usersyntax']));
@@ -1532,15 +1540,6 @@ echo $html;
 // DETAILLIERTE EINSTELLUNGEN
 		$pagecontent .= "<h3>".getLanguageValue("config_cmsdetail_headline")."</h3>";
 		$pagecontent .= "<table class=\"data\">";
-		// Zeile "SETZE DATEIRECHTE FÜR NEUE DATEIEN"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\"><a accesskey=\"".createNormalTooltip("chmodnewfiles_tooltiptitle", "chmodnewfiles_tooltiptext", 150)."\"><img class=\"right\" src=\"gfx/information.gif\" alt=\"info\"></a>".getLanguageValue("chmodnewfiles_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"checkbox\" ";
-		if ($CMS_CONF->get("chmodnewfiles") == "true")
-			$pagecontent .= "checked=checked";
-		$pagecontent .= " name=\"chmodnewfiles\">".getLanguageValue("chmodnewfiles_text2")."<br />";
-		$pagecontent .= "<input type=\"text\" class=\"text1\" name=\"chmodnewfilesatts\" value=\"".$CMS_CONF->get("chmodnewfilesatts")."\" /></td>";
-		$pagecontent .= "</tr>";
 		// Zeile "HTML-TEMPLATE"
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("template_text")."</td>";
@@ -1570,6 +1569,7 @@ echo $html;
 
 	function configAdminDisplay() {
 		global $ADMIN_CONF;
+		global $CMS_CONF;
 		// Änderungen speichern
 		$changesmade = false;
 		if (isset($_GET['apply']) && ($_GET['apply'] == "true")) {
@@ -1606,6 +1606,17 @@ echo $html;
 			}
 			else
 				$ADMIN_CONF->set("overwriteuploadfiles", "false");
+			
+			if (!isset($_GET['chmodnewfiles']) || preg_match("/^[0-7]{3}$/", $_GET['chmodnewfilesatts'])) {
+				if (isset($_GET['chmodnewfiles']) && ($_GET['chmodnewfiles'] == "on")) {
+					$CMS_CONF->set("chmodnewfiles", "true");
+					$CMS_CONF->set("chmodnewfilesatts", $_GET['chmodnewfilesatts']);
+				}
+				else {
+					$CMS_CONF->set("chmodnewfiles", "false");
+					$CMS_CONF->set("chmodnewfilesatts", "");
+				}
+			}
 		}
 		$pagecontent = "<h2>".getLanguageValue("button_config_displayadmin")."</h2>";
 		if ($changesmade)
@@ -1653,6 +1664,15 @@ echo $html;
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("reminder_backup_text")."</td>";
 		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"backupmsgintervall\" value=\"".$backupmsgintervall."\" /></td>";
+		$pagecontent .= "</tr>";
+		// Zeile "SETZE DATEIRECHTE FÜR NEUE DATEIEN"
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\"><a accesskey=\"".createNormalTooltip("chmodnewfiles_tooltiptitle", "chmodnewfiles_tooltiptext", 150)."\"><img class=\"right\" src=\"gfx/information.gif\" alt=\"info\"></a>".getLanguageValue("chmodnewfiles_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"checkbox\" ";
+		if ($CMS_CONF->get("chmodnewfiles") == "true")
+			$pagecontent .= "checked=checked";
+		$pagecontent .= " name=\"chmodnewfiles\">".getLanguageValue("chmodnewfiles_text2")."<br />";
+		$pagecontent .= "<input type=\"text\" class=\"text1\" name=\"chmodnewfilesatts\" value=\"".$CMS_CONF->get("chmodnewfilesatts")."\" /></td>";
 		$pagecontent .= "</tr>";
 		// Zeile "UPLOAD-FILTER"
 		$pagecontent .= "<tr>";
@@ -1858,12 +1878,18 @@ echo $html;
 	
 	function saveContentToPage($content, $page) {
 		global $specialchars;
+		global $CMS_CONF;
 		$handle=fopen($specialchars->deleteSpecialChars($page), "w");
 		if (get_magic_quotes_gpc())
 			fputs($handle, trim(stripslashes($content)));
 		else
 			fputs($handle, trim($content));
 		fclose($handle);
+		// chmod, wenn so eingestellt
+	    if ($CMS_CONF->get("chmodnewfiles") == "true") {
+			chmod ($page, octdec($CMS_CONF->get("chmodnewfilesatts")));
+		}
+
 	}
 	
 		// Lösche ein Verzeichnis rekursiv
