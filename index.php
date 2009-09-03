@@ -1043,7 +1043,7 @@ echo "</pre>";
     // Sichert einen Input-Wert
     function cleanInput($input) {
         if (function_exists("mb_convert_encoding")) {
-            $input = mb_convert_encoding($input, "ISO-8859-1");
+            $input = htmlentities(mb_convert_encoding($input, "ISO-8859-1"));
         }
         return htmlentities($input, ENT_QUOTES, 'ISO8859-1');    
     } 
