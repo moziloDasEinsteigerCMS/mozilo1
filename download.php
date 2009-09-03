@@ -2,13 +2,15 @@
 
 /* 
 * 
-* $Revision: 19 $
-* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+* $Revision: 115 $
+* $LastChangedDate: 2009-01-27 21:14:39 +0100 (Di, 27 Jan 2009) $
 * $Author: arvid $
 *
 */
 
-require_once("Properties.php");
+	require_once("Properties.php");
+	
+	$ERRORMESSAGE = "Fehlerhafter Parameter übergeben.";	
 	$DOWNLOADS = new Properties("conf/downloads.conf");
 
 	$CAT 	= preg_replace('/(\/|\\\)/', "", htmlspecialchars($_REQUEST['cat']));
@@ -16,14 +18,78 @@ require_once("Properties.php");
 	$PATH = "kategorien/$CAT/dateien/$FILE";
 
 	// Abbruch bei fehlerhaften Parametern
-	if (($CAT == "") || ($FILE == "") || (!file_exists($PATH)))
-		die("Invalid Parameters given.");
+	if (($CAT == "") || ($FILE == "") || (!file_exists($PATH))) {
+		die($ERRORMESSAGE);
+	}
 		
 	// Alles okay, Downloadzähler inkrementieren und Datei ausliefern
 	else {
 		$DOWNLOADS->set($CAT.":".$FILE, $DOWNLOADS->get($CAT.":".$FILE) + 1);
-		header("Content-Type: application/octet-stream");
-		header("Content-Disposition: attachment; filename=\"".$FILE."\"");
-		readfile($PATH);
+		download($PATH);
 	}
+	
+
+	function download($file){
+		
+		// Existiert die Datei?
+		if (!is_file($file)) { 
+			die($ERRORMESSAGE);
+		}
+		
+		// Infos zur Datei
+		$len = filesize($file);
+		$filename = basename($file);
+		$file_extension = strtolower(substr(strrchr($filename,"."),1));
+		
+		
+		// abhängig von der Extension; Content-Type setzen
+		switch( $file_extension ) {
+		      case "pdf": $ctype="application/pdf"; break;
+		      case "exe": $ctype="application/octet-stream"; break;
+		      case "zip": $ctype="application/zip"; break;
+		      case "doc": $ctype="application/msword"; break;
+		      case "xls": $ctype="application/vnd.ms-excel"; break;
+		      case "ppt": $ctype="application/vnd.ms-powerpoint"; break;
+		      case "gif": $ctype="image/gif"; break;
+		      case "png": $ctype="image/png"; break;
+		      case "jpeg":
+		      case "jpg": $ctype="image/jpg"; break;
+		      case "mp3": $ctype="audio/mpeg"; break;
+		      case "wav": $ctype="audio/x-wav"; break;
+		      case "mpeg":
+		      case "mpg":
+		      case "mpe": $ctype="video/mpeg"; break;
+		      case "mov": $ctype="video/quicktime"; break;
+		      case "avi": $ctype="video/x-msvideo"; break;
+		      case "txt": $ctype="text/plain"; break;
+		      case "htm": 
+		      case "html":$ctype="Content-type:text/html"; break;
+		
+		      // PHP-Dateien dÃ¼rfen nicht heruntergeladen werden
+		      case "php": die($ERRORMESSAGE); break;
+		
+		  		default: $ctype="application/force-download";
+		}
+		
+		// Header schreiben
+		header("Pragma: public");
+		header("Expires: 0");
+		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+		header("Cache-Control: public"); 
+		header("Content-Description: File Transfer");
+		
+		// oben ausgewählter Content-Type
+		header("Content-Type: $ctype");
+		
+		// Datei direkt im Browser anzeigen (inline); Dateinamen setzen
+		$header="Content-Disposition: inline; filename=".$filename.";";
+		// Mit "Content-Disposition: attachment" wird der Download über ein Downloadfenster erzwungen:
+		/*	$header="Content-Disposition: attachment; filename=".$filename.";";*/
+		header($header );
+		header("Content-Transfer-Encoding: binary");
+		header("Content-Length: ".$len);
+		@readfile($file);
+		exit;
+	} 
+
 ?>

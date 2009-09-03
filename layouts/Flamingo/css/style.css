@@ -1,8 +1,8 @@
 /* 
 * 
-* $Revision: 22 $
-* $LastChangedDate: 2008-03-21 12:55:02 +0100 (Fr, 21 Mrz 2008) $
-* $Author: arvid $
+* $Revision:22 $
+* $LastChangedDate:2008-03-21 12:55:02 +0100 (Fr, 21 Mrz 2008) $
+* $Author:arvid $
 *
 */
 /* -------------------------------------------------------- */
@@ -42,6 +42,11 @@ a:hover	{
 em {
 	font:inherit;
 	font-style:normal;
+}
+input, textarea {
+	border:1px solid #C2001A;
+	color:#404040;
+	background-color:#FFF1F3;
 }
 
 
@@ -123,7 +128,16 @@ div.mainmenu {
 	text-align:center;
 	margin-left:10px;
 }
-
+ul.mainmenu {
+	margin: 0px;
+	padding: 0px;
+}
+li.mainmenu {
+	display:inline;
+}
+li.mainmenu_submenu {
+	display:inline;
+}
 
 /* -------------------------------------------------------- */
 /* Hauptmenü (Galerie) */
@@ -132,6 +146,14 @@ div.gallerymenu {
 	padding:6px 8px 0px 8px;
 	line-height:30px;
 	text-align:center;
+}
+ul.gallerymenu {
+	margin: 0px;
+	padding: 0px;
+}
+li.gallerymenu {
+	display:inline;
+	padding-right: 7px;
 }
 
 
@@ -142,6 +164,13 @@ div.detailmenu {
 	padding:6px 8px 0px 8px;
 	line-height:30px;
 	text-align:left;
+}
+ul.detailmenu {
+	margin: 0px;
+	padding: 0px;
+}
+li.detailmenu {
+	display:inline;
 }
 
 
@@ -268,6 +297,33 @@ a.detailmenuactive:hover {
 
 
 /* -------------------------------------------------------- */
+/* Galeriemenüpunkt */
+/* --------------- */
+a.gallerymenu {
+	padding:3px 5px;
+	color:#404040;
+	font-weight:bold;
+}
+a.gallerymenu:hover {
+	color:#FF7994;
+	text-decoration:none;
+}
+
+
+/* -------------------------------------------------------- */
+/* Aktiver Galeriemenüpunkt */
+/* ----------------------- */
+a.gallerymenuactive {
+	padding:3px 5px;
+	color:#FF7994;
+	font-weight:bold;
+}
+a.gallerymenuactive:hover {
+	text-decoration:none;
+}
+
+
+/* -------------------------------------------------------- */
 /* Submenüpunkt */
 /* --------------- */
 a.submenu {
@@ -309,15 +365,15 @@ a.submenuactive:hover {
 
 
 /* -------------------------------------------------------- */
-/* Zuletzt geänderte Seite */
-/* ----------------------- */
-a.latestchangedlink {
+/* Links im Footer */
+/* --------------- */
+div.lastchange a {
 	text-decoration:none;
 	font-size:10px;
 	color:#707070;
 	font-weight:bold;
 }
-a.latestchangedlink:hover {
+div.lastchange a:hover {
 	text-decoration:underline;
 }
 
@@ -325,7 +381,7 @@ a.latestchangedlink:hover {
 /* -------------------------------------------------------- */
 /* Fehler in Tag-Attribut oder -Wert */
 /* --------------------------------- */
-em.deadlink {
+.deadlink {
 	color:#ff4444;
 	text-decoration:line-through;
 	font-weight:bold;
@@ -335,7 +391,7 @@ em.deadlink {
 /* -------------------------------------------------------- */
 /* Suchwort-Hervorhebungen */
 /* ----------------------- */
-em.highlight {
+.highlight {
 	padding:0px 1px;
 	font-size:inherit;
 	background-color:#dd0000;
@@ -376,6 +432,38 @@ input.searchtextfield {
 /* Suchbutton */
 /* ---------- */
 input.searchbutton {
+	border:none;
+	background-color:transparent;
+}
+
+
+/* -------------------------------------------------------- */
+/* Kontaktformular */
+/* --------------- */
+form#contact_form {
+}
+table#contact_table {
+}
+table#contact_table td {
+  vertical-align:top;
+  padding:5px;
+}
+span#contact_errormessage{
+  color:#880000;
+  font-weight:bold;
+}
+span#contact_successmessage{
+  color:#008800;
+  font-weight:bold;
+}
+input#contact_name, input#contact_mail, input#contact_website {
+  width:200px;
+}
+textarea#contact_message {
+  width:200px;
+}
+input#contact_submit {
+  width:200px;
 }
 
 
@@ -437,68 +525,75 @@ img {
 	border:none;
 }
 
+div.imagesubtitle {
+	margin:6px 3px;
+	text-align:justify;
+	font-size:0.97em;
+	line-height:1.0em;
+}
 
 /* -------------------------------------------------------- */
 /* [bildlinks|...] */
 /* --------------- */
-img.leftcontentimage {
+div.leftcontentimage {
 	margin:8px;
-	border:1px solid;
 	max-width:100px;
 	float:left;
 	margin-left:0px;
+	padding:2px;
 }
 
+img.leftcontentimage {
+	border:1px solid;
+	max-width:100px;
+}
 
 /* -------------------------------------------------------- */
 /* [bildrechts|...] */
 /* ---------------- */
-img.rightcontentimage {
+div.rightcontentimage {
 	margin:8px;
-	border:1px solid;
 	max-width:100px;
 	float:right;
 	margin-right:0px;
+	padding:2px;
+}
+
+img.rightcontentimage {
+	border:1px solid;
+	max-width:100px;
 }
 
 
 /* -------------------------------------------------------- */
 /* [fett|...] */
 /* ---------- */
-em.bold {
-	font-weight:bold;
+b {
+
 }
 
 
 /* -------------------------------------------------------- */
 /* [kursiv|...] */
 /* ------------ */
-em.italic {
-	font-style:italic;
+i {
+
 }
 
-
-/* -------------------------------------------------------- */
-/* [fettkursiv|...] */
-/* ---------------- */
-em.bolditalic {
-	font-weight:bold;
-	font-style:italic;
-}
 
 /* -------------------------------------------------------- */
 /* [unter|...] */
 /* ------------ */
-em.underlined {
-	text-decoration:underline;
+u {
+
 }
 
 
 /* -------------------------------------------------------- */
 /* [durch|...] */
 /* ------------ */
-em.crossed {
-	text-decoration:line-through;
+s {
+	
 }
 
 

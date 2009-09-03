@@ -1,8 +1,8 @@
 /* 
 * 
-* $Revision: 22 $
-* $LastChangedDate: 2008-03-21 12:55:02 +0100 (Fr, 21 Mrz 2008) $
-* $Author: arvid $
+* $Revision:22 $
+* $LastChangedDate:2008-03-21 12:55:02 +0100 (Fr, 21 Mrz 2008) $
+* $Author:arvid $
 *
 */
 /* -------------------------------------------------------- */
@@ -103,15 +103,34 @@ div.mainmenu {
 	font-size:12px;
 	font-weight:bold;
 }
+ul.mainmenu {
+	margin: 0px;
+	padding: 0px;
+}
+li.mainmenu {
+	display:inline;
+}
+li.mainmenu_submenu {
+	display:inline;
+}
 
 
 /* -------------------------------------------------------- */
 /* Hauptmenü (Galerie) */
 /* ------------------- */
 div.gallerymenu {
-	padding:6px 8px 0px 8px;
-	line-height:30px;
+	padding:3px 10px 3px 10px;
+	border-bottom:1px solid #C0C0C0;
+	background-color:#EFEFEF;
 	text-align:center;
+}
+ul.gallerymenu {
+	margin: 0px;
+	padding: 0px;
+}
+li.gallerymenu {
+	display:inline;
+	padding-right: 5px;
 }
 
 
@@ -123,6 +142,14 @@ div.detailmenu {
 	border-bottom:1px solid #C0C0C0;
 	background-color:#EFEFEF;
 	text-align:center;
+}
+ul.detailmenu {
+	margin: 0px;
+	padding: 0px;
+}
+li.detailmenu {
+	display:inline;
+	padding-right: 5px;
 }
 
 
@@ -233,6 +260,32 @@ a.detailmenuactive:hover {
 
 
 /* -------------------------------------------------------- */
+/* Galeriemenüpunkt */
+/* --------------- */
+a.gallerymenu {
+	margin:6px 10px;
+	color:#707070;
+}
+a.gallerymenu:hover {
+	color:#000000;
+	text-decoration:none;
+}
+
+
+/* -------------------------------------------------------- */
+/* Aktiver Galeriemenüpunkt */
+/* ----------------------- */
+a.gallerymenuactive {
+	margin:6px 10px;
+	color:#000000;
+	font-weight:bold;
+}
+a.gallerymenuactive:hover {
+	text-decoration:none;
+}
+
+
+/* -------------------------------------------------------- */
 /* Submenüpunkt */
 /* --------------- */
 a.submenu {
@@ -262,15 +315,15 @@ a.submenuactive:hover {
 
 
 /* -------------------------------------------------------- */
-/* Zuletzt geänderte Seite */
-/* ----------------------- */
-a.latestchangedlink {
+/* Links im Footer */
+/* --------------- */
+div.lastchange a {
 	text-decoration:none;
 	font-size:10px;
 	color:#a0a0a0;
 	font-weight:bold;
 }
-a.latestchangedlink:hover {
+div.lastchange a:hover {
 	text-decoration:underline;
 }
 
@@ -278,7 +331,7 @@ a.latestchangedlink:hover {
 /* -------------------------------------------------------- */
 /* Fehler in Tag-Attribut oder -Wert */
 /* --------------------------------- */
-em.deadlink {
+.deadlink {
 	color:#ff4444;
 	text-decoration:line-through;
 	font-weight:bold;
@@ -288,7 +341,7 @@ em.deadlink {
 /* -------------------------------------------------------- */
 /* Suchwort-Hervorhebungen */
 /* ----------------------- */
-em.highlight {
+.highlight {
 	padding:0px 1px;
 	font-size:inherit;
 	background-color:#dd0000;
@@ -328,6 +381,39 @@ input.searchtextfield {
 /* ---------- */
 input.searchbutton {
 	margin-bottom:-5px;
+}
+
+
+/* -------------------------------------------------------- */
+/* Kontaktformular */
+/* --------------- */
+form#contact_form {
+}
+table#contact_table {
+}
+table#contact_table td {
+  vertical-align:top;
+  padding:5px;
+}
+span#contact_errormessage{
+  color:#880000;
+  font-weight:bold;
+}
+span#contact_successmessage{
+  color:#008800;
+  font-weight:bold;
+}
+input#contact_name, input#contact_mail, input#contact_website {
+	border:1px solid #C0C0C0;
+  width:200px;
+}
+textarea#contact_message {
+	border:1px solid #C0C0C0;
+  width:200px;
+}
+input#contact_submit {
+	border:1px solid #C0C0C0;
+  width:200px;
 }
 
 
@@ -389,68 +475,75 @@ img {
 	border:none;
 }
 
+div.imagesubtitle {
+	margin:3px 3px;
+	text-align:justify;
+	font-size:0.9em;
+	line-height:1.1em;
+}
+
 
 /* -------------------------------------------------------- */
 /* [bildlinks|...] */
 /* --------------- */
-img.leftcontentimage {
+div.leftcontentimage {
 	margin:8px;
-	border:1px solid;
 	max-width:100px;
 	float:left;
 	margin-left:0px;
+}
+
+img.leftcontentimage {
+	max-width:100px;
+	border:1px solid;
 }
 
 
 /* -------------------------------------------------------- */
 /* [bildrechts|...] */
 /* ---------------- */
-img.rightcontentimage {
+div.rightcontentimage {
 	margin:8px;
-	border:1px solid;
 	max-width:100px;
 	float:right;
 	margin-right:0px;
+}
+
+img.rightcontentimage {
+	border:1px solid;
+	max-width:100px;
 }
 
 
 /* -------------------------------------------------------- */
 /* [fett|...] */
 /* ---------- */
-em.bold {
-	font-weight:bold;
+b {
+
 }
 
 
 /* -------------------------------------------------------- */
 /* [kursiv|...] */
 /* ------------ */
-em.italic {
-	font-style:italic;
+i {
+
 }
 
-
-/* -------------------------------------------------------- */
-/* [fettkursiv|...] */
-/* ---------------- */
-em.bolditalic {
-	font-weight:bold;
-	font-style:italic;
-}
 
 /* -------------------------------------------------------- */
 /* [unter|...] */
 /* ------------ */
-em.underlined {
-	text-decoration:underline;
+u {
+
 }
 
 
 /* -------------------------------------------------------- */
 /* [durch|...] */
 /* ------------ */
-em.crossed {
-	text-decoration:line-through;
+s {
+
 }
 
 

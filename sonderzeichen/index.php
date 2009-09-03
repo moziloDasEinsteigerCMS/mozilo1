@@ -2,20 +2,18 @@
 
 /* 
 * 
-* $Revision: 19 $
-* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+* $Revision: 73 $
+* $LastChangedDate: 2009-01-05 17:12:45 +0100 (Mo, 05 Jan 2009) $
 * $Author: arvid $
 *
 */
+
 
 /*
 ######
 		
 	Ein Sonderzeichenkonverter für moziloCMS
 
-	mozilo 2008
-	www.mozilo.de
-		
 ######
 */
 	require_once("../SpecialChars.php");
@@ -85,7 +83,7 @@
 		elseif ($type == 1)
 			$checked1 = " checked=\"checked\"";
 
-		$form = "<form method=\"get\" action=\"index.php\" name=\"form\" >\n"
+		$form = "<form accept-charset=\"ISO-8859-1\" method=\"get\" action=\"index.php\" name=\"form\" >\n"
 		."<input type=\"text\" id=\"input\" name=\"input\" value=\""
 		.htmlentities($input)
 		."\" /> \n"

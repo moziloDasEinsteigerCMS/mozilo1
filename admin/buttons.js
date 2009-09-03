@@ -1,11 +1,12 @@
 /* 
 * 
-* $Revision: 19 $
-* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+* $Revision: 74 $
+* $LastChangedDate: 2009-01-08 19:43:18 +0100 (Do, 08 Jan 2009) $
 * $Author: arvid $
 *
 */
-function insert(aTag, eTag) {
+
+function insert(aTag, eTag, keepSelectedText) {
   var input = document.forms['form'].elements['pagecontent'];
   var scrolltop = input.scrollTop;
   input.focus();
@@ -14,10 +15,14 @@ function insert(aTag, eTag) {
     /* Einfügen des Formatierungscodes */
     var range = document.selection.createRange();
     var insText = range.text;
-    range.text = aTag + insText + eTag;
+    if (keepSelectedText == true) {
+    	range.text = aTag + insText + eTag;
+    } else {
+    	range.text = aTag + eTag;
+    }
     /* Anpassen der Cursorposition */
     range = document.selection.createRange();
-    if (insText.length == 0) {
+    if ((insText.length == 0) || (keepSelectedText == false)) {
       range.move('character', -eTag.length);
     } else {
       range.moveStart('character', aTag.length + insText.length + eTag.length);      
@@ -31,10 +36,14 @@ function insert(aTag, eTag) {
     var start = input.selectionStart;
     var end = input.selectionEnd;
     var insText = input.value.substring(start, end);
-    input.value = input.value.substr(0, start) + aTag + insText + eTag + input.value.substr(end);
+    if (keepSelectedText == true) {
+	    input.value = input.value.substr(0, start) + aTag + insText + eTag + input.value.substr(end);
+	  } else {
+	  	input.value = input.value.substr(0, start) + aTag + eTag + input.value.substr(end);
+	  }
     /* Anpassen der Cursorposition */
     var pos;
-    if (insText.length == 0) {
+    if ((insText.length == 0) || (keepSelectedText == false)) {
       pos = start + aTag.length;
     } else {
       pos = start + aTag.length + insText.length + eTag.length;
@@ -63,14 +72,14 @@ function insert(aTag, eTag) {
 
 function insertAndResetSelectbox(selectbox) {
 	if (selectbox.selectedIndex > 0) {
-		insert(selectbox.options[selectbox.selectedIndex].value, '');
+		insert(selectbox.options[selectbox.selectedIndex].value, '', false);
 		selectbox.selectedIndex = 0;
 	}
 }
 
 function insertTagAndResetSelectbox(selectbox) {
 	if (selectbox.selectedIndex > 0) {
-		insert('['+selectbox.options[selectbox.selectedIndex].value+'|', ']');
+		insert('['+selectbox.options[selectbox.selectedIndex].value+'|', ']', true);
 		selectbox.selectedIndex = 0;
 	}
 }

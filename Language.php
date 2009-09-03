@@ -2,11 +2,12 @@
 
 /* 
 * 
-* $Revision: 19 $
-* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+* $Revision: 168 $
+* $LastChangedDate: 2009-01-31 01:20:16 +0100 (Sa, 31 Jan 2009) $
 * $Author: arvid $
 *
 */
+
 
 
 /*
@@ -48,7 +49,7 @@ class Language {
 // Sprachelement ohne Zusatz aus Sprachdatei holen
 // ------------------------------------------------------------------------------
 	function getLanguageValue0($phrase) {
-		return $this->LANG_CONF->get($phrase);
+		return htmlentities($this->LANG_CONF->get($phrase));
 	}
 
 
@@ -56,7 +57,7 @@ class Language {
 // Sprachelement mit einem zusätzlichen Parameter aus Sprachdatei holen
 // ------------------------------------------------------------------------------
 	function getLanguageValue1($phrase, $param1) {
-		$text = $this->LANG_CONF->get($phrase);
+		$text = htmlentities($this->LANG_CONF->get($phrase));
 		$text = preg_replace("/{PARAM1}/", $param1, $text);
 		return $text;
 	}
@@ -66,7 +67,7 @@ class Language {
 // Sprachelement mit zwei zusätzlichen Parametern aus Sprachdatei holen
 // ------------------------------------------------------------------------------
 	function getLanguageValue2($phrase, $param1, $param2) {
-		$text = $this->LANG_CONF->get($phrase);
+		$text = htmlentities($this->LANG_CONF->get($phrase));
 		$text = preg_replace("/{PARAM1}/", $param1, $text);
 		$text = preg_replace("/{PARAM2}/", $param2, $text);
 		return $text;

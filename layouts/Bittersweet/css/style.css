@@ -1,8 +1,8 @@
 /* 
 * 
-* $Revision: 22 $
-* $LastChangedDate: 2008-03-21 12:55:02 +0100 (Fr, 21 Mrz 2008) $
-* $Author: arvid $
+* $Revision:22 $
+* $LastChangedDate:2008-03-21 12:55:02 +0100 (Fr, 21 Mrz 2008) $
+* $Author:arvid $
 *
 */
 /*#############################################################
@@ -34,7 +34,7 @@ bodygal {
 	font: normal 62.5% "Lucida Sans Unicode",sans-serif;
 	width:100%
 }
-input {
+input, textarea {
 	color: #555;
 	font: normal 1.1em "Lucida Sans Unicode",sans-serif;
 }
@@ -138,6 +138,31 @@ h1,h2,h3 {color: #654;}
 .main {float: left;}
 
 /* navigation */
+ul.mainmenu {
+	margin: 0px;
+	padding: 0px;
+}
+li.mainmenu {
+	display:inline;
+}
+li.mainmenu_submenu {
+	display:inline;
+}
+ul.detailmenu {
+	margin: 0px;
+	padding: 0px;
+}
+li.detailmenu {
+	display:inline;
+}
+ul.gallerymenu {
+	margin: 0px;
+	padding: 0px;
+}
+li.gallerymenu {
+	display:inline;
+	padding-right: 7px;
+}
 .navigation {
 	float: left;
 	margin-left: 1px;
@@ -277,19 +302,47 @@ img.thumbnail {
 em {
 font-style:normal;
 }
-em.bold {
-font-weight:bold;
-}
-em.italic {
-font-style:italic;
-}
-em.deadlink {
+.deadlink {
 color:#aa0000;
 text-decoration:line-through;
 }
-em.underlined {
-	text-decoration:underline;
+.highlight {
+	padding:0px 1px;
+	font-size:inherit;
+	background-color:#dd0000;
+	color:#ffffff;
+	font-size:inherit;
 }
+
+
+/* -------------------------------------------------------- */
+/* Kontaktformular */
+/* --------------- */
+form#contact_form {
+}
+table#contact_table {
+}
+table#contact_table td {
+  vertical-align:top;
+  padding:5px;
+}
+span#contact_errormessage{
+  color:#880000;
+  font-weight:bold;
+}
+span#contact_successmessage{
+  color:#008800;
+  font-weight:bold;
+}
+input#contact_name, input#contact_mail, input#contact_website {
+  width:200px;
+}
+textarea#contact_message {
+  width:200px;
+}
+input#contact_submit {
+  width:200px;
+}s
 /* -------------------------------------------------------- */
 /* [bild|...] */
 /* ---------- */
@@ -297,28 +350,42 @@ img {
 	border:none;
 }
 
+div.imagesubtitle {
+	margin:6px 3px;
+	text-align:justify;
+	font-size:0.95em;
+	line-height:0.95em;
+}
 
 /* -------------------------------------------------------- */
 /* [bildlinks|...] */
 /* --------------- */
-img.leftcontentimage {
+div.leftcontentimage {
 	margin:8px;
-	border:1px solid;
 	max-width:100px;
 	float:left;
 	margin-left:0px;
+}
+
+img.leftcontentimage {
+	border:1px solid;
+	max-width:100px;
 }
 
 
 /* -------------------------------------------------------- */
 /* [bildrechts|...] */
 /* ---------------- */
-img.rightcontentimage {
+div.rightcontentimage {
 	margin:8px;
-	border:1px solid;
 	max-width:100px;
 	float:right;
 	margin-right:0px;
+}
+
+img.rightcontentimage {
+	border:1px solid;
+	max-width:100px;
 }
 
 /* -------------------------------------------------------- */

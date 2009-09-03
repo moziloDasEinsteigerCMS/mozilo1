@@ -2,9 +2,9 @@
 
 /* 
 * 
-* $Revision: 19 $
-* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
-* $Author: arvid $
+* $Revision:35 $
+* $LastChangedDate:2008-07-09 19:24:00 +0200 (Mi, 09 Jul 2008) $
+* $Author:arvid $
 *
 */
 
@@ -56,10 +56,10 @@ $WEBSITE_TITLE			= $mainconf->get("websitetitle");
 if ($WEBSITE_TITLE == "")
 	$WEBSITE_TITLE = "Titel der Website";
 
-$layoutdir 			= "layouts/".$mainconf->get("cmslayout");
-$TEMPLATE_FILE	= "$layoutdir/gallerytemplate.html";
-$CSS_FILE				= "$layoutdir/css/style.css";
-$FAVICON_FILE		= "$layoutdir/favicon.ico";
+$LAYOUT_DIR			= $mainconf->get("cmslayout");
+$TEMPLATE_FILE	= "layouts/$LAYOUT_DIR/gallerytemplate.html";
+$CSS_FILE				= "layouts/$LAYOUT_DIR/css/style.css";
+$FAVICON_FILE		= "layouts/$LAYOUT_DIR/favicon.ico";
 
 // Übergebene Parameter überprüfen
 $GAL_REQUEST = htmlentities($_GET['gal']);
@@ -110,6 +110,7 @@ echo $HTML;
 // ------------------------------------------------------------------------------
 	function readTemplate() {
 		global $CSS_FILE;
+		global $LAYOUT_DIR;
 		global $GAL_NAME;
 		global $HTML;
 		global $FAVICON_FILE;
@@ -132,6 +133,7 @@ echo $HTML;
 		// Platzhalter des Templates mit Inhalt füllen
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
+    $HTML = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR, $HTML);
     //$HTML = preg_replace('/{WEBSITE_TITLE}/', $WEBSITE_TITLE, $HTML);
     $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_TITLE, $language->getLanguageValue0("message_galleries_0"), $GAL_NAME), $HTML);
     $HTML = preg_replace('/{CURRENTGALLERY}/', $language->getLanguageValue1("message_gallery_1", $GAL_NAME), $HTML);
@@ -174,24 +176,27 @@ echo $HTML;
 		// Keine Bilder im Galerieverzeichnis?
 		if (count($PICARRAY) == 0)
 			return "&nbsp;";
+		
+		$gallerymenu = "<ul class=\"gallerymenu\">";
+		
 		// Link "Erstes Bild"
 		if ($INDEX == $FIRST)
-			$linkclass = "detailmenuactive";
+			$linkclass = "gallerymenuactive";
 		else
-			$linkclass = "detailmenu";
-		$gallerymenu = "<a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$FIRST\" class=\"$linkclass\">".$language->getLanguageValue0("message_firstimage_0")."</a> ";
+			$linkclass = "gallerymenu";
+		$gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$FIRST\" class=\"$linkclass\">".$language->getLanguageValue0("message_firstimage_0")."</a></li>";
 		// Link "Voriges Bild"
-		$gallerymenu .= "<a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$BEFORE\" class=\"detailmenu\">".$language->getLanguageValue0("message_previousimage_0")."</a> ";
+		$gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$BEFORE\" class=\"detailmenu\">".$language->getLanguageValue0("message_previousimage_0")."</a></li>";
 		// Link "Nächstes Bild"
-		$gallerymenu .= "<a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$NEXT\" class=\"detailmenu\">".$language->getLanguageValue0("message_nextimage_0")."</a> ";
+		$gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$NEXT\" class=\"detailmenu\">".$language->getLanguageValue0("message_nextimage_0")."</a></li>";
 		// Link "Letztes Bild"
 		if ($INDEX == $LAST)
-			$linkclass = "detailmenuactive";
+			$linkclass = "gallerymenuactive";
 		else
-			$linkclass = "detailmenu";
-		$gallerymenu .= "<a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$LAST\" class=\"$linkclass\">".$language->getLanguageValue0("message_lastimage_0")."</a>";
+			$linkclass = "gallerymenu";
+		$gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$LAST\" class=\"$linkclass\">".$language->getLanguageValue0("message_lastimage_0")."</a></li>";
 		// Rückgabe des Menüs
-		return $gallerymenu;
+		return $gallerymenu."</ul>";
 	}
 	
 	
@@ -295,10 +300,10 @@ echo $HTML;
 				$h=$MAX_IMG_HEIGHT;
 				$w=round(($MAX_IMG_HEIGHT*$size[0])/$size[1]);
 			}
-			$currentpic .= "<img src=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $PICARRAY[$INDEX-1])."\"  style=\"width:".$w."px;height:".$h."px;\"/>";
+			$currentpic .= "<img src=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $PICARRAY[$INDEX-1])."\"  style=\"width:".$w."px;height:".$h."px;\" />";
 		}
 		else
-			$currentpic .= "<img src=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $PICARRAY[$INDEX-1])."\"  style=\"max-width:".$MAX_IMG_WIDTH."px;max-height:".$MAX_IMG_HEIGHT."px;\"/>";
+			$currentpic .= "<img src=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $PICARRAY[$INDEX-1])."\"  style=\"max-width:".$MAX_IMG_WIDTH."px;max-height:".$MAX_IMG_HEIGHT."px;\" />";
 			// Link zur Vollbildansicht schließen
 			$currentpic .= "</a>";
 		// Rückgabe des Bildes
@@ -367,6 +372,7 @@ function checkThumbs() {
 	global $DIR_GALLERY;
 	global $DIR_THUMBS;
 	global $PICARRAY;
+	global $language;
 	
 	// Vorschauverzeichnis prüfen
 	if (!file_exists($DIR_THUMBS))

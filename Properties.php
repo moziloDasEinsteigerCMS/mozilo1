@@ -2,11 +2,12 @@
 
 /* 
 * 
-* $Revision: 19 $
-* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+* $Revision: 72 $
+* $LastChangedDate: 2009-01-05 17:11:58 +0100 (Mo, 05 Jan 2009) $
 * $Author: arvid $
 *
 */
+
 
 /**
  * 
@@ -16,9 +17,9 @@
  * 
  *  Properties - reads java style properties files.
  * 
- *  $Id: Properties.php 19 2008-03-12 17:06:54Z arvid $
+ *  $Id:Properties.php 19 2008-03-12 17:06:54Z arvid $
  *
- * @version   $Id: Properties.php 19 2008-03-12 17:06:54Z arvid $
+ * @version   $Id:Properties.php 19 2008-03-12 17:06:54Z arvid $
  * @package Combine
  * @author   David Giffin <david@giffin.org>
  * @since    PHP 4.0

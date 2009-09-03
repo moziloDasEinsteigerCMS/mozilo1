@@ -1,7 +1,7 @@
 /* 
 * 
-* $Revision: 28 $
-* $LastChangedDate: 2008-04-16 18:33:31 +0200 (Mi, 16 Apr 2008) $
+* $Revision: 154 $
+* $LastChangedDate: 2009-01-30 00:03:23 +0100 (Fr, 30 Jan 2009) $
 * $Author: arvid $
 *
 */
@@ -122,7 +122,7 @@ background-color: #DEB3AF;
 	vertical-align: middle;
 }
 
-A.imagelink
+a.imagelink, a.imagelink img
 {
 	text-decoration: none;
 	border-width: 0px; 
@@ -404,6 +404,17 @@ TD.config_row2
 	vertical-align:top;
 	text-align:left;
 }
+
+/**
+ * Ergänzung zu TD.config_row2 auf der editsite
+ */
+TD.righttext
+{
+	text-align:right;
+	padding-right:30px;
+	vertical-align:bottom;
+}
+
 TD.config_row1
 {
 	padding-top: 10px;
@@ -423,7 +434,7 @@ TD.config_row0
 	border-top-color: #D1D1D1;
 	border-top-style: solid;
 	border-top-width: 1px;
-	width:65%;
+	width:63%;
 	vertical-align:top;
 	text-align:left;
 }
@@ -463,6 +474,27 @@ TD.title
 }
 
 #home_logout:hover
+{
+	background-color: #AFC4DE;
+}
+
+#home_sysinfo
+{
+	display: block;
+	height: 20px;
+	width: 20px;
+	left: 50px;
+	top: 85px;
+	position: absolute;
+	border: 1px solid #C0C0C0;
+	
+	background-position: center;
+	background-image: url(gfx/info.gif);
+	background-repeat: no-repeat;
+	background-color: #FFFFFF;
+}
+
+#home_sysinfo:hover
 {
 	background-color: #AFC4DE;
 }
@@ -728,7 +760,7 @@ TD.title
 	background-color: #FFFFFF;
 }
 
-#upload_new:hover
+#upload_info:hover
 {
 	background-color: #AFC4DE;
 }
@@ -842,10 +874,17 @@ select
 	margin-bottom: 10px;
 	
 }
-select.overviewselect {
-    margin-top: 1px;
-    margin-bottom: 1px;
+select.overviewselect, select.usersyntaxselectbox {
+    margin-top: -2px;
+    margin-bottom: 0px;
+    height:18px;
+    font-size:0.9em;
+    max-width:150px;
 } 
+select.usersyntaxselectbox {
+    max-width:200px;
+}
+
 select.maxwidth {
 	width:270px;
 	max-width:260px;
@@ -876,6 +915,15 @@ Input.submit
 {
 	border: 1px solid #C0C0C0;
 }
+
+.text3
+{
+	border: 1px solid #C0C0C0;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	width:100px;
+}
+
 .select1
 {
 	border: 1px solid #C0C0C0;
@@ -902,23 +950,33 @@ textarea.usersyntaxarea {
 {
 	display:block;
 	margin:10px;
-	border: 1px solid green;
+	color:#00aa00;
+	border: 1px solid;
 	padding: 5px;
-	color: green;
+	padding-left:30px;
 	font-weight: bolder;
+	background-color:#DDFFDD;
+	background-image:url('gfx/msg_success.png');
+	background-position:5px 5px;
+	background-repeat:no-repeat;
 }
 
 .fehler
 {
 	display:block;
 	margin:10px;
-	border: 1px solid red;
+	color:#aa0000;
+	border: 1px solid;
 	padding: 5px;
-	color: red;
+	padding-left:30px;
 	font-weight: bolder;
+	background-color:#FFDDDD;
+	background-image:url('gfx/msg_error.png');
+	background-position:5px 5px;
+	background-repeat:no-repeat;
 }
 
-div.loginform_maindiv
+div#loginform_maindiv
 {
 	height: 100px;
 	width: 300px;
@@ -932,7 +990,27 @@ div.loginform_maindiv
 	padding: 10px;
 	background-color: white;
 }
-div.loginform_shadowdiv
+div#loginform_maindiv_disabled
+{
+	height: 100px;
+	width: 300px;
+	margin-top: -50px;
+	margin-left: -150px;
+	padding: 0;
+	top: 50%;
+	left: 50%;
+	position: absolute;
+	border: 1px solid #C0C0C0;
+	padding: 10px;
+	background-color: #e0e0e0;
+	color:#777777;
+}
+div#loginform_maindiv_disabled .text2, div#loginform_maindiv_disabled .submit {
+	background-color: #e0e0e0;
+	border: 1px solid #C0C0C0;
+	color: #777777;
+}
+div#loginform_shadowdiv
 {
 	height: 100px;
 	width: 300px;
@@ -946,7 +1024,7 @@ div.loginform_shadowdiv
 	padding: 10px;
 }
 
-div.loginform_logo
+div#loginform_logo
 {
 	height: 416px;
 	width: 667px;
@@ -987,7 +1065,7 @@ div.fehler
 img.js
 {
 	border: 1px solid #c0c0c0;
-	height: 24px;
+/*	height: 24px;*/
 	padding: 1px;
 	background-color: #FFFFFF;
 	margin:1px 2px 5px 2px;
@@ -1031,9 +1109,11 @@ h3 {
 
 div.colordiv {
 	width:70px;
-	height:20px;
 	border:1px solid #7F9DB9;
+	height: 18px;
 	background-color:#FFFFFF;
+
+	margin-top:-4px;
 }
 input.colorinput {
 	background-color:#FFFFFF;
@@ -1048,4 +1128,18 @@ img.colorimage {
 	float:right;
 	padding:1px;
 	margin:0px;
+}
+
+input#farbcode {
+	font-size:10px;
+	background-color:transparent;
+}
+
+div#files_list {
+	padding:5px 0px;
+}
+
+div#files_list input {
+	margin-left:10px;
+	margin-top:3px;
 }

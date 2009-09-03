@@ -2,133 +2,192 @@
 
 /* 
 * 
-* $Revision: 19 $
-* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+* $Revision: 115 $
+* $LastChangedDate: 2009-01-27 21:14:39 +0100 (Di, 27 Jan 2009) $
 * $Author: arvid $
 *
 */
 
+
 require_once("Crypt.php");
+require_once("../Mail.php");
 require("filesystem.php");
-// Wichtig: Die Session muss gestartet werden
-// bevor die erste Textausgabe an den Browser
-// erfolgt ist. Daher am Besten immer als ersten
-// Befehl einfügen
+
+// Session starten!
 session_start();
 
-// Überprüfen: Existiert ein Benutzer? Wenn nicht: admin:install anlegen
-$adminconf = new Properties("conf/logindata.conf");
+// Initialisierungen
+$logindataconf = new Properties("conf/logindata.conf");
+$basicconf = new Properties("conf/basic.conf");
 $pwcrypt = new Crypt();
-if (($adminconf->get("name") == "") || ($adminconf->get("pw") == "")) {
-	$adminconf->set("name", "admin");
-	$adminconf->set("pw", $pwcrypt->encrypt("install"));
-	$adminconf->set("initialpw", "true");
+$mailfunctions = new Mail(true);
+
+// MAXIMALE ANZAHL FALSCHER LOGINS
+$FALSELOGINLIMIT = 3;
+// DAUER DER SPERRE NACH FALSCHEN LOGINS IN MINUTEN
+$LOGINLOCKTIME = 10;
+
+
+// Überprüfen: Existiert ein Benutzer? Wenn nicht: admin:install anlegen
+if (($logindataconf->get("name") == "") || ($logindataconf->get("pw") == "")) {
+	$logindataconf->set("name", "admin");
+	$logindataconf->set("pw", $pwcrypt->encrypt("install"));
+	$logindataconf->set("initialpw", "true");
 }
 
 $HTML = "<!doctype html public \"-//W3C//DTD HTML 4.0 //EN\"><html>";
 
-// für den Logout-Link wird der Parameter über die URL übergeben
-// daher wird hier $_GET abgefragt
-if (isset($_GET['logout']))
-{
+// User hat sich ausgeloggt
+if (isset($_GET['logout'])) {
     // Session beenden und die Sessiondaten löschen
     session_destroy();
-    // Auch bei zerstörter Session, ist die Variable
-    // $_SESSION noch vorhanden, bis die Seite im Browser
-    // neu angezeigt wird. Daher muss auch diese Variable
-    // gesondert zerstört werden.
     unset($_SESSION);
 }
 
 // Wurde das Anmeldeformular verschickt?
-// Dann die Zugangsdaten in der Funktion check_login() prüfen
 if  (isset($_POST['login'])) {
-		if (check_login($_POST['username'], $_POST['password']))
-    {
-        // Bei erfolgreichem Zugang, die Daten in der
-        // Session speichern. Das Passwort sollte nie
-        // in der Session gespeichert werden, nur
-        // der Benutzername und die erfolgreiche Anmeldung
-        // an sich werden hier abgelegt.
-        $_SESSION['username'] = $_POST['username'];
-        $_SESSION['login_okay'] = true;
+	// Zugangsdaten prüfen
+		if (checkLoginData($_POST['username'], $_POST['password'])) {
+			// Daten in der Session merken
+      $_SESSION['username'] = $_POST['username'];
+      $_SESSION['login_okay'] = true;
     }
 }
 
-// war die Anmeldung schon erfolgreich?
-// Dann einen Willkommensgruß anzeigen
-if (isset($_SESSION['login_okay']) and $_SESSION['login_okay'])
+// Anmeldung erfolgreich
+if (isset($_SESSION['login_okay']) and $_SESSION['login_okay']) {
+	// Counter für falsche Logins innerhalb der Sperrzeit zurücksetzen
+	$logindataconf->set("falselogincounttemp", 0);
+	// ...ab in den Admin!
 	header("location:index.php");
+}
+
+// Anmeldung fehlerhaft
 elseif  (isset($_POST['login'])) {
-	$HTML .= "<head><link rel=\"stylesheet\" href=\"adminstyle.css\" type=\"text/css\" /><title>Login fehlgeschlagen</title></head><body onLoad=\"document.loginform.username.focus();document.loginform.username.select()\" ><div class=\"fehler\">".getlanguagevalue("incorrect_login")."</div>".login_formular();
-	
-// Keine erfolgreiche Anmeldung und noch kein
-// Formular versandt? Dann wurde die Seite
-// zum ersten Mal aufgerufen.
-} else {
-	$HTML .= "<head><link rel=\"stylesheet\" href=\"adminstyle.css\" type=\"text/css\" /><title>Login - bitte anmelden</title></head><body onLoad=\"document.loginform.username.focus();document.loginform.username.select()\" >".login_formular();
-} // if-else Ende
+	// Counter hochzählen
+	$falselogincounttemp = ($logindataconf->get("falselogincounttemp"))+1;
+	$logindataconf->set("falselogincounttemp", $falselogincounttemp); // Zähler für die aktuelle Sperrzeit
+	$falselogincount = ($logindataconf->get("falselogincount"))+1;
+	$logindataconf->set("falselogincount", $falselogincount); // Gesamtzähler
+	$HTML .= "<head>"
+		."<link rel=\"stylesheet\" href=\"adminstyle.css\" type=\"text/css\" />"
+		."<title>".getlanguagevalue("incorrect_login")."</title>"
+		."</head>"
+		."<body onLoad=\"document.loginform.username.focus();document.loginform.username.select()\" >"
+		."<div class=\"fehler\">".getlanguagevalue("incorrect_login")."</div>";
+	// maximale Anzahl falscher Logins erreicht?
+	if ($falselogincounttemp >= $FALSELOGINLIMIT) {
+		// Sperrzeit starten
+		$logindataconf->set("loginlockstarttime", time());
+		// Mail an Admin
+		if ($basicconf->get("sendadminmail") == "true") {
+			$mailcontent = getLanguageValue("loginlocked_mailcontent")."\r\n\r\n"
+				.strftime(getLanguageValue("_dateformat"), time())."\r\n"
+				.$_SERVER['REMOTE_ADDR']." / ".gethostbyaddr($_SERVER['REMOTE_ADDR'])."\r\n"
+				.getLanguageValue("username").": ".$_POST['username'];
+				
+				// Prüfen ob die Mail-Funktion vorhanden ist
+				if($mailfunctions->isMailAvailable())
+				{
+					$mailfunctions->sendMailToAdmin(getLanguageValue("loginlocked_mailsubject"), $mailcontent);
+				}
+		}
+		// Formular ausgrauen
+		$HTML .= login_formular(false);
+	}
+	else {
+		// Formular nochmal normal anzeigen
+		$HTML .= login_formular(true);
+	}
+}
+
+// Formular noch nicht abgeschickt? Dann wurde die Seite zum ersten Mal aufgerufen.
+else {
+	$HTML .= "<head>"
+		."<link rel=\"stylesheet\" href=\"adminstyle.css\" type=\"text/css\" />"
+		."<title>".getlanguagevalue("loginplease")."</title>"
+		."</head>"
+		."<body onLoad=\"document.loginform.username.focus();document.loginform.username.select()\" >";
+		
+		// Login noch gesperrt?
+		if (($logindataconf->get("falselogincounttemp") > 0) && (time() - $logindataconf->get("loginlockstarttime")) <= $LOGINLOCKTIME*60) {
+			// gesperrtes Formular anzeigen
+			$HTML .= login_formular(false);
+		}
+		else {
+			// Zähler zurücksetzen
+			$logindataconf->set("falselogincounttemp", 0);
+			// normales Formular anzeigen
+			$HTML .= login_formular(true);
+		}
+} 
 
 $HTML .= "</body></html>";
 
 echo $HTML;
 
-// Die Funktion login_formular() zeigt das Formular mit
-// den Eingabefeldern an. Da dieses Formular oben zweimal
-// benötigt wurde (beim ersten Aufruf und bei fehlerhafter
-// Anmeldung), wird es in eine Funktion gepackt, die man
-// leicht mehrmals verwenden kann.
-function login_formular()
-{
-	$form = "<div id=\"mozilo_Logo\"></div>";
-	$form .= "<div class=\"loginform_shadowdiv\"></div>";
-	$form .= "<div class=\"loginform_maindiv\">";
-	$form .= "<form name=\"loginform\" action=\"".htmlentities($_SERVER['PHP_SELF'])."\" method=\"POST\">";
-  $form .= "<table>";
-  $form .= "<tr>";
-  $form .= "<td class=\"loginImage\" rowspan=\"2\">";
-  $form .= "<img src=\"gfx/login.gif\" alt=\"Login\"/>";
-  $form .= "</td>";
-  $form .= "<td class=\"description\">";
-  $form .= getLanguageValue("username").":";
-  $form .= "</td>";
-  $form .= "<td>";
-  $form .= "<input class=\"text2\" type=\"text\" name=\"username\">";
-  $form .= "</td>";
-  $form .= "</tr>";
-  $form .= "<tr>";
-  $form .= "<td class=\"description\">";
-  $form .= getLanguageValue("password").":";
-  $form .= "</td>";
-  $form .= "<td>";
-  $form .= "<input class=\"text2\" type=\"password\" name=\"password\">";
-  $form .= "</td>";
-  $form .= "</tr>";
-  $form .= "<tr>";
-  $form .= "<td colspan=\"3\" style=\"text-align: center;\"><input name=\"login\" value=\"Login\" class=\"submit\" type=\"submit\"></td>";
-  $form .= "</tr>";
-  $form .= "</table>";
-  $form .= "</form>";
+// Aufbau des Login-Formulars
+function login_formular($enabled) {
+	$form = "<div id=\"mozilo_Logo\"></div>"
+		."<div id=\"loginform_shadowdiv\"></div>";
+  if ($enabled)
+		$form .= "<div id=\"loginform_maindiv\">";
+	else
+		$form .= "<div id=\"loginform_maindiv_disabled\">";
+	if ($enabled)
+		$form .= "<form accept-charset=\"ISO-8859-1\" name=\"loginform\" action=\"".htmlentities($_SERVER['PHP_SELF'])."\" method=\"POST\">";
+  $form .= "<table>"
+  	."<tr>"
+  	."<td class=\"loginImage\" rowspan=\"2\">"
+  	."<img src=\"gfx/login.gif\" alt=\"Login\"/>"
+  	."</td>"
+  	."<td class=\"description\">"
+  	.getLanguageValue("username").":"
+  	."</td>"
+  	."<td>";
+  if ($enabled)
+		$form .= "<input class=\"text2\" type=\"text\" name=\"username\">";
+	else
+		$form .= "<input class=\"text2\" type=\"text\" name=\"username\" readonly=\"readonly\">";
+  $form .= "</td>"
+  	."</tr>"
+  	."<tr>"
+  	."<td class=\"description\">"
+  	.getLanguageValue("password").":"
+  	."</td>"
+  	."<td>";
+  if ($enabled)
+		$form .= "<input class=\"text2\" type=\"password\" name=\"password\">";
+	else
+		$form .= "<input class=\"text2\" type=\"password\" name=\"password\" readonly=\"readonly\">";
+  $form .= "</td>"
+  	."</tr>"
+  	."<tr>"
+  	."<td colspan=\"3\" style=\"text-align: center;\">";
+  if ($enabled)
+  	$form .= "<input name=\"login\" value=\"Login\" class=\"submit\" type=\"submit\">";
+  else
+  	$form .= "<input name=\"login\" value=\"Login\" class=\"submit\" type=\"submit\" readonly=\"readonly\">";
+  $form .= "</td>"
+  	."</tr>"
+  	."</table>";
+  if ($enabled)
+  	$form .= "</form>";
 	$form .= "</div>";
 	return $form;
 }
 
-// Die Funktion check_login prüft Benutzername und Passwort.
-// Diese Funktion könnte man später mit weiteren Zugangsdaten
-// erweitern. Am Besten wäre es, die Zugangsdaten aus
-// einer Datenbank zu holen, da man hier die Benutzer
-// flexibel verwalten kann, ohne jedes Mal den Code
-// zu ändern.
-function check_login($user, $pass)
+// Logindaten überprüfen
+function checkLoginData($user, $pass)
 {
-	global $adminconf;
+	global $logindataconf;
 	global $pwcrypt;
-    if ( ($user == $adminconf->get("name")) and ($pwcrypt->encrypt($pass) == $adminconf->get("pw")) )
+    if ( ($user == $logindataconf->get("name")) and ($pwcrypt->encrypt($pass) == $logindataconf->get("pw")) )
     {
         return true;
     } else {
         return false;
     }
 }
-// Copyright 2004 Marian Heddesheimer, 23562 Lübeck
 
+?>

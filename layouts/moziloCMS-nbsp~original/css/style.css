@@ -1,8 +1,8 @@
-/* 
-* 
-* $Revision: 22 $
-* $LastChangedDate: 2008-03-21 12:55:02 +0100 (Fr, 21 Mrz 2008) $
-* $Author: arvid $
+/*
+*
+* $Revision:22 $
+* $LastChangedDate:2008-03-21 12:55:02 +0100 (Fr, 21 Mrz 2008) $
+* $Author:arvid $
 *
 */
 /* -------------------------------------------------------- */
@@ -40,7 +40,9 @@ em {
 	font:inherit;
 	font-style:normal;
 }
-
+input, textarea {
+	border:1px solid #C0C0C0;
+}
 
 /* -------------------------------------------------------- */
 /* Haupt-Layer */
@@ -97,6 +99,16 @@ div.mainmenu {
 	margin-top:8px;
 	text-align:center;
 }
+ul.mainmenu {
+	margin: 0px;
+	padding: 0px;
+}
+li.mainmenu {
+	display:inline;
+}
+li.mainmenu_submenu {
+	display:inline;
+}
 
 
 /* -------------------------------------------------------- */
@@ -107,6 +119,14 @@ div.gallerymenu {
 	line-height:30px;
 	text-align:center;
 }
+ul.gallerymenu {
+	margin: 0px;
+	padding: 0px;
+}
+li.gallerymenu {
+	display:inline;
+	padding-right: 5px;
+}
 
 
 /* -------------------------------------------------------- */
@@ -116,6 +136,14 @@ div.detailmenu {
 	padding:6px 8px 0px 8px;
 	line-height:30px;
 	text-align:left;
+}
+ul.detailmenu {
+	margin: 0px;
+	padding: 0px;
+}
+li.detailmenu {
+	display:inline;
+	padding-right: 5px;
 }
 
 
@@ -201,9 +229,9 @@ a.menuactive {
 	display:block;
 	padding:3px;
 	color:#000000;
+	background-color:#D0D0D0;
 	text-align:center;
 	border:1px solid #C0C0C0;
-	background-color:#D0D0D0;
 	width:120px;
 	margin:2px 5px;
 	font-weight:bold;
@@ -242,6 +270,39 @@ a.detailmenuactive {
 	font-weight:bold;
 }
 a.detailmenuactive:hover {
+	text-decoration:none;
+}
+
+
+/* -------------------------------------------------------- */
+/* Galeriemenüpunkt */
+/* --------------- */
+a.gallerymenu {
+	padding:3px 5px;
+	color:#000000;
+	background-color:#FFFFFF;
+	border:1px solid #C0C0C0;
+	font-weight:bold;
+}
+a.gallerymenu:hover {
+	color:#000000;
+	text-decoration:none;
+	border:1px solid #C0C0C0;
+	background-color:#D0D0D0;
+}
+
+
+/* -------------------------------------------------------- */
+/* Aktiver Detailmenüpunkt */
+/* ----------------------- */
+a.gallerymenuactive {
+	padding:3px 5px;
+	color:#000000;
+	border:1px solid #C0C0C0;
+	background-color:#D0D0D0;
+	font-weight:bold;
+}
+a.gallerymenuactive:hover {
 	text-decoration:none;
 }
 
@@ -288,15 +349,15 @@ a.submenuactive:hover {
 
 
 /* -------------------------------------------------------- */
-/* Zuletzt geänderte Seite */
-/* ----------------------- */
-a.latestchangedlink {
+/* Links im Footer */
+/* --------------- */
+div.lastchange a {
 	text-decoration:none;
 	font-size:10px;
 	color:#a0a0a0;
 	font-weight:bold;
 }
-a.latestchangedlink:hover {
+div.lastchange a:hover {
 	text-decoration:underline;
 }
 
@@ -304,7 +365,7 @@ a.latestchangedlink:hover {
 /* -------------------------------------------------------- */
 /* Fehler in Tag-Attribut oder -Wert */
 /* --------------------------------- */
-em.deadlink {
+.deadlink {
 	color:#ff4444;
 	text-decoration:line-through;
 	font-weight:bold;
@@ -314,7 +375,7 @@ em.deadlink {
 /* -------------------------------------------------------- */
 /* Suchwort-Hervorhebungen */
 /* ----------------------- */
-em.highlight {
+.highlight {
 	padding:0px 1px;
 	font-size:inherit;
 	background-color:#dd0000;
@@ -350,7 +411,6 @@ form.searchform:hover {
 /* Suchfeld */
 /* -------- */
 input.searchtextfield {
-	border:1px solid #C0C0C0;
 	width:85px;
 	margin:0px;
 	margin:4px 1px;
@@ -361,6 +421,38 @@ input.searchtextfield {
 /* Suchbutton */
 /* ---------- */
 input.searchbutton {
+	margin-left:3px;
+	border:none;
+}
+
+
+/* -------------------------------------------------------- */
+/* Kontaktformular */
+/* --------------- */
+form#contact_form {
+}
+table#contact_table {
+}
+table#contact_table td {
+  vertical-align:top;
+  padding:5px;
+}
+span#contact_errormessage{
+  color:#880000;
+  font-weight:bold;
+}
+span#contact_successmessage{
+  color:#008800;
+  font-weight:bold;
+}
+input#contact_name, input#contact_mail, input#contact_website {
+  width:200px;
+}
+textarea#contact_message {
+  width:200px;
+}
+input#contact_submit {
+  width:200px;
 }
 
 
@@ -422,68 +514,75 @@ img {
 	border:none;
 }
 
+div.imagesubtitle {
+	margin:3px 3px;
+	text-align:justify;
+	font-size:0.9em;
+	line-height:1.1em;
+}
+
 
 /* -------------------------------------------------------- */
 /* [bildlinks|...] */
 /* --------------- */
-img.leftcontentimage {
+div.leftcontentimage {
 	margin:8px;
-	border:1px solid;
 	max-width:100px;
 	float:left;
 	margin-left:0px;
+}
+
+img.leftcontentimage {
+	border:1px solid;
+	max-width:100px;
 }
 
 
 /* -------------------------------------------------------- */
 /* [bildrechts|...] */
 /* ---------------- */
-img.rightcontentimage {
+div.rightcontentimage {
 	margin:8px;
-	border:1px solid;
 	max-width:100px;
 	float:right;
 	margin-right:0px;
+}
+
+img.rightcontentimage {
+	border:1px solid;
+	max-width:100px;
 }
 
 
 /* -------------------------------------------------------- */
 /* [fett|...] */
 /* ---------- */
-em.bold {
-	font-weight:bold;
+b {
+
 }
 
 
 /* -------------------------------------------------------- */
 /* [kursiv|...] */
 /* ------------ */
-em.italic {
-	font-style:italic;
+i {
+
 }
 
-
-/* -------------------------------------------------------- */
-/* [fettkursiv|...] */
-/* ---------------- */
-em.bolditalic {
-	font-weight:bold;
-	font-style:italic;
-}
 
 /* -------------------------------------------------------- */
 /* [unter|...] */
 /* ------------ */
-em.underlined {
-	text-decoration:underline;
+u {
+
 }
 
 
 /* -------------------------------------------------------- */
 /* [durch|...] */
 /* ------------ */
-em.crossed {
-	text-decoration:line-through;
+s {
+
 }
 
 
