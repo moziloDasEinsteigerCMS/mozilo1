@@ -27,7 +27,7 @@ class Language {
 // Konstruktor
 // ------------------------------------------------------------------------------
 	function Language() {
-		$cms_conf	= new Properties("main.conf");
+		$cms_conf	= new Properties("conf/main.conf");
 		$currentlanguage = $cms_conf->get("cmslanguage");
 		if (($currentlanguage == "") || (!file_exists("sprachen/$currentlanguage.conf")))
 			$currentlanguage = "Deutsch";

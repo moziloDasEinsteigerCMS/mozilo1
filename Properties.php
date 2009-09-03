@@ -77,10 +77,11 @@ class Properties {
 
 		$lines = file($this->file);
 		foreach ($lines as $line) {
+			// comments
 			if (preg_match("/^#/",$line) || preg_match("/^\s*$/",$line)) {
 				continue;
 			}
-			if (preg_match("/^(.*)=(.*)/",$line,$matches)) {
+			if (preg_match("/^([^=]*)=(.*)/",$line,$matches)) {
 				$this->properties[trim($matches[1])] = trim($matches[2]);
 			}
 		}
@@ -155,12 +156,27 @@ class Properties {
 
 
 	/**
+	 * Search key which matches a pattern
+	 *
+	 */
+	function keyExists($searchkey) {
+		foreach ($this->properties as $key => $value) {
+			if ($searchkey == $key){
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	/**
 	 * Set Properties from an Array
 	 *
 	 * @param array $values an associtive array of values
 	 */
 	function setFromArray($values) {
 		$ret = true;
+		unset($this->properties);
 		foreach ($values as $key => $value) {
 			if (!$this->set($key, $value))
 				$ret = false;

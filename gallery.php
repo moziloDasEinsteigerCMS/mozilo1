@@ -24,7 +24,7 @@ require_once("Language.php");
 require_once("Properties.php");
 require_once("SpecialChars.php");
 $language = new Language();
-$mainconf = new Properties("main.conf");
+$mainconf = new Properties("conf/main.conf");
 $specialchars = new SpecialChars();
 
 // Vorschaubilder nach Benutzereinstellung und wenn GDlib installiert
@@ -119,6 +119,8 @@ echo $HTML;
 		global $USETHUMBS;
 		global $WEBSITE_TITLE;
 		global $language;
+		global $mainconf;
+		
 		// Template-Datei auslesen
     if (!$file = @fopen($TEMPLATE_FILE, "r"))
         die($language->getLanguageValue1("message_template_error_1", $TEMPLATE_FILE));
@@ -128,10 +130,11 @@ echo $HTML;
 		// Platzhalter des Templates mit Inhalt füllen
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
-    $HTML = preg_replace('/{WEBSITE_TITLE}/', $WEBSITE_TITLE, $HTML);
+    //$HTML = preg_replace('/{WEBSITE_TITLE}/', $WEBSITE_TITLE, $HTML);
+    $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_TITLE, $language->getLanguageValue0("message_galleries_0"), $GAL_NAME), $HTML);
     $HTML = preg_replace('/{CURRENTGALLERY}/', $language->getLanguageValue1("message_gallery_1", $GAL_NAME), $HTML);
     if (count($PICARRAY) == 0)
-    	$HTML = preg_replace('/{NUMBERMENU}/', $language->getLanguageValue0("message_galleryempty_0", $value), $HTML);
+    	$HTML = preg_replace('/{NUMBERMENU}/', $language->getLanguageValue0("message_galleryempty_0"), $HTML);
 		if ($USETHUMBS) {
 	    $HTML = preg_replace('/{GALLERYMENU}/', "&nbsp;", $HTML);
     	$HTML = preg_replace('/{NUMBERMENU}/', getThumbnails(), $HTML);
@@ -370,4 +373,26 @@ function checkThumbs() {
 			$thumbnailfunction->createThumb($pic, $DIR_GALLERY, $DIR_THUMBS);
 	}
 }
+
+
+// ------------------------------------------------------------------------------
+// Rückgabe des Website-Titels
+// ------------------------------------------------------------------------------
+	function getWebsiteTitle($websitetitle, $cattitle, $pagetitle) {
+		global $mainconf;
+
+		$title = $mainconf->get("titlebarformat");
+		$sep = $mainconf->get("titlebarseparator");
+		
+    $title = preg_replace('/{WEBSITE}/', $websitetitle, $title);
+		if ($cattitle == "")
+			$title = preg_replace('/{CATEGORY}/', "", $title);
+		else
+			$title = preg_replace('/{CATEGORY}/', $cattitle, $title);
+    $title = preg_replace('/{PAGE}/', $pagetitle, $title);
+    $title = preg_replace('/{SEP}/', $sep, $title);
+    return $title;
+	}
+
+
 ?>

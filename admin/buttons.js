@@ -60,3 +60,10 @@ function insertAndResetSelectbox(selectbox) {
 		selectbox.selectedIndex = 0;
 	}
 }
+
+function insertTagAndResetSelectbox(selectbox) {
+	if (selectbox.selectedIndex > 0) {
+		insert('['+selectbox.options[selectbox.selectedIndex].value+'|', ']');
+		selectbox.selectedIndex = 0;
+	}
+}

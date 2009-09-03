@@ -14,7 +14,7 @@ BODY
 {
 	/* Positionierung */
 	min-height: 500px;
-	width: 780px;
+	width: 795px;
 	left: 50%;
 	margin-left: -390px;
 	padding: 0px;
@@ -239,7 +239,7 @@ A.imagelink
 	/* Positionierung */
 	position:absolute;
 	left:5px;
-	top:375px;
+	top:287px;
 	text-align: left;
 	
 	/* Design */
@@ -269,7 +269,7 @@ A.imagelink
 	/* Positionierung */
 	position:absolute;
 	left:5px;
-	top:287px;
+	top:375px;
 	text-align: left;
 	
 	/* Design */
@@ -507,7 +507,7 @@ TD.title
 	height: 20px;
 	width: 20px;
 	left: 30px;
-	top: 347px;
+	top: 435px;
 	background-position: center;
 	background-image: url(gfx/new.gif);
 	background-repeat: no-repeat;
@@ -526,7 +526,7 @@ TD.title
 	height: 20px;
 	width: 20px;
 	left: 50px;
-	top: 347px;
+	top: 435px;
 	background-position: center;
 	background-image: url(gfx/edit.gif);
 	background-repeat: no-repeat;
@@ -545,7 +545,7 @@ TD.title
 	height: 20px;
 	width: 20px;
 	left: 70px;
-	top: 347px;
+	top: 435px;
 	background-position: center;
 	background-image: url(gfx/delete.gif);
 	background-repeat: no-repeat;
@@ -677,10 +677,29 @@ TD.title
 	border: 1px solid #C0C0C0;
 	height: 20px;
 	width: 20px;
-	left: 50px;
-	top: 435px;
+	left: 30px;
+	top: 347px;
 	background-position: center;
 	background-image: url(gfx/new.gif);
+	background-repeat: no-repeat;
+	background-color: #FFFFFF;
+}
+
+#upload_new:hover
+{
+	background-color: #AFC4DE;
+}
+
+#upload_info
+{
+	position: absolute;
+	border: 1px solid #C0C0C0;
+	height: 20px;
+	width: 20px;
+	left: 50px;
+	top: 347px;
+	background-position: center;
+	background-image: url(gfx/info.gif);
 	background-repeat: no-repeat;
 	background-color: #FFFFFF;
 }
@@ -697,7 +716,7 @@ TD.title
 	height: 20px;
 	width: 20px;
 	left: 70px;
-	top: 435px;
+	top: 347px;
 	background-position: center;
 	background-image: url(gfx/delete.gif);
 	background-repeat: no-repeat;
@@ -804,13 +823,11 @@ select.overviewselect {
 	max-width:90px;
 	font-size:0.8em;
 }
-Input.text1
-{
-	border: 1px solid #C0C0C0;
-	margin-top: 10px;
-	margin-bottom: 10px;
-	
+select.maxwidth {
+	width:170px;
+	max-width:170px;
 }
+
 Input.submit
 {
 	border: 1px solid #5E8AB4;
@@ -819,9 +836,25 @@ Input.submit
 	background-color:#ffffff;
 	
 }
-Input.text2
+.text1
 {
 	border: 1px solid #C0C0C0;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	width:170px;
+	max-width:170px;
+}
+.text2
+{
+	border: 1px solid #C0C0C0;
+}
+.select1
+{
+	border: 1px solid #C0C0C0;
+	margin-top: 10px;
+	margin-bottom: 0px;
+	width:170px;
+	max-width:170px;
 }
 
 textarea {
@@ -829,6 +862,13 @@ textarea {
 	border: 1px solid #C0C0C0;
 	margin: 10px;
 	background-color:#ffffff;
+}
+textarea.usersyntaxarea {
+	border: 1px solid #C0C0C0;
+	margin:10px 0px;
+	width:95%;
+	height:100px;
+	max-width:inherit;
 }
 .erfolg
 {

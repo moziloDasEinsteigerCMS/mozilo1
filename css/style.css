@@ -240,6 +240,47 @@ a.detailmenuactive:hover {
 
 
 /* -------------------------------------------------------- */
+/* Submenüpunkt */
+/* --------------- */
+a.submenu {
+	display:block;
+	width:120px;
+	margin:1px 5px;
+	padding:1px 3px;
+	color:#000000;
+	background-color:#FFFFFF;
+	border:1px solid #C0C0C0;
+	font-weight:normal;
+	text-align:right;
+}
+a.submenu:hover {
+	color:#000000;
+	text-decoration:none;
+	border:1px solid #C0C0C0;
+	background-color:#E0E0E0;
+}
+
+
+/* -------------------------------------------------------- */
+/* Aktiver Submenüpunkt */
+/* ----------------------- */
+a.submenuactive {
+	display:block;
+	width:120px;
+	margin:1px 5px;
+	padding:1px 3px;
+	color:#000000;
+	border:1px solid #C0C0C0;
+	background-color:#E0E0E0;
+	font-weight:normal;
+	text-align:right;
+}
+a.submenuactive:hover {
+	text-decoration:none;
+}
+
+
+/* -------------------------------------------------------- */
 /* Zuletzt geänderte Seite */
 /* ----------------------- */
 a.latestchangedlink {

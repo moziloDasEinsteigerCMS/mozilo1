@@ -1,6 +1,6 @@
 <?php
 	
-	require_once("Properties.php");
+	require_once("../Properties.php");
 	require_once("../SpecialChars.php");
 	
 	$specialchars = new SpecialChars();
@@ -93,32 +93,36 @@
 	@author: Oliver Lorenz
 	Gibt eine Dropdown-Liste mit den allen möglichen und belegten Positionen zurueck 
 	--------------------------------------------------------------------------------*/
-	function show_files($dir)
+	function show_files($dir, $currentfile)
 	{
-		$content = "<select name=\"position\" size=1>";
+		$content = "<select name=\"position\" class=\"select1\" size=1>";
 		global $specialchars;
-		$vergeben = getFiles($dir);
+		$vergeben = getFiles($dir, ".tmp");
 
-	    for($pos = 0; $pos < 100; $pos++ )
-	    {
-	    	if(!in_array($pos,$vergeben))
-	    	{
-	    		$content .= "<option>";
-					$content .= addFrontZero($pos);
-					$content .= "</option>";		
-	    	}
-	    	else
-	    	{
-	    		$content .= "<option style=\"color:lightgrey;\">";
-	    		$fullname = $specialchars->rebuildSpecialChars(specialNrDir($dir, $pos), true);
-					$content .= addFrontZero($pos)." ".substr($fullname, 0, strlen($fullname)-strlen(".txt"));
-					$content .= "</option>";		
-	    	}
-	    
-	    }
-	    $content .= "</select>";
-	    
-	    return $content;
+    for($pos = 0; $pos < 100; $pos++ )
+    {
+    	if(!in_array($pos,$vergeben))
+    	{
+    		$content .= "<option>";
+				$content .= addFrontZero($pos);
+				$content .= "</option>";		
+    	}
+    	else
+    	{
+    		if (specialNrDir($dir, $pos) == $currentfile.".txt")
+    			$selected = "selected=\"selected\" ";
+    		else
+    			$selected = " ";
+    		$content .= "<option ".$selected."style=\"color:lightgrey;\">";
+    		$fullname = $specialchars->rebuildSpecialChars(specialNrDir($dir, $pos), true);
+				$content .= addFrontZero($pos)." ".substr($fullname, 0, strlen($fullname)-strlen(".txt"));
+				$content .= "</option>";		
+    	}
+    
+    }
+    $content .= "</select>";
+    
+    return $content;
 	}
 
 	/**--------------------------------------------------------------------------------
@@ -150,13 +154,15 @@
 	@author: Arvid Zimmermann
 	Gibt alle enthaltenen Dateien in ein Array aus
 	--------------------------------------------------------------------------------*/
-	function getFiles($dir)
+	function getFiles($dir, $excludeextension)
 	{
 		$files = array();
 		$handle = opendir($dir);
 		while($file = readdir($handle)) {
-			if(($file != ".") && ($file != "..") && ($file != "dateien") && ($file != "galerie")) {
-				array_push($files, $file);
+			if(($file != ".") && ($file != "..") && ($file != "dateien")) {
+				// auszuschließende Extensions nicht berücksichtigen
+				if (substr($file, strlen($file)-4, strlen($file)) != ".tmp")
+					array_push($files, $file);
 			}
 		}
 		closedir($handle);
