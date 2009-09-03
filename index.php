@@ -2,8 +2,8 @@
 
 /* 
 * 
-* $Revision: 153 $
-* $LastChangedDate: 2009-01-29 23:34:19 +0100 (Do, 29 Jan 2009) $
+* $Revision: 181 $
+* $LastChangedDate: 2009-03-22 17:07:22 +0100 (So, 22 Mrz 2009) $
 * $Author: arvid $
 *
 */
@@ -1051,6 +1051,10 @@ echo "</pre>";
 	// Prüft einen Requestparameter
 	function getRequestParam($param, $clean) {
 		if (isset($_REQUEST[$param])) {
+		    // Nullbytes abfangen!
+		    if (strpos($_REQUEST[$param], "\x00") > 0) {
+		        die();
+		    }
 			if ($clean) {
 				return cleanInput($_REQUEST[$param]);
 			}
