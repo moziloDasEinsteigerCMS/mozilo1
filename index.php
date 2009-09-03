@@ -302,17 +302,23 @@ INHALT
 		$mainmenu = "";
 		// Kategorien-Verzeichnis einlesen
 		$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, array(), false);
+		// numerische Accesskeys für angezeigte Menüpunkte
+		$currentaccesskey = 0;
 		// Jedes Element des Arrays ans Menü anhängen
 		foreach ($categoriesarray as $currentcategory) {
 			// Wenn die Kategorie keine Contentseiten hat, zeige sie nicht an
 			if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true) == "")
 				$mainmenu .= "";
 			// Aktuelle Kategorie als aktiven Menüpunkt anzeigen...
-			elseif ($currentcategory == $CAT_REQUEST)
-				$mainmenu .= "<a href=\"index.php?cat=$currentcategory\" class=\"menuactive\">".substr($specialchars->rebuildSpecialChars($currentcategory, false), 3, strlen($currentcategory))."</a>";
+			elseif ($currentcategory == $CAT_REQUEST) {
+				$currentaccesskey++;
+				$mainmenu .= "<a href=\"index.php?cat=$currentcategory\" class=\"menuactive\" accesskey=\"$currentaccesskey\">".substr($specialchars->rebuildSpecialChars($currentcategory, false), 3, strlen($currentcategory))."</a>";
+			}
 			// ...alle anderen als normalen Menüpunkt.
-			else
-					$mainmenu .= "<a href=\"index.php?cat=$currentcategory\" class=\"menu\">".substr($specialchars->rebuildSpecialChars($currentcategory, false), 3, strlen($currentcategory))."</a>";
+			else {
+				$currentaccesskey++;
+				$mainmenu .= "<a href=\"index.php?cat=$currentcategory\" class=\"menu\" accesskey=\"$currentaccesskey\">".substr($specialchars->rebuildSpecialChars($currentcategory, false), 3, strlen($currentcategory))."</a>";
+			}
 		}
 		// Rückgabe des Menüs
 		return $mainmenu;
@@ -341,22 +347,27 @@ INHALT
 		$detailmenu = "";
 		// Content-Verzeichnis der aktuellen Kategorie einlesen
 		$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST", array($CONTENT_FILES_DIR, $CONTENT_GALLERY_DIR), true);
+		// alphanumerische Accesskeys (über numerischen ASCII-Code) für angezeigte Menüpunkte
+		$currentaccesskey = 0;
 		// Jedes Element des Arrays ans Menü anhängen
 		foreach ($contentarray as $currentcontent) {
+			$currentaccesskey++;
 			// Aktuelle Kategorie als aktiven Menüpunkt anzeigen...
-			if (substr($currentcontent, 0, strlen($currentcontent) - strlen($CONTENT_EXTENSION)) == $PAGE_REQUEST)
+			if (substr($currentcontent, 0, strlen($currentcontent) - strlen($CONTENT_EXTENSION)) == $PAGE_REQUEST) {
 				$detailmenu .= "<a href=\"index.php?cat=$CAT_REQUEST&amp;page=".
 												substr($currentcontent, 0, strlen($currentcontent) - strlen($CONTENT_EXTENSION)).
-												"\" class=\"detailmenuactive\">".
+												"\" class=\"detailmenuactive\" accesskey=\"".chr($currentaccesskey+96)."\">".
 												$specialchars->rebuildSpecialChars(substr($currentcontent, 3, strlen($currentcontent) - strlen($CONTENT_EXTENSION) - 3), false).
 												"</a> ";
+			}
 			// ...alle anderen als normalen Menüpunkt.
-			else
+			else {
 				$detailmenu .= "<a href=\"index.php?cat=$CAT_REQUEST&amp;page=".
 												substr($currentcontent, 0, strlen($currentcontent) - strlen($CONTENT_EXTENSION)).
-												"\" class=\"detailmenu\">".
+												"\" class=\"detailmenu\" accesskey=\"".chr($currentaccesskey+96)."\">".
 												$specialchars->rebuildSpecialChars(substr($currentcontent, 3, strlen($currentcontent) - strlen($CONTENT_EXTENSION) - 3), false).
 												"</a> ";
+			}
 		}
 		// Rückgabe des Menüs
 		return $detailmenu;
@@ -466,7 +477,7 @@ INHALT
 			elseif ($attribute == "mail"){
 				// Überprüfung auf Validität
 				if (preg_match("/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/", $value))
-					$content = str_replace ($match, "<a href=\"mailto:$value\" title=\"Mail an &quot;$value&quot; schreiben\">$value</a>", $content);
+					$content = str_replace ($match, "<a href=\"".obfuscateAdress("mailto:$value", 3)."\" title=\"Mail an &quot;".obfuscateAdress("$value", 3)."&quot; schreiben\">".obfuscateAdress("$value", 3)."</a>", $content);
 				else
 					$content = str_replace ($match, "<em class=\"deadlink\" title=\"Fehlerhafte E-Mail-Adresse &quot;$value&quot;\">$value</em>", $content);
 			}
@@ -774,6 +785,41 @@ INHALT
 	
 	
 // ------------------------------------------------------------------------------
+// E-Mail-Adressen verschleiern 
+// ------------------------------------------------------------------------------
+// Dank für spam-me-not.php an Rolf Offermanns! 
+// Spam-me-not in JavaScript: http://www.zapyon.de
+	function obfuscateAdress($originalString, $mode) {
+		// $mode == 1			dezimales ASCII
+		// $mode == 2			hexadezimales ASCII
+		// $mode == 3			zufällig gemischt
+		$encodedString = "";
+		$nowCodeString = "";
+		$randomNumber = -1;
+
+		$originalLength = strlen($originalString);
+		$encodeMode = $mode;
+		
+		for ( $i = 0; $i < $originalLength; $i++) {
+			if ($mode == 3) $encodeMode = rand(1,2);
+			switch ($encodeMode) {
+				case 1: // Decimal code
+					$nowCodeString = "&#" . ord($originalString[$i]) . ";";
+					break;
+				case 2: // Hexadecimal code
+					$nowCodeString = "&#x" . dechex(ord($originalString[$i])) . ";";
+					break;
+				default:
+					return "ERROR: wrong encoding mode.";
+			}
+			$encodedString .= $nowCodeString;
+		}
+		return $encodedString;
+	}
+
+
+
+// ------------------------------------------------------------------------------
 // Phrasen in Inhalt hervorheben
 // ------------------------------------------------------------------------------
 	function highlight($content, $phrase) {
@@ -789,7 +835,7 @@ INHALT
 // Anzeige der Informationen zum System
 // ------------------------------------------------------------------------------
 	function getCmsInfo() {
-		return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" class=\"latestchangedlink\" title=\"cms.mozilo.de\">moziloCMS 1.6.1</a>";
+		return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" class=\"latestchangedlink\" title=\"cms.mozilo.de\">moziloCMS 1.6.2</a>";
 	}
 
 

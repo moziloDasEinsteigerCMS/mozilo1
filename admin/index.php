@@ -148,9 +148,17 @@ $ADMIN_TITLE = "moziloAdmin";
 	
 /* Seiteninhalt */
 	$html .= "<div id=\"div_content\">";
+	// Warnung, wenn noch das Initialpaßwort verwendet wird
 	$loginconf = new Properties("conf/logindata.conf");
 	if (($loginconf->get("initialpw") == "true") && ($action <> "loginadminconfig"))
 		$html .= returnMessage(false, getLanguageValue("warning_initial_pw"));
+	// Warnung, wenn die letzte Backupwarnung mehr als einen Monat her ist
+	// 2592000 = 60 * 60 * 24 * 30 = 30 Tage = 1 Monat
+	$month = getLastBackup() + 2592000;
+	if($month < time())	{
+		$html .= returnMessage(false, getLanguageValue("reminder_backup"));
+		setLastBackup();
+	}
 	$html .= $pagecontent;
 	$html .= "</div>";
 
@@ -172,13 +180,6 @@ echo $html;
 	function home() {
 		$pagecontent .= "<h2>".getLanguageValue("button_home")."</h2>";
 		$pagecontent .= "<p>";
-		
-		$month = getLastBackup() + 2592000;
-		if($month < time())
-		{
-			$pagecontent .= returnMessage(false, getLanguageValue("reminder_backup"));
-			setLastBackup();
-		}
 		$pagecontent .= getLanguageValue("welcome_text");
 		$pagecontent .= "</p>";
 		return array(getLanguageValue("button_home"), $pagecontent);
@@ -1074,6 +1075,8 @@ echo $html;
 			$pagecontent .= "<tr>";
 			$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallerymaxwidth_text");
 			$pagecontent .= "<input type=\"hidden\" name=\"gppr\" value=\"".$CMS_CONF->get("gallerypicsperrow")."\">";
+			if (!extension_loaded("gd"))
+				$pagecontent .= "<input type=\"hidden\" name=\"gthumbs\" value=\"false\">";
 			$pagecontent .= "</td>";
 			$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"gmw\" value=\"".$CMS_CONF->get("gallerymaxwidth")."\" /></td>";
 			$pagecontent .= "</tr>";
