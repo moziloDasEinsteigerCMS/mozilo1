@@ -202,7 +202,6 @@
 		$dir = stripslashes($dir);
 		if (!is_file($dir)){
 	        $handle = opendir($dir);
-	        $file = readdir($handle);
 	        $vergeben = array();
 	        while($file = readdir($handle))
 	        {

@@ -756,7 +756,6 @@ echo $html;
 		
 		else {
 			$dirs = getDirs("$CONTENT_DIR_REL");
-			foreach ($dirs as $file)
 			sort($dirs);
 			$pagecontent .= "<p>".getLanguageValue("page_edit_text")."</p>";
 			foreach ($dirs as $file) {
