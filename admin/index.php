@@ -76,6 +76,9 @@ $ADMIN_TITLE = "moziloAdmin";
 	$html .= "<script src=\"buttons.js\" type=\"text/javascript\"></script>";
 	$html .= "<title>$ADMIN_TITLE - $pagetitle</title>";
 	$html .= "<link rel=\"stylesheet\" href=\"adminstyle.css\" type=\"text/css\" />";
+	$html .= "<link rel=\"stylesheet\" href=\"js_color_picker_v2/js_color_picker_v2.css\" media=\"screen\" type=\"text/css\" />";
+	$html .= "<script type=\"text/javascript\" src=\"js_color_picker_v2/color_functions.js\"></script>";
+	$html .= "<script type=\"text/javascript\" src=\"js_color_picker_v2/js_color_picker_v2.js\"></script>";
 	$html .= "</head>";
 	$html .= "<body onload=\"htmlOverlopen(document.documentElement,0)\">";
 	
@@ -154,10 +157,14 @@ $ADMIN_TITLE = "moziloAdmin";
 		$html .= returnMessage(false, getLanguageValue("warning_initial_pw"));
 	// Warnung, wenn die letzte Backupwarnung mehr als einen Monat her ist
 	// 2592000 = 60 * 60 * 24 * 30 = 30 Tage = 1 Monat
-	$month = getLastBackup() + 2592000;
-	if($month < time())	{
-		$html .= returnMessage(false, getLanguageValue("reminder_backup"));
+	if (getLastBackup() == 0)
 		setLastBackup();
+	else {
+		$month = getLastBackup() + 2592000;
+		if($month < time())	{
+			$html .= returnMessage(false, getLanguageValue("reminder_backup"));
+			setLastBackup();
+		}
 	}
 	$html .= $pagecontent;
 	$html .= "</div>";
@@ -335,7 +342,7 @@ echo $html;
 			$pagecontent .= getLanguageValue("choose_category");
 			$pagecontent .= "</td>";	
 			$pagecontent .= "<td class=\"config_row2\">";	
-			$pagecontent .= getCatsAsSelect();
+			$pagecontent .= getCatsAsSelect("");
 			$pagecontent .= "</td>";	
 			$pagecontent .= "</tr>";	
 			$pagecontent .= "<tr>";	
@@ -517,7 +524,7 @@ echo $html;
 			$pagecontent .= "<table class=\"data\">";
 			$pagecontent .= "<tr>";
 			$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("choose_category_for_page")."</td>";
-			$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect()."</td></tr>";
+			$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect("")."</td></tr>";
 			$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td>";
 			$pagecontent .= "<td class=\"config_row2\"><input type=\"submit\" name=\"chosen\" class=\"submit\" value=\"".getLanguageValue("choose_category_button")."\" /></td></tr>";
 			$pagecontent .= "</table>";
@@ -567,7 +574,7 @@ echo $html;
 			$draft = "";
 			if (substr($_GET['file'], strlen($_GET['file'])-4, strlen($_GET['file'])) == ".tmp")
 				$draft = " (".getLanguageValue("draft").")";
-			$pagecontent .= "<p>".getLanguageValue("site_name").": "."<input class=\"text2\" type=\"text\" name=\"newpage\" value=\"".$specialchars->rebuildSpecialChars(substr($_GET['file'],3,strlen($_GET['file'])-7), true)."\" />$draft</p>";
+			$pagecontent .= "<p style=\"margin-bottom:0px;\">".getLanguageValue("site_name").": "."<input class=\"text2\" type=\"text\" name=\"newpage\" value=\"".$specialchars->rebuildSpecialChars(substr($_GET['file'],3,strlen($_GET['file'])-7), true)."\" />$draft</p>";
 			$pagecontent .= showEditPageForm($_GET['cat'], $_GET['file'], "editsite");
 			$pagecontent .= "</form>";
 		}
@@ -705,7 +712,7 @@ echo $html;
 		// Zeile "KATEGORIE WÄHLEN"
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallery_choose_category_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect()."</td>";
+		$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect($_POST['cat'])."</td>";
 		$pagecontent .= "</tr>";
 		// Zeile "BILDDATEI WÄHLEN"
 		$pagecontent .= "<tr>";
@@ -731,7 +738,7 @@ echo $html;
 		$pagecontent .= "<table class=\"data\">";
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("choose_cat_for_editgallery")."</td>";
-		$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect()."</td></tr>";
+		$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect("")."</td></tr>";
 		$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td>";
 		$pagecontent .= "<td class=\"config_row2\"><input type=\"submit\" name=\"chosen\" class=\"submit\" value=\"".getLanguageValue("choose_category_button")."\" /></td></tr>";
 		$pagecontent .= "</table>";
@@ -837,7 +844,7 @@ echo $html;
 		$pagecontent .= "<table class=\"data\">";
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("choose_cat_for_deletegallery")."</td>";
-		$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect()."</td></tr>";
+		$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect("")."</td></tr>";
 		$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td>";
 		$pagecontent .= "<td class=\"config_row2\"><input type=\"submit\" name=\"chosen\" class=\"submit\" value=\"".getLanguageValue("choose_category_button")."\" /></td></tr>";
 		$pagecontent .= "</table>";
@@ -884,7 +891,7 @@ echo $html;
 		$pagecontent .= "<form method=\"post\" action=\"index.php\" enctype=\"multipart/form-data\"><input type=\"hidden\" name=\"action\" value=\"newfile\" />";
 		$pagecontent .= "<table><tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("data_choose_category_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect()."</td></tr>";
+		$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect($specialchars->deleteSpecialChars($_POST['cat']))."</td></tr>";
 		// Datei auswählen
 		$pagecontent .= "<tr><td class=\"config_row1\">".getLanguageValue("data_choose_file_text")."</td><td class=\"config_row2\"><input type=\"file\" class=\"text1\" name=\"uploadfile\" /></td></tr>";
 		// Button
@@ -965,6 +972,7 @@ echo $html;
 				&& isset($_GET['css']) && ($_GET['css'] <> "") 
 				&& isset($_GET['favicon']) && ($_GET['favicon'] <> "") 
 				&& isset($_GET['dcat']) && ($_GET['dcat'] <> "") 
+				&& isset($_GET['syntaxslinks']) && ($_GET['syntaxslinks'] <> "") 
 				) {
 				$CMS_CONF->set("websitetitle", htmlentities($_GET['title']));
 				$CMS_CONF->set("templatefile", $_GET['template']);
@@ -976,6 +984,7 @@ echo $html;
 				$CMS_CONF->set("cssfile", $_GET['css']);
 				$CMS_CONF->set("faviconfile", $_GET['favicon']);
 				$CMS_CONF->set("defaultcat", $specialchars->deleteSpecialChars($_GET['dcat']));
+				$CMS_CONF->set("shortenlinks", $_GET['syntaxslinks']);
 				if ($_GET['usesyntax'] == "on")
 					$CMS_CONF->set("usecmssyntax", "true");
 				else
@@ -987,8 +996,10 @@ echo $html;
 		}
 		$pagecontent .= "<p>".getLanguageValue("config_cmsdisplay_text")."</p>";
 		$pagecontent .= "<form action=\"index.php\" method=\"get\"><input type=\"hidden\" name=\"action\" value=\"displaycmsconfig\"><input type=\"hidden\" name=\"apply\" value=\"true\">";
+
+// ALLGEMEINE EINSTELLUNGEN
 		$pagecontent .= "<h3>".getLanguageValue("config_cmsglobal_headline")."</h3>";
-		$pagecontent .= "<table>";
+		$pagecontent .= "<table class=\"data\">";
 		// Zeile "WEBSITE-TITEL"
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("websitetitle_text")."</td>";
@@ -1021,31 +1032,33 @@ echo $html;
 		$pagecontent .= " name=\"usesyntax\">".getLanguageValue("usesyntax_text2")."</td>";
 		$pagecontent .= "</tr>";
 		$pagecontent .= "</table>";
-		$pagecontent .= "<h3>".getLanguageValue("config_cmsdetail_headline")."</h3>";
-		$pagecontent .= "<table>";
-		// Zeile "HTML-TEMPLATE"
+
+// SYNTAX-EINSTELLUNGEN
+		$pagecontent .= "<h3>".getLanguageValue("config_cmssyntax_headline")."</h3>";
+		$pagecontent .= "<table class=\"data\">";
+		// Zeile "LINKS KÜRZEN"
+		$checked0 = "";
+		$checked1 = "";
+		$checked2 = "";
+		if ($CMS_CONF->get("shortenlinks") == "2")
+			$checked2 = "checked=\"checked\" ";
+		elseif ($CMS_CONF->get("shortenlinks") == "1")
+			$checked1 = "checked=\"checked\" ";
+		else
+			$checked0 = "checked=\"checked\" ";
 		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("template_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"template\" value=\"".$CMS_CONF->get("templatefile")."\" /></td>";
-		$pagecontent .= "</tr>";
-		// Zeile "GALERIE-TEMPLATE"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallerytemplate_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"gallerytemplate\" value=\"".$CMS_CONF->get("gallerytemplatefile")."\" /></td>";
-		$pagecontent .= "</tr>";
-		// Zeile "CSS-DATEI"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("css_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"css\" value=\"".$CMS_CONF->get("cssfile")."\" /></td>";
-		$pagecontent .= "</tr>";
-		// Zeile "FAVICON"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("favicon_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"favicon\" value=\"".$CMS_CONF->get("faviconfile")."\" /></td>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("syntaxshortenlinks_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\">";
+		$pagecontent .= "<input type=\"radio\" name=\"syntaxslinks\" value=\"0\"$checked0 />http://www.domain.com<br />";
+		$pagecontent .= "<input type=\"radio\" name=\"syntaxslinks\" value=\"1\"$checked1 />www.domain.com<br />";
+		$pagecontent .= "<input type=\"radio\" name=\"syntaxslinks\" value=\"2\"$checked2 />domain.com<br />";
+		$pagecontent .= "</td>";
 		$pagecontent .= "</tr>";
 		$pagecontent .= "</table>";
+
+// GALERIE-EINSTELLUNGEN
 		$pagecontent .= "<h3>".getLanguageValue("config_cmsgallery_headline")."</h3>";
-		$pagecontent .= "<table>";
+		$pagecontent .= "<table class=\"data\">";
 		// Zeile "GALERIE IM EINZEL- ODER ÜBERSICHT-MODUS" (nur, wenn GDlib installiert ist)
 		if (extension_loaded("gd")) {
 			if ($CMS_CONF->get("galleryusethumbs") == "true")
@@ -1086,6 +1099,31 @@ echo $html;
 			$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"gmh\" value=\"".$CMS_CONF->get("gallerymaxheight")."\" /></td>";
 			$pagecontent .= "</tr>";
 		}
+		$pagecontent .= "</table>";
+
+// DETAILLIERTE EINSTELLUNGEN
+		$pagecontent .= "<h3>".getLanguageValue("config_cmsdetail_headline")."</h3>";
+		$pagecontent .= "<table class=\"data\">";
+		// Zeile "HTML-TEMPLATE"
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("template_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"template\" value=\"".$CMS_CONF->get("templatefile")."\" /></td>";
+		$pagecontent .= "</tr>";
+		// Zeile "GALERIE-TEMPLATE"
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallerytemplate_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"gallerytemplate\" value=\"".$CMS_CONF->get("gallerytemplatefile")."\" /></td>";
+		$pagecontent .= "</tr>";
+		// Zeile "CSS-DATEI"
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("css_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"css\" value=\"".$CMS_CONF->get("cssfile")."\" /></td>";
+		$pagecontent .= "</tr>";
+		// Zeile "FAVICON"
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("favicon_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"favicon\" value=\"".$CMS_CONF->get("faviconfile")."\" /></td>";
+		$pagecontent .= "</tr>";
 		// Zeile "ÜBERNEHMEN"
 		$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td><td class=\"config_row2\"><input type=\"submit\" class=\"submit\" value=\"".getLanguageValue("config_submit")."\"/></td></tr>";
 		$pagecontent .= "</table>";
@@ -1163,7 +1201,7 @@ echo $html;
 		$adminconf = new Properties("conf/logindata.conf");
 		$erroroccured = false;
 		require_once("Crypt.php");
-		$pwcrypt = new Crypt("send 'i cracked your silly code' to codecracked@azett.com");
+		$pwcrypt = new Crypt();
 		// Übergebene Werte prüfen
 		if ($_POST['apply'] == "true") {
 			// Alle Felder übergeben...
@@ -1186,7 +1224,7 @@ echo $html;
 			
 			// Alte Zugangsdaten korrekt? 
 			if(!$erroroccured)
-				if (($_POST['oldname'] == $adminconf->get("name")) && ($_POST['oldpw'] == $pwcrypt->decrypt($adminconf->get("pw"))))
+				if (($_POST['oldname'] == $adminconf->get("name")) && ($pwcrypt->encrypt($_POST['oldpw']) == $adminconf->get("pw")))
 					$erroroccured = false;
 				else {
 					$erroroccured = true;
@@ -1282,7 +1320,7 @@ echo $html;
 			$pagecontent = "[ueber1|".substr($page, 3,strlen($page)-7)."]";
 		
 		if ($CMS_CONF->get("usecmssyntax") == "true") {
-			$content = returnFormatToolbar();
+			$content = returnFormatToolbar($cat);
 	  }
 
 		// Seiteninhalt
@@ -1349,12 +1387,22 @@ echo $html;
 			return "<span class=\"fehler\">".$message."</span>";
 	}
 	
-	function returnFormatToolbar() {
-			$content = "<p class=\"toolbar\">"
+	function returnFormatToolbar($currentcat) {
+			$content = "<div style=\"padding:10px;\">"//"<p class=\"toolbar\">"
 			// show user information if javascript inactive
 			."<noscript><span class=\"fehler\">".getLanguageValue("toolbar_nojs_text")."</span></noscript>"
-			// syntax elements
-			.getLanguageValue("toolbar_syntaxelements")."<br />"
+			// syntax elements, colors
+			."<table>"
+			."<tr>"
+			."<td style=\"padding-right:10px;\">"
+			.getLanguageValue("toolbar_syntaxelements")
+			."</td>"
+			."<td>"
+			.getLanguageValue("toolbar_textcoloring")
+			."</td>"
+			."</tr>"
+			."<tr>"
+			."<td style=\"padding-right:10px;\">"
 			."<img class=\"js\" title=\"[link| ... ]\" alt=\"Link\" src=\"gfx/jsToolbar/link.png\" onClick=\"insert('[link|', ']')\">"
 	    ."<img class=\"js\" alt=\"eMail\" title=\"[mail| ... ]\" src=\"gfx/jsToolbar/mail.png\" onClick=\"insert('[mail|', ']')\">"
 	    ."<img class=\"js\" alt=\"Seite\"	title=\"[seite| ... ]\" src=\"gfx/jsToolbar/seite.png\" onClick=\"insert('[seite|', ']')\">"
@@ -1372,18 +1420,125 @@ echo $html;
 	  	."<img class=\"js\" alt=\"Liste3\" title=\"[liste3| ... ]\" src=\"gfx/jsToolbar/liste3.png\" onClick=\"insert('[liste3|', ']')\">"
 	  	."<img class=\"js\" alt=\"Horizontale Linie\" title=\"[----]\" src=\"gfx/jsToolbar/linie.png\" onClick=\"insert('[----]', '')\">"
 	  	."<img class=\"js\" alt=\"HTML\" title=\"[html| ... ]\" src=\"gfx/jsToolbar/html.png\" onClick=\"insert('[html|', ']')\">"
-	  	."<br />"
+	  	."</td>"
+	  	."<td>"
+	  	."<table><tr><td>"
+	  	."<img class=\"js\" style=\"background-color:#AA0000\" alt=\"Farbe\" id=\"farbicon\" title=\"[farbe=RRGGBB| ... ]\" src=\"gfx/jsToolbar/farbe.png\" onClick=\"insert('[farbe=' + document.getElementById('farbcode').value + '|', ']')\">"
+	  	."</td><td>"
+	  	."<div class=\"colordiv\">"
+	  	."<input type=\"text\" readonly=\"readonly\" maxlength=\"6\" value=\"AA0000\" class=\"colorinput\" id=\"farbcode\" size=\"0\">"
+			."<img class=\"colorimage\" src=\"js_color_picker_v2/images/select_arrow.gif\" onmouseover=\"this.src='js_color_picker_v2/images/select_arrow_over.gif'\" onmouseout=\"this.src='js_color_picker_v2/images/select_arrow.gif'\" onclick=\"showColorPicker(this,document.getElementById('farbcode'))\" alt=\"...\" title=\"Farbauswahl\" />"
+			."</div>"
+			."</td></tr></table>"
+	  	."</td>"
+	  	."</tr>"
+			."</table>"
+			."<table>"
+	  	."<tr>"
 			// text formatting
-			.getLanguageValue("toolbar_textformatting")."<br />"
+			."<td>"
+			.getLanguageValue("toolbar_textformatting")
+			."</td>"
+			// contents
+			."<td>"
+			.getLanguageValue("toolbar_contents")
+			."</td>"
+			."</tr>"
+			."<tr>"
+			."<td style=\"padding-right:10px;\">"
 	  	."<img class=\"js\" alt=\"Linksbündig\" title=\"[links| ... ]\" src=\"gfx/jsToolbar/links.png\" onClick=\"insert('[links|', ']')\">"
 	  	."<img class=\"js\" alt=\"Zentriert\" title=\"[zentriert| ... ]\" src=\"gfx/jsToolbar/zentriert.png\" onClick=\"insert('[zentriert|', ']')\">"
 	  	."<img class=\"js\" alt=\"Blocksatz\" title=\"[block| ... ]\" src=\"gfx/jsToolbar/block.png\" onClick=\"insert('[block|', ']')\">"
 	  	."<img class=\"js\" alt=\"Rechtsbündig\" title=\"[rechts| ... ]\" src=\"gfx/jsToolbar/rechts.png\" onClick=\"insert('[rechts|', ']')\">"
 	  	."<img class=\"js\" alt=\"Fett\" title=\"[fett| ... ]\" src=\"gfx/jsToolbar/fett.png\" onClick=\"insert('[fett|', ']')\">"
 	  	."<img class=\"js\" alt=\"Kursiv\" title=\"[kursiv| ... ]\" src=\"gfx/jsToolbar/kursiv.png\" onClick=\"insert('[kursiv|', ']')\">"
-	  	."<img class=\"js\" alt=\"Fettkursiv\" title=\"[fettkursiv| ... ]\" src=\"gfx/jsToolbar/fettkursiv.png\" onClick=\"insert('[fettkursiv|', ']')\">"
 	  	."<img class=\"js\" alt=\"Unterstrichen\" title=\"[unter| ... ]\" src=\"gfx/jsToolbar/unter.png\" onClick=\"insert('[unter|', ']')\">"
-	  	."<img class=\"js\" alt=\"Farbe\" title=\"[farbe=RRGGBB| ... ]\" src=\"gfx/jsToolbar/farbe.png\" onClick=\"insert('[farbe=AA0000|', ']')\"></p>";
-	  
+	  	."<img class=\"js\" alt=\"Durchgetrichen\" title=\"[durch| ... ]\" src=\"gfx/jsToolbar/durch.png\" onClick=\"insert('[durch|', ']')\">"
+	  	."</td>"
+			."<td>"
+	  	.returnOverviewSelectbox(1, $currentcat)
+	  	."&nbsp;"
+	  	.returnOverviewSelectbox(2, $currentcat)
+	  	."&nbsp;"
+	  	.returnOverviewSelectbox(3, $currentcat)
+	  	."</td>"
+	  	."</tr></table>"
+	  	
+	  	."</div>";
+	  	
 	  return $content;
+	}
+	
+	
+	// Rückgabe einer Selectbox mit Elementen, die per Klick in die Inhaltsseite übernommen werden können
+	// $type: 1=Kategorien 2=Inhaltsseiten 3=Dateien
+	function returnOverviewSelectbox($type, $currentcat) {
+		global $specialchars;
+
+		$elements = array();
+		$selectname = "";
+
+		switch ($type) {
+			// Kategorien
+			case 1:
+				$handle = opendir("../inhalt");
+				while (($file = readdir($handle))) {
+					if (($file <> ".") && ($file <> ".."))
+						array_push($elements, $file);
+				}
+				closedir($handle);
+				$selectname = "cats";
+				break;
+			// Inhaltsseiten
+			case 2:
+				$handle = opendir("../inhalt/$currentcat");
+				while (($file = readdir($handle))) {
+					if (($file <> ".") && ($file <> "..") && is_file("../inhalt/$currentcat/$file"))
+						array_push($elements, $file);
+				}
+				closedir($handle);
+				$selectname = "pages";
+				break;
+			// Dateien
+			case 3:
+				$handle = opendir("../inhalt/$currentcat/dateien");
+				while (($file = readdir($handle))) {
+					if (($file <> ".") && ($file <> "..") && is_file("../inhalt/$currentcat/dateien/$file"))
+						array_push($elements, $file);
+				}
+				closedir($handle);
+				$selectname = "files";
+				break;
+			default:
+				return "WRONG PARAMETER!";
+		}
+		sort($elements);
+		$select = "<select name=\"cat\" class=\"overviewselect\" onchange=\"insertAndResetSelectbox(this);\">";
+		switch ($type) {
+			// Kategorien
+			case 1:
+				$select .="<option value=\"\">".getLanguageValue("button_category").":</option>";
+				foreach ($elements as $element) {
+					$element = $specialchars->rebuildSpecialChars(substr($element, 3, strlen($element)), $true);
+					$select .= "<option value=\"".$element."\">".$element."</option>";
+				}
+				break;
+			// Inhaltsseiten
+			case 2:
+				$select .="<option value=\"\">".getLanguageValue("button_site").":</option>";
+				foreach ($elements as $element) {
+					$element = $specialchars->rebuildSpecialChars(substr($element, 3, strlen($element) - 3 - strlen(".txt")), $true);
+					$select .= "<option value=\"".$element."\">".$element."</option>";
+				}
+				break;
+			// Dateien
+			case 3:
+				$select .="<option value=\"\">".getLanguageValue("button_data").":</option>";
+				foreach ($elements as $element) {
+					$select .= "<option value=\"".$element."\">".$element."</option>";
+				}
+				break;
+		}
+		$select .= "</select>";
+		return $select;
 	}

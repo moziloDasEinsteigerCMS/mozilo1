@@ -1,5 +1,6 @@
 function insert(aTag, eTag) {
   var input = document.forms['form'].elements['pagecontent'];
+  var scrolltop = input.scrollTop;
   input.focus();
   /* für Internet Explorer */
   if(typeof document.selection != 'undefined') {
@@ -50,4 +51,12 @@ function insert(aTag, eTag) {
     var insText = prompt("Bitte geben Sie den zu formatierenden Text ein:");
     input.value = input.value.substr(0, pos) + aTag + insText + eTag + input.value.substr(pos);
   }
+  input.scrollTop = scrolltop;
+}
+
+function insertAndResetSelectbox(selectbox) {
+	if (selectbox.selectedIndex > 0) {
+		insert(selectbox.options[selectbox.selectedIndex].value, '');
+		selectbox.selectedIndex = 0;
+	}
 }

@@ -799,6 +799,10 @@ select
 	margin-bottom: 10px;
 	
 }
+select.overviewselect {
+	width:120px;
+	max-width:120px;
+}
 Input.text1
 {
 	border: 1px solid #C0C0C0;
@@ -918,8 +922,7 @@ img.js
 	height: 24px;
 	padding: 1px;
 	background-color: #FFFFFF;
-	margin: 2px;
-	
+	margin:1px 2px 5px 1px;
 }
 
 img.js:hover
@@ -943,4 +946,25 @@ h3 {
 	margin-top:10px;
 	margin-bottom:5px;
 	text-decoration:none;
+}
+
+div.colordiv {
+	width:70px;
+	height:20px;
+	border:1px solid #7F9DB9;
+	background-color:#FFFFFF;
+}
+input.colorinput {
+	background-color:#FFFFFF;
+	height:17px;
+	font-size:12px;
+	border:0px;
+	margin-top:2px;
+	text-align:right;
+	padding:0px;
+}
+img.colorimage {
+	float:right;
+	padding:1px;
+	margin:0px;
 }

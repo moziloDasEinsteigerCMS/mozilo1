@@ -221,7 +221,7 @@
 	    return $dirarray;
 	}
 	
-	function getCatsAsSelect() {
+	function getCatsAsSelect($selectedcat) {
 		global $specialchars;
 		$dirs = array();
 		$handle = opendir('../inhalt');
@@ -232,8 +232,12 @@
 		closedir($handle);
 		sort($dirs);
 		$select = "<select name=\"cat\">";
-			foreach ($dirs as $file)
-				$select .= "<option value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</option>";
+			foreach ($dirs as $file) {
+				if (($selectedcat <> "") && ($file == $selectedcat))
+					$select .= "<option selected=\"selected\" value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</option>";
+				else
+					$select .= "<option value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</option>";
+			}
 		$select .= "</select>";
 		return $select;
 	}
