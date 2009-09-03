@@ -14,8 +14,10 @@ $ADMIN_TITLE = "moziloAdmin";
 
 /* Login überprüfen */
 	session_start();
-	if (!$_SESSION['login_okay'])
+	if (!$_SESSION['login_okay']) {
 		header("location:login.php?logout=true");
+		die("");
+	}
 
 	require_once("filesystem.php");
 	require_once("string.php");
@@ -827,6 +829,7 @@ echo $html;
 		global $GALLERIES_DIR_REL;
 		global $PREVIEW_DIR_NAME;
 		global $ALLOWED_SPECIALCHARS_REGEX;
+		global $CMS_CONF;
 		
 		if (isset($_REQUEST['gal']) && file_exists("$GALLERIES_DIR_REL/".$_REQUEST['gal']))
 			$mygallery = $_REQUEST['gal'];
@@ -861,6 +864,9 @@ echo $html;
 		  	else {
 		  		// Bild und Kommentar speichern
 		    	move_uploaded_file($_FILES['uploadfile']['tmp_name'], $gallerydir."/".$_FILES['uploadfile']['name']);
+					// chmod, wenn so eingestellt
+	    		if ($CMS_CONF->get("chmodnewfiles") == "true")
+	    			chmod ($gallerydir."/".$_FILES['uploadfile']['name'], octdec($CMS_CONF->get("chmodnewfilesatts")));
 					$galleryconf = new Properties($gallerydir."/texte.conf");
 					$galleryconf->set($_FILES['uploadfile']['name'], stripslashes($_POST['comment']));
 		  		// Vorschaubild erstellen (nur, wenn GDlib installiert ist)
@@ -868,6 +874,9 @@ echo $html;
 						require_once("../Thumbnail.php");
 						$tn = new Thumbnail();
 						$tn->createThumb($_FILES['uploadfile']['name'], $gallerydir."/", $gallerydir."/$PREVIEW_DIR_NAME/");
+						// chmod, wenn so eingestellt
+		    		if ($CMS_CONF->get("chmodnewfiles") == "true")
+							chmod ($gallerydir."/$PREVIEW_DIR_NAME/".$_FILES['uploadfile']['name'], octdec($CMS_CONF->get("chmodnewfilesatts")));
 					}
 		    	$pagecontent .= returnMessage(true, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("gallery_upload_success"));
 			  }
@@ -1065,6 +1074,7 @@ echo $html;
 		global $ADMIN_CONF;
 		global $specialchars;
 		global $CONTENT_DIR_REL;
+		global $CMS_CONF;
 		$pagecontent = "<h2>".getLanguageValue("button_data_new")."</h2>";
 		if (isset($_POST['cat']))
 			$cat = $_POST['cat'];
@@ -1087,6 +1097,9 @@ echo $html;
     	// alles okay, hochladen!
 	    else {
 	    	move_uploaded_file($_FILES['uploadfile']['tmp_name'], "$CONTENT_DIR_REL/".$cat."/dateien/".$_FILES['uploadfile']['name']);
+	    	// chmod, wenn so eingestellt
+	    	if ($CMS_CONF->get("chmodnewfiles") == "true")
+	    		chmod ("$CONTENT_DIR_REL/".$cat."/dateien/".$_FILES['uploadfile']['name'], octdec($CMS_CONF->get("chmodnewfilesatts")));
 	    	$pagecontent .= returnMessage(true, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("data_upload_success"));
     	}
 		}
@@ -1137,7 +1150,14 @@ echo $html;
 							$countword = getLanguageValue("data_download"); // Singular
 						if ($downloads == "")
 							$downloads = "0";
-						$pagecontent .= "<tr><td class=\"config_row1\">$subfile</td><td class=\"config_row2\">".$downloads." ".$countword."</a></td></tr>";
+						// Downloads pro Tag berechnen
+						$dayscounted = ceil((time() - $DOWNLOAD_COUNTS->get("_downloadcounterstarttime")) / (60*60*24));
+						$downloadsperday = round(($downloads/$dayscounted), 2);
+						if ($downloads > 0)
+							$downloadsperdaytext = " (".$downloadsperday." ".getLanguageValue("data_downloadsperday").")";
+						else
+							$downloadsperdaytext = "";
+						$pagecontent .= "<tr><td class=\"config_row1\">$subfile</td><td class=\"config_row2\">".$downloads." ".$countword.$downloadsperdaytext."</td></tr>";
 						$hasdata = true;
 					}
 				}
@@ -1232,6 +1252,8 @@ echo $html;
 				&& isset($_GET['syntaxslinks']) && ($_GET['syntaxslinks'] <> "")
 				&& isset($_GET['lang']) && ($_GET['lang'] <> "")
 				&& isset($_GET['titlebarformat']) && ($_GET['titlebarformat'] <> "")
+				&& (!isset($_GET['chmodnewfiles']) || preg_match("/^[0-7]{3}$/", $_GET['chmodnewfilesatts']))
+				
 				) {
 				$CMS_CONF->set("websitetitle", htmlentities(stripslashes($_GET['title'])));
 				$CMS_CONF->set("templatefile", $_GET['template']);
@@ -1264,6 +1286,15 @@ echo $html;
 					$CMS_CONF->set("usesubmenu", "true");
 				else
 					$CMS_CONF->set("usesubmenu", "false");
+					
+				if (isset($_GET['chmodnewfiles']) && ($_GET['chmodnewfiles'] == "on")) {
+					$CMS_CONF->set("chmodnewfiles", "true");
+					$CMS_CONF->set("chmodnewfilesatts", $_GET['chmodnewfilesatts']);
+				}
+				else {
+					$CMS_CONF->set("chmodnewfiles", "false");
+					$CMS_CONF->set("chmodnewfilesatts", "");
+				}
 				
 				// Speichern der benutzerdefinierten Syntaxelemente -> ERWEITERN UM PRÜFUNG!	
 				$handle = @fopen($USER_SYNTAX_FILE, "w");
@@ -1456,6 +1487,8 @@ echo $html;
 		$pagecontent .= "<table class=\"data\">";
 		// Zeile "GALERIE IM EINZEL- ODER ÜBERSICHT-MODUS" (nur, wenn GDlib installiert ist)
 		if (extension_loaded("gd")) {
+			$checked1 = "";
+			$checked2 = "";
 			if ($CMS_CONF->get("galleryusethumbs") == "true")
 				$checked1 = "checked=\"checked\" ";
 			else
@@ -1499,6 +1532,15 @@ echo $html;
 // DETAILLIERTE EINSTELLUNGEN
 		$pagecontent .= "<h3>".getLanguageValue("config_cmsdetail_headline")."</h3>";
 		$pagecontent .= "<table class=\"data\">";
+		// Zeile "SETZE DATEIRECHTE FÜR NEUE DATEIEN"
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\"><a accesskey=\"".createNormalTooltip("chmodnewfiles_tooltiptitle", "chmodnewfiles_tooltiptext", 150)."\"><img class=\"right\" src=\"gfx/information.gif\" alt=\"info\"></a>".getLanguageValue("chmodnewfiles_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"checkbox\" ";
+		if ($CMS_CONF->get("chmodnewfiles") == "true")
+			$pagecontent .= "checked=checked";
+		$pagecontent .= " name=\"chmodnewfiles\">".getLanguageValue("chmodnewfiles_text2")."<br />";
+		$pagecontent .= "<input type=\"text\" class=\"text1\" name=\"chmodnewfilesatts\" value=\"".$CMS_CONF->get("chmodnewfilesatts")."\" /></td>";
+		$pagecontent .= "</tr>";
 		// Zeile "HTML-TEMPLATE"
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("template_text")."</td>";
@@ -1877,6 +1919,7 @@ echo $html;
 	function returnUserSyntaxSelectbox() {
 		global $USER_SYNTAX;
   	$usersyntaxarray = $USER_SYNTAX->toArray();
+  	ksort($usersyntaxarray);
 
 		$content = "<select name=\"usersyntax\" onchange=\"insertTagAndResetSelectbox(this);\">"
 		."<option value=\"\">".getLanguageValue("usersyntax")."</option>";

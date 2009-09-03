@@ -445,22 +445,28 @@ verwendet werden sollte!
 
 			$i++;
 		}
-
-		// Immer ersetzen: Horizontale Linen
-		$content = preg_replace('/\[----\](\r\n|\r|\n)?/m', '<hr />', $content);
-		// Zeilenwechsel setzen
-		$content = preg_replace('/\n/', '<br />', $content);
-		// Zeilenwechsel nach Blockelementen wieder herausnehmen
-		$content = preg_replace('/<\/ul>(\r\n|\r|\n)<br \/>/', "</ul>", $content);
-		$content = preg_replace('/<\/ol>(\r\n|\r|\n)<br \/>/', "</ol>", $content);
-		$content = preg_replace('/(<\/h[123]>)(\r\n|\r|\n)<br \/>/', "$1", $content);
-		// Leerzeichen für Zeilen ohne Inhalt erzwingen
-		$content = preg_replace('/>(\r\n|\r|\n)<br \/>/', ">$1&nbsp;<br />", $content);
-
+		
 		// Rekursion, wenn noch Fundstellen
 		if ($i > 0)
 			$content = $this->convertContent($content, false);
-			
+		else {
+			// Immer ersetzen: Horizontale Linen
+			$content = preg_replace('/\[----\]/', '<hr />', $content);
+			// Zeilenwechsel setzen
+			$content = preg_replace('/\n/', '<br />', $content);
+			// Zeilenwechsel nach Blockelementen entfernen
+			// Tag-Beginn																							<
+			// optional: Slash bei schließenden Tags									(\/)?
+			// Blockelemente 																					(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)
+			// optional: sonstige Attribute bis zum Slash							(\s[^\/]*?)?
+			// optional: Slash bei implizit schließenden Tags 				(\s\/)?
+			// Tag-Ende																								>
+			// Danach Zeilenwechsel und <br>													[\r\n|\r|\n]<br \/>
+			$content = preg_replace('/<(\/)?(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)(\s[^\/]*?)?(\s\/)?>[\r\n|\r|\n]<br \/>/', "<$1$2$3$4>", $content);
+			// Leerzeichen für Zeilen ohne Inhalt erzwingen
+			$content = preg_replace('/>(\r\n|\r|\n)<br/', ">$1&nbsp;<br", $content);
+		}
+
 		// Konvertierten Seiteninhalt zurückgeben
     return $content;
 	}
