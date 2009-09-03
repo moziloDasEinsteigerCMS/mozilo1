@@ -11,13 +11,13 @@
 require_once("Properties.php");
 	$DOWNLOADS = new Properties("conf/downloads.conf");
 
-	$CAT 	= $_REQUEST['cat'];
-	$FILE = $_REQUEST['file'];
+	$CAT 	= preg_replace('/(\/|\\\)/', "", $_REQUEST['cat']);
+	$FILE = preg_replace('/(\/|\\\)/', "", $_REQUEST['file']);
 	$PATH = "kategorien/$CAT/dateien/$FILE";
 
 	// Abbruch bei fehlerhaften Parametern
 	if (($CAT == "") || ($FILE == "") || (!file_exists($PATH)))
-		die("Invalid Parameters given. Stop hackin', kid.");
+		die("Invalid Parameters given.");
 		
 	// Alles okay, Downloadzähler inkrementieren und Datei ausliefern
 	else {
