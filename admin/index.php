@@ -2,8 +2,8 @@
 
 /* 
 * 
-* $Revision: 26 $
-* $LastChangedDate: 2008-04-11 21:51:19 +0200 (Fr, 11 Apr 2008) $
+* $Revision: 32 $
+* $LastChangedDate: 2008-05-25 14:22:21 +0200 (So, 25 Mai 2008) $
 * $Author: arvid $
 *
 */
@@ -2249,19 +2249,25 @@ echo $html;
 				
 			// Dateien
 			case 2:
+				// alle Kategorien durchgehen
 				$cathandle = opendir("$CONTENT_DIR_REL");
 				while (($catdir = readdir($cathandle))) {
 					if (($catdir <> ".") && ($catdir <> "..")) {
 						$cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), false);
 						array_push($elements, array($cleancatname, ":".$cleancatname));
 						$handle = opendir("$CONTENT_DIR_REL/$catdir/dateien");
+						$currentcat_filearray = array();
 						while (($file = readdir($handle))) {
 							if (($file <> ".") && ($file <> "..") && is_file("$CONTENT_DIR_REL/$catdir/dateien/$file")) {
-								if ($catdir == $currentcat)
-									array_push($elements, array($spacer.$file, $file));
-								else
-									array_push($elements, array($spacer.$file, $cleancatname.":".$file));
+								array_push($currentcat_filearray, $file);
 							}
+						}
+						natcasesort($currentcat_filearray);
+						foreach ($currentcat_filearray as $current_file) {
+							if ($catdir == $currentcat)
+								array_push($elements, array($spacer.$current_file, $current_file));
+							else
+								array_push($elements, array($spacer.$current_file, $cleancatname.":".$current_file));
 						}
 						closedir($handle);
 					}
@@ -2272,9 +2278,14 @@ echo $html;
 			// Galerien
 			case 3:
 				$handle = opendir($GALLERIES_DIR_REL);
+				$galleries = array();
 				while (($file = readdir($handle))) {
 					if (($file <> ".") && ($file <> ".."))
-						array_push($elements, array($specialchars->rebuildSpecialChars($file, true), $specialchars->rebuildSpecialChars($file, true)));
+						array_push($galleries, $file);
+				}
+				natcasesort($galleries);
+				foreach ($galleries as $currentgallery) {
+					array_push($elements, array($specialchars->rebuildSpecialChars($currentgallery, false), $specialchars->rebuildSpecialChars($currentgallery, false)));
 				}
 				closedir($handle);
 				$selectname = "gals";

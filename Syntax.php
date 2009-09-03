@@ -2,8 +2,8 @@
 
 /* 
 * 
-* $Revision: 26 $
-* $LastChangedDate: 2008-04-11 21:51:19 +0200 (Fr, 11 Apr 2008) $
+* $Revision: 32 $
+* $LastChangedDate: 2008-05-25 14:22:21 +0200 (So, 25 Mai 2008) $
 * $Author: arvid $
 *
 */
@@ -426,7 +426,7 @@ class Syntax {
 			
 			// HTML
 			elseif ($attribute == "html"){
-				$nobrvalue = preg_replace('/(\r\n|\r|\n)?/m', '', $value);
+				$nobrvalue = preg_replace('/(\r\n|\r|\n)/m', '{newline_in_html_tag}', $value);
 				$content = str_replace ("$match", html_entity_decode($nobrvalue), $content);
 			}
 
@@ -585,6 +585,9 @@ verwendet werden sollte!
 
 		// Platzhalter ersetzen
 		$content = replacePlaceholders($content);
+		
+		// Zeilenwechsel in HTML-Tags wiederherstellen	
+		$content = preg_replace('/{newline_in_html_tag}/', "\n", $content);
 	
 		// Konvertierten Seiteninhalt zurückgeben
     return $content;

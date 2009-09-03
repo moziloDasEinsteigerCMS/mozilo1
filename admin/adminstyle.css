@@ -1,7 +1,7 @@
 /* 
 * 
-* $Revision: 19 $
-* $LastChangedDate: 2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+* $Revision: 28 $
+* $LastChangedDate: 2008-04-16 18:33:31 +0200 (Mi, 16 Apr 2008) $
 * $Author: arvid $
 *
 */
@@ -843,9 +843,9 @@ select
 	
 }
 select.overviewselect {
-	margin-top: 1px;
-	margin-bottom: 1px;
-}
+    margin-top: 1px;
+    margin-bottom: 1px;
+} 
 select.maxwidth {
 	width:270px;
 	max-width:260px;
