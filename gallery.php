@@ -146,7 +146,10 @@ echo $HTML;
 	    $HTML = preg_replace('/{GALLERYMENU}/', getGalleryMenu(), $HTML);
 	    $HTML = preg_replace('/{NUMBERMENU}/', getNumberMenu(), $HTML);
 	    $HTML = preg_replace('/{CURRENTPIC}/', getCurrentPic(), $HTML);
-	    $HTML = preg_replace('/{CURRENTDESCRIPTION}/', getCurrentDescription($PICARRAY[$INDEX-1]), $HTML);
+	    if (count($PICARRAY) > 0)
+	    	$HTML = preg_replace('/{CURRENTDESCRIPTION}/', getCurrentDescription($PICARRAY[$INDEX-1]), $HTML);
+	    else
+	    	$HTML = preg_replace('/{CURRENTDESCRIPTION}/', "", $HTML);
 	    $HTML = preg_replace('/{XOUTOFY}/', getXoutofY(), $HTML);
 		}
 	}

@@ -62,11 +62,11 @@
 	@author: Oliver Lorenz
 	Gibt eine Dropdown-Liste mit den allen möglichen und belegten Positionen zurueck 
 	--------------------------------------------------------------------------------*/
-	function show_dirs($dir)
+	function show_dirs($maindir, $selecteddir)
 	{
 		$content = "<select name=\"position\" size=1>";
 		global $specialchars;
-		$vergeben = getDirs($dir);
+		$vergeben = getDirs($maindir);
 
 	    for($pos = 0; $pos < 100; $pos++ )
 	    {
@@ -78,8 +78,11 @@
 	    	}
 	    	else
 	    	{
-	    		$content .= "<option style=\"color:lightgrey;\">";
-					$content .= addFrontZero($pos)." ".$specialchars->rebuildSpecialChars(specialNrDir($dir, $pos), true);
+	    		$selected = "";
+	    		if (addFrontZero($pos)."_".specialNrDir($maindir, $pos) == $selecteddir)
+	    			$selected = "selected=\"selected\" ";
+	    		$content .= "<option style=\"color:lightgrey;\"$selected>";
+					$content .= addFrontZero($pos)." ".$specialchars->rebuildSpecialChars(specialNrDir($maindir, $pos), true);
 					$content .= "</option>";		
 	    	}
 	    
@@ -93,11 +96,14 @@
 	@author: Oliver Lorenz
 	Gibt eine Dropdown-Liste mit den allen möglichen und belegten Positionen zurueck 
 	--------------------------------------------------------------------------------*/
-	function show_files($dir, $currentfile)
+	function show_files($dir, $currentfile, $includedrafts)
 	{
-		$content = "<select name=\"position\" class=\"select1\" size=1>";
 		global $specialchars;
-		$vergeben = getFiles($dir, ".tmp");
+		$content = "<select name=\"position\" class=\"select1\" size=1>";
+		if ($includedrafts)
+			$vergeben = getFiles($dir, "");
+		else
+			$vergeben = getFiles($dir, ".tmp");
 
     for($pos = 0; $pos < 100; $pos++ )
     {
@@ -109,7 +115,7 @@
     	}
     	else
     	{
-    		if (specialNrDir($dir, $pos) == $currentfile.".txt")
+    		if ((specialNrDir($dir, $pos) == $currentfile.".txt") || (specialNrDir($dir, $pos) == $currentfile.".tmp"))
     			$selected = "selected=\"selected\" ";
     		else
     			$selected = " ";
@@ -161,7 +167,11 @@
 		while($file = readdir($handle)) {
 			if(($file != ".") && ($file != "..") && ($file != "dateien")) {
 				// auszuschließende Extensions nicht berücksichtigen
-				if (substr($file, strlen($file)-4, strlen($file)) != ".tmp")
+				if ($excludeextension != "") {
+					if (substr($file, strlen($file)-4, strlen($file)) != "$excludeextension")
+						array_push($files, $file);
+				}
+				else
 					array_push($files, $file);
 			}
 		}

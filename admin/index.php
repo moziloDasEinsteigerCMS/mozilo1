@@ -1,4 +1,15 @@
 <?php
+	// DEEEEEEEEEEEBUG ;)
+	// Ausgabe aller übergebenen Werte zu Testzwecken
+/*	
+	echo "<h2>POST</h2>";
+	foreach ($_POST as $a => $b)
+		echo $a." -> ".$b."<br />";
+	echo "<h2>GET</h2>";
+	foreach ($_GET as $a => $b)
+		echo $a." -> ".$b."<br />";
+*/	
+
 $ADMIN_TITLE = "moziloAdmin";
 
 /* Login überprüfen */
@@ -8,12 +19,18 @@ $ADMIN_TITLE = "moziloAdmin";
 
 	require_once("filesystem.php");
 	require_once("string.php");
+	require_once("../Smileys.php");
+	
 	$ADMIN_CONF	= new Properties("conf/basic.conf");
 	$CMS_CONF	= new Properties("../conf/main.conf");
 	$DOWNLOAD_COUNTS = new Properties("../conf/downloads.conf");
 	$USER_SYNTAX_FILE = "../conf/syntax.conf";
 	$USER_SYNTAX = new Properties($USER_SYNTAX_FILE);
 	
+/* Abwärtskompatibilität: Downloadcounter initalisieren */
+	if ($DOWNLOAD_COUNTS->get("_downloadcounterstarttime") == "")
+		$DOWNLOAD_COUNTS->set("_downloadcounterstarttime", time());
+
 /* Pfade */
 	$CONTENT_DIR_NAME		= "kategorien";
 	$CONTENT_DIR_REL		= "../".$CONTENT_DIR_NAME;
@@ -21,12 +38,16 @@ $ADMIN_TITLE = "moziloAdmin";
 	$GALLERIES_DIR_REL	= "../".$GALLERIES_DIR_NAME;
 	$PREVIEW_DIR_NAME		= "vorschau";
 
+/* RegEx für erlaubte Zeichen in Inhaltsseiten, Kategorien, Dateien und Galerien */
+$ALLOWED_SPECIALCHARS_REGEX = "/^[a-zA-Z0-9_\-äöüÄÖÜß\s\?\!\&\€\<\>\@\.]+$/";
 
 
 /* Aktion abhängig vom action-Parameter */
-	$action = $_GET['action'];
-	if ($action == "")
-		$action = $_POST['action'];
+	if (isset($_REQUEST['action']))
+		$action = $_REQUEST['action'];
+	else
+		$action = "";
+
 	$functionreturn = array();
 	
 	// Kategorien
@@ -95,18 +116,6 @@ $ADMIN_TITLE = "moziloAdmin";
 	$html .= "<script type=\"text/javascript\" src=\"js_color_picker_v2/js_color_picker_v2.js\"></script>";
 	$html .= "</head>";
 	$html .= "<body onload=\"htmlOverlopen(document.documentElement,0)\">";
-	
-	// DEEEEEEEEEEEBUG ;)
-	// Ausgabe aller übergebenen Werte zu Testzwecken
-	/*
-	echo "<h2>POST</h2>";
-	foreach ($_POST as $a => $b)
-		echo $a." -> ".$b."<br />";
-	echo "<h2>GET</h2>";
-	foreach ($_GET as $a => $b)
-		echo $a." -> ".$b."<br />";
-	*/
-	
 	$html .= "<div id=\"mozilo_Logo\"></div>";
 	$html .= "<div id=\"main_div\">";
 	// Titelleiste
@@ -225,8 +234,7 @@ echo $html;
 		
 		global $action;
 		global $CONTENT_DIR_REL;
-		
-		$specialcharregex = "/^[a-zA-Z0-9_\-äöüÄÖÜß\s\?\!\&\€\<\>\@\.]+$/";
+		global $ALLOWED_SPECIALCHARS_REGEX;
 		
 		$pagecontent = "";
 		
@@ -234,6 +242,7 @@ echo $html;
 		$message1 = "";
 		$message2 = "";
 		$message3 = "";
+		$message4 = "";
 		$nameconflict = false;
 		if(isset($_GET["position"]))
 		{
@@ -245,7 +254,7 @@ echo $html;
 			{
 				$message1 = htmlentities($_GET['name']).": ".getLanguageValue("category_exist");
 			}
-			elseif(!(preg_match($specialcharregex, $_GET["name"])))
+			elseif(!(preg_match($ALLOWED_SPECIALCHARS_REGEX, $_GET["name"])))
 			{
 				$message4 = htmlentities($_GET['name']).": ".getLanguageValue("category_name_wrong");
 				$nameconflict = true;	
@@ -308,7 +317,7 @@ echo $html;
 		// Zeile "NEUE POSITION"
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\"><a accesskey=\"".createNormalTooltip("category_numbers", "category_number_help", 150)."\"><img class=\"right\" src=\"gfx/information.gif\" alt=\"info\"></a>".getLanguageValue("choose_category_position")."</td>";
-		$pagecontent .= "<td class=\"config_row2\">".show_dirs("$CONTENT_DIR_REL/")."</td>";
+		$pagecontent .= "<td class=\"config_row2\">".show_dirs("$CONTENT_DIR_REL/", "")."</td>";
 		$pagecontent .= "</tr>";
 		// Zeile "SUBMIT"
 		$pagecontent .= "<tr>";
@@ -324,16 +333,16 @@ echo $html;
 		global $action;
 		global $specialchars;
 		global $CONTENT_DIR_REL;
+		global $ALLOWED_SPECIALCHARS_REGEX;
 		
-		$specialcharregex = "/^[a-zA-Z0-9_\-äöüÄÖÜß\s\?\!\&\€\<\>\@\.]+$/";
-
 		$pagecontent = "<h2>".getLanguageValue("button_category_edit")."</h2>";
 		$goto = "";
+		$done = false;
 		
 		if(isset($_GET["submit"])) {
 			// Position frei
 			if (strlen($_GET["position"])<3) {
-				if (preg_match($specialcharregex, $_GET["cat"])) {
+				if (preg_match($ALLOWED_SPECIALCHARS_REGEX, $_GET["cat"])) {
 					@rename("$CONTENT_DIR_REL/".$_GET["cat"],"$CONTENT_DIR_REL/".$_GET["position"]."_".$specialchars->deleteSpecialChars($_GET["newname"]));
 					renameCategoryInDownloadStats($_GET["cat"], $_GET["position"]."_".$specialchars->deleteSpecialChars($_GET["newname"]));
 					$pagecontent .= returnMessage(true, htmlentities($_GET["newname"]).": ".getLanguageValue("category_edited"));
@@ -344,7 +353,7 @@ echo $html;
 			}
 			// Position belegt, aber mit der gleichen Kategorie >> UMBENENNEN
 			elseif (substr($_GET["position"],0,2)."_".$specialchars->deleteSpecialChars(substr($_GET["position"],3)) == $_GET["cat"]) {
-				if (preg_match($specialcharregex, $_GET["newname"])) {
+				if (preg_match($ALLOWED_SPECIALCHARS_REGEX, $_GET["newname"])) {
 					if (@rename("$CONTENT_DIR_REL/".$_GET["cat"], "$CONTENT_DIR_REL/".substr($_GET["position"],0,2)."_".$specialchars->deleteSpecialChars($_GET["newname"]))) {
 						renameCategoryInDownloadStats($_GET["cat"], substr($_GET["position"],0,2)."_".$specialchars->deleteSpecialChars($_GET["newname"]));
 						$pagecontent .= returnMessage(true, htmlentities($_GET["newname"]).": ".getLanguageValue("category_edited"));
@@ -371,7 +380,6 @@ echo $html;
 			$pagecontent .= "</p>";
 			$pagecontent .= "<h3>".getLanguageValue("choice_text")."</h3>";
 			$pagecontent .= "<form action=\"index.php\" method=\"GET\"><input type=\"hidden\" name=\"action\" value=\"".$action."\">";
-			$pagecontent .= "<input type=\"hidden\" name=\"cat\" value=\"".$_GET["cat"]."\">";
 			$pagecontent .= "<table class=\"data\">";
 			$pagecontent .= "<tr>";	
 			$pagecontent .= "<td class=\"config_row1\">";	
@@ -379,7 +387,7 @@ echo $html;
 			$pagecontent .= "</td>";	
 			$pagecontent .= "<td class=\"config_row2\">";	
 			$pagecontent .= getCatsAsSelect("");
-			$pagecontent .= "</td>";	
+			$pagecontent .= "</td>";
 			$pagecontent .= "</tr>";	
 			$pagecontent .= "<tr>";	
 			$pagecontent .= "<td class=\"config_row1\">&nbsp;</td>";	
@@ -409,7 +417,7 @@ echo $html;
 			$pagecontent .= "<tr>";
 			$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("current_category_position")."</td>";
 			$pagecontent .= "<td class=\"config_row2\">";
-			$pagecontent .= show_dirs("$CONTENT_DIR_REL");
+			$pagecontent .= show_dirs("$CONTENT_DIR_REL", $_GET["cat"]);
 			$pagecontent .= "</td>";
 			$pagecontent .= "</tr>";
 			$pagecontent .= "<tr>";
@@ -494,12 +502,14 @@ echo $html;
 	function newSite() {
 		global $specialchars;
 		global $CONTENT_DIR_REL;
+		global $ALLOWED_SPECIALCHARS_REGEX;
+
+		$pagecontent = "";
 		
-		$specialcharregex = "/^[a-zA-Z0-9_\-äöüÄÖÜß\s\?\!\&\€\<\>\@\.]+$/";
 		// Wenn nach dem Editieren "Speichern" gedrückt wurde
 		if (isset($_POST['save'])) {
 			// Entwurf speichern
-			if ($_POST['draft'] == "on") {
+			if (isset($_POST['draft']) && ($_POST['draft'] == "on")) {
 				saveContentToPage($_POST['pagecontent'],"$CONTENT_DIR_REL/".$_POST['cat']."/".substr($_POST['page'], 0, strlen($_POST['page'])-4).".tmp");
 			}
 			// Veröffentlichen
@@ -518,7 +528,7 @@ echo $html;
 				(
 					isset($_POST['position']) && isset($_POST['name']) 
 					&& (strlen($_POST['name']) == 0)
-					&& (!preg_match($specialcharregex, $_POST['name']))
+					&& (!preg_match($ALLOWED_SPECIALCHARS_REGEX, $_POST['name']))
 					&& (strlen($_POST['position'])>2)
 				) 
 			) {
@@ -527,7 +537,7 @@ echo $html;
 			if (isset($_POST['position']) && isset($_POST['name'])) {
 				if (strlen($_POST['name']) == 0)
 					$pagecontent .= returnMessage(false, getLanguageValue("page_empty"));
-				elseif (!preg_match($specialcharregex, $_POST["name"]))
+				elseif (!preg_match($ALLOWED_SPECIALCHARS_REGEX, $_POST["name"]))
 					$pagecontent .= returnMessage(false, htmlentities($_POST['name']).": ".getLanguageValue("invalid_values"));
 				elseif (strlen($_POST["position"])>2)
 					$pagecontent .= returnMessage(false, htmlentities($_POST['name']).": ".getLanguageValue("page_exist"));	
@@ -540,7 +550,7 @@ echo $html;
 			$pagecontent .= "</tr>";
 			$pagecontent .= "<tr>";
 			$pagecontent .= "<td class=\"config_row1\"><a accesskey=\"".createNormalTooltip("page_numbers", "page_number_help", 150)."\"><img class=\"right\" src=\"gfx/information.gif\" alt=\"info\"></a>".getLanguageValue("choose_page_position")."</td>";
-			$pagecontent .= "<td class=\"config_row2\">".show_files("$CONTENT_DIR_REL/".$_POST['cat'], "x")."</td>";
+			$pagecontent .= "<td class=\"config_row2\">".show_files("$CONTENT_DIR_REL/".$_POST['cat'], "x", false)."</td>";
 			$pagecontent .= "</tr>";
 			$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td>";
 			$pagecontent .= "<td class=\"config_row2\"><input type=\"submit\" name=\"chosen\" class=\"submit\" value=\"".getLanguageValue("button_newpage_create")."\" /></td></tr>";
@@ -566,12 +576,12 @@ echo $html;
 				isset($_POST['position']) 
 				&& isset($_POST['name']) 
 				&& strlen($_POST['name']) > 0
-				&& preg_match($specialcharregex, $_POST['name'])
+				&& preg_match($ALLOWED_SPECIALCHARS_REGEX, $_POST['name'])
 				&& (strlen($_POST['position'])<=2)
 				) {
 			$pagecontent = "<h2>".getLanguageValue("button_site_new")."</h2>";
 			$pagecontent .= "<form name=\"form\" method=\"post\" action=\"index.php\">";
-			$pagecontent .= showEditPageForm($_POST['cat'], $_POST['position']."_".$_POST['name'].".txt", "newsite");
+			$pagecontent .= showEditPageForm($_POST['cat'], $_POST['position']."_".$_POST['name'].".txt", "newsite", "");
 			$pagecontent .= "</form>";
 		}
 		return array(getLanguageValue("button_site_new"), $pagecontent);
@@ -580,61 +590,82 @@ echo $html;
 	function editSite() {
 		global $specialchars;
 		global $CONTENT_DIR_REL;
+		global $ALLOWED_SPECIALCHARS_REGEX;
+		
 		$pagecontent = "<h2>".getLanguageValue("button_site_edit")."</h2>";
 		// Wenn nach dem Editieren "Speichern" gedrückt wurde
 		if (isset($_POST['save']) || isset($_POST['savetemp'])) {
-			// neue Position ist frei bzw. eigene Position
-			$newpos = substr($_POST['position'],0,2);
-			if ((strlen($newpos) < 3) || (substr($_POST['page'],0,2) == substr($newpos,0,2))) {
-				// Entwurf speichern
-				if ($_POST['draft'] == "on") {
-					$newpagename = $newpos."_".$specialchars->deleteSpecialChars($_POST['newpage']).".tmp";
-					saveContentToPage($_POST['pagecontent'],"$CONTENT_DIR_REL/".$_POST['cat']."/".$newpagename);
+			// Korrekte Zeichen im neuen Seitennamen
+			if (preg_match($ALLOWED_SPECIALCHARS_REGEX, $_POST['newpage'])) {
+				// neue Position ist frei bzw. eigene Position
+				$newpos = substr($_POST['position'],0,2);
+	
+				if ((strlen($newpos) < 3) || (substr($_POST['page'],0,2) == substr($newpos,0,2))) {
+					// Entwurf speichern
+					if (isset($_POST['draft']) && ($_POST['draft'] == "on")) {
+						$newpagename = $newpos."_".$specialchars->deleteSpecialChars($_POST['newpage']).".tmp";
+						saveContentToPage($_POST['pagecontent'],"$CONTENT_DIR_REL/".$_POST['cat']."/".$newpagename);
+					}
+					// Veröffentlichen
+					else {
+						$newpagename = $newpos."_".$specialchars->deleteSpecialChars($_POST['newpage']).".txt";
+						if ($newpagename <> $_POST['page'])
+							@unlink("$CONTENT_DIR_REL/".$_POST['cat']."/".$_POST['page']);
+						saveContentToPage($_POST['pagecontent'],"$CONTENT_DIR_REL/".$_POST['cat']."/".$newpagename);
+					}
+					$pagecontent = returnMessage(true, htmlentities($_POST['newpage']).": ".getLanguageValue("changes_applied")).$pagecontent;
 				}
-				// Veröffentlichen
 				else {
-					$newpagename = $newpos."_".$specialchars->deleteSpecialChars($_POST['newpage']).".txt";
-					if ($newpagename <> $_POST['page'])
-						@unlink("$CONTENT_DIR_REL/".$_POST['cat']."/".$_POST['page']);
-					saveContentToPage($_POST['pagecontent'],"$CONTENT_DIR_REL/".$_POST['cat']."/".$newpagename);
+					$pagecontent .= returnMessage(false, substr($newpos,0,2).": ".getLanguageValue("page_exist"));
 				}
-				$pagecontent = returnMessage(true, htmlentities($_POST['newpage']).": ".getLanguageValue("changes_applied")).$pagecontent;
+				// Beim Zwischenspeichern: Zurückkehren zur Editieransicht
+				if (isset($_POST['savetemp'])) {
+					if (isset($_POST['draft']) && ($_POST['draft'] == "on"))
+						$ext = ".tmp";
+					else
+						$ext = ".txt";
+					header("location:index.php?action=editsite&cat=".$_POST['cat']."&file=".$newpos."_".$specialchars->deleteSpecialChars($_POST['newpage']).$ext."&savetemp=true");
+				}
 			}
+			// Ungültige Zeichen im neuen Seitennamen
 			else {
-				$pagecontent .= returnMessage(false, substr($newpos,0,2).": ".getLanguageValue("page_exist"));
-			}
-			// Beim Zwischenspeichern: Zurückkehren zur Editieransicht
-			if (isset($_POST['savetemp'])) {
-				if ($_POST['draft'] == "on") 
-					$ext = ".tmp";
-				else
-					$ext = ".txt";
-				header("location:index.php?action=editsite&cat=".$_POST['cat']."&file=".$newpos."_".$specialchars->deleteSpecialChars($_POST['newpage']).$ext."&savetemp=true");
+				// Inhalt der Textarea temporär sichern
+				saveContentToPage($_POST['pagecontent'],"$CONTENT_DIR_REL/".$_POST['cat']."/"."temp.txt");
+				header("location:index.php?action=editsite&cat=".$_POST['cat']."&file=".$_POST['page']."&invalidvalues=true&invalidname=".$_POST['newpage']);
 			}
 		}
 		// Wenn nach dem Editieren "Abbrechen" gedrückt wurde
 		elseif (isset($_POST['cancel']))
 			header("location:index.php?action=editsite");
+		
 		// Editieransicht der Inhaltsseite
 		if (isset($_GET['file']) && isset($_GET['cat'])) {
+			$file = $_GET['file'];
+			$cat = $_GET['cat'];
+			$tempfile = "";
 			// Erfolgsmeldung nach dem Zwischenspeichern
 			if (isset($_GET['savetemp']))
-				$pagecontent .= returnMessage(true, $specialchars->rebuildSpecialChars(substr($_GET['file'],3,strlen($_GET['file'])-7), false).": ".getLanguageValue("changes_applied"));
+				$pagecontent .= returnMessage(true, $specialchars->rebuildSpecialChars(substr($file,3,strlen($file)-7), false).": ".getLanguageValue("changes_applied"));
+			if (isset($_GET['invalidvalues'])) {
+				$pagecontent .= returnMessage(false, $_GET['invalidname'].": ".getLanguageValue("invalid_values"));
+				$tempfile = "temp.txt";
+			}
+
 			$pagecontent .= "<form name=\"form\" method=\"post\" action=\"index.php\">";
 			$draft = "";
-			if (substr($_GET['file'], strlen($_GET['file'])-4, strlen($_GET['file'])) == ".tmp")
+			if (substr($file, strlen($file)-4, strlen($file)) == ".tmp")
 				$draft = " (".getLanguageValue("draft").")";
 			$pagecontent .= "<table class=\"data\" style=\"margin:0px 10px;\"><tr>"
 			."<td style=\"padding-right:10px;\">".getLanguageValue("site_name").": "
 			."<input class=\"text2\" type=\"text\" name=\"newpage\" value=\""
-			.$specialchars->rebuildSpecialChars(substr($_GET['file'],3,strlen($_GET['file'])-7), true)
+			.$specialchars->rebuildSpecialChars(substr($file,3,strlen($file)-7), true)
 			."\" />$draft</td>"
 			."<td style=\"padding-right:10px;padding-bottom:10px;\">"
-			.getLanguageValue("site_position").": ".show_files("$CONTENT_DIR_REL/".$_GET['cat'], substr($_GET['file'],3,strlen($_GET['file'])-7))
+			.getLanguageValue("site_position").": ".show_files("$CONTENT_DIR_REL/".$cat, substr($file,3,strlen($file)-7), true)
 			."</td>"
 			."</tr>"
 			."</table>";
-			$pagecontent .= showEditPageForm($_GET['cat'], $_GET['file'], "editsite");
+			$pagecontent .= showEditPageForm($cat, $file, "editsite", $tempfile);
 			$pagecontent .= "</form>";
 		}
 		
@@ -682,14 +713,23 @@ echo $html;
 		$pagecontent = "<h2>".getLanguageValue("button_site_delete")."</h2>";
 		// Löschen der Inhaltsseite nach Auswertung der übergebenen Parameter
 		if (isset($_GET['cat']) && isset($_GET['file']) && file_exists("$CONTENT_DIR_REL/".$_GET['cat']) && file_exists("$CONTENT_DIR_REL/".$_GET['cat']."/".$_GET['file'])) {
+			if (substr($_GET['file'], strlen($_GET['file'])-4, strlen($_GET['file'])) == ".tmp")
+				$draft = " (".getLanguageValue("draft").")";
+			else
+				$draft = "";
+			// Löschnachfrage bestätigt?
 			if (isset($_GET['confirm']) && ($_GET['confirm'] == "true")) {
 				if (@unlink("$CONTENT_DIR_REL/".$_GET['cat']."/".$_GET['file']))
-					$pagecontent .= returnMessage(true, $specialchars->rebuildSpecialChars(substr($_GET['file'], 3, strlen($_GET['file'])-7), true).": ".getLanguageValue("page_deleted"));
+					// Löschen erfolgreich
+					$pagecontent .= returnMessage(true, $specialchars->rebuildSpecialChars(substr($_GET['file'], 3, strlen($_GET['file'])-7), true)."$draft: ".getLanguageValue("page_deleted"));
 				else
-					$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars(substr($_GET['file'], 3, strlen($_GET['file'])-7), true).": ".getLanguageValue("page_delete_error"));
+					// Löschen fehlgeschlagen
+					$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars(substr($_GET['file'], 3, strlen($_GET['file'])-7), true)."$draft: ".getLanguageValue("page_delete_error"));
 			}
-			else
-				$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars(substr($_GET['file'], 3, strlen($_GET['file'])-7), true).": ".getLanguageValue("page_delete_confirm")." <a href=\"index.php?action=deletesite&amp;cat=".$_GET['cat']."&amp;file=".$_GET['file']."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=deletesite\">".getLanguageValue("no")."</a>");
+			// Nachfrage: Wirklich löschen?
+			else {
+					$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars(substr($_GET['file'], 3, strlen($_GET['file'])-7), true)."$draft: ".getLanguageValue("page_delete_confirm")." <a href=\"index.php?action=deletesite&amp;cat=".$_GET['cat']."&amp;file=".$_GET['file']."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=deletesite\">".getLanguageValue("no")."</a>");
+			}
 		}
 		$pagecontent .= "<p>".getLanguageValue("page_delete_text")."</p>";
 		$dirs = getDirs("$CONTENT_DIR_REL");
@@ -742,13 +782,12 @@ echo $html;
 		global $specialchars;
 		global $GALLERIES_DIR_REL;
 		global $PREVIEW_DIR_NAME;
+		global $ALLOWED_SPECIALCHARS_REGEX;
 		
 		$pagecontent = "<h2>".getLanguageValue("button_gallery_new")."</h2>";
 
-		$specialcharregex = "/^[a-zA-Z0-9_\-äöüÄÖÜß\s\?\!\&\€\<\>\@\.]+$/";
-		
 		if ($_SERVER["REQUEST_METHOD"] == "POST"){
-			if (isset($_POST['galleryname']) && preg_match($specialcharregex, $_POST['galleryname'])) {
+			if (isset($_POST['galleryname']) && preg_match($ALLOWED_SPECIALCHARS_REGEX, $_POST['galleryname'])) {
 				$dirname = $specialchars->deleteSpecialChars($_POST['galleryname']);
 				// Galerieverzeichnis schon vorhanden? Wenn nicht: anlegen!
 				if (!file_exists("$GALLERIES_DIR_REL/".$dirname)) {
@@ -787,13 +826,10 @@ echo $html;
 		global $specialchars;
 		global $GALLERIES_DIR_REL;
 		global $PREVIEW_DIR_NAME;
+		global $ALLOWED_SPECIALCHARS_REGEX;
 		
-		$specialcharregex = "/^[a-zA-Z0-9_\-äöüÄÖÜß\s\?\!\&\€\<\>\@\.]+$/";
-
-		if (isset($_GET['gal']) && file_exists("$GALLERIES_DIR_REL/".$_GET['gal']))
-			$mygallery = $_GET['gal'];
-		else
-			$mygallery = $_POST['gal'];
+		if (isset($_REQUEST['gal']) && file_exists("$GALLERIES_DIR_REL/".$_REQUEST['gal']))
+			$mygallery = $_REQUEST['gal'];
 
 		$pagecontent = "<h2>".getLanguageValue("button_gallery_edit")."</h2>";
 		// Zuerst: Galerie wählen
@@ -842,7 +878,7 @@ echo $html;
 				if (file_exists("$GALLERIES_DIR_REL/".$specialchars->deleteSpecialChars($_GET["newname"])))
 					$pagecontent .= returnMessage(false, htmlentities($_GET['newname']).": ".getLanguageValue("gallery_exists_error"));
 				// Fehlermeldung, wenn kein Name angegeben oder nicht erlaubte Zeichen enthalten
-				elseif (($_GET['newname'] == "") || (!preg_match($specialcharregex, $_GET['newname'])))
+				elseif (($_GET['newname'] == "") || (!preg_match($ALLOWED_SPECIALCHARS_REGEX, $_GET['newname'])))
 					$pagecontent .= returnMessage(false, htmlentities($_GET['newname']).": ".getLanguageValue("invalid_values"));
 				// sonst: Galerieverzeichnis umbenennen
 				else {
@@ -922,13 +958,19 @@ echo $html;
 			sort($gallerypics);
 			foreach ($gallerypics as $file) {
 				$counter++;
-				$pagecontent .= "<form action=\"index.php\" method=\"GET\"><input type=\"hidden\" name=\"action\" value=\"editgallery\"><input type=\"hidden\" name=\"gal\" value=\"".$mygallery."\"><input type=\"hidden\" name=\"image\" value=\"".$file."\">";
+				$pagecontent .= "<form action=\"index.php#lastsavedimage\" method=\"GET\"><input type=\"hidden\" name=\"action\" value=\"editgallery\"><input type=\"hidden\" name=\"gal\" value=\"".$mygallery."\"><input type=\"hidden\" name=\"image\" value=\"".$file."\">";
 				$pagecontent .= "<table class=\"data\">";
 				$pagecontent .= "<tr>";
+				// Anker setzen, zu dem nach dem Speichern gesprungen wird
+				if (isset($_GET['save']) && isset($_GET['image']) && ($_GET['image'] == $file)) 
+					$lastsavedanchor = " id=\"lastsavedimage\"";
+				else
+					$lastsavedanchor = "";
+				// Vorschaubild anzeigen, wenn vorhanden; sonst Originalbild
 				if (file_exists("$GALLERIES_DIR_REL/".$mygallery."/$PREVIEW_DIR_NAME/".$file))
-					$pagecontent .= "<td class=\"config_row1\"><img src=\"$GALLERIES_DIR_REL/".$mygallery."/$PREVIEW_DIR_NAME/".$file."\" alt=\"$file\" style=\"width:100px;\" /><br />".$file."</td>";
+					$pagecontent .= "<td class=\"config_row1\"".$lastsavedanchor."><img src=\"$GALLERIES_DIR_REL/".$mygallery."/$PREVIEW_DIR_NAME/".$file."\" alt=\"$file\" style=\"width:100px;\" /><br />".$file."</td>";
 				else			
-					$pagecontent .= "<td class=\"config_row1\"><img src=\"$GALLERIES_DIR_REL/".$mygallery."/".$file."\" alt=\"$file\" style=\"width:100px;\" /><br />".$file."</td>";
+					$pagecontent .= "<td class=\"config_row1\"".$lastsavedanchor."><img src=\"$GALLERIES_DIR_REL/".$mygallery."/".$file."\" alt=\"$file\" style=\"width:100px;\" /><br />".$file."</td>";
 				$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"comment\" value=\"".htmlentities($galleryconf->get($file))."\" /><input type=\"submit\" name=\"save\" value=\"".getLanguageValue("button_save")."\" class=\"submit\" /> <input type=\"submit\" name=\"delete\" value=\"".getLanguageValue("button_delete")."\" class=\"submit\" /></td>";
 				$pagecontent .= "</tr>";
 				$pagecontent .= "</table>";
@@ -952,11 +994,16 @@ echo $html;
 		global $GALLERIES_DIR_REL;
 		global $PREVIEW_DIR_NAME;
 		
+		if (isset($_GET['gal']))
+			$gal = $_GET['gal'];
+		else
+			$gal = "";
+		
 		// Zuerst: Kategorie wählen
 		$pagecontent = "<h2>".getLanguageValue("button_gallery_delete")."</h2>";
 		// Wenn die Kategorie schon gewählt wurde
-		if (isset($_GET['gal']) && file_exists("$GALLERIES_DIR_REL/".$_GET['gal'])) {
-			$mygallery = "$GALLERIES_DIR_REL/".$_GET['gal'];
+		if (($gal != "") && file_exists("$GALLERIES_DIR_REL/".$gal)) {
+			$mygallery = "$GALLERIES_DIR_REL/".$gal;
 			if (isset($_GET['confirm']) && ($_GET['confirm'] == "true")) {
 				$success = true;
 				$couldnotrmdir = false;
@@ -979,14 +1026,14 @@ echo $html;
 				if (!@rmdir($mygallery))
 					$couldnotrmdir = true;
 				if ($success && !$couldnotrmdir)
-					$pagecontent .= returnMessage(true, $specialchars->rebuildSpecialChars($_GET['gal'], true).": ".getLanguageValue("gallery_delete_success"));
+					$pagecontent .= returnMessage(true, $specialchars->rebuildSpecialChars($gal, true).": ".getLanguageValue("gallery_delete_success"));
 				elseif ($success && $couldnotrmdir)
-					$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars($_GET['gal'], true).": ".getLanguageValue("gallery_delete_success")." ".getLanguageValue("gallery_delete_no_rmdir"));
+					$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars($gal, true).": ".getLanguageValue("gallery_delete_success")." ".getLanguageValue("gallery_delete_no_rmdir"));
 				else
-					$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars($_GET['gal'], true).": ".getLanguageValue("gallery_delete_error"));	
+					$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars($gal, true).": ".getLanguageValue("gallery_delete_error"));	
 			}
 			else {
-				$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars($_GET['gal'], true).": ".getLanguageValue("gallery_confirm_deleteall")." <a href=\"index.php?action=deletegallery&amp;delete=true&amp;gal=".$_GET['gal']."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=deletegallery\">".getLanguageValue("no")."</a>");
+				$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars($gal, true).": ".getLanguageValue("gallery_confirm_deleteall")." <a href=\"index.php?action=deletegallery&amp;delete=true&amp;gal=".$gal."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=deletegallery\">".getLanguageValue("no")."</a>");
 			}
 		}
 		$pagecontent .= "<p>".getLanguageValue("gallery_delete_text")."</p>";
@@ -994,7 +1041,7 @@ echo $html;
 		$pagecontent .= "<table class=\"data\">";
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("choose_gal_for_delete")."</td>";
-		$pagecontent .= "<td class=\"config_row2\">".getGalleriesAsSelect($_GET['gal'])."</td></tr>";
+		$pagecontent .= "<td class=\"config_row2\">".getGalleriesAsSelect($gal)."</td></tr>";
 		$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td>";
 		$pagecontent .= "<td class=\"config_row2\"><input type=\"submit\" name=\"chosen\" class=\"submit\" value=\"".getLanguageValue("choose_gallery_button")."\" /></td></tr>";
 		$pagecontent .= "</table>";
@@ -1019,6 +1066,10 @@ echo $html;
 		global $specialchars;
 		global $CONTENT_DIR_REL;
 		$pagecontent = "<h2>".getLanguageValue("button_data_new")."</h2>";
+		if (isset($_POST['cat']))
+			$cat = $_POST['cat'];
+		else
+			$cat = "";
 		// Datei hochladen
 	  if (isset($_FILES['uploadfile']) and !$_FILES['uploadfile']['error']) {
 	    // nicht erlaubte Endung
@@ -1030,12 +1081,12 @@ echo $html;
 	    	$pagecontent .= returnMessage(false, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("invalid_values"));
 	    }
 	  	// Datei vorhanden und "Überschreiben"-Checkbox nicht aktiviert
-	    elseif (file_exists("$CONTENT_DIR_REL/".$specialchars->deleteSpecialChars($_POST['cat'])."/dateien/".$_FILES['uploadfile']['name']) && ($_POST['overwrite'] != "on")) {
+	    elseif (file_exists("$CONTENT_DIR_REL/".$specialchars->deleteSpecialChars($cat)."/dateien/".$_FILES['uploadfile']['name']) && ($_POST['overwrite'] != "on")) {
 	    	$pagecontent .= returnMessage(false, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("data_uploadfile_exists"));
 	    }
     	// alles okay, hochladen!
 	    else {
-	    	move_uploaded_file($_FILES['uploadfile']['tmp_name'], "$CONTENT_DIR_REL/".$_POST['cat']."/dateien/".$_FILES['uploadfile']['name']);
+	    	move_uploaded_file($_FILES['uploadfile']['tmp_name'], "$CONTENT_DIR_REL/".$cat."/dateien/".$_FILES['uploadfile']['name']);
 	    	$pagecontent .= returnMessage(true, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("data_upload_success"));
     	}
 		}
@@ -1044,7 +1095,7 @@ echo $html;
 		$pagecontent .= "<table><tr>";
 		// Kategorie auswählen
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("data_choose_category_text")."</td>"
-		."<td class=\"config_row2\">".getCatsAsSelect($specialchars->deleteSpecialChars($_POST['cat']))."</td></tr>";
+		."<td class=\"config_row2\">".getCatsAsSelect($specialchars->deleteSpecialChars($cat))."</td></tr>";
 		// Datei auswählen
 		$pagecontent .= "<tr><td class=\"config_row1\">".getLanguageValue("data_choose_file_text")."</td>"
 		."<td class=\"config_row2\"><input type=\"file\" name=\"uploadfile\" /></td></tr>";
@@ -1064,8 +1115,8 @@ echo $html;
 		global $specialchars;
 		global $CONTENT_DIR_REL;
 		global $DOWNLOAD_COUNTS;
-		$pagecontent = "<h2>".getLanguageValue("button_data_info")."</h2>";
-		$pagecontent .= "<p>".getLanguageValue("data_info_text")."</p>";
+		$pagecontent = "<h2>".getLanguageValue("button_data_info")."</h2>"
+		."<p>".getLanguageValue("data_info_text")." ".strftime(getLanguageValue("_dateformat"), $DOWNLOAD_COUNTS->get("_downloadcounterstarttime"))."</p>";
 		$dirs = getDirs("$CONTENT_DIR_REL");
 		foreach ($dirs as $file) {
 			$file = $file."_".specialNrDir("$CONTENT_DIR_REL", $file);
@@ -1182,7 +1233,7 @@ echo $html;
 				&& isset($_GET['lang']) && ($_GET['lang'] <> "")
 				&& isset($_GET['titlebarformat']) && ($_GET['titlebarformat'] <> "")
 				) {
-				$CMS_CONF->set("websitetitle", htmlentities($_GET['title']));
+				$CMS_CONF->set("websitetitle", htmlentities(stripslashes($_GET['title'])));
 				$CMS_CONF->set("templatefile", $_GET['template']);
 				$CMS_CONF->set("gallerytemplatefile", $_GET['gallerytemplate']);
 				$CMS_CONF->set("galleryusethumbs", $_GET['gthumbs']);
@@ -1199,12 +1250,17 @@ echo $html;
 				$titlesep = preg_replace('/\s/', "&nbsp;", htmlspecialchars($titlesep));
 				$CMS_CONF->set("titlebarseparator", $titlesep);
 				
-				if ($_GET['usesyntax'] == "on")
+				if (isset($_GET['usesyntax']) && ($_GET['usesyntax'] == "on"))
 					$CMS_CONF->set("usecmssyntax", "true");
 				else
 					$CMS_CONF->set("usecmssyntax", "false");
 
-				if ($_GET['usesubmenu'] == "on")
+				if (isset($_GET['replaceemoticons']) && ($_GET['replaceemoticons'] == "on"))
+					$CMS_CONF->set("replaceemoticons", "true");
+				else
+					$CMS_CONF->set("replaceemoticons", "false");
+
+				if (isset($_GET['usesubmenu']) && ($_GET['usesubmenu'] == "on"))
 					$CMS_CONF->set("usesubmenu", "true");
 				else
 					$CMS_CONF->set("usesubmenu", "false");
@@ -1226,7 +1282,7 @@ echo $html;
 // ALLGEMEINE EINSTELLUNGEN
 		$pagecontent .= "<h3>".getLanguageValue("config_cmsglobal_headline")."</h3>";
 		$pagecontent .= "<table class=\"data\">";
-		// Zeile "CMS-Version"
+		// Zeile "CMS-VERSION"
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("cmsversion_text")."</td>";
 		$pagecontent .= "<td class=\"config_row2\">".$CMS_CONF->get("cmsversion")."</td>";
@@ -1241,8 +1297,10 @@ echo $html;
 				if (($file != ".") && ($file != "..")) {
 					if (substr($file,0,strlen($file)-strlen(".conf")) == $CMS_CONF->get("cmslanguage"))
 						$selected = " selected";
-					$pagecontent .= "<option".$selected.">";
-					$pagecontent .= substr($file,0,strlen($file)-strlen(".conf"));
+					$pagecontent .= "<option".$selected." value=\"".substr($file,0,strlen($file)-strlen(".conf"))."\">";
+					// Übersetzer aus der aktuellen Sprachdatei holen
+					$languagefile = new Properties("../sprachen/$file");
+					$pagecontent .= substr($file,0,strlen($file)-strlen(".conf"))." (".getLanguageValue("translator_text")." ".$languagefile->get("_translator_0").")";
 					$pagecontent .= "</option>";
 				}
 			}
@@ -1328,36 +1386,69 @@ echo $html;
 		$pagecontent .= "<td class=\"config_row2\"><input type=\"checkbox\" ";
 		if ($CMS_CONF->get("usecmssyntax") == "true")
 			$pagecontent .= "checked=checked";
-		$pagecontent .= " name=\"usesyntax\">".getLanguageValue("usesyntax_text2")."</td>";
-		$pagecontent .= "</tr>";
-		// Zeile "LINKS KÜRZEN"
-		$checked0 = "";
-		$checked1 = "";
-		$checked2 = "";
-		if ($CMS_CONF->get("shortenlinks") == "2")
-			$checked2 = "checked=\"checked\" ";
-		elseif ($CMS_CONF->get("shortenlinks") == "1")
-			$checked1 = "checked=\"checked\" ";
-		else
-			$checked0 = "checked=\"checked\" ";
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("syntaxshortenlinks_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\">";
-		$pagecontent .= "<input type=\"radio\" name=\"syntaxslinks\" value=\"0\"$checked0 />http://www.domain.com<br />";
-		$pagecontent .= "<input type=\"radio\" name=\"syntaxslinks\" value=\"1\"$checked1 />www.domain.com<br />";
-		$pagecontent .= "<input type=\"radio\" name=\"syntaxslinks\" value=\"2\"$checked2 />domain.com<br />";
-		$pagecontent .= "</td>";
-		$pagecontent .= "</tr>";
-		// Zeile "BENUTZERDEFINIERTE SYNTAX-ELEMENTE"
-		
-		$usersyntaxdefs = "";
-		if (file_exists($USER_SYNTAX_FILE)) {
-			$handle = @fopen($USER_SYNTAX_FILE, "r");
-			$usersyntaxdefs = @fread($handle, @filesize($USER_SYNTAX_FILE));
-			@fclose($handle);
+		$pagecontent .= " name=\"usesyntax\" />".getLanguageValue("usesyntax_text2");
+		// Wenn die CMS-Syntax deaktiviert ist: Die anderen Werte per Hidden-Inputs durchreichen
+		if ($CMS_CONF->get("usecmssyntax") != "true") {
+			// Links kürzen (Wert "0" extra setzen, damit der Parameter nicht leer durchgereicht wird)
+			$shortenthem = $CMS_CONF->get("shortenlinks");
+			if ($shortenthem == "")
+				$shortenthem = "0";
+			$pagecontent .= "<input type=\"hidden\" name=\"syntaxslinks\" value=\"".$shortenthem."\" />";
+			// Benutzerdefinierte Syntaxelemente
+			$usersyntaxdefs = "";
+			if (file_exists($USER_SYNTAX_FILE)) {
+				$handle = @fopen($USER_SYNTAX_FILE, "r");
+				$usersyntaxdefs = @fread($handle, @filesize($USER_SYNTAX_FILE));
+				@fclose($handle);
+			}
+			$pagecontent .= "<input type=\"hidden\" name=\"usersyntax\" value=\"".htmlentities($usersyntaxdefs)."\" />";
+			// Ersetze Emoticons
+			if ($CMS_CONF->get("replaceemoticons") == "true")
+				$replacethem = "on";
+			else
+				$replacethem = "off";
+			$pagecontent .= "<input type=\"hidden\" name=\"replaceemoticons\" value=\"".$CMS_CONF->get("shortenlinks")."\" />";
 		}
-		$pagecontent .= "<tr><td class=\"config_row1\" colspan=\"2\">".getLanguageValue("usersyntax_text")."<br />";
-		$pagecontent .= "<textarea class=\"usersyntaxarea\" name=\"usersyntax\">".htmlentities($usersyntaxdefs)."</textarea></td></tr>";
+		$pagecontent .= "</td></tr>";
+		// Die folgenden Einstellungen werden nur angezeigt, wenn die CMS-Syntax aktiv ist
+		if ($CMS_CONF->get("usecmssyntax") == "true") {
+			// Zeile "LINKS KÜRZEN"
+			$checked0 = "";
+			$checked1 = "";
+			$checked2 = "";
+			if ($CMS_CONF->get("shortenlinks") == "2")
+				$checked2 = " checked=\"checked\"";
+			elseif ($CMS_CONF->get("shortenlinks") == "1")
+				$checked1 = " checked=\"checked\"";
+			else
+				$checked0 = " checked=\"checked\"";
+			$pagecontent .= "<tr>";
+			$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("syntaxshortenlinks_text")."</td>";
+			$pagecontent .= "<td class=\"config_row2\">";
+			$pagecontent .= "<input type=\"radio\" name=\"syntaxslinks\" value=\"0\"$checked0 />http://www.domain.com<br />";
+			$pagecontent .= "<input type=\"radio\" name=\"syntaxslinks\" value=\"1\"$checked1 />www.domain.com<br />";
+			$pagecontent .= "<input type=\"radio\" name=\"syntaxslinks\" value=\"2\"$checked2 />domain.com<br />";
+			$pagecontent .= "</td>";
+			$pagecontent .= "</tr>";
+			// Zeile "BENUTZERDEFINIERTE SYNTAX-ELEMENTE"
+			$usersyntaxdefs = "";
+			if (file_exists($USER_SYNTAX_FILE)) {
+				$handle = @fopen($USER_SYNTAX_FILE, "r");
+				$usersyntaxdefs = @fread($handle, @filesize($USER_SYNTAX_FILE));
+				@fclose($handle);
+			}
+			$pagecontent .= "<tr><td class=\"config_row1\" colspan=\"2\">".getLanguageValue("usersyntax_text")."<br />";
+			$pagecontent .= "<textarea class=\"usersyntaxarea\" name=\"usersyntax\">".htmlentities($usersyntaxdefs)."</textarea></td></tr>";
+			// Zeile "ERSETZE EMOTICONS"
+			$pagecontent .= "<tr>";
+			$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("replaceemoticons_text")."</td>";
+			$pagecontent .= "<td class=\"config_row2\"><input type=\"checkbox\" ";
+			if ($CMS_CONF->get("replaceemoticons") == "true")
+				$pagecontent .= "checked=checked";
+			$pagecontent .= " name=\"replaceemoticons\">".getLanguageValue("replaceemoticons_text2")."</td>";
+			$pagecontent .= "</tr>";
+		}
+
 		$pagecontent .= "</table>";
 
 // GALERIE-EINSTELLUNGEN
@@ -1498,8 +1589,9 @@ echo $html;
 					if(substr($file,0,9) == "language_") {
 						if (substr($file,9,4) == $ADMIN_CONF->get("language"))
 							$selected = " selected";
-						$pagecontent .= "<option".$selected.">";
-						$pagecontent .= substr($file,9,4);
+						$pagecontent .= "<option".$selected." value=\"".substr($file,9,4)."\">";
+						$currentlanguage = new Properties("conf/$file");
+						$pagecontent .= substr($file,9,4)." (".getLanguageValue("translator_text")." ".$currentlanguage->get("_translator").")";
 						$pagecontent .= "</option>";
 					}
 				}
@@ -1544,10 +1636,21 @@ echo $html;
 		$pagecontent = "<h2>".getLanguageValue("button_config_loginadmin")."</h2>";
 		$adminconf = new Properties("conf/logindata.conf");
 		$erroroccured = false;
+
+		if (isset($_POST['oldname']))
+			$oldname = $_POST['oldname'];
+		else
+			$oldname = "";
+
+		if (isset($_POST['newname']))
+			$newname = $_POST['newname'];
+		else
+			$newname = "";
+
 		require_once("Crypt.php");
 		$pwcrypt = new Crypt();
 		// Übergebene Werte prüfen
-		if ($_POST['apply'] == "true") {
+		if (isset($_POST['apply']) && ($_POST['apply'] == "true")) {
 			// Alle Felder übergeben...
 			if(!$erroroccured)
 				if (isset($_POST['oldname']) && isset($_POST['oldpw']) && isset($_POST['newname']) && isset($_POST['newpw']) && isset($_POST['newpwrepeat']))
@@ -1620,7 +1723,7 @@ echo $html;
 		// Zeile "ALTER NAME"
 		."<tr>"
 		."<td class=\"config_row1\">".getLanguageValue("config_oldname_text")."</td>"
-		."<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"oldname\" value=\"".$_POST['oldname']."\" /></td>"
+		."<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"oldname\" value=\"".$oldname."\" /></td>"
 		."</tr>"
 		// Zeile "ALTES PASSWORT"
 		."<tr>"
@@ -1630,7 +1733,7 @@ echo $html;
 		// Zeile "NEUER NAME"
 		."<tr>"
 		."<td class=\"config_row1\">".getLanguageValue("config_newname_text")."</td>"
-		."<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"newname\" value=\"".$_POST['newname']."\" /></td>"
+		."<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"newname\" value=\"".$newname."\" /></td>"
 		."</tr>"
 		// Zeile "NEUES PASSWORT"
 		."<tr>"
@@ -1651,22 +1754,42 @@ echo $html;
 	}
 	
 	// Anzeige der Editieransicht
-	function showEditPageForm($cat, $page, $action)	{
+	function showEditPageForm($cat, $page, $action, $tempfile)	{
 		global $ADMIN_CONF;
 		global $CMS_CONF;
 		global $specialchars;
 		global $CONTENT_DIR_REL;
-		$file = "$CONTENT_DIR_REL/".$cat."/".$page;
+		
+		$content = "";
+		
+		// wenn das Tempfile gesetzt ist: Tempfile statt originaler Datei verwenden
+		if ($tempfile == "")
+			$file = "$CONTENT_DIR_REL/".$cat."/".$page;
+		else
+			$file = "$CONTENT_DIR_REL/".$cat."/".$tempfile;
+		
 		if (file_exists($file)) {
+			// Inhaltsseite schon vorhanden: Inhalt ins Textfeld holen
 			$handle=fopen($file, "r");
-			$pagecontent = htmlentities(fread($handle, filesize($file)));
+			if (filesize($file) > 0)
+				$pagecontent = htmlentities(fread($handle, filesize($file)));
+			else
+				$pagecontent = "";
 			fclose($handle);
+			// Tempfile hat seinen Zweck erfüllt und kann gelöscht werden
+			if ($tempfile != "") {
+				@unlink("$CONTENT_DIR_REL/".$cat."/".$tempfile);
+				// ab hier gilt wieder die Datei der Inhaltsseite
+				$file = "$CONTENT_DIR_REL/".$cat."/".$page;
+			}
 		}
 		else
+			// Inhaltsseite noch nicht vorhanden: Titel als Überschrift ins Textfeld einfügen
 			$pagecontent = "[ueber1|".substr($page, 3,strlen($page)-7)."]";
 		
+		// Anzeige der Formatsymbolleiste, wenn die CMS-Syntax aktiviert ist
 		if ($CMS_CONF->get("usecmssyntax") == "true") {
-			$content = returnFormatToolbar($cat);
+			$content .= returnFormatToolbar($cat);
 	  }
 
 		// Seiteninhalt
@@ -1679,9 +1802,11 @@ echo $html;
 		."<input type=\"hidden\" name=\"page\" value=\"$page\" />"
 		."<input type=\"hidden\" name=\"action\" value=\"$action\" />"
 		."<input type=\"hidden\" name=\"cat\" value=\"$cat\" />"
-		."<input type=\"submit\" name=\"cancel\" value=\"".getLanguageValue("button_cancel")."\" accesskey=\"a\" /> "
-		."<input type=\"submit\" name=\"savetemp\" value=\"".getLanguageValue("button_savetemp")."\" accesskey=\"w\" /> "
-		."<input type=\"submit\" name=\"save\" value=\"".getLanguageValue("button_save")."\" accesskey=\"s\" /> ";
+		."<input type=\"submit\" name=\"cancel\" value=\"".getLanguageValue("button_cancel")."\" accesskey=\"a\" /> ";
+		// Zwischenspeichern-Button nicht beim Neuanlegen einer Inhaltsseite anzeigen
+		if (file_exists($file))
+			$content .= "<input type=\"submit\" name=\"savetemp\" value=\"".getLanguageValue("button_savetemp")."\" accesskey=\"w\" /> ";
+		$content .= "<input type=\"submit\" name=\"save\" value=\"".getLanguageValue("button_save")."\" accesskey=\"s\" /> ";
 		$checked = "";
 		if (substr($page, strlen($page)-4, 4) == ".tmp")
 			$checked = " checked";
@@ -1739,10 +1864,35 @@ echo $html;
 			return "<span class=\"fehler\">".$message."</span>";
 	}
 	
+	// Smiley-Liste
+	function returnSmileyBar() {
+		$smileys = new Smileys("../smileys");
+		$content = "";
+		foreach($smileys->getSmileysArray() as $icon => $emoticon)
+			$content .= "<img class=\"jss\" title=\":$icon:\" alt=\"$emoticon\" src=\"../smileys/$icon.gif\" onClick=\"insert(' :$icon: ', '')\" />";
+		return $content;
+	}
+	
+	// Selectbox mit allen benutzerdefinierten Syntaxelementen
+	function returnUserSyntaxSelectbox() {
+		global $USER_SYNTAX;
+  	$usersyntaxarray = $USER_SYNTAX->toArray();
+
+		$content = "<select name=\"usersyntax\" onchange=\"insertTagAndResetSelectbox(this);\">"
+		."<option value=\"\">".getLanguageValue("usersyntax")."</option>";
+		foreach ($usersyntaxarray as $key => $value) {
+			$content .= "<option value=\"".$key."\">[".$key."|...]</option>";
+		}
+		$content .= "</select>";
+		return $content;
+	}
+
+	
 	function returnFormatToolbar($currentcat) {
+		global $CMS_CONF;
 		global $USER_SYNTAX;
 		
-		$content = "<div style=\"padding:0px 10px;\">"//"<p class=\"toolbar\">"
+		$content = "<div style=\"padding:0px 10px;\">"
 		// show user information if javascript inactive
 		."<noscript><span class=\"fehler\">".getLanguageValue("toolbar_nojs_text")."</span></noscript>"
 		// syntax elements, colors
@@ -1819,21 +1969,24 @@ echo $html;
   	.returnOverviewSelectbox(4, $currentcat)
   	."</td>"
   	."</tr>";
-  	// Benutzerdefinierte Syntaxelemente als Selectbox (wenn welche definiert sind)
+  	// Benutzerdefinierte Syntaxelemente als Selectbox (wenn welche definiert sind); Smileyleiste
   	$usersyntaxarray = $USER_SYNTAX->toArray();
-		if (count($usersyntaxarray) > 0) {
-			//$content .= "<tr><td colspan=\"2\">".getLanguageValue("usersyntax")."</td></tr>";
-			$content .= "<tr><td colspan=\"2\"><select name=\"usersyntax\" onchange=\"insertTagAndResetSelectbox(this);\">"
-			."<option value=\"\">".getLanguageValue("usersyntax")."</option>";
-			foreach ($usersyntaxarray as $key => $value) {
-				$content .= "<option value=\"".$key."\">[".$key."|...]</option>";
-			}
-			$content .= "</select></td></tr>";
+  	
+  	// Beides anzeigen
+		if ((count($usersyntaxarray) > 0) && ($CMS_CONF->get("replaceemoticons") == "true")) {
+			$content .= "<tr><td>".returnUserSyntaxSelectbox()."</td>"
+			."<td>".returnSmileyBar()."</td></tr>";
 		}
-  	$content .= "</table>"
-  	
-  	."</div>";
-  	
+		// Nur benutzerdefinierte Syntaxelemente zeigen
+		elseif ((count($usersyntaxarray) > 0) && ($CMS_CONF->get("replaceemoticons") != "true")) {
+			$content .= "<tr><td colspan=\"2\">".returnUserSyntaxSelectbox()."</td></tr>";
+		}
+		// Nur Smileyleiste zeigen
+		elseif ((count($usersyntaxarray) == 0) && ($CMS_CONF->get("replaceemoticons") == "true")) {
+			$content .= "<tr><td colspan=\"2\">".returnSmileyBar()."</td></tr>";
+		}
+
+  	$content .= "</table></div>";
 	  return $content;
 	}
 	

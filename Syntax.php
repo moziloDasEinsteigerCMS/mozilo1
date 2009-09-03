@@ -41,7 +41,7 @@ class Syntax {
 					// ip-adresse (ipv4)		([\d]{1,3}\.){3}[\d]{1,3}
 					// port									\:[\d]{1,5}
 					// subdirs|files				(\w)+
-		$this->LINK_REGEX = "/^(https?|t?ftps?|gopher|telnets?|mms|imaps?|irc|pop3s?|rdp|smb|smtps?|sql|ssh)\:\/\/((\w)+\:(\w)+\@)?[((\w)+\.)?(\w)+\.[a-zA-Z]{2,4}|([\d]{1,3}\.){3}[\d]{1,3}](\:[\d]{1,5})?((\w)+)?$/";
+		$this->LINK_REGEX = "/^(https?|t?ftps?|gopher|telnets?|mms|imaps?|irc|pop3s?|rdp|smb|smtps?|sql|ssh|svn)\:\/\/((\w)+\:(\w)+\@)?[((\w)+\.)?(\w)+\.[a-zA-Z]{2,4}|([\d]{1,3}\.){3}[\d]{1,3}](\:[\d]{1,5})?((\w)+)?$/";
 		$this->MAIL_REGEX = "/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/";
 		$this->USER_SYNTAX	= new Properties("conf/syntax.conf");
 	}
@@ -450,11 +450,12 @@ verwendet werden sollte!
 		$content = preg_replace('/\[----\](\r\n|\r|\n)?/m', '<hr />', $content);
 		// Zeilenwechsel setzen
 		$content = preg_replace('/\n/', '<br />', $content);
-		// Zeilenwechsel vor und nach Blockelementen wieder herausnehmen
-		//$content = preg_replace('/<br \/><hr \/>/', "<hr />", $content);
+		// Zeilenwechsel nach Blockelementen wieder herausnehmen
 		$content = preg_replace('/<\/ul>(\r\n|\r|\n)<br \/>/', "</ul>", $content);
 		$content = preg_replace('/<\/ol>(\r\n|\r|\n)<br \/>/', "</ol>", $content);
 		$content = preg_replace('/(<\/h[123]>)(\r\n|\r|\n)<br \/>/', "$1", $content);
+		// Leerzeichen für Zeilen ohne Inhalt erzwingen
+		$content = preg_replace('/>(\r\n|\r|\n)<br \/>/', ">$1&nbsp;<br />", $content);
 
 		// Rekursion, wenn noch Fundstellen
 		if ($i > 0)

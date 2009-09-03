@@ -970,6 +970,19 @@ img.js:hover
 	background-color: #AFC4DE;
 }
 
+img.jss
+{
+	border: 1px solid #c0c0c0;
+	padding: 1px;
+	background-color: #FFFFFF;
+	margin:1px 2px 5px 1px;
+}
+
+img.jss:hover
+{
+	background-color: #AFC4DE;
+}
+
 div.js
 {
 	border: 1px solid black;

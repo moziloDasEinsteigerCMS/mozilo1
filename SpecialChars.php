@@ -47,6 +47,8 @@ class SpecialChars {
 		$text = preg_replace("/ß/", "-szlig-", $text);
 		$text = preg_replace("/\s/", "-nbsp-", $text);
 		$text = preg_replace("/ /", "-nbsp-", $text);
+		$text = preg_replace("/&nbsp;/", "-nbsp-", $text);
+		$text = preg_replace("/\240/", "-nbsp-", $text); // für den IE: Zeichen "ð", warum auch immer -.-
 		$text = preg_replace("/\?/", "-ques-", $text);
 		$text = preg_replace("/&/", "-amp-", $text);
 		$text = preg_replace("/&amp;/", "-amp-", $text);

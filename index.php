@@ -28,11 +28,14 @@ INHALT
 	require_once("Properties.php");
 	require_once("SpecialChars.php");
 	require_once("Syntax.php");
+	require_once("Smileys.php");
+
 	
 	$language = new Language();
 	$mainconfig = new Properties("conf/main.conf");
 	$specialchars = new SpecialChars();
 	$syntax = new Syntax();
+	$smileys = new Smileys("smileys");
 	
 	// Config-Parameter auslesen
 	
@@ -50,11 +53,11 @@ INHALT
 
 	$DEFAULT_CATEGORY		= $mainconfig->get("defaultcat");
 	if ($DEFAULT_CATEGORY == "")
-		$DEFAULT_CATEGORY = "10_Home";
+		$DEFAULT_CATEGORY = "10_Willkommen";
 
 	$DEFAULT_PAGE				= $mainconfig->get("defaultpage");
 	if ($DEFAULT_PAGE == "")
-		$DEFAULT_PAGE = "10_Home";
+		$DEFAULT_PAGE = "10_Willkommen";
 
 	$FAVICON_FILE				= $mainconfig->get("faviconfile");
 	if ($FAVICON_FILE == "")
@@ -64,10 +67,21 @@ INHALT
 	if ($mainconfig->get("usecmssyntax") == "false")
 		$USE_CMS_SYNTAX = false;
 
-	$CAT_REQUEST 				= htmlentities(stripslashes($_GET['cat']));
-	$PAGE_REQUEST 			= htmlentities(stripslashes($_GET['page']));
-	$ACTION_REQUEST 		= htmlentities(stripslashes($_GET['action']));
-	
+	if (isset($_GET['cat']))
+		$CAT_REQUEST 				= htmlentities(stripslashes($_GET['cat']));
+	else
+		$CAT_REQUEST 				= "";
+
+	if (isset($_GET['page']))
+		$PAGE_REQUEST 				= htmlentities(stripslashes($_GET['page']));
+	else
+		$PAGE_REQUEST 				= "";
+
+	if (isset($_GET['action']))
+		$ACTION_REQUEST 				= htmlentities(stripslashes($_GET['action']));
+	else
+		$ACTION_REQUEST 				= "";
+		
 	$CONTENT_DIR_REL		= "kategorien";
 	$CONTENT_DIR_ABS 		= getcwd() . "/$CONTENT_DIR_REL";
 	$CONTENT_FILES_DIR	= "dateien";
@@ -118,11 +132,10 @@ INHALT
 				|| (!file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST")) 
 				// ...oder eine Kategorie ohne Contentseiten...
 				|| (getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST", true) == "")
-				// ...oder eine nicht existente Content-Seite...
-				|| (($PAGE_REQUEST <> "") && (!file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$CONTENT_EXTENSION")))
 			)
 			// ...dann verwende die Standardkategorie
 			$CAT_REQUEST = $DEFAULT_CATEGORY;
+
 		
 		// Kategorie-Verzeichnis einlesen
 		$pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true);
@@ -152,6 +165,7 @@ INHALT
 		global $language;
 		global $syntax;
 		global $mainconfig;
+		global $smileys;
 		
 		// Template-Datei auslesen
     if (!$file = @fopen($TEMPLATE_FILE, "r"))
@@ -193,14 +207,17 @@ INHALT
 	    $cattitle 		= $pagecontentarray[1];
   	  $pagetitle 		= $pagecontentarray[2];
   	}
+  	
+  	// Smileys ersetzen
+ 		if ($mainconfig->get("replaceemoticons") == "true")
+  		$pagecontent = $smileys->replaceEmoticons($pagecontent);
 
 		// Gesuchte Phrasen hervorheben
 		if ((isset($_GET['highlight'])) &&  ($_GET['highlight'] <> ""))
-			$pagecontent = highlight($pagecontent, htmlentities($_GET['highlight']));
+			$pagecontent = highlight($pagecontent, $_GET['highlight']);
 		
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
-    //$HTML = preg_replace('/{WEBSITE_TITLE}/', $WEBSITE_TITLE, $HTML);
     $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_TITLE, $cattitle, $pagetitle), $HTML);
 		$HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
     $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
@@ -448,7 +465,7 @@ INHALT
 
 
 // ------------------------------------------------------------------------------
-// Einlesen des Inhalts-Verzeichnisses, Rückgabe der zuletzt geänderten Datei
+// Rückgabe des Suchfeldes
 // ------------------------------------------------------------------------------
 	function getSearchForm(){
 		global $language;
@@ -559,58 +576,96 @@ INHALT
 		global $language;
 		global $specialchars;
 		
-		$query = htmlentities(trim($_GET['query']));
-		$searchresults = "<h1>".$language->getLanguageValue1("message_searchresult_1", $query)."</h1>";
-		// Kategorien-Verzeichnis einlesen
-		$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false);
-		// Alle Kategorien durchsuchen
 		$matchesoverall = 0;
-		foreach ($categoriesarray as $currentcategory) {
-			// Wenn die Kategorie keine Contentseiten hat, zur nächsten springen
-			if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true) == "")
-				continue;
-			// Alle Inhaltsseiten der aktuellen Kategorie sammeln, die das Suchwort enthalten...
-			$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true);
-			$matchingpages = array();
-			$i = 0;
-			foreach ($contentarray as $currentcontent) {
-				$pagename = pageToName($currentcontent, false);
-				$filepath = $CONTENT_DIR_REL."/".$currentcategory."/".$currentcontent;
-				if (filesize($filepath) > 0) {
-					$handle = fopen($filepath, "r");
-					$content = fread($handle, filesize($filepath));
-					fclose($handle);
-					if (
-						($query == "") 
-						|| (substr_count(strtolower($content), strtolower(html_entity_decode($query))) > 0) 
-						|| (substr_count(strtolower($pagename), strtolower($query)) > 0)) {
+		$searchresults = "";
+		
+		// Überhaupt erst etwas machen, wenn die Suche nicht leer ist
+		if (trim($_GET['query']) != "") {
+			// Damit die Links in der Ergbnisliste korrekt sind: Suchanfrage bereinigen
+			$queryarray = explode(" ", preg_replace('/"/',"",$_GET['query']));
+			$searchresults .= "<h1>".$language->getLanguageValue1("message_searchresult_1", htmlentities(trim($_GET['query'])))."</h1>";
+
+			// Kategorien-Verzeichnis einlesen
+			$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false);
+
+			// Alle Kategorien durchsuchen
+			foreach ($categoriesarray as $currentcategory) {
+
+				// Wenn die Kategorie keine Contentseiten hat, direkt zur nächsten springen
+				if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true) == "")
+					continue;
+
+				$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true);
+				$matchingpages = array();
+				$i = 0;
+
+				// Alle Inhaltsseiten durchsuchen
+				foreach ($contentarray as $currentcontent) {
+					$pagename = pageToName($currentcontent, false);
+					$filepath = $CONTENT_DIR_REL."/".$currentcategory."/".$currentcontent;
+					$ismatch = false;
+					$content = "";
+					// Dateiinhalt auslesen, wenn vorhanden...
+					if (filesize($filepath) > 0) {
+						$handle = fopen($filepath, "r");
+						$content = fread($handle, filesize($filepath));
+						fclose($handle);
+						// ...und alle Syntax-Tags entfernen. Gesucht werden soll nur im reinen Text
+						$content = preg_replace("/\[[^\[\]]+\|([^\[\]]*)\]/U", "$1", $content);
+						// Auch Emoticons in Doppelpunkten (z.B. ":lach:") sollen nicht berücksichtigt werden
+						$content = preg_replace("/:[^\s]+:/U", "", $content);
+						// Zum Schluß noch die horizontalen Linien ("[----]") von der Suche ausschließen
+						$content = preg_replace("/\[----\]/U", "", $content);
+					}
+					// für jede Seite alle Suchbegriffe suchen
+					foreach($queryarray as $query) {
+						if ($query == "")
+							continue;
+						// Wenn...
+						if (
+							// ...der aktuelle Suchbegriff im Seitennamen...
+							(substr_count(strtolower($pagename), strtolower($query)) > 0)
+							// ...oder im eigentlichen Seiteninhalt vorkommt (überpürüft werden nur Seiten, die nicht leer sind), ...
+							|| ((filesize($filepath) > 0) && (substr_count(strtolower($content), strtolower(html_entity_decode($query))) > 0))
+							)
+							// ...dann setze das Treffer-Flag
+							$ismatch = true;
+					}
+					// Treffer? -> Seite in die Ergebnisliste aufnehmen
+					if ($ismatch) {
 						$matchingpages[$i] = $currentcontent;
 						$i++;
 					}
 				}
-			}
-			// die gesammelten Seiten ausgeben
-			if (count($matchingpages) > 0) {
-				$categoryname = catToName($currentcategory, false);
-				$searchresults .= "<h2>$categoryname</h2><ul>";
-				foreach ($matchingpages as $matchingpage) {
-					$pagename = pageToName($matchingpage, false);
-					$filepath = $CONTENT_DIR_REL."/".$currentcategory."/".$matchingpage;
-					$searchresults .= "<li><a href=\"index.php?cat=$currentcategory&amp;page=".
-												substr($matchingpage, 0, strlen($matchingpage) - strlen($CONTENT_EXTENSION)).
-												"&amp;highlight=$query\" title=\"".$language->getLanguageValue2("tooltip_link_page_2", $pagename, $categoryname)."\">".
-												$pagename.
-												"</a></li>";
+				
+				// die gesammelten Seiten ausgeben
+				if (count($matchingpages) > 0) {
+					$highlightparameter = implode(",", $queryarray);
+					$categoryname = catToName($currentcategory, false);
+					$searchresults .= "<h2>$categoryname</h2><ul>";
+					foreach ($matchingpages as $matchingpage) {
+						$pagename = pageToName($matchingpage, false);
+						$filepath = $CONTENT_DIR_REL."/".$currentcategory."/".$matchingpage;
+						$searchresults .= "<li>".
+							highlight(
+								"<a href=\"index.php?cat=$currentcategory&amp;page=".
+								substr($matchingpage, 0, strlen($matchingpage) - strlen($CONTENT_EXTENSION)).
+								"&amp;highlight=$highlightparameter\" title=\"".$language->getLanguageValue2("tooltip_link_page_2", $pagename, $categoryname)."\">".
+								$pagename.
+								"</a>", 
+								$_GET['query']).
+							"</li>";
+					}
+					$searchresults .= "</ul>";
+					$matchesoverall += count($matchingpages);
 				}
-				$searchresults .= "</ul>";
-				$matchesoverall += count($matchingpages);
 			}
 		}
 		// Keine Inhalte gefunden?
 		if ($matchesoverall == 0)
-			$searchresults .= $language->getLanguageValue0("message_nodatafound_0", $value);
+			$searchresults .= $language->getLanguageValue0("message_nodatafound_0", htmlentities(trim($_GET['query'])));
 		// Rückgabe des Menüs
-		return array($searchresults, $language->getLanguageValue0("message_search_0"), $language->getLanguageValue1("message_searchresult_1", $query));
+		return array($searchresults, $language->getLanguageValue0("message_search_0"), $language->getLanguageValue1("message_searchresult_1", htmlentities(trim($_GET['query']))));
 	}
 	
 	
@@ -652,13 +707,17 @@ INHALT
 // ------------------------------------------------------------------------------
 // Phrasen in Inhalt hervorheben
 // ------------------------------------------------------------------------------
-	function highlight($content, $phrase) {
-		$phrase = preg_quote($phrase);
-		if (preg_match("/&.*;/", $phrase))
-			$content = preg_replace("/((<[^>]*)|$phrase)/ie", '"\2"=="\1"? "\1":"<em class=\"highlight\">\1</em>"', $content);
-		else
-		// nicht ersetzen zwischen < und > sowie zwischen & und ;
+	function highlight($content, $phrasestring) {
+		// Zu highlightende Begriffe kommen kommasepariert ("begriff1,begriff2")-> in Array wandeln
+		$phrasearray = explode(",", htmlentities($phrasestring));
+		// jeden Begriff highlighten
+		foreach($phrasearray as $phrase) {
+			// Regex-Zeichen im zu highlightenden Text escapen (.\+*?[^]$(){}=!<>|:)
+			$phrase = preg_quote($phrase);
+			// Slashes im zu highlightenden Text escapen
+			$phrase = preg_replace("/\//", "\\\\/", $phrase);
 			$content = preg_replace("/((<[^>]*|&[^;]*)|$phrase)/ie", '"\2"=="\1"? "\1":"<em class=\"highlight\">\1</em>"', $content);
+		}
 		return $content;
 	}
 
