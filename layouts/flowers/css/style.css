@@ -192,16 +192,10 @@ li.mainmenu {
 	display:inline;
 	padding     : 4px 4px 1px 4px;
 }
-li.mainmenu_submenu {
-	display:inline;
-}
-ul.detailmenu {
-	margin: 0px;
-	padding: 0px;
-}
 li.detailmenu {
 	display:inline;
 }
+
 ul.gallerymenu {
 	margin: 0px;
 	padding: 0px;
@@ -332,7 +326,7 @@ a.gallery { }  */
 /* [bild|...] */
 img {border : none;}
 
-div.imagesubtitle {
+span.imagesubtitle {
 	margin:0px;
 	text-align:justify;
 	font-size:0.9em;
@@ -341,7 +335,7 @@ div.imagesubtitle {
 }
 
 /* [bildlinks|...] */
-div.leftcontentimage {
+span.leftcontentimage {
 	margin:15px;
 	max-width:150px;
 	float:left;
@@ -356,7 +350,7 @@ img.leftcontentimage {margin-bottom:8px;
                      }
 
 /* [bildrechts|...] */
-div.rightcontentimage {
+span.rightcontentimage {
 	margin:15px;
 	max-width:150px;
 	float:right;

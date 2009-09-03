@@ -14,7 +14,8 @@
 		
 		width: 252px;	/* IE 5.x */
 		width/* */:/**/250px;	/* Other browsers */
-		width: /**/250px;	
+		width: /**/250px;
+		margin-left: -250px;
 	}
 
 	#dhtmlgoodies_colorPicker_iframe{
@@ -25,6 +26,7 @@
 		width: 252px;	/* IE 5.x */
 		width/* */:/**/250px;	/* Other browsers */
 		width: /**/250px;	
+		margin-left: -250px;
 	}
 	
 	#dhtmlgoodies_colorPicker .colorPicker_topRow{

@@ -2,8 +2,8 @@
 
 /* 
 * 
-* $Revision: 115 $
-* $LastChangedDate: 2009-01-27 21:14:39 +0100 (Di, 27 Jan 2009) $
+* $Revision: 190 $
+* $LastChangedDate: 2009-04-23 21:42:09 +0200 (Do, 23 Apr 2009) $
 * $Author: arvid $
 *
 */
@@ -15,6 +15,9 @@ require("filesystem.php");
 
 // Session starten!
 session_start();
+
+// Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
+@ini_set("display_errors", 0);
 
 // Initialisierungen
 $logindataconf = new Properties("conf/logindata.conf");

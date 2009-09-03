@@ -2,8 +2,8 @@
 
 /* 
 * 
-* $Revision: 115 $
-* $LastChangedDate: 2009-01-27 21:14:39 +0100 (Di, 27 Jan 2009) $
+* $Revision: 190 $
+* $LastChangedDate: 2009-04-23 21:42:09 +0200 (Do, 23 Apr 2009) $
 * $Author: arvid $
 *
 */
@@ -30,30 +30,29 @@ class Mail {
 		}
 	}
 	
-	
-/*	// Sendet eine Mail
-	function sendMail($to, $from, $subject, $content) {
-		@mail(html_entity_decode($to), html_entity_decode($subject), html_entity_decode($content), $this->getHeader(html_entity_decode($from)));
-	}
-*/
-
-	// Sendet eine Mail an die konfigurierte Admin-Adresse
+	// Sendet eine Mail an die konfigurierte Admin-Adresse (Absender ist der CMS-Titel)
 	function sendMailToAdmin($subject, $content) {
-		$to = $this->ADMINCONF->get("adminmail");
-		$from = "\"".$this->CMSCONF->get("websitetitle")."\"";
-		@mail(html_entity_decode($to), html_entity_decode($subject), html_entity_decode($content), $this->getHeader(html_entity_decode($from)));
+		//$from = "\"".$this->CMSCONF->get("websitetitle")."\"";
+		$from = $this->ADMINCONF->get("adminmail");
+		$this->sendMailToAdminWithFrom($subject, $content, $from);
 	}
-
+	
+	// Sendet eine Mail an die konfigurierte Admin-Adresse (mit definierter Absender-Adresse) 
+	function sendMailToAdminWithFrom($subject, $content, $from) {
+		$to = $this->ADMINCONF->get("adminmail");
+		@mail(html_entity_decode($to), html_entity_decode($subject), html_entity_decode($content), $this->getHeader(html_entity_decode($to), html_entity_decode($from)));
+	}
+	
 
 	// Baut den Mail-Header zusammen
-	function getHeader($from) {
+	function getHeader($from, $replyto) {
 		return "From: ".$from."\r\n"
 			."MIME-Version: 1.0\r\n"
 			."Content-type: text/plain; charset=iso-8859-1\r\n"
-			."Reply-To: ".$from."\r\n"
+			."Reply-To: ".$replyto."\r\n"
 			."X-Priority: 0\r\n"
 			."X-MimeOLE: \r\n"
-			."X-mailer: moziloCMS";
+			."X-mailer: moziloCMS ".$this->CMSCONF->get("cmsversion");
 	}
 	
 	// Prüft ob die Mail-Funktion verfügbar ist

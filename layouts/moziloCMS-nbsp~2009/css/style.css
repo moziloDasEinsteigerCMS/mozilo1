@@ -236,9 +236,6 @@ ul.mainmenu {
 li.mainmenu {
 	display:inline;
 }
-li.mainmenu_submenu {
-	display:inline;
-}
 ul.detailmenu {
 	margin: 0px;
 	padding: 0px;
@@ -462,7 +459,7 @@ img {
 	border:none;
 }
 
-div.imagesubtitle {
+span.imagesubtitle {
 	margin:3px 3px;
 	text-align:justify;
 	font-size:0.98em;
@@ -473,7 +470,7 @@ div.imagesubtitle {
 /* -------------------------------------------------------- */
 /* [bildlinks|...] */
 /* --------------- */
-div.leftcontentimage {
+span.leftcontentimage {
 	margin:6px 20px 6px 20px;
 	max-width:200px;
 	float:left;
@@ -489,7 +486,7 @@ img.leftcontentimage {
 /* -------------------------------------------------------- */
 /* [bildrechts|...] */
 /* ---------------- */
-div.rightcontentimage {
+span.rightcontentimage {
 	margin:6px 20px 6px 20px;
 	max-width:200px;
 	float:right;

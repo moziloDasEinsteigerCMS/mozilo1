@@ -2,9 +2,9 @@
 
 /* 
 * 
-* $Revision: 163 $
-* $LastChangedDate: 2009-01-30 17:38:26 +0100 (Fr, 30 Jan 2009) $
-* $Author: oliver $
+* $Revision: 198 $
+* $LastChangedDate: 2009-05-13 20:09:42 +0200 (Mi, 13 Mai 2009) $
+* $Author: arvid $
 *
 */
 
@@ -132,9 +132,9 @@ function show_files($dir, $currentfile, $includedrafts)
 		// Position ist belegt: Seintennamen anzeigen
 		else {
 			if (
-				(specialNrDir($dir, addFrontZero($pos)) == $currentfile.$EXT_PAGE) 
-				|| (specialNrDir($dir, addFrontZero($pos)) == $currentfile.$EXT_HIDDEN) 
-				|| (specialNrDir($dir, addFrontZero($pos)) == $currentfile.$EXT_DRAFT)
+				(specialNrFile($dir, addFrontZero($pos)) == $currentfile.$EXT_PAGE) 
+				|| (specialNrFile($dir, addFrontZero($pos)) == $currentfile.$EXT_HIDDEN) 
+				|| (specialNrFile($dir, addFrontZero($pos)) == $currentfile.$EXT_DRAFT)
 				) {
 				$selected = "selected=\"selected\" ";
 			}
@@ -142,7 +142,7 @@ function show_files($dir, $currentfile, $includedrafts)
 				$selected = " ";
 			}
 			$content .= "<option ".$selected."style=\"color:lightgrey;\">";
-			$fullname = $specialchars->rebuildSpecialChars(specialNrDir($dir, addFrontZero($pos)), true);
+			$fullname = $specialchars->rebuildSpecialChars(specialNrFile($dir, addFrontZero($pos)), true);
 			$content .= addFrontZero($pos)." ".substr($fullname, 0, strlen($fullname)-strlen(".txt"));
 			$content .= "</option>";
 		}
@@ -165,7 +165,7 @@ function getDirs($dir)
 		$handle = opendir($dir);
 		while($file = readdir($handle))
 		{
-			if(isValidDirOrFile($file) && !is_file($file))
+			if(isValidDirOrFile($file) && !is_file("$dir/$file"))
 			{
 				array_push($vergeben, substr($file,0,2));
 			}
@@ -212,7 +212,7 @@ function specialNrDir($dir, $nr)
 		$vergeben = array();
 		while($file = readdir($handle))
 		{
-			if(isValidDirOrFile($file) && !is_file($file))
+			if(isValidDirOrFile($file) && !is_file("$dir/$file"))
 			{
 				if(substr($file,0,2)==$nr)
 				{
@@ -228,12 +228,13 @@ function specialNrDir($dir, $nr)
  @author: Oliver Lorenz
  Sucht nach einer Datei, die mit einer Bestimmten Nummern-Praefix beginnt
  --------------------------------------------------------------------------------*/
+
 function specialNrFile($dir, $nr) {
 	$dir = stripslashes($dir);
 	if (!is_file($dir)){
 		$handle = opendir($dir);
 		while($file = readdir($handle)) {
-			if(isValidDirOrFile($file) && is_file($file)) {
+			if(isValidDirOrFile($file) && is_file("$dir/$file")) {
 				if(substr($file,0,2)==$nr) {
 					return substr($file,3);
 				}
@@ -250,16 +251,21 @@ function specialNrFile($dir, $nr) {
 function createCategory()
 {
 	global $specialchars;
-	global $CMS_CONF;
+	global $ADMIN_CONF;
+	
 	$betterString = $specialchars->replaceSpecialChars($_REQUEST["name"]);
 	mkdir ("../kategorien/".$_REQUEST["position"]."_".$betterString, 0777);
 	mkdir ("../kategorien/".$_REQUEST["position"]."_".$betterString."/dateien", 0777);
 	// chmod, wenn so eingestellt
-	if ($CMS_CONF->get("chmodnewfiles") == "true") {
-		chmod ("../kategorien/".$_REQUEST["position"]."_".$betterString, octdec($CMS_CONF->get("chmodnewfilesatts")));
-		chmod ("../kategorien/".$_REQUEST["position"]."_".$betterString."/dateien", octdec($CMS_CONF->get("chmodnewfilesatts")));
+	if ($ADMIN_CONF->get("chmodnewfiles") == "true") {
+		$mode = $ADMIN_CONF->get("chmodnewfilesatts");
+        // X-Bit setzen, um Verzeichniszugriff zu garantieren
+		if(substr($mode,0,1) >=2 and substr($mode,0,1) <= 6) $mode = $mode + 100;
+		if(substr($mode,1,1) >=2 and substr($mode,1,1) <= 6) $mode = $mode + 10;
+		if(substr($mode,2,1) >=2 and substr($mode,2,1) <= 6) $mode = $mode + 1;
+		chmod ("../kategorien/".$_REQUEST["position"]."_".$betterString, octdec($mode));
+		chmod ("../kategorien/".$_REQUEST["position"]."_".$betterString."/dateien", octdec($mode));
 	}
-
 }
 
 function getFreeDirs($dir)
@@ -328,7 +334,7 @@ function getDirContentAsArray($dir, $includefiles) {
 		while($file = readdir($handle)) {
 			if(isValidDirOrFile($file)) {
 				// wenn $includefiles true ist, werden auch Dateien ins Array gesteckt; sonst nur Verzeichnisse
-				if (($includefiles == true) || !is_file($file))
+				if (($includefiles == true) || !is_file("$dir/$file"))
 				array_push($dircontent, $file);
 			}
 		}
@@ -384,6 +390,10 @@ function convertFileSizeUnit($filesize){
 // Ändert Referenzen auf eine Inhaltsseite in allen anderen Inhaltsseiten
 // ------------------------------------------------------------------------------
 	function updateReferencesInAllContentPages($oldCategory, $oldPage, $newCategory, $newPage) {
+		# Wichtig !!!!!!
+		# Rename CAT: $oldPage und $newPage müssen leer sein, $oldCategory und $newCategory aber gesetzt
+		# Rename PAGE: $newCategory muss leer sein, $oldCategory, $oldPage und $newPage aber gesetzt
+		# Move PAGE: Alle müssen gefüllt sein
 		global $CONTENT_DIR_REL;
 		
 		// Alle Kategorien einlesen
@@ -401,7 +411,7 @@ function convertFileSizeUnit($filesize){
 						// Datei schließen
 						@fclose($pagehandle);
 						// Referenzen im Inhalt ersetzen
-						$result = updateReferencesInText($pagecontent, $currentcategory, $oldCategory, $oldPage, $newCategory, $newPage);
+						$result = updateReferencesInText($pagecontent, $currentcategory, $currentpage, $oldCategory, $oldPage, $newCategory, $newPage);
 						// Ersetzung nur vornehmen, wenn überhaupt Referenzen auftauchen
 						if ($result[0]) {
 						// Inhaltsseite speichern
@@ -413,88 +423,115 @@ function convertFileSizeUnit($filesize){
 			}
 		}
 		closedir($contentdirhandle);
-
-		
-		//echo "updateReferences($oldCategory, $oldPage, $newCategory, $newPage)";
 	}
 		
-// ------------------------------------------------------------------------------
-// Ändert Referenzen auf eine Inhaltsseite in einem übergebenen Text
-// ------------------------------------------------------------------------------
-	function updateReferencesInText($currentPagesContent, $currentPagesCategory, $oldCategoryOfMovedPage, $oldNameOfMovedPage, $newCategoryOfMovedPage, $newNameOfMovedPage) {
+	// ------------------------------------------------------------------------------
+	// Ändert Referenzen auf eine Inhaltsseite in einem übergebenen Text
+	// ------------------------------------------------------------------------------
+	function updateReferencesInText($currentPagesContent, $currentPagesCategory, $movedPage, $oldCategory, $oldPage, $newCategory, $newPage) {
 		global $specialchars;
-		
-		$currentPagesCategory 	= $specialchars->rebuildSpecialChars($currentPagesCategory,true);
-		$oldCategoryOfMovedPage = $specialchars->rebuildSpecialChars($oldCategoryOfMovedPage,true);
-		$newCategoryOfMovedPage = $specialchars->rebuildSpecialChars($newCategoryOfMovedPage,true);
-		$newNameOfMovedPage 	= $specialchars->rebuildSpecialChars($newNameOfMovedPage,true);
-		$oldNameOfMovedPage 	= $specialchars->rebuildSpecialChars($oldNameOfMovedPage,true);
-		
-		// Fileextension wegschneiden
-		$currentPagesCategory 	= substr($currentPagesCategory,3,strlen($currentPagesCategory));
-		$oldCategoryOfMovedPage = substr($oldCategoryOfMovedPage,3,strlen($oldCategoryOfMovedPage));
-		$newCategoryOfMovedPage = substr($newCategoryOfMovedPage,3,strlen($newCategoryOfMovedPage));
-		$newNameOfMovedPage 	= substr($newNameOfMovedPage,3,strlen($newNameOfMovedPage)-7);
-		$oldNameOfMovedPage 	= substr($oldNameOfMovedPage,3,strlen($oldNameOfMovedPage)-7);
-		
-		// Flag: muß wirklich was ersetzt werden?
+		global $CONTENT_DIR_REL;
+
+		$pos_currentPagesCategory 	= $specialchars->rebuildSpecialChars($currentPagesCategory,false);
+		$pos_oldCategory		= $specialchars->rebuildSpecialChars($oldCategory,false);
+		$pos_oldPage			= $specialchars->rebuildSpecialChars($oldPage,false);
+		$pos_newCategory 		= $specialchars->rebuildSpecialChars($newCategory,false);
+		$pos_newPage 			= $specialchars->rebuildSpecialChars($newPage,false);
+		$movedPage 			= $specialchars->rebuildSpecialChars($movedPage,false);
+
 		$changesmade = false;
+	
+		$oldCategory	= html_entity_decode(substr($pos_oldCategory,3));
+		$oldPage	= html_entity_decode(substr($pos_oldPage,3,-4));
+		$newCategory 	= html_entity_decode(substr($pos_newCategory,3));
+		$newPage 	= html_entity_decode(substr($pos_newPage,3,-4));
 
 		// Nach Texten in eckigen Klammern suchen
 		preg_match_all("/\[([^\[\]]+)\|([^\[\]]*)\]/Um", $currentPagesContent, $matches);
 		$i = 0;
+	
+		$allowed_attributes = array("seite","kategorie","datei","bild","bildlinks","bildrechts","include");
+	
 		// Für jeden Treffer...
 		foreach ($matches[0] as $match) {
 			// ...Auswertung und Verarbeitung der Informationen
 			$attribute = $matches[1][$i];
-			$value = $matches[2][$i];
-			
-			// Link auf Inhaltsseite in aktueller oder anderer Kategorie (überprüfen, ob Inhaltsseite existiert)
-			if ($attribute == "seite" || substr($attribute,0,6) == "seite=") {
-				
-				$seite = "";
-				$kategorie = "";
-				
+			$replace_match = "";
+			if(strstr($attribute,"=")) {
+				$allowed_test = substr($attribute,0,strpos($attribute,"="));
 
-				$valuearray = explode(":", $value);
-				if (count($valuearray) == 2) 
-				{
-					$kategorie = $valuearray[0];
-					$seite = $valuearray[1];
-				}
-				else
-				{
-					$seite = $valuearray[0];
-				}
-				
-				if($newCategoryOfMovedPage != $oldCategoryOfMovedPage)
-				{
-					$kategorie = $newCategoryOfMovedPage;
-					$changesmade = true;
-				}
-				
-				if($newNameOfMovedPage != $oldNameOfMovedPage)
-				{
-					$seite = $newNameOfMovedPage;
-					$changesmade = true;
-				}
-				
-				if ($changesmade && $seite == $oldNameOfMovedPage) {
-					// Inhaltsseite liegt in "meiner" Kategorie
-					if ($kategorie == "") {
-						$currentPagesContent = str_replace ("$match", "[".$attribute."|".html_entity_decode($seite)."]", $currentPagesContent);
-					}
-					// Inhaltsseite ist in anderer Kategorie
-					else {
-						$currentPagesContent = str_replace ("$match", "[".$attribute."|".html_entity_decode($kategorie).":".html_entity_decode($seite)."]", $currentPagesContent);
-					}
-				}
+			} else {
+				$allowed_test = $attribute;
 			}
-			$i++;
+			if(in_array($allowed_test,$allowed_attributes))
+			{
+$debug = false;
+if($debug) echo "match = $match -----------<br>\n";
+if($debug) echo "datei = $pos_currentPagesCategory/$movedPage<br>\n";
+				# weil oldPage und newPage lehr sind Kategorie rename
+				if(!empty($oldCategory) and !empty($newCategory) and empty($oldPage) and empty($newPage))
+				{
+					# einfach alle oldCategory -> newCategory
+					if(strstr($match,"|".$oldCategory.":") or strstr($match,"|".$oldCategory."]"))  
+					{
+						$replace_match = str_replace($oldCategory,$newCategory,$match);
+if($debug) echo "cat = $match -> $replace_match<br>\n";
+					}
+				}
+				# weil newCategory lehr Inhaltseite rename
+				if(!empty($oldCategory) and empty($newCategory) and !empty($oldPage) and !empty($newPage))
+				{
+					# ist [attribut|oldCategory:oldPage] dann oldPage -> newPage
+					# oder ist [attribut|oldPage] und die untersuchende datei in oldCategory dann oldPage -> newPage
+					if((strstr($match,"|$oldCategory:$oldPage]") or (strstr($match,"|$oldPage]")
+					and $pos_oldCategory == $pos_currentPagesCategory )))
+					{
+						$replace_match = str_replace($oldPage,$newPage,$match);
+if($debug) echo "page = $match -> $replace_match<br>\n";
+					}
+				}
+				# alles voll dann move Inhaltseite in andere Kategorie
+				if(!empty($oldCategory) and !empty($newCategory) and !empty($oldPage) and !empty($newPage))
+				{
+					# weil in der zu bearbeitende Inhaltseite ein Object ist
+					# das in alten Kategorie liegt neue Kategorie einfügen
+					if($movedPage == $pos_newPage
+					and !strstr($match,":")
+					and $oldCategory != $newCategory)
+					{
+						$replace_match = str_replace("|","|$oldCategory:",$match);
+if($debug) echo "+++cat = $match -> $replace_match<br>\n";
+						}
+					# weil in der zu bearbeitende Inhaltseite ein Object ist
+					# das in der Kategorie liegt in die die Inhaltseite verschoben wird,
+					# Kategorie entfernen
+					elseif($movedPage == $pos_newPage
+					and strstr($match,":")
+					and $pos_currentPagesCategory == $pos_newCategory)
+					{
+						$replace_match = str_replace("|$newCategory:","|",$match);
+if($debug) echo "---cat = $match -> $replace_match<br>\n";
+					}
+					# alle andern Inhaltseiten die [attribut|oldCategory:oldPage] enthalten ändern
+					elseif(strstr($match,"|$oldCategory:$oldPage]"))
+					{
+						$replace_match = str_replace("$oldCategory:$oldPage","$newCategory:$newPage",$match);
+if($debug) echo "cat_page = $match -> $replace_match<br>\n";
+					}
+				}
+				# änderung nur wenn was geändert wurde
+				if(!empty($replace_match) and $matches[0][$i] != $replace_match) {
+					$currentPagesContent = str_replace ($matches[0][$i], $replace_match, $currentPagesContent);
+if($debug) echo "diff == match = ".$matches[0][$i]." | replace_match = $replace_match<br>\n";
+					$changesmade = true;
+				}
+if($debug) echo "<br>\n";
+			}	
+		$i++;
 		}
-		
-		// Konvertierten Seiteninhalt zurückgeben
-    return array($changesmade, $currentPagesContent);
+	// Konvertierten Seiteninhalt zurückgeben
+	return array($changesmade, $currentPagesContent);
 	}
+		
 
 ?>

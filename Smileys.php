@@ -2,8 +2,8 @@
 
 /* 
 * 
-* $Revision: 115 $
-* $LastChangedDate: 2009-01-27 21:14:39 +0100 (Di, 27 Jan 2009) $
+* $Revision: 192 $
+* $LastChangedDate: 2009-04-29 17:46:45 +0200 (Mi, 29 Apr 2009) $
 * $Author: arvid $
 *
 */
@@ -21,7 +21,7 @@
 		Arvid Zimmermann 2007 <moziloWiki@azett.com>
 		
 */
-require_once("Properties.php");
+// require_once("Properties.php"); // unnötig, da bereits in index.php includiert
 
 class Smileys {
 	

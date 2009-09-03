@@ -2,14 +2,17 @@
 
 /* 
 * 
-* $Revision: 115 $
-* $LastChangedDate: 2009-01-27 21:14:39 +0100 (Di, 27 Jan 2009) $
+* $Revision: 190 $
+* $LastChangedDate: 2009-04-23 21:42:09 +0200 (Do, 23 Apr 2009) $
 * $Author: arvid $
 *
 */
 
 	require_once("Properties.php");
 	
+	// Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
+	@ini_set("display_errors", 0);
+
 	$ERRORMESSAGE = "Fehlerhafter Parameter übergeben.";	
 	$DOWNLOADS = new Properties("conf/downloads.conf");
 
