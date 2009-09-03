@@ -74,15 +74,15 @@ INHALT
 		$USE_CMS_SYNTAX = false;
 
 	if (isset($_GET['cat']))
-		$CAT_REQUEST 				= htmlentities(stripslashes($_GET['cat']));
+		$CAT_REQUEST 				= preg_replace('/(\/|\\\)/', "", htmlentities(stripslashes($_GET['cat'])));
 	else
 		$CAT_REQUEST 				= "";
 
 	if (isset($_GET['page']))
-		$PAGE_REQUEST 				= htmlentities(stripslashes($_GET['page']));
+		$PAGE_REQUEST 				= preg_replace('/(\/|\\\)/', "", htmlentities(stripslashes($_GET['page'])));
 	else
 		$PAGE_REQUEST 				= "";
-
+	
 	if (isset($_GET['action']))
 		$ACTION_REQUEST 				= htmlentities(stripslashes($_GET['action']));
 	else
@@ -244,7 +244,7 @@ INHALT
     	$HTML = preg_replace('/{WEBSITE_KEYWORDS}/', "<meta name=\"keywords\" content=\"".$mainconfig->get("websitekeywords")."\" />", $HTML);
 
     // Meta-Tag "description" (nur ersetzen, wenn nicht leer)
-		if ($mainconfig->get("websitekeywords") == "")
+		if ($mainconfig->get("websitedescription") == "")
     	$HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', "", $HTML);
     else
     	$HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', "<meta name=\"description\" content=\"".$mainconfig->get("websitedescription")."\" />", $HTML);
