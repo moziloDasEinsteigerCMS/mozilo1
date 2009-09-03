@@ -1040,11 +1040,13 @@ echo "</pre>";
 		return $form;
 	}
 
-	// Sichert einen Input-Wert
-	function cleanInput($input) {
-		$input = mb_convert_encoding($input, "ISO-8859-1");
-		return htmlentities($input, ENT_QUOTES, 'ISO8859-1');	
-	}
+    // Sichert einen Input-Wert
+    function cleanInput($input) {
+        if (function_exists("mb_convert_encoding")) {
+            $input = mb_convert_encoding($input, "ISO-8859-1");
+        }
+        return htmlentities($input, ENT_QUOTES, 'ISO8859-1');    
+    } 
 	
 	// Prüft einen Requestparameter
 	function getRequestParam($param, $clean) {
