@@ -800,8 +800,9 @@ select
 	
 }
 select.overviewselect {
-	width:120px;
-	max-width:120px;
+	width:90px;
+	max-width:90px;
+	font-size:0.8em;
 }
 Input.text1
 {
@@ -825,7 +826,6 @@ Input.text2
 
 textarea {
 	width:645px;
-	height:350px;
 	border: 1px solid #C0C0C0;
 	margin: 10px;
 	background-color:#ffffff;

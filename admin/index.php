@@ -10,6 +10,15 @@ $ADMIN_TITLE = "moziloAdmin";
 	require_once("string.php");
 	$ADMIN_CONF	= new Properties("conf/basic.conf");
 	$CMS_CONF	= new Properties("../main.conf");
+	
+/* Pfade */
+	$CONTENT_DIR_NAME		= "kategorien";
+	$CONTENT_DIR_REL		= "../".$CONTENT_DIR_NAME;
+	$GALLERIES_DIR_NAME	= "galerien";
+	$GALLERIES_DIR_REL	= "../".$GALLERIES_DIR_NAME;
+	$PREVIEW_DIR_NAME		= "vorschau";
+
+
 
 /* Aktion abhängig vom action-Parameter */
 	$action = $_GET['action'];
@@ -151,19 +160,24 @@ $ADMIN_TITLE = "moziloAdmin";
 	
 /* Seiteninhalt */
 	$html .= "<div id=\"div_content\">";
+
 	// Warnung, wenn noch das Initialpaßwort verwendet wird
 	$loginconf = new Properties("conf/logindata.conf");
 	if (($loginconf->get("initialpw") == "true") && ($action <> "loginadminconfig"))
 		$html .= returnMessage(false, getLanguageValue("warning_initial_pw"));
-	// Warnung, wenn die letzte Backupwarnung mehr als einen Monat her ist
-	// 2592000 = 60 * 60 * 24 * 30 = 30 Tage = 1 Monat
-	if (getLastBackup() == 0)
-		setLastBackup();
-	else {
-		$month = getLastBackup() + 2592000;
-		if($month < time())	{
-			$html .= returnMessage(false, getLanguageValue("reminder_backup"));
+
+	// Warnung, wenn die letzte Backupwarnung mehr als $intervallsetting Tage her ist
+	$intervallsetting = $ADMIN_CONF->get("backupmsgintervall");
+	if (($intervallsetting != "") && preg_match("/^[0-9]+$/", $intervallsetting) && ($intervallsetting > 0)) {
+		$intervallinseconds = 60 * 60 * 24 * $intervallsetting;
+		if (getLastBackup() == 0)
 			setLastBackup();
+		else {
+			$nextbackup = getLastBackup() + $intervallinseconds;
+			if($nextbackup <= time())	{
+				$html .= returnMessage(false, getLanguageValue("reminder_backup"));
+				setLastBackup();
+			}
 		}
 	}
 	$html .= $pagecontent;
@@ -204,10 +218,13 @@ echo $html;
 		return array(getLanguageValue("button_category"), $pagecontent);
 	}
 
-	function newCategory() 
-	{
+	function newCategory() {
 		
 		global $action;
+		global $CONTENT_DIR_REL;
+		
+		$specialcharregex = "/^[a-zA-Z0-9_\-äöüÄÖÜß\s\?\!\&\€\<\>\@\.]+$/";
+		
 		$pagecontent = "";
 		
 		$title = getLanguageValue("button_category_new");
@@ -223,22 +240,22 @@ echo $html;
 			}
 			elseif(strlen($_GET["position"])>2)
 			{
-				$message1 = getLanguageValue("category_exist");
+				$message1 = htmlentities($_GET['name']).": ".getLanguageValue("category_exist");
 			}
-			elseif(!(preg_match("/^[a-zA-Z0-9_\-äöüÄÖÜß\s]+$/", $_GET["name"])))
+			elseif(!(preg_match($specialcharregex, $_GET["name"])))
 			{
-				$message4 = getLanguageValue("category_name_wrong");
+				$message4 = htmlentities($_GET['name']).": ".getLanguageValue("category_name_wrong");
 				$nameconflict = true;	
 			}
 			elseif(strlen($_GET["name"])>64)
 			{
-				$message4 = getLanguageValue("name_too_long");
+				$message4 = htmlentities($_GET['name']).": ".getLanguageValue("name_too_long");
 				$nameconflict = true;	
 			}
 			if(strlen($_GET["position"])<3 && strlen($_GET["name"]) != 0 && !$nameconflict)
 			{
 				createInhalt();
-				$message2 = getLanguageValue("category_created_ok");
+				$message2 = htmlentities($_GET['name']).": ".getLanguageValue("category_created_ok");
 			}
 		}
 		
@@ -288,7 +305,7 @@ echo $html;
 		// Zeile "NEUE POSITION"
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\"><a accesskey=\"".createNormalTooltip("category_numbers", "category_number_help", 150)."\"><img class=\"right\" src=\"gfx/information.gif\" alt=\"info\"></a>".getLanguageValue("choose_category_position")."</td>";
-		$pagecontent .= "<td class=\"config_row2\">".show_dirs("../inhalt/")."</td>";
+		$pagecontent .= "<td class=\"config_row2\">".show_dirs("$CONTENT_DIR_REL/")."</td>";
 		$pagecontent .= "</tr>";
 		// Zeile "SUBMIT"
 		$pagecontent .= "<tr>";
@@ -303,31 +320,41 @@ echo $html;
 	function editCategory() {
 		global $action;
 		global $specialchars;
+		global $CONTENT_DIR_REL;
+		
+		$specialcharregex = "/^[a-zA-Z0-9_\-äöüÄÖÜß\s\?\!\&\€\<\>\@\.]+$/";
+
 		$pagecontent .= "<h2>".getLanguageValue("button_category_edit")."</h2>";
 		$goto = "";
 		
 		if(isset($_GET["submit"])) {
 			// Position frei
 			if (strlen($_GET["position"])<3) {
-				rename("../inhalt/".$_GET["cat"],"../inhalt/".$_GET["position"]."_".$specialchars->deleteSpecialChars($_GET["newname"]));
-				$pagecontent .= returnMessage(true,getLanguageValue("category_edited"));
+				@rename("$CONTENT_DIR_REL/".$_GET["cat"],"$CONTENT_DIR_REL/".$_GET["position"]."_".$specialchars->deleteSpecialChars($_GET["newname"]));
+				$pagecontent .= returnMessage(true, htmlentities($_GET["newname"]).": ".getLanguageValue("category_edited"));
+				$done = true;
 			}
 			// Position belegt, aber mit der gleichen Kategorie >> UMBENENNEN
 			elseif (substr($_GET["position"],0,2)."_".$specialchars->deleteSpecialChars(substr($_GET["position"],3)) == $_GET["cat"]) {
-				if (rename("../inhalt/".$_GET["cat"], "../inhalt/".substr($_GET["position"],0,2)."_".$specialchars->deleteSpecialChars($_GET["newname"]))) {
-					$pagecontent .= returnMessage(true,getLanguageValue("category_edited"));
-					$_GET["cat"] = substr($_GET["position"],0,2)."_".$specialchars->deleteSpecialChars($_GET["newname"]);
+				if (preg_match($specialcharregex, $_GET["cat"])) {
+					if (@rename("$CONTENT_DIR_REL/".$_GET["cat"], "$CONTENT_DIR_REL/".substr($_GET["position"],0,2)."_".$specialchars->deleteSpecialChars($_GET["newname"]))) {
+						$pagecontent .= returnMessage(true, htmlentities($_GET["newname"]).": ".getLanguageValue("category_edited"));
+						$_GET["cat"] = substr($_GET["position"],0,2)."_".$specialchars->deleteSpecialChars($_GET["newname"]);
+						$done = true;
+					}
 				}
+				else
+					$pagecontent .= returnMessage(false, htmlentities($_GET["cat"]).": ".getLanguageValue("invalid_values"));
 			}
 			// Position mit anderer Kategorie belegt
 			else
 			{
-				$pagecontent .= returnMessage(false,getLanguageValue("position_in_use"));
+				$pagecontent .= returnMessage(false, htmlentities($_GET["cat"]).": ".getLanguageValue("position_in_use"));
 				$goto = "->";
 			}
 		}
 		
-		if(!isset($_GET["cat"]) && $goto != "->")
+		if((!isset($_GET["cat"]) && $goto != "->") || $done)
 		{
 			// 1. Seite
 			$pagecontent .= "<p>";
@@ -353,7 +380,7 @@ echo $html;
 			$pagecontent .= "</table>";
 			$pagecontent .= "</form>";
 		}
-		if(isset($_GET["cat"]) || $goto == "->")
+		elseif(isset($_GET["cat"]) || $goto == "->")
 		{
 			$pagecontent .= "<p>";
 			$pagecontent .= getLanguageValue("category_choosed");
@@ -373,7 +400,7 @@ echo $html;
 			$pagecontent .= "<tr>";
 			$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("current_category_position")."</td>";
 			$pagecontent .= "<td class=\"config_row2\">";
-			$pagecontent .= show_dirs("../inhalt");
+			$pagecontent .= show_dirs("$CONTENT_DIR_REL");
 			$pagecontent .= "</td>";
 			$pagecontent .= "</tr>";
 			$pagecontent .= "<tr>";
@@ -390,33 +417,33 @@ echo $html;
 
 	function deleteCategory() {
 		global $specialchars;
+		global $CONTENT_DIR_REL;
 		$pagecontent = "<h2>".getLanguageValue("button_category_delete")."</h2>";
 		// Löschen der Kategorie nach Auswertung der übergebenen Parameter
-		if (isset($_GET['cat']) && file_exists("../inhalt/".$_GET['cat'])) {
+		if (isset($_GET['cat']) && file_exists("$CONTENT_DIR_REL/".$_GET['cat'])) {
 			if (isset($_GET['confirm']) && ($_GET['confirm'] == "true")) {
-				if (deleteDir("../inhalt/".$_GET['cat']))
-					$pagecontent .= returnMessage(true, getLanguageValue("category_deleted"));
+				if (deleteDir("$CONTENT_DIR_REL/".$_GET['cat']))
+					$pagecontent .= returnMessage(true, $specialchars->rebuildSpecialChars(substr($_GET['cat'], 3, strlen($_GET['cat'])), true).": ".getLanguageValue("category_deleted"));
 				else
-					$pagecontent .= returnMessage(false, getLanguageValue("category_delete_error"));
+					$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars(substr($_GET['cat'], 3, strlen($_GET['cat'])), true).": ".getLanguageValue("category_delete_error"));
 			}
 			else
 				$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars(substr($_GET['cat'], 3, strlen($_GET['cat'])), true).": ".getLanguageValue("category_delete_confirm")." <a href=\"index.php?action=deletecategory&amp;cat=".$_GET['cat']."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=deletecategory\">".getLanguageValue("no")."</a>");
 		}
 		
 		$pagecontent .= "<p>".getLanguageValue("category_delete_text")."</p>";
-		$dirs = getDirs("../inhalt");
+		$dirs = getDirs("$CONTENT_DIR_REL");
 		$pagecontent .= "<table class=\"data\">";
 		foreach ($dirs as $file) {
-			$file = $file."_".specialNrDir("../inhalt", $file);
+			$file = $file."_".specialNrDir("$CONTENT_DIR_REL", $file);
 			if (($file <> ".") && ($file <> "..") 
-				&& ($pageshandle = opendir("../inhalt/".$file)) 
-				&& ($fileshandle = opendir("../inhalt/".$file."/dateien")) 
-				&& ($galleryhandle = opendir("../inhalt/".$file."/galerie")) 
+				&& ($pageshandle = opendir("$CONTENT_DIR_REL/".$file)) 
+				&& ($fileshandle = opendir("$CONTENT_DIR_REL/".$file."/dateien")) 
 				) {
 				// Anzahl Inhaltsseiten auslesen
 				$pagescount = 0;
 				while (($currentpage = readdir($pageshandle))) {
-					if (is_file("../inhalt/".$file."/".$currentpage))
+					if (is_file("$CONTENT_DIR_REL/".$file."/".$currentpage))
 						$pagescount++;
 				}
 				// Anzahl Dateien auslesen
@@ -425,25 +452,15 @@ echo $html;
 					if (($filesdir <> ".") && ($filesdir <> ".."))
 						$filecount++;
 				}
-				// Anzahl Galeriebilder auslesen
-				$gallerycount = 0;
-				while (($gallerydir = readdir($galleryhandle))) {
-					if (is_file("../inhalt/".$file."/galerie/".$gallerydir) && ($gallerydir <> "texte.conf"))
-						$gallerycount++;
-				}
 				if ($pagescount == 1)
 					$pagestext = getLanguageValue("single_page");
 				else
 					$pagestext = getLanguageValue("many_pages");
-				if ($gallerycount == 1)
-					$galleriestext = getLanguageValue("single_gallerypic");
-				else
-					$galleriestext = getLanguageValue("many_gallerypics");
 				if ($filecount == 1)
 					$filestext = getLanguageValue("single_file");
 				else
 					$filestext = getLanguageValue("many_files");
-				$pagecontent .= "<tr><td class=\"config_row1\"><h3>".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</h3> ($pagescount $pagestext, $gallerycount $galleriestext, $filecount $filestext)</td>";
+				$pagecontent .= "<tr><td class=\"config_row1\"><h3>".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</h3> ($pagescount $pagestext, $filecount $filestext)</td>";
 				$pagecontent .= "<td class=\"config_row2\"><a href=\"index.php?action=deletecategory&amp;cat=$file".""."\">".getLanguageValue("button_delete")."</a></td></tr>";
 			}
 		}
@@ -465,18 +482,20 @@ echo $html;
 
 	function newSite() {
 		global $specialchars;
-
+		global $CONTENT_DIR_REL;
+		
+		$specialcharregex = "/^[a-zA-Z0-9_\-äöüÄÖÜß\s\?\!\&\€\<\>\@\.]+$/";
 		// Wenn nach dem Editieren "Speichern" gedrückt wurde
 		if (isset($_POST['save'])) {
 			// Entwurf speichern
 			if ($_POST['draft'] == "on") {
-				saveContentToPage($_POST['pagecontent'],"../inhalt/".$_POST['cat']."/".substr($_POST['page'], 0, strlen($_POST['page'])-4).".tmp");
+				saveContentToPage($_POST['pagecontent'],"$CONTENT_DIR_REL/".$_POST['cat']."/".substr($_POST['page'], 0, strlen($_POST['page'])-4).".tmp");
 			}
 			// Veröffentlichen
 			else {
-				saveContentToPage($_POST['pagecontent'],"../inhalt/".$_POST['cat']."/".$_POST['page']);
+				saveContentToPage($_POST['pagecontent'],"$CONTENT_DIR_REL/".$_POST['cat']."/".$_POST['page']);
 			}
-			$pagecontent = returnMessage(true, getLanguageValue("changes_applied"));
+			$pagecontent = returnMessage(true, htmlentities(substr($_POST['page'], 3,strlen($_POST['page'])-7)).": ".getLanguageValue("changes_applied"));
 		}
 		
 		// Wenn nach dem Editieren "Abbrechen" gedrückt wurde
@@ -488,7 +507,7 @@ echo $html;
 				(
 					isset($_POST['position']) && isset($_POST['name']) 
 					&& (strlen($_POST['name']) == 0)
-					&& (!preg_match("/^[a-zA-Z0-9_\-äöüÄÖÜß\s]+$/", $_POST['name']))
+					&& (!preg_match($specialcharregex, $_POST['name']))
 					&& (strlen($_POST['position'])>2)
 				) 
 			) {
@@ -497,10 +516,10 @@ echo $html;
 			if (isset($_POST['position']) && isset($_POST['name'])) {
 				if (strlen($_POST['name']) == 0)
 					$pagecontent .= returnMessage(false, getLanguageValue("page_empty"));
-				elseif (!preg_match("/^[a-zA-Z0-9_\-äöüÄÖÜß\s]+$/", $_POST["name"]))
-					$pagecontent .= returnMessage(false, getLanguageValue("invalid_values"));
+				elseif (!preg_match($specialcharregex, $_POST["name"]))
+					$pagecontent .= returnMessage(false, htmlentities($_POST['name']).": ".getLanguageValue("invalid_values"));
 				elseif (strlen($_POST["position"])>2)
-					$pagecontent .= returnMessage(false, getLanguageValue("page_exist"));	
+					$pagecontent .= returnMessage(false, htmlentities($_POST['name']).": ".getLanguageValue("page_exist"));	
 			}
 			$pagecontent .= "<form action=\"index.php\" method=\"POST\"><input type=\"hidden\" name=\"action\" value=\"newsite\"><input type=\"hidden\" name=\"cat\" value=\"".$_POST['cat']."\">";
 			$pagecontent .= "<table class=\"data\">";
@@ -510,7 +529,7 @@ echo $html;
 			$pagecontent .= "</tr>";
 			$pagecontent .= "<tr>";
 			$pagecontent .= "<td class=\"config_row1\"><a accesskey=\"".createNormalTooltip("page_numbers", "page_number_help", 150)."\"><img class=\"right\" src=\"gfx/information.gif\" alt=\"info\"></a>".getLanguageValue("choose_page_position")."</td>";
-			$pagecontent .= "<td class=\"config_row2\">".show_files("../inhalt/".$_POST['cat'])."</td>";
+			$pagecontent .= "<td class=\"config_row2\">".show_files("$CONTENT_DIR_REL/".$_POST['cat'])."</td>";
 			$pagecontent .= "</tr>";
 			$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td>";
 			$pagecontent .= "<td class=\"config_row2\"><input type=\"submit\" name=\"chosen\" class=\"submit\" value=\"".getLanguageValue("button_newpage_create")."\" /></td></tr>";
@@ -536,7 +555,7 @@ echo $html;
 				isset($_POST['position']) 
 				&& isset($_POST['name']) 
 				&& strlen($_POST['name']) > 0
-				&& preg_match("/^[a-zA-Z0-9_\-äöüÄÖÜß\s]+$/", $_POST['name'])
+				&& preg_match($specialcharregex, $_POST['name'])
 				&& (strlen($_POST['position'])<=2)
 				) {
 			$pagecontent = "<h2>".getLanguageValue("button_site_new")."</h2>";
@@ -549,22 +568,23 @@ echo $html;
 
 	function editSite() {
 		global $specialchars;
+		global $CONTENT_DIR_REL;
 		$pagecontent = "<h2>".getLanguageValue("button_site_edit")."</h2>";
 		// Wenn nach dem Editieren "Speichern" gedrückt wurde
 		if (isset($_POST['save'])) {
 			// Entwurf speichern
 			if ($_POST['draft'] == "on") {
 				$newpagename = substr($_POST['page'],0,2)."_".$specialchars->deleteSpecialChars($_POST['newpage']).".tmp";
-				saveContentToPage($_POST['pagecontent'],"../inhalt/".$_POST['cat']."/".$newpagename);
+				saveContentToPage($_POST['pagecontent'],"$CONTENT_DIR_REL/".$_POST['cat']."/".$newpagename);
 			}
 			// Veröffentlichen
 			else {
 				$newpagename = substr($_POST['page'],0,2)."_".$specialchars->deleteSpecialChars($_POST['newpage']).".txt";
 				if ($newpagename <> $_POST['page'])
-					unlink("../inhalt/".$_POST['cat']."/".$_POST['page']);
-				saveContentToPage($_POST['pagecontent'],"../inhalt/".$_POST['cat']."/".$newpagename);
+					@unlink("$CONTENT_DIR_REL/".$_POST['cat']."/".$_POST['page']);
+				saveContentToPage($_POST['pagecontent'],"$CONTENT_DIR_REL/".$_POST['cat']."/".$newpagename);
 			}
-			$pagecontent = returnMessage(true, getLanguageValue("changes_applied")).$pagecontent;
+			$pagecontent = returnMessage(true, htmlentities($_POST['newpage']).": ".getLanguageValue("changes_applied")).$pagecontent;
 		}
 		// Wenn nach dem Editieren "Abbrechen" gedrückt wurde
 		elseif (isset($_POST['cancel']))
@@ -580,19 +600,19 @@ echo $html;
 		}
 		
 		else {
-			$dirs = getDirs("../inhalt");
+			$dirs = getDirs("$CONTENT_DIR_REL");
 			foreach ($dirs as $file)
 			sort($dirs);
 			$pagecontent .= "<p>".getLanguageValue("page_edit_text")."</p>";
 			foreach ($dirs as $file) {
-				$file = $file."_".specialNrDir("../inhalt", $file);
-					if (($file <> ".") && ($file <> "..") && ($subhandle = opendir("../inhalt/".$file))) {
+				$file = $file."_".specialNrDir("$CONTENT_DIR_REL", $file);
+					if (($file <> ".") && ($file <> "..") && ($subhandle = opendir("$CONTENT_DIR_REL/".$file))) {
 						$pagecontent .= "<h3>".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</h3>";
 						$hasdata = false;
 						$pagecontent .= "<table class=\"data\">";
 						$catcontent = array();
 						while (($subfile = readdir($subhandle)))
-							if (is_file("../inhalt/".$file."/".$subfile))
+							if (is_file("$CONTENT_DIR_REL/".$file."/".$subfile))
 								array_push($catcontent, $subfile);
 						sort($catcontent);
 						foreach ($catcontent as $subfile) {
@@ -619,30 +639,31 @@ echo $html;
 
 	function deleteSite() {
 		global $specialchars;
+		global $CONTENT_DIR_REL;
 		$pagecontent = "<h2>".getLanguageValue("button_site_delete")."</h2>";
 		// Löschen der Inhaltsseite nach Auswertung der übergebenen Parameter
-		if (isset($_GET['cat']) && isset($_GET['file']) && file_exists("../inhalt/".$_GET['cat']) && file_exists("../inhalt/".$_GET['cat']."/".$_GET['file'])) {
+		if (isset($_GET['cat']) && isset($_GET['file']) && file_exists("$CONTENT_DIR_REL/".$_GET['cat']) && file_exists("$CONTENT_DIR_REL/".$_GET['cat']."/".$_GET['file'])) {
 			if (isset($_GET['confirm']) && ($_GET['confirm'] == "true")) {
-				if (unlink("../inhalt/".$_GET['cat']."/".$_GET['file']))
-					$pagecontent .= returnMessage(true, getLanguageValue("page_deleted"));
+				if (@unlink("$CONTENT_DIR_REL/".$_GET['cat']."/".$_GET['file']))
+					$pagecontent .= returnMessage(true, $specialchars->rebuildSpecialChars(substr($_GET['file'], 3, strlen($_GET['file'])-7), true).": ".getLanguageValue("page_deleted"));
 				else
-					$pagecontent .= returnMessage(false, getLanguageValue("page_delete_error"));
+					$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars(substr($_GET['file'], 3, strlen($_GET['file'])-7), true).": ".getLanguageValue("page_delete_error"));
 			}
 			else
 				$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars(substr($_GET['file'], 3, strlen($_GET['file'])-7), true).": ".getLanguageValue("page_delete_confirm")." <a href=\"index.php?action=deletesite&amp;cat=".$_GET['cat']."&amp;file=".$_GET['file']."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=deletesite\">".getLanguageValue("no")."</a>");
 		}
 		$pagecontent .= "<p>".getLanguageValue("page_delete_text")."</p>";
-		$dirs = getDirs("../inhalt");
+		$dirs = getDirs("$CONTENT_DIR_REL");
 		foreach ($dirs as $file) {
-			$file = $file."_".specialNrDir("../inhalt", $file);
-			if (($file <> ".") && ($file <> "..") && ($subhandle = opendir("../inhalt/".$file))) {
+			$file = $file."_".specialNrDir("$CONTENT_DIR_REL", $file);
+			if (($file <> ".") && ($file <> "..") && ($subhandle = opendir("$CONTENT_DIR_REL/".$file))) {
 				$pagecontent .= "<h3>".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</h3>";
 				$hasdata = false;
 				$pagecontent .= "<table class=\"data\">";
 				
 				$catcontent = array();
 				while (($subfile = readdir($subhandle)))
-					if (is_file("../inhalt/".$file."/".$subfile))
+					if (is_file("$CONTENT_DIR_REL/".$file."/".$subfile))
 						array_push($catcontent, $subfile);
 				sort($catcontent);
 				foreach ($catcontent as $subfile) {
@@ -680,116 +701,159 @@ echo $html;
 
 	function newGallery() {
 		global $specialchars;
-		$pagecontent = "<h2>".getLanguageValue("button_gallery_new")."</h2>";
-		// Galeriebild hochladen
+		global $GALLERIES_DIR_REL;
+		global $PREVIEW_DIR_NAME;
+		
+		$pagecontent .= "<h2>".getLanguageValue("button_gallery_new")."</h2>";
+
+		$specialcharregex = "/^[a-zA-Z0-9_\-äöüÄÖÜß\s\?\!\&\€\<\>\@\.]+$/";
+		
 		if ($_SERVER["REQUEST_METHOD"] == "POST"){
-		  if (isset($_FILES['uploadfile']) and !$_FILES['uploadfile']['error']) {
-		    if (!fileHasExtension($_FILES['uploadfile']['name'], array("jpg", "jpeg", "jpe", "gif", "png")))
-		    	$pagecontent .= returnMessage(false, $_FILES['uploadfile']['name'].": ".getLanguageValue("gallery_uploadfile_wrongtype"));
-		    elseif (file_exists("../inhalt/".$_POST['cat']."/galerie/".$_FILES['uploadfile']['name']))
-		    	$pagecontent .= returnMessage(false, $_FILES['uploadfile']['name'].": ".getLanguageValue("gallery_uploadfile_exists"));
-		    elseif (!preg_match("/^[a-zA-Z0-9_\-äöüÄÖÜß.]+$/", $_FILES['uploadfile']['name'])) {
-		    	$pagecontent .= returnMessage(false, getLanguageValue("invalid_values"));
-		  	}
-		  	else {
-		  		// Bild und Kommentar speichern
-		    	move_uploaded_file($_FILES['uploadfile']['tmp_name'], "../inhalt/".$_POST['cat']."/galerie/".$_FILES['uploadfile']['name']);
-					$galleryconf = new Properties("../inhalt/".$_POST['cat']."/galerie/texte.conf");
-					$galleryconf->set($_FILES['uploadfile']['name'], stripslashes($_POST['comment']));
-		  		// Vorschaubild erstellen (nur, wenn GDlib installiert ist)
-					if (extension_loaded("gd")) {
-						require_once("../Thumbnail.php");
-						$tn = new Thumbnail();
-						$tn->createThumb($_FILES['uploadfile']['name'], "../inhalt/".$_POST['cat']."/galerie/", "../inhalt/".$_POST['cat']."/galerie/vorschau/");
+			if (isset($_POST['galleryname']) && preg_match($specialcharregex, $_POST['galleryname'])) {
+				$dirname = $specialchars->deleteSpecialChars($_POST['galleryname']);
+				// Galerieverzeichnis schon vorhanden? Wenn nicht: anlegen!
+				if (!file_exists("$GALLERIES_DIR_REL/".$dirname)) {
+					if (@mkdir($GALLERIES_DIR_REL."/".$dirname, 0777) && @mkdir($GALLERIES_DIR_REL."/".$dirname."/".$PREVIEW_DIR_NAME, 0777)) {
+						$filename = "$GALLERIES_DIR_REL/".$dirname."/texte.conf";
+						$fp = fopen ($filename, "w");
+						chmod ($filename, 0777);
+						fclose($fp);
+						$pagecontent .= returnMessage(true, htmlentities($_POST['galleryname']).": ".getLanguageValue("gallery_create_success"));
 					}
-		    	$pagecontent .= returnMessage(true, getLanguageValue("gallery_upload_success"));
-			  }
+					else
+						$pagecontent .= returnMessage(false, htmlentities($_POST['galleryname']).": ".getLanguageValue("gallery_create_error"));
+				}
+				else {
+					$pagecontent .= returnMessage(false, htmlentities($_POST['galleryname']).": ".getLanguageValue("gallery_exists_error"));
+				}
 			}
+			else
+				$pagecontent .= returnMessage(false, htmlentities($_POST['galleryname']).": ".getLanguageValue("invalid_values"));
 		}
-		$pagecontent .= "<p>".getLanguageValue("gallery_new_text")."</p>";
 		$pagecontent .= "<form method=\"post\" action=\"index.php\" enctype=\"multipart/form-data\"><input type=\"hidden\" name=\"action\" value=\"newgallery\" />";
-		$pagecontent .= "<table>";
-		// Zeile "KATEGORIE WÄHLEN"
+		$pagecontent .= "<table class=\"data\">";
+		// Zeile "NAME DER GALERIE"
 		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallery_choose_category_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect($_POST['cat'])."</td>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallery_choose_name_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"galleryname\" /></td>";
 		$pagecontent .= "</tr>";
-		// Zeile "BILDDATEI WÄHLEN"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallery_choose_file_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"file\" class=\"text1\" name=\"uploadfile\" /></td>";
-		$pagecontent .= "</tr>";
-		// Zeile "KOMMENTAR"
-		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallery_add_comment_text")."</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"comment\" /></td>";
-		$pagecontent .= "</tr>";
-		// Zeile "UPLOADEN"
-		$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td><td class=\"config_row2\"><input type=\"submit\" class=\"submit\" value=\"".getLanguageValue("button_data_new")."\" /></td></tr>";
+		// Zeile "GALERIE ANLEGEN"
+		$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td><td class=\"config_row2\"><input type=\"submit\" class=\"submit\" value=\"".getLanguageValue("button_gallery_new")."\" /></td></tr>";
 		$pagecontent .= "</table></form>";
+
 		return array(getLanguageValue("button_gallery_new"), $pagecontent);
 	}
 
 	function editGallery() {
 		global $specialchars;
-		// Zuerst: Kategorie wählen
+		global $GALLERIES_DIR_REL;
+		global $PREVIEW_DIR_NAME;
+
+		if (isset($_GET['gal']) && file_exists("$GALLERIES_DIR_REL/".$_GET['gal']))
+			$mygallery = $_GET['gal'];
+		else
+			$mygallery = $_POST['gal'];
+
 		$pagecontent = "<h2>".getLanguageValue("button_gallery_edit")."</h2>";
+		// Zuerst: Galerie wählen
 		$pagecontent .= "<form action=\"index.php\" method=\"GET\"><input type=\"hidden\" name=\"action\" value=\"editgallery\">";
 		$pagecontent .= "<table class=\"data\">";
 		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("choose_cat_for_editgallery")."</td>";
-		$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect("")."</td></tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("choose_gal_for_editgallery")."</td>";
+		$pagecontent .= "<td class=\"config_row2\">".getGalleriesAsSelect("")."</td></tr>";
 		$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"submit\" name=\"chosen\" class=\"submit\" value=\"".getLanguageValue("choose_category_button")."\" /></td></tr>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"submit\" name=\"chosen\" class=\"submit\" value=\"".getLanguageValue("choose_gallery_button")."\" /></td></tr>";
 		$pagecontent .= "</table>";
 		$pagecontent .= "</form>";
 
-		// Wenn die Kategorie schon gewählt wurde
-		if (isset($_GET['cat']) && file_exists("../inhalt/".$_GET['cat'])) {
-			$galleryconf = new Properties("../inhalt/".$_GET['cat']."/galerie/texte.conf");
+		// Wenn die Galerie schon gewählt wurde
+		if (isset($mygallery) && file_exists("$GALLERIES_DIR_REL/".$mygallery)) {
+			$galleryconf = new Properties("$GALLERIES_DIR_REL/".$mygallery."/texte.conf");
 			$msg = "";
 			$pagecontent = "<h2>".getLanguageValue("button_gallery_edit")."</h2>";
+			// Galeriebild hochladen
+		  if (isset($_FILES['uploadfile']) and !$_FILES['uploadfile']['error']) {
+		  	$gallerydir = "$GALLERIES_DIR_REL/".$mygallery;
+		    if (!fileHasExtension($_FILES['uploadfile']['name'], array("jpg", "jpeg", "jpe", "gif", "png")))
+		    	$pagecontent .= returnMessage(false, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("gallery_uploadfile_wrongtype"));
+		    elseif (file_exists($gallerydir."/".$_FILES['uploadfile']['name']))
+		    	$pagecontent .= returnMessage(false, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("gallery_uploadfile_exists"));
+		    elseif (!preg_match("/^[a-zA-Z0-9_\-äöüÄÖÜß.]+$/", $_FILES['uploadfile']['name'])) {
+		    	$pagecontent .= returnMessage(false, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("invalid_values"));
+		  	}
+		  	else {
+		  		// Bild und Kommentar speichern
+		    	move_uploaded_file($_FILES['uploadfile']['tmp_name'], $gallerydir."/".$_FILES['uploadfile']['name']);
+					$galleryconf = new Properties($gallerydir."/texte.conf");
+					$galleryconf->set($_FILES['uploadfile']['name'], stripslashes($_POST['comment']));
+		  		// Vorschaubild erstellen (nur, wenn GDlib installiert ist)
+					if (extension_loaded("gd")) {
+						require_once("../Thumbnail.php");
+						$tn = new Thumbnail();
+						$tn->createThumb($_FILES['uploadfile']['name'], $gallerydir."/", $gallerydir."/$PREVIEW_DIR_NAME/");
+					}
+		    	$pagecontent .= returnMessage(true, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("gallery_upload_success"));
+			  }
+			}
 			// Wenn "Speichern" gedrückt wurde
 			if (isset($_GET['save'])) {
 				$galleryconf->set($_GET['image'], stripslashes($_GET['comment']));
-				$pagecontent .= returnMessage(true, getLanguageValue("changes_applied"));
+				$pagecontent .= returnMessage(true, htmlentities($_GET['image']).": ".getLanguageValue("changes_applied"));
 			} 
 			// Wenn "Löschen" gedrückt wurde
 			elseif (isset($_GET['delete'])) {
 				// nach Bestätigung: löschen
 				if (isset($_GET['confirm'])) {
+					$galleryconf->delete($_GET['image']);
 					if (
-						$galleryconf->delete($_GET['image']) 
-						&& unlink("../inhalt/".$_GET['cat']."/galerie/".$_GET['image']) 
-						&& (!file_exists("../inhalt/".$_GET['cat']."/galerie/vorschau/".$_GET['image']) || unlink("../inhalt/".$_GET['cat']."/galerie/vorschau/".$_GET['image']))
+						@unlink("$GALLERIES_DIR_REL/".$mygallery."/".$_GET['image']) 
+						&& (!file_exists("$GALLERIES_DIR_REL/".$mygallery."/$PREVIEW_DIR_NAME/".$_GET['image']) || @unlink("$GALLERIES_DIR_REL/".$mygallery."/$PREVIEW_DIR_NAME/".$_GET['image']))
 					) 
-						$pagecontent .= returnMessage(true, getLanguageValue("gallery_image_deleted"));
+						$pagecontent .= returnMessage(true, htmlentities($_GET['image']).": ".getLanguageValue("gallery_image_deleted"));
 					else
-						$pagecontent .= returnMessage(false, getLanguageValue("data_file_delete_error"));
+						$pagecontent .= returnMessage(false, htmlentities($_GET['image']).": ".getLanguageValue("data_file_delete_error"));
 				}
 				else
-					$pagecontent .= returnMessage(false, $_GET['image'].": ".getLanguageValue("gallery_confirm_delete")." <a href=\"index.php?action=editgallery&amp;delete=true&amp;cat=".$_GET['cat']."&amp;image=".$_GET['image']."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=editgallery&amp;cat=".$_GET['cat']."\">".getLanguageValue("no")."</a>");
+					$pagecontent .= returnMessage(false, htmlentities($_GET['image']).": ".getLanguageValue("gallery_confirm_delete")." <a href=\"index.php?action=editgallery&amp;delete=true&amp;gal=".$mygallery."&amp;image=".$_GET['image']."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=editgallery&amp;gal=".$mygallery."\">".getLanguageValue("no")."</a>");
 			} 
-			$pagecontent .= "<h3>".getLanguageValue("chosen_category")." ".$specialchars->rebuildSpecialChars(substr($_GET['cat'], 3, strlen($_GET['cat'])-3), true)."</h3>";
+			$pagecontent .= "<h3>".getLanguageValue("chosen_gallery")." ".$specialchars->rebuildSpecialChars($mygallery, true)."</h3>";
 			$pagecontent .= "<p>".getLanguageValue("gallery_edit_text")."</p>";
-			$handle = opendir("../inhalt/".$_GET['cat']."/galerie");
+			$pagecontent .= "<h3>".getLanguageValue("gallery_upload")."</h3>";
+			$pagecontent .= "<form method=\"post\" action=\"index.php\" enctype=\"multipart/form-data\"><input type=\"hidden\" name=\"action\" value=\"editgallery\" /><input type=\"hidden\" name=\"gal\" value=\"".$mygallery."\" />";
+			$pagecontent .= "<table>";
+			// Zeile "BILDDATEI WÄHLEN"
+			$pagecontent .= "<tr>";
+			$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallery_choose_file_text")."</td>";
+			$pagecontent .= "<td class=\"config_row2\"><input type=\"file\" class=\"text1\" name=\"uploadfile\" /></td>";
+			$pagecontent .= "</tr>";
+			// Zeile "KOMMENTAR"
+			$pagecontent .= "<tr>";
+			$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("gallery_add_comment_text")."</td>";
+			$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"comment\" /></td>";
+			$pagecontent .= "</tr>";
+			// Zeile "UPLOADEN"
+			$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td><td class=\"config_row2\"><input type=\"submit\" class=\"submit\" value=\"".getLanguageValue("button_gallery_upload")."\" /></td></tr>";
+			$pagecontent .= "</table></form>";
+			
+			$pagecontent .= "<h3>".getLanguageValue("gallery_overview")."</h3>";
 			// alle Bilder der Galerie auflisten
+			$handle = opendir("$GALLERIES_DIR_REL/".$mygallery);
 			$counter = 0;
 			$gallerypics = array();
 			while (($file = readdir($handle))) {
-				if (is_file("../inhalt/".$_GET['cat']."/galerie/".$file) && ($file <> "texte.conf")) 
+				if (is_file("$GALLERIES_DIR_REL/".$mygallery."/".$file) && ($file <> "texte.conf")) 
 					array_push($gallerypics, $file);
 			}
 			sort($gallerypics);
 			foreach ($gallerypics as $file) {
 				$counter++;
-				$pagecontent .= "<form action=\"index.php\" method=\"GET\"><input type=\"hidden\" name=\"action\" value=\"editgallery\"><input type=\"hidden\" name=\"cat\" value=\"".$_GET['cat']."\"><input type=\"hidden\" name=\"image\" value=\"".$file."\">";
+				$pagecontent .= "<form action=\"index.php\" method=\"GET\"><input type=\"hidden\" name=\"action\" value=\"editgallery\"><input type=\"hidden\" name=\"gal\" value=\"".$mygallery."\"><input type=\"hidden\" name=\"image\" value=\"".$file."\">";
 				$pagecontent .= "<table class=\"data\">";
 				$pagecontent .= "<tr>";
-				if (file_exists("../inhalt/".$_GET['cat']."/galerie/vorschau/".$file))
-					$pagecontent .= "<td class=\"config_row1\"><img src=\"../inhalt/".$_GET['cat']."/galerie/vorschau/".$file."\" alt=\"$file\" style=\"width:100px;\" /><br />".$file."</td>";
+				if (file_exists("$GALLERIES_DIR_REL/".$mygallery."/$PREVIEW_DIR_NAME/".$file))
+					$pagecontent .= "<td class=\"config_row1\"><img src=\"$GALLERIES_DIR_REL/".$mygallery."/$PREVIEW_DIR_NAME/".$file."\" alt=\"$file\" style=\"width:100px;\" /><br />".$file."</td>";
 				else			
-					$pagecontent .= "<td class=\"config_row1\"><img src=\"../inhalt/".$_GET['cat']."/galerie/".$file."\" alt=\"$file\" style=\"width:100px;\" /><br />".$file."</td>";
+					$pagecontent .= "<td class=\"config_row1\"><img src=\"$GALLERIES_DIR_REL/".$mygallery."/".$file."\" alt=\"$file\" style=\"width:100px;\" /><br />".$file."</td>";
 				$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"comment\" value=\"".htmlentities($galleryconf->get($file))."\" /><input type=\"submit\" name=\"save\" value=\"".getLanguageValue("button_save")."\" class=\"submit\" /> <input type=\"submit\" name=\"delete\" value=\"".getLanguageValue("button_delete")."\" class=\"submit\" /></td>";
 				$pagecontent .= "</tr>";
 				$pagecontent .= "</table>";
@@ -809,44 +873,55 @@ echo $html;
 	}
 
 	function deleteGallery() {
+		global $specialchars;
+		global $GALLERIES_DIR_REL;
+		global $PREVIEW_DIR_NAME;
+		
 		// Zuerst: Kategorie wählen
 		$pagecontent = "<h2>".getLanguageValue("button_gallery_delete")."</h2>";
 		// Wenn die Kategorie schon gewählt wurde
-		if (isset($_GET['cat']) && file_exists("../inhalt/".$_GET['cat'])) {
+		if (isset($_GET['gal']) && file_exists("$GALLERIES_DIR_REL/".$_GET['gal'])) {
+			$mygallery = "$GALLERIES_DIR_REL/".$_GET['gal'];
 			if (isset($_GET['confirm']) && ($_GET['confirm'] == "true")) {
 				$success = true;
+				$couldnotrmdir = false;
 				// Vorschauverzeichnis leeren
-				$handle = opendir("../inhalt/".$_GET['cat']."/galerie/vorschau");
+				$handle = opendir($mygallery."/$PREVIEW_DIR_NAME");
 				while ($file = readdir($handle)) {
-					if (is_file("../inhalt/".$_GET['cat']."/galerie/vorschau/".$file))
-						if (!unlink("../inhalt/".$_GET['cat']."/galerie/vorschau/".$file))
+					if (is_file($mygallery."/$PREVIEW_DIR_NAME/".$file))
+						if (!@unlink($mygallery."/$PREVIEW_DIR_NAME/".$file))
 							$success = false;
 				}
+				if (!@rmdir($mygallery."/$PREVIEW_DIR_NAME"))
+					$couldnotrmdir = true;
 				// Galerieverzeichnis leeren
-				$handle = opendir("../inhalt/".$_GET['cat']."/galerie");
+				$handle = opendir($mygallery);
 				while ($file = readdir($handle)) {
-					if (is_file("../inhalt/".$_GET['cat']."/galerie/".$file))
-						if (!unlink("../inhalt/".$_GET['cat']."/galerie/".$file))
+					if (is_file($mygallery."/".$file))
+						if (!@unlink($mygallery."/".$file))
 							$success = false;
 				}
-				@fclose(@fopen("../inhalt/".$_GET['cat']."/galerie/texte.conf", "w"));
-				if ($success)
-					$pagecontent .= returnMessage(true, getLanguageValue("gallery_delete_success"));
+				if (!@rmdir($mygallery))
+					$couldnotrmdir = true;
+				if ($success && !$couldnotrmdir)
+					$pagecontent .= returnMessage(true, $specialchars->rebuildSpecialChars($_GET['gal'], true).": ".getLanguageValue("gallery_delete_success"));
+				elseif ($success && $couldnotrmdir)
+					$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars($_GET['gal'], true).": ".getLanguageValue("gallery_delete_success")." ".getLanguageValue("gallery_delete_no_rmdir"));
 				else
-					$pagecontent .= returnMessage(false, getLanguageValue("gallery_delete_error"));	
+					$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars($_GET['gal'], true).": ".getLanguageValue("gallery_delete_error"));	
 			}
 			else {
-				$pagecontent .= returnMessage(false, substr($_GET['cat'],3,strlen($_GET['cat'])-3).": ".getLanguageValue("gallery_confirm_deleteall")." <a href=\"index.php?action=deletegallery&amp;delete=true&amp;cat=".$_GET['cat']."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=deletegallery\">".getLanguageValue("no")."</a>");
+				$pagecontent .= returnMessage(false, $specialchars->rebuildSpecialChars($_GET['gal'], true).": ".getLanguageValue("gallery_confirm_deleteall")." <a href=\"index.php?action=deletegallery&amp;delete=true&amp;gal=".$_GET['gal']."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=deletegallery\">".getLanguageValue("no")."</a>");
 			}
 		}
 		$pagecontent .= "<p>".getLanguageValue("gallery_delete_text")."</p>";
 		$pagecontent .= "<form action=\"index.php\" method=\"GET\"><input type=\"hidden\" name=\"action\" value=\"deletegallery\">";
 		$pagecontent .= "<table class=\"data\">";
 		$pagecontent .= "<tr>";
-		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("choose_cat_for_deletegallery")."</td>";
-		$pagecontent .= "<td class=\"config_row2\">".getCatsAsSelect("")."</td></tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("choose_gal_for_delete")."</td>";
+		$pagecontent .= "<td class=\"config_row2\">".getGalleriesAsSelect($_GET['gal'])."</td></tr>";
 		$pagecontent .= "<tr><td class=\"config_row1\">&nbsp;</td>";
-		$pagecontent .= "<td class=\"config_row2\"><input type=\"submit\" name=\"chosen\" class=\"submit\" value=\"".getLanguageValue("choose_category_button")."\" /></td></tr>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"submit\" name=\"chosen\" class=\"submit\" value=\"".getLanguageValue("choose_gallery_button")."\" /></td></tr>";
 		$pagecontent .= "</table>";
 		$pagecontent .= "</form>";
 		return array(getLanguageValue("button_gallery_delete"), $pagecontent);
@@ -866,23 +941,24 @@ echo $html;
 	function newFile() {
 		global $ADMIN_CONF;
 		global $specialchars;
+		global $CONTENT_DIR_REL;
 		$pagecontent = "<h2>".getLanguageValue("button_data_new")."</h2>";
 		// Datei hochladen
 		if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		  if (isset($_FILES['uploadfile']) and !$_FILES['uploadfile']['error']) {
-		    if (file_exists("../inhalt/".$specialchars->deleteSpecialChars($_POST['cat'])."/dateien/".$_FILES['uploadfile']['name'])) {
-		    	$pagecontent .= returnMessage(false, $_FILES['uploadfile']['name'].": ".getLanguageValue("data_uploadfile_exists"));
+		    if (file_exists("$CONTENT_DIR_REL/".$specialchars->deleteSpecialChars($_POST['cat'])."/dateien/".$_FILES['uploadfile']['name'])) {
+		    	$pagecontent .= returnMessage(false, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("data_uploadfile_exists"));
 		    }
 		    elseif (fileHasExtension($_FILES['uploadfile']['name'], explode(",", $ADMIN_CONF->get("noupload")))) {
-		    	$pagecontent .= returnMessage(false, $_FILES['uploadfile']['name'].": ".getLanguageValue("data_uploadfile_wrongext"));
+		    	$pagecontent .= returnMessage(false, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("data_uploadfile_wrongext"));
 		    }
 		    else {
 		    	if(preg_match("/^[a-zA-Z0-9_\-äöüÄÖÜß.]+$/", $_FILES['uploadfile']['name'])) {
-			    	move_uploaded_file($_FILES['uploadfile']['tmp_name'], "../inhalt/".$_POST['cat']."/dateien/".$_FILES['uploadfile']['name']);
-			    	$pagecontent .= returnMessage(true, getLanguageValue("data_upload_success"));
+			    	move_uploaded_file($_FILES['uploadfile']['tmp_name'], "$CONTENT_DIR_REL/".$_POST['cat']."/dateien/".$_FILES['uploadfile']['name']);
+			    	$pagecontent .= returnMessage(true, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("data_upload_success"));
 		    	}
 			    else {
-			    	$pagecontent .= returnMessage(false, getLanguageValue("invalid_values"));
+			    	$pagecontent .= returnMessage(false, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("invalid_values"));
 			    }
 			  }
 			}
@@ -902,23 +978,24 @@ echo $html;
 
 	function deleteFile() {
 		global $specialchars;
+		global $CONTENT_DIR_REL;
 		$pagecontent = "<h2>".getLanguageValue("button_data_delete")."</h2>";
 		// Löschen der Dateien nach Auswertung der übergebenen Parameter
-		if (isset($_GET['cat']) && isset($_GET['file']) && file_exists("../inhalt/".$_GET['cat']) && file_exists("../inhalt/".$_GET['cat']."/dateien/".$_GET['file'])) {
+		if (isset($_GET['cat']) && isset($_GET['file']) && file_exists("$CONTENT_DIR_REL/".$_GET['cat']) && file_exists("$CONTENT_DIR_REL/".$_GET['cat']."/dateien/".$_GET['file'])) {
 			if (isset($_GET['confirm']) && ($_GET['confirm'] == "true")) {
-				if (unlink("../inhalt/".$_GET['cat']."/dateien/".$_GET['file']))
-					$pagecontent .= returnMessage(true, getLanguageValue("data_file_deleted"));
+				if (@unlink("$CONTENT_DIR_REL/".$_GET['cat']."/dateien/".$_GET['file']))
+					$pagecontent .= returnMessage(true, htmlentities($_GET['file']).": ".getLanguageValue("data_file_deleted"));
 				else
-					$pagecontent .= returnMessage(false, getLanguageValue("data_file_delete_error"));
+					$pagecontent .= returnMessage(false, htmlentities($_GET['file']).": ".getLanguageValue("data_file_delete_error"));
 			}
 			else
-				$pagecontent .= returnMessage(false, $_GET['file'].": ".getLanguageValue("data_file_delete_confirm")." <a href=\"index.php?action=deletefile&amp;cat=".$_GET['cat']."&amp;file=".$_GET['file']."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=deletefile\">".getLanguageValue("no")."</a>");
+				$pagecontent .= returnMessage(false, htmlentities($_GET['file']).": ".getLanguageValue("data_file_delete_confirm")." <a href=\"index.php?action=deletefile&amp;cat=".$_GET['cat']."&amp;file=".$_GET['file']."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=deletefile\">".getLanguageValue("no")."</a>");
 		}
 		$pagecontent .= "<p>".getLanguageValue("data_delete_text")."</p>";
-		$dirs = getDirs("../inhalt");
+		$dirs = getDirs("$CONTENT_DIR_REL");
 		foreach ($dirs as $file) {
-			$file = $file."_".specialNrDir("../inhalt", $file);
-			if (($file <> ".") && ($file <> "..") && ($subhandle = opendir("../inhalt/".$file."/dateien"))) {
+			$file = $file."_".specialNrDir("$CONTENT_DIR_REL", $file);
+			if (($file <> ".") && ($file <> "..") && ($subhandle = opendir("$CONTENT_DIR_REL/".$file."/dateien"))) {
 				$pagecontent .= "<h3>".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</h3>";
 				$hasdata = false;
 				$pagecontent .= "<table class=\"data\">";
@@ -929,7 +1006,7 @@ echo $html;
 				sort($mysubfiles);
 				foreach ($mysubfiles as $subfile) {
 					if (($subfile <> ".") && ($subfile <> "..")) {
-						$pagecontent .= "<tr><td class=\"config_row1\">$subfile</td><td class=\"config_row2\"><a href=\"../inhalt/".$file."/dateien/".$subfile."\" target=\"_blank\">".getLanguageValue("data_download")."</a> - <a href=\"index.php?action=deletefile&amp;cat=".$file."&amp;file=".$subfile."\">".getLanguageValue("button_delete")."</a></td></tr>";
+						$pagecontent .= "<tr><td class=\"config_row1\">$subfile</td><td class=\"config_row2\"><a href=\"$CONTENT_DIR_REL/".$file."/dateien/".$subfile."\" target=\"_blank\">".getLanguageValue("data_download")."</a> - <a href=\"index.php?action=deletefile&amp;cat=".$file."&amp;file=".$subfile."\">".getLanguageValue("button_delete")."</a></td></tr>";
 						$hasdata = true;
 					}
 				}
@@ -956,6 +1033,7 @@ echo $html;
 	function configCMSDisplay() {
 		global $CMS_CONF;
 		global $specialchars;
+		global $CONTENT_DIR_REL;
 		$pagecontent .= "<h2>".getLanguageValue("button_config_displaycms")."</h2>";
 		// Änderungen speichern
 		$changesmade = false;
@@ -972,7 +1050,8 @@ echo $html;
 				&& isset($_GET['css']) && ($_GET['css'] <> "") 
 				&& isset($_GET['favicon']) && ($_GET['favicon'] <> "") 
 				&& isset($_GET['dcat']) && ($_GET['dcat'] <> "") 
-				&& isset($_GET['syntaxslinks']) && ($_GET['syntaxslinks'] <> "") 
+				&& isset($_GET['syntaxslinks']) && ($_GET['syntaxslinks'] <> "")
+				&& isset($_GET['lang']) && ($_GET['lang'] <> "")
 				) {
 				$CMS_CONF->set("websitetitle", htmlentities($_GET['title']));
 				$CMS_CONF->set("templatefile", $_GET['template']);
@@ -985,6 +1064,7 @@ echo $html;
 				$CMS_CONF->set("faviconfile", $_GET['favicon']);
 				$CMS_CONF->set("defaultcat", $specialchars->deleteSpecialChars($_GET['dcat']));
 				$CMS_CONF->set("shortenlinks", $_GET['syntaxslinks']);
+				$CMS_CONF->set("cmslanguage", $_GET['lang']);
 				if ($_GET['usesyntax'] == "on")
 					$CMS_CONF->set("usecmssyntax", "true");
 				else
@@ -1000,6 +1080,29 @@ echo $html;
 // ALLGEMEINE EINSTELLUNGEN
 		$pagecontent .= "<h3>".getLanguageValue("config_cmsglobal_headline")."</h3>";
 		$pagecontent .= "<table class=\"data\">";
+		// Zeile "CMS-Version"
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("cmsversion_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\">".$CMS_CONF->get("cmsversion")."</td>";
+		$pagecontent .= "</tr>";
+		// Zeile "SPRACHAUSWAHL"
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("cmslanguage_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\"><select name=\"lang\">";
+		if ($handle = opendir('../sprachen')){
+			while ($file = readdir($handle)) {
+				$selected = "";
+				if (($file != ".") && ($file != "..")) {
+					if (substr($file,0,strlen($file)-strlen(".conf")) == $CMS_CONF->get("cmslanguage"))
+						$selected = " selected";
+					$pagecontent .= "<option".$selected.">";
+					$pagecontent .= substr($file,0,strlen($file)-strlen(".conf"));
+					$pagecontent .= "</option>";
+				}
+			}
+			closedir($handle);
+		}
+		$pagecontent .= "</select></td></tr>";
 		// Zeile "WEBSITE-TITEL"
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("websitetitle_text")."</td>";
@@ -1010,16 +1113,16 @@ echo $html;
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("defaultcat_text")."</td>";
 		$pagecontent .= "<td class=\"config_row2\">";
 		$dirs = array();
-		$dirs = getDirs("../inhalt");
+		$dirs = getDirs("$CONTENT_DIR_REL");
 		$pagecontent .= "<select name=\"dcat\">";
 		foreach ($dirs as $element) {
-			$myfiles = getFiles("../inhalt/".$element."_".specialNrDir("../inhalt", $element));
+			$myfiles = getFiles("$CONTENT_DIR_REL/".$element."_".specialNrDir("$CONTENT_DIR_REL", $element));
 			if (count($myfiles) == 0)
 				continue;
 			$selected = "";
-			if ($element."_".$specialchars->rebuildSpecialChars(specialNrDir("../inhalt", $element), true) == $CMS_CONF->get("defaultcat"))
+			if ($element."_".$specialchars->rebuildSpecialChars(specialNrDir("$CONTENT_DIR_REL", $element), true) == $CMS_CONF->get("defaultcat"))
 				$selected = "selected ";
-			$pagecontent .= "<option ".$selected."value=\"".$element."_".$specialchars->rebuildSpecialChars(specialNrDir("../inhalt", $element), true)."\">".$specialchars->rebuildSpecialChars(specialNrDir("../inhalt", $element), true)."</option>";
+			$pagecontent .= "<option ".$selected."value=\"".$element."_".$specialchars->rebuildSpecialChars(specialNrDir("$CONTENT_DIR_REL", $element), true)."\">".$specialchars->rebuildSpecialChars(specialNrDir("$CONTENT_DIR_REL", $element), true)."</option>";
 		}
 		$pagecontent .= "</select></td>";
 		$pagecontent .= "</tr>";
@@ -1150,6 +1253,19 @@ echo $html;
 				$ADMIN_CONF->set("noupload", $_GET['noupload']);
 				$changesmade = true;
 			}
+			if (isset($_GET['textareaheight']) && preg_match("/^[0-9]+$/", $_GET['textareaheight'])) {
+				$height = $_GET['textareaheight'];
+				if ($height < 50)
+					$height = 50;
+				elseif ($height > 1000)
+					$height = 1000;
+				$ADMIN_CONF->set("textareaheight", $height);
+				$changesmade = true;
+			}
+			if (isset($_GET['backupmsgintervall']) && preg_match("/^[0-9]+$/", $_GET['backupmsgintervall'])) {
+				$ADMIN_CONF->set("backupmsgintervall", $_GET['backupmsgintervall']);
+				$changesmade = true;
+			}
 		}
 		$pagecontent .= "<h2>".getLanguageValue("button_config_displayadmin")."</h2>";
 		if ($changesmade)
@@ -1184,6 +1300,19 @@ echo $html;
 			closedir($handle);
 		}
 		$pagecontent .= "</select></td></tr>";
+		// Zeile "HÖHE DES TEXTFELDES"
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("textareaheight_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"textareaheight\" value=\"".$ADMIN_CONF->get("textareaheight")."\" /></td>";
+		$pagecontent .= "</tr>";
+		// Zeile "BACKUP-ERINNERUNG"
+		$backupmsgintervall = $ADMIN_CONF->get("backupmsgintervall");
+		if ($backupmsgintervall == "")
+			$backupmsgintervall = 0;
+		$pagecontent .= "<tr>";
+		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("reminder_backup_text")."</td>";
+		$pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"backupmsgintervall\" value=\"".$backupmsgintervall."\" /></td>";
+		$pagecontent .= "</tr>";
 		// Zeile "UPLOAD-FILTER"
 		$pagecontent .= "<tr>";
 		$pagecontent .= "<td class=\"config_row1\">".getLanguageValue("uploadfilter_text")."</td>";
@@ -1308,9 +1437,11 @@ echo $html;
 	
 	// Anzeige der Editieransicht
 	function showEditPageForm($cat, $page, $action)	{
+		global $ADMIN_CONF;
 		global $CMS_CONF;
 		global $specialchars;
-		$file = "../inhalt/".$cat."/".$page;
+		global $CONTENT_DIR_REL;
+		$file = "$CONTENT_DIR_REL/".$cat."/".$page;
 		if (file_exists($file)) {
 			$handle=fopen($file, "r");
 			$pagecontent = htmlentities(fread($handle, filesize($file)));
@@ -1324,7 +1455,12 @@ echo $html;
 	  }
 
 		// Seiteninhalt
-		$content .= "<textarea name=\"pagecontent\">".$pagecontent."</textarea>";
+		$height = $ADMIN_CONF->get("textareaheight");
+		if ($height == "") {
+			$height = 350;
+			$ADMIN_CONF->set("textareaheight", $height);
+		}
+		$content .= "<textarea style=\"height:$height;\" name=\"pagecontent\">".$pagecontent."</textarea>";
 		$content .= "<input type=\"hidden\" name=\"page\" value=\"$page\" />";
 		$content .= "<input type=\"hidden\" name=\"action\" value=\"$action\" />";
 		$content .= "<input type=\"hidden\" name=\"cat\" value=\"$cat\" />";
@@ -1362,11 +1498,11 @@ echo $html;
 				$success = deleteDir($path."/".$currentelement);
 			// Datei: löschen
 			else
-				$success = unlink($path."/".$currentelement);				
+				$success = @unlink($path."/".$currentelement);				
 		}
 		closedir($handle);
 		// Verzeichnis löschen
-		$success = rmdir($path);
+		$success = @rmdir($path);
 		return $success;
 	}
 	
@@ -1461,6 +1597,8 @@ echo $html;
 	  	.returnOverviewSelectbox(2, $currentcat)
 	  	."&nbsp;"
 	  	.returnOverviewSelectbox(3, $currentcat)
+	  	."&nbsp;"
+	  	.returnOverviewSelectbox(4, $currentcat)
 	  	."</td>"
 	  	."</tr></table>"
 	  	
@@ -1474,6 +1612,8 @@ echo $html;
 	// $type: 1=Kategorien 2=Inhaltsseiten 3=Dateien
 	function returnOverviewSelectbox($type, $currentcat) {
 		global $specialchars;
+		global $CONTENT_DIR_REL;
+		global $GALLERIES_DIR_REL;
 
 		$elements = array();
 		$selectname = "";
@@ -1481,7 +1621,7 @@ echo $html;
 		switch ($type) {
 			// Kategorien
 			case 1:
-				$handle = opendir("../inhalt");
+				$handle = opendir("$CONTENT_DIR_REL");
 				while (($file = readdir($handle))) {
 					if (($file <> ".") && ($file <> ".."))
 						array_push($elements, $file);
@@ -1491,9 +1631,9 @@ echo $html;
 				break;
 			// Inhaltsseiten
 			case 2:
-				$handle = opendir("../inhalt/$currentcat");
+				$handle = opendir("$CONTENT_DIR_REL/$currentcat");
 				while (($file = readdir($handle))) {
-					if (($file <> ".") && ($file <> "..") && is_file("../inhalt/$currentcat/$file"))
+					if (($file <> ".") && ($file <> "..") && is_file("$CONTENT_DIR_REL/$currentcat/$file") && (substr($file, strlen($file)-4, 4) == ".txt"))
 						array_push($elements, $file);
 				}
 				closedir($handle);
@@ -1501,13 +1641,23 @@ echo $html;
 				break;
 			// Dateien
 			case 3:
-				$handle = opendir("../inhalt/$currentcat/dateien");
+				$handle = opendir("$CONTENT_DIR_REL/$currentcat/dateien");
 				while (($file = readdir($handle))) {
-					if (($file <> ".") && ($file <> "..") && is_file("../inhalt/$currentcat/dateien/$file"))
+					if (($file <> ".") && ($file <> "..") && is_file("$CONTENT_DIR_REL/$currentcat/dateien/$file"))
 						array_push($elements, $file);
 				}
 				closedir($handle);
 				$selectname = "files";
+				break;
+			// Galerien
+			case 4:
+				$handle = opendir($GALLERIES_DIR_REL);
+				while (($file = readdir($handle))) {
+					if (($file <> ".") && ($file <> ".."))
+						array_push($elements, $file);
+				}
+				closedir($handle);
+				$selectname = "gals";
 				break;
 			default:
 				return "WRONG PARAMETER!";
@@ -1536,6 +1686,13 @@ echo $html;
 				$select .="<option value=\"\">".getLanguageValue("button_data").":</option>";
 				foreach ($elements as $element) {
 					$select .= "<option value=\"".$element."\">".$element."</option>";
+				}
+				break;
+			// Galerien
+			case 4:
+				$select .="<option value=\"\">".getLanguageValue("button_gallery").":</option>";
+				foreach ($elements as $element) {
+					$select .= "<option value=\"".$specialchars->rebuildSpecialChars($element, true)."\">".$specialchars->rebuildSpecialChars($element, true)."</option>";
 				}
 				break;
 		}

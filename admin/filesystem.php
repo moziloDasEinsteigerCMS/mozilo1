@@ -195,14 +195,8 @@
   {
   	global $specialchars;
   	$betterString = $specialchars->deleteSpecialChars($_GET["name"]);
-		mkdir ("../inhalt/".$_GET["position"]."_".$betterString, 0777);
-		mkdir ("../inhalt/".$_GET["position"]."_".$betterString."/dateien", 0777);
-		mkdir ("../inhalt/".$_GET["position"]."_".$betterString."/galerie", 0777);
-		mkdir ("../inhalt/".$_GET["position"]."_".$betterString."/galerie/vorschau", 0777);
-		$filename = "../inhalt/".$_GET["position"]."_".$betterString."/galerie/texte.conf";
-		$fp = fopen ($filename, "w");
-		chmod ($filename, 0777);
-		fclose($fp);
+		mkdir ("../kategorien/".$_GET["position"]."_".$betterString, 0777);
+		mkdir ("../kategorien/".$_GET["position"]."_".$betterString."/dateien", 0777);
   }
   
   function getFreeDirs($dir)
@@ -224,7 +218,7 @@
 	function getCatsAsSelect($selectedcat) {
 		global $specialchars;
 		$dirs = array();
-		$handle = opendir('../inhalt');
+		$handle = opendir('../kategorien');
 		while (($file = readdir($handle))) {
 			if (($file <> ".") && ($file <> ".."))
 				array_push($dirs, $file);
@@ -232,12 +226,33 @@
 		closedir($handle);
 		sort($dirs);
 		$select = "<select name=\"cat\">";
-			foreach ($dirs as $file) {
-				if (($selectedcat <> "") && ($file == $selectedcat))
-					$select .= "<option selected=\"selected\" value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</option>";
-				else
-					$select .= "<option value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</option>";
-			}
+		foreach ($dirs as $file) {
+			if (($selectedcat <> "") && ($file == $selectedcat))
+				$select .= "<option selected=\"selected\" value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</option>";
+			else
+				$select .= "<option value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</option>";
+		}
+		$select .= "</select>";
+		return $select;
+	}
+
+	function getGalleriesAsSelect($selectedgallery) {
+		global $specialchars;
+		$dirs = array();
+		$handle = opendir('../galerien');
+		while (($file = readdir($handle))) {
+			if (($file <> ".") && ($file <> ".."))
+				array_push($dirs, $file);
+		}
+		closedir($handle);
+		sort($dirs);
+		$select = "<select name=\"gal\">";
+		foreach ($dirs as $file) {
+			if (($selectedgallery <> "") && ($file == $selectedgallery))
+				$select .= "<option selected=\"selected\" value=\"".$file."\">".$specialchars->rebuildSpecialChars($file, true)."</option>";
+			else
+				$select .= "<option value=\"".$file."\">".$specialchars->rebuildSpecialChars($file, true)."</option>";
+		}
 		$select .= "</select>";
 		return $select;
 	}

@@ -5,7 +5,6 @@ INHALT
 ######
 		
 		Projekt "Flatfile-basiertes CMS für Einsteiger"
-		Online-Bildergalerie
 		Mai 2006
 		Klasse ITF04-1
 		Industrieschule Chemnitz
@@ -13,13 +12,18 @@ INHALT
 		Ronny Monser
 		Arvid Zimmermann
 		Oliver Lorenz
-		-> mozilo
+		www.mozilo.de
 
+		Dieses Dokument ist die Galeriefunktion für
+		moziloCMS.
+		
 ######
 */
 
+require_once("Language.php");
 require_once("Properties.php");
 require_once("SpecialChars.php");
+$language = new Language();
 $mainconf = new Properties("main.conf");
 $specialchars = new SpecialChars();
 
@@ -56,17 +60,17 @@ if ($FAVICON_FILE == "")
 	$FAVICON_FILE = "favicon.ico";
 
 // Übergebene Parameter überprüfen
-$CAT_REQUEST = $_GET['cat'];
-$DIR_GALLERY = "inhalt/".$CAT_REQUEST."/galerie/";
+$GAL_REQUEST = $_GET['gal'];
+$DIR_GALLERY = "./galerien/".$GAL_REQUEST."/";
 $DIR_THUMBS = $DIR_GALLERY."vorschau/";
-if (($CAT_REQUEST == "") || (!file_exists($DIR_GALLERY)))
-	die ("FEHLER: Keine g&uuml;ltige Kategorie angegeben oder fehlendes Galerieverzeichnis!");
-$CURRENTCATEGORY = substr($CAT_REQUEST,3);
+if (($GAL_REQUEST == "") || (!file_exists($DIR_GALLERY)))
+	die ($language->getLanguageValue1("message_gallerydir_error_1", $GAL_REQUEST));
+$GAL_NAME = $specialchars->rebuildSpecialChars($GAL_REQUEST, true);
 
 // Galerieverzeichnis einlesen
 $PICARRAY = getPicsAsArray($DIR_GALLERY, array("jpg", "jpeg", "jpe", "gif", "png"));
 $ALLINDEXES = array();
-for($i=1;$i<=count($PICARRAY);$i++) 
+for ($i=1; $i<=count($PICARRAY); $i++) 
 	array_push($ALLINDEXES, $i);
 // globaler Index
 if ((!isset($_GET['index'])) || (!in_array($_GET['index'], $ALLINDEXES)))
@@ -104,7 +108,7 @@ echo $HTML;
 // ------------------------------------------------------------------------------
 	function readTemplate() {
 		global $CSS_FILE;
-		global $CURRENTCATEGORY;
+		global $GAL_NAME;
 		global $HTML;
 		global $FAVICON_FILE;
 		global $PICARRAY;
@@ -114,9 +118,10 @@ echo $HTML;
 		global $USE_CMS_SYNTAX;
 		global $USETHUMBS;
 		global $WEBSITE_TITLE;
+		global $language;
 		// Template-Datei auslesen
     if (!$file = @fopen($TEMPLATE_FILE, "r"))
-        die("'$TEMPLATE_FILE' fehlt! Bitte kontaktieren Sie den Administrator.");
+        die($language->getLanguageValue1("message_template_error_1", $TEMPLATE_FILE));
     $template = fread($file, filesize($TEMPLATE_FILE));
     fclose($file);
     
@@ -124,9 +129,9 @@ echo $HTML;
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
     $HTML = preg_replace('/{WEBSITE_TITLE}/', $WEBSITE_TITLE, $HTML);
-    $HTML = preg_replace('/{CURRENTCATEGORY}/', $specialchars->rebuildSpecialChars($CURRENTCATEGORY, true), $HTML);
+    $HTML = preg_replace('/{CURRENTGALLERY}/', $language->getLanguageValue1("message_gallery_1", $GAL_NAME), $HTML);
     if (count($PICARRAY) == 0)
-    	$HTML = preg_replace('/{NUMBERMENU}/', "Diese Galerie enth&auml;lt keine Bilder.", $HTML);
+    	$HTML = preg_replace('/{NUMBERMENU}/', $language->getLanguageValue0("message_galleryempty_0", $value), $HTML);
 		if ($USETHUMBS) {
 	    $HTML = preg_replace('/{GALLERYMENU}/', "&nbsp;", $HTML);
     	$HTML = preg_replace('/{NUMBERMENU}/', getThumbnails(), $HTML);
@@ -150,12 +155,13 @@ echo $HTML;
 	function getGalleryMenu() {
 		global $ALLINDEXES;
 		global $BEFORE;
-		global $CAT_REQUEST;
+		global $GAL_REQUEST;
 		global $FIRST;
 		global $INDEX;
 		global $PICARRAY;
 		global $LAST;
 		global $NEXT;
+		global $language;
 		
 		// Keine Bilder im Galerieverzeichnis?
 		if (count($PICARRAY) == 0)
@@ -165,17 +171,17 @@ echo $HTML;
 			$linkclass = "detailmenuactive";
 		else
 			$linkclass = "detailmenu";
-		$gallerymenu = "<a href=\"gallery.php?cat=$CAT_REQUEST&amp;index=$FIRST\" class=\"$linkclass\">Erstes Bild</a> ";
+		$gallerymenu = "<a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$FIRST\" class=\"$linkclass\">".$language->getLanguageValue0("message_firstimage_0")."</a> ";
 		// Link "Voriges Bild"
-		$gallerymenu .= "<a href=\"gallery.php?cat=$CAT_REQUEST&amp;index=$BEFORE\" class=\"detailmenu\">Voriges Bild</a> ";
+		$gallerymenu .= "<a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$BEFORE\" class=\"detailmenu\">".$language->getLanguageValue0("message_previousimage_0")."</a> ";
 		// Link "Nächstes Bild"
-		$gallerymenu .= "<a href=\"gallery.php?cat=$CAT_REQUEST&amp;index=$NEXT\" class=\"detailmenu\">Nächstes Bild</a> ";
+		$gallerymenu .= "<a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$NEXT\" class=\"detailmenu\">".$language->getLanguageValue0("message_nextimage_0")."</a> ";
 		// Link "Letztes Bild"
 		if ($INDEX == $LAST)
 			$linkclass = "detailmenuactive";
 		else
 			$linkclass = "detailmenu";
-		$gallerymenu .= "<a href=\"gallery.php?cat=$CAT_REQUEST&amp;index=$LAST\" class=\"$linkclass\">Letztes Bild</a>";
+		$gallerymenu .= "<a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$LAST\" class=\"$linkclass\">".$language->getLanguageValue0("message_lastimage_0")."</a>";
 		// Rückgabe des Menüs
 		return $gallerymenu;
 	}
@@ -186,7 +192,7 @@ echo $HTML;
 // ------------------------------------------------------------------------------
 	function getNumberMenu() {
 		global $mainconf;
-		global $CAT_REQUEST;
+		global $GAL_REQUEST;
 		global $FIRST;
 		global $INDEX;
 		global $LAST;
@@ -201,7 +207,7 @@ echo $HTML;
 			if ($INDEX == $i)
 					$numbermenu .= "<em class=\"bold\">".$i."</em> | ";
 			else
-					$numbermenu .= "<a href=\"gallery.php?cat=".$CAT_REQUEST."&amp;index=".$i."\">".$i."</a> | ";
+					$numbermenu .= "<a href=\"gallery.php?gal=".$GAL_REQUEST."&amp;index=".$i."\">".$i."</a> | ";
 		}
 		// Rückgabe des Menüs
 		return substr($numbermenu, 0, strlen($numbermenu)-2);
@@ -216,6 +222,7 @@ echo $HTML;
 		global $DIR_THUMBS;
 		global $PICARRAY;
 		global $THUMBARRAY;
+		global $language;
 		global $mainconf;
 		
 		// Aus Config auslesen: Wieviele Bilder pro Tabellenzeile?
@@ -234,7 +241,7 @@ echo $HTML;
 			if (($i > 0) && ($i % $picsperrow == 0))
 				$thumbs .= "</tr><tr>";
 			$thumbs .= "<td class=\"gallerytd\" style=\"width:".floor(100 / $picsperrow)."%;\">"
-			."<a href=\"".$DIR_GALLERY.$PICARRAY[$i]."\" target=\"_blank\" title=\"Vollbildanzeige: ".$PICARRAY[$i]."\">"
+			."<a href=\"".$DIR_GALLERY.$PICARRAY[$i]."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $PICARRAY[$i])."\">"
 			."<img src=\"".$DIR_THUMBS.$THUMBARRAY[$i]."\" alt=\"".$THUMBARRAY[$i]."\" class=\"thumbnail\" />"
 			."</a><br />"
 			.$description
@@ -259,11 +266,12 @@ echo $HTML;
 		global $MAX_IMG_HEIGHT;
 		global $MAX_IMG_WIDTH;
 		global $PICARRAY;
+		global $language;
 		// Keine Bilder im Galerieverzeichnis?
 		if (count($PICARRAY) == 0)
 			return "&nbsp;";
 		// Link zur Vollbildansicht öffnen
-		$currentpic = "<a href=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" target=\"_blank\" title=\"Vollbildanzeige: ".$PICARRAY[$INDEX-1]."\">";
+		$currentpic = "<a href=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $PICARRAY[$INDEX-1])."\">";
 		// Bilder für die Anzeige skalieren
 		if (extension_loaded('gd')) {
 			$size = getimagesize($DIR_GALLERY.$PICARRAY[$INDEX-1]);
@@ -279,10 +287,10 @@ echo $HTML;
 				$h=$MAX_IMG_HEIGHT;
 				$w=round(($MAX_IMG_HEIGHT*$size[0])/$size[1]);
 			}
-			$currentpic .= "<img src=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" alt=\"Galeriebild &quot;".$PICARRAY[$INDEX-1]."&quot;\"  style=\"width:".$w."px;height:".$h."px;\"/>";
+			$currentpic .= "<img src=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $PICARRAY[$INDEX-1])."\"  style=\"width:".$w."px;height:".$h."px;\"/>";
 		}
 		else
-			$currentpic .= "<img src=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" alt=\"Galeriebild &quot;".$PICARRAY[$INDEX-1]."&quot;\"  style=\"max-width:".$MAX_IMG_WIDTH."px;max-height:".$MAX_IMG_HEIGHT."px;\"/>";
+			$currentpic .= "<img src=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $PICARRAY[$INDEX-1])."\"  style=\"max-width:".$MAX_IMG_WIDTH."px;max-height:".$MAX_IMG_HEIGHT."px;\"/>";
 			// Link zur Vollbildansicht schließen
 			$currentpic .= "</a>";
 		// Rückgabe des Bildes
@@ -313,10 +321,11 @@ echo $HTML;
 		global $INDEX;
 		global $LAST;
 		global $PICARRAY;
+		global $language;
 		// Keine Bilder im Galerieverzeichnis?
 		if (count($PICARRAY) == 0)
 			return "&nbsp;";
-		return "(Bild $INDEX von $LAST)";
+		return $language->getLanguageValue2("message_gallery_xoutofy_2", $INDEX, $LAST);
 	}
 	
 	
@@ -353,7 +362,7 @@ function checkThumbs() {
 	
 	// Vorschauverzeichnis prüfen
 	if (!file_exists($DIR_THUMBS))
-		die ("FEHLER: Fehlendes Vorschauverzeichnis!");
+		die ($language->getLanguageValue1("tooltip_link_category_error_1", $DIR_THUMBS));
 	// alle Bilder überprüfen: Vorschau dazu vorhanden?
 	foreach($PICARRAY as $pic) {
 		// Vorschaubild anlegen, wenn nicht vorhanden
