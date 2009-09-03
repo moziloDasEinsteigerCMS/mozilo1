@@ -526,28 +526,34 @@ INHALT
 				$content = str_replace ($match, "<a href=\"gallery.php?cat=$CAT_REQUEST\" title=\"Galerie &quot;".substr($specialchars->rebuildSpecialChars($CAT_REQUEST, true), 3, strlen($CAT_REQUEST) - 3)."&quot; ($j Bilder) ansehen\" target=\"_blank\">$value</a>", $content);
 			}
 
-			// Bild aus dem Dateiverzeichnis (überprüfen, ob Bilddatei existiert - sonst wird ein externer Pfad angenommen)
+			// Bild aus dem Dateiverzeichnis oder externes Bild
 			elseif ($attribute == "bild"){
 				if (file_exists("./$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/$value"))
 					$content = str_replace ($match, "<img src=\"$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/".preg_replace("'\s'", "%20", $value)."\" alt=\"Bild &quot;$value&quot;\" />", $content);
-				else
+				elseif (preg_match("/^(http|https|ftp|gopher|telnet|mms)\:\/\/((\w)+\:(\w)+\@)?[((\w)+\.)?(\w)+\.[a-zA-Z]{2,4}|([\d]{1,3}\.){3}[\d]{1,3}](\:[\d]{1,5})?((\w)+)?$/", $value))
 					$content = str_replace ($match, "<img src=\"$value\" alt=\"Bild &quot;$value&quot;\" />", $content);
+				else
+					$content = str_replace ($match, "<em class=\"deadlink\" title=\"Unbekannte Datei oder fehlerhafte Adresse: &quot;$value&quot;\">$value</em>", $content);
 			}
 
 			// Bild links ausgerichtet
 			elseif ($attribute == "bildlinks"){
 				if (file_exists("./$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/$value"))
 					$content = str_replace ($match, "<img src=\"$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/".preg_replace("'\s'", "%20", $value)."\" class=\"leftcontentimage\" alt=\"Bild &quot;$value&quot;\" />", $content);
-				else
+				elseif (preg_match("/^(http|https|ftp|gopher|telnet|mms)\:\/\/((\w)+\:(\w)+\@)?[((\w)+\.)?(\w)+\.[a-zA-Z]{2,4}|([\d]{1,3}\.){3}[\d]{1,3}](\:[\d]{1,5})?((\w)+)?$/", $value))
 					$content = str_replace ($match, "<img src=\"$value\" class=\"leftcontentimage\" alt=\"Bild &quot;$value&quot;\" />", $content);
+				else
+					$content = str_replace ($match, "<em class=\"deadlink\" title=\"Unbekannte Datei oder fehlerhafte Adresse: &quot;$value&quot;\">$value</em>", $content);
 			}
 
 			// Bild rechts ausgerichtet
 			elseif ($attribute == "bildrechts"){
 				if (file_exists("./$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/$value"))
 					$content = str_replace ($match, "<img src=\"$CONTENT_DIR_REL/$CAT_REQUEST/$CONTENT_FILES_DIR/".preg_replace("'\s'", "%20", $value)."\" class=\"rightcontentimage\" alt=\"Bild &quot;$value&quot;\" />", $content);
-				else
+				elseif (preg_match("/^(http|https|ftp|gopher|telnet|mms)\:\/\/((\w)+\:(\w)+\@)?[((\w)+\.)?(\w)+\.[a-zA-Z]{2,4}|([\d]{1,3}\.){3}[\d]{1,3}](\:[\d]{1,5})?((\w)+)?$/", $value))
 					$content = str_replace ($match, "<img src=\"$value\" class=\"rightcontentimage\" alt=\"Bild &quot;$value&quot;\" />", $content);
+				else
+					$content = str_replace ($match, "<em class=\"deadlink\" title=\"Unbekannte Datei oder fehlerhafte Adresse: &quot;$value&quot;\">$value</em>", $content);
 			}
 
 			// linksbündiger Text
@@ -783,7 +789,7 @@ INHALT
 // Anzeige der Informationen zum System
 // ------------------------------------------------------------------------------
 	function getCmsInfo() {
-		return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" class=\"latestchangedlink\" title=\"cms.mozilo.de\">moziloCMS 1.6</a>";
+		return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" class=\"latestchangedlink\" title=\"cms.mozilo.de\">moziloCMS 1.6.1</a>";
 	}
 
 
