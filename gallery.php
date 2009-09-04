@@ -34,7 +34,7 @@ require_once("Properties.php");
 require_once("SpecialChars.php");
 
 // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
-@ini_set("display_errors", 0);
+# @ini_set("display_errors", 0);
 
 $language = new Language();
 $mainconf = new Properties("conf/main.conf");
@@ -66,12 +66,12 @@ $CSS_FILE                = "layouts/$LAYOUT_DIR/css/style.css";
 $FAVICON_FILE        = "layouts/$LAYOUT_DIR/favicon.ico";
 
 // Übergebene Parameter überprüfen
-$GAL_REQUEST = htmlentities($_GET['gal'],ENT_COMPAT,'ISO-8859-1');
+$GAL_REQUEST = $specialchars->replaceSpecialChars($_GET['gal'],false);
 $DIR_GALLERY = "./galerien/".$GAL_REQUEST."/";
 $DIR_THUMBS = $DIR_GALLERY."vorschau/";
 if (($GAL_REQUEST == "") || (!file_exists($DIR_GALLERY)))
     die ($language->getLanguageValue1("message_gallerydir_error_1", $GAL_REQUEST));
-$GAL_NAME = $specialchars->rebuildSpecialChars($GAL_REQUEST, true);
+$GAL_NAME = $specialchars->rebuildSpecialChars($GAL_REQUEST, true, true);
 
 // Galerieverzeichnis einlesen
 $PICARRAY = getPicsAsArray($DIR_GALLERY, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
@@ -244,7 +244,7 @@ echo $HTML;
         global $THUMBARRAY;
         global $language;
         global $mainconf;
-        
+        global $specialchars;
         // Aus Config auslesen: Wieviele Bilder pro Tabellenzeile?
         $picsperrow = $mainconf->get("gallerypicsperrow");
         if (($picsperrow == "") || ($picsperrow == 0))
@@ -261,8 +261,8 @@ echo $HTML;
             if (($i > 0) && ($i % $picsperrow == 0))
                 $thumbs .= "</tr><tr>";
             $thumbs .= "<td class=\"gallerytd\" style=\"width:".floor(100 / $picsperrow)."%;\">"
-            ."<a href=\"".$DIR_GALLERY.$PICARRAY[$i]."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $PICARRAY[$i])."\">"
-            ."<img src=\"".$DIR_THUMBS.$THUMBARRAY[$i]."\" alt=\"".$THUMBARRAY[$i]."\" class=\"thumbnail\" />"
+            ."<a href=\"".$specialchars->replaceSpecialChars($DIR_GALLERY.$PICARRAY[$i],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($PICARRAY[$i],true,true))."\">"
+            ."<img src=\"".$specialchars->replaceSpecialChars($DIR_THUMBS.$THUMBARRAY[$i],true)."\" alt=\"".$specialchars->rebuildSpecialChars($THUMBARRAY[$i],true,true)."\" class=\"thumbnail\" />"
             ."</a><br />"
             .$description
             ."</td>";
@@ -287,11 +287,12 @@ echo $HTML;
         global $MAX_IMG_WIDTH;
         global $PICARRAY;
         global $language;
+        global $specialchars;
         // Keine Bilder im Galerieverzeichnis?
         if (count($PICARRAY) == 0)
             return "&nbsp;";
         // Link zur Vollbildansicht öffnen
-        $currentpic = "<a href=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $PICARRAY[$INDEX-1])."\">";
+        $currentpic = "<a href=\"".$specialchars->replaceSpecialChars($DIR_GALLERY.$PICARRAY[$INDEX-1],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($PICARRAY[$INDEX-1],true,true))."\">";
         // Bilder für die Anzeige skalieren
         if (extension_loaded('gd')) {
             $size = getimagesize($DIR_GALLERY.$PICARRAY[$INDEX-1]);
@@ -307,10 +308,10 @@ echo $HTML;
                 $h=$MAX_IMG_HEIGHT;
                 $w=round(($MAX_IMG_HEIGHT*$size[0])/$size[1]);
             }
-            $currentpic .= "<img src=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $PICARRAY[$INDEX-1])."\"  style=\"width:".$w."px;height:".$h."px;\" />";
+            $currentpic .= "<img src=\"".$specialchars->replaceSpecialChars($DIR_GALLERY.$PICARRAY[$INDEX-1],true)."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $specialchars->rebuildSpecialChars($PICARRAY[$INDEX-1],true,true))."\"  style=\"width:".$w."px;height:".$h."px;\" />";
         }
         else
-            $currentpic .= "<img src=\"".$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $PICARRAY[$INDEX-1])."\"  style=\"max-width:".$MAX_IMG_WIDTH."px;max-height:".$MAX_IMG_HEIGHT."px;\" />";
+            $currentpic .= "<img src=\"".$specialchars->replaceSpecialChars($DIR_GALLERY.$PICARRAY[$INDEX-1],true)."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $specialchars->rebuildSpecialChars($PICARRAY[$INDEX-1],true,true))."\"  style=\"max-width:".$MAX_IMG_WIDTH."px;max-height:".$MAX_IMG_HEIGHT."px;\" />";
             // Link zur Vollbildansicht schließen
             $currentpic .= "</a>";
         // Rückgabe des Bildes
@@ -366,7 +367,7 @@ function getPicsAsArray($dir, $filetypes) {
         if (($file <> ".") && ($file <> "..") && (in_array(strtolower(substr(strrchr($file, "."), 1, strlen(strrchr($file, "."))-1)), $filetypes))) {
             // ...wenn alles paßt, ans Bilder-Array anhängen
             array_push($picarray, $file);
-        }
+    }
     }
     closedir($currentdir);
     sort($picarray);

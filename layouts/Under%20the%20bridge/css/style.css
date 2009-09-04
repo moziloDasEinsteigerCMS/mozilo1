@@ -100,10 +100,13 @@ body {
 }
 
 #footer {
-	margin: 80px 0px 0px 0px;
+	height:143px;
+	background-image: url(../grafiken/footer.jpg);
+}
+#footercontent {
 	text-align: center;
 	font-size: .9em;
-	width:inherit;
+	padding: 80px 0px 0px 0px;
 }
 
 /******************************* menu ****************************************/
@@ -337,4 +340,32 @@ td.contenttable2 {
 
 td.gallerytd {
 	vertical-align:top;
+}
+
+/* -------------------------------------------------------- */
+/* [zentriert|...] */
+/* --------------- */
+.aligncenter {
+    text-align:center;
+}
+
+/* -------------------------------------------------------- */
+/* [links|...] */
+/* ----------- */
+.alignleft {
+    text-align:left;
+}
+
+/* -------------------------------------------------------- */
+/* [rechts|...] */
+/* ------------ */
+.alignright {
+    text-align:right;
+}
+
+/* -------------------------------------------------------- */
+/* [block|...] */
+/* ----------- */
+.alignjustify {
+    text-align:justify;
 }

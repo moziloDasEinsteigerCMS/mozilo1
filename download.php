@@ -16,8 +16,10 @@
 	$ERRORMESSAGE = "Fehlerhafter Parameter übergeben.";	
 	$DOWNLOADS = new Properties("conf/downloads.conf");
 
-	$CAT 	= preg_replace('/(\/|\\\)/', "", htmlspecialchars($_REQUEST['cat']));
-	$FILE = preg_replace('/(\/|\\\)/', "", htmlspecialchars($_REQUEST['file']));
+#	$CAT 	= preg_replace('/(\/|\\\)/', "", htmlspecialchars($_REQUEST['cat']));
+#	$FILE = preg_replace('/(\/|\\\)/', "", htmlspecialchars($_REQUEST['file']));
+	$CAT 	= preg_replace('/(\/|\\\)/', "", rawurlencode($_REQUEST['cat']));
+	$FILE = preg_replace('/(\/|\\\)/', "", rawurlencode($_REQUEST['file']));
 	$PATH = "kategorien/$CAT/dateien/$FILE";
 
 	// Abbruch bei fehlerhaften Parametern

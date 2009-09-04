@@ -41,7 +41,7 @@ class SpecialChars {
 // Erlaubte Sonderzeichen als RegEx zurückgeben
 // ------------------------------------------------------------------------------
 	function getSpecialCharsRegex() {
-		$regex = "/^[a-zA-Z0-9_\-\s\?\!\@\.€".addslashes(html_entity_decode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)),ENT_COMPAT,'ISO-8859-1'))."]+$/";
+		$regex = "/^[a-zA-Z0-9_\%\-\s\?\!\@\.€".addslashes(html_entity_decode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)),ENT_COMPAT,'ISO-8859-1'))."]+$/";
 		$regex = preg_replace("/&#39;/", "\'", $regex);
 		return $regex;
 	}
@@ -68,8 +68,18 @@ class SpecialChars {
 // ------------------------------------------------------------------------------    
 // Inhaltsseiten/Kategorien für Speicherung umlaut- und sonderzeichenbereinigen 
 // ------------------------------------------------------------------------------
-	function replaceSpecialChars($text) {
-		$text = htmlentities(stripslashes($text),ENT_COMPAT,'ISO-8859-1');
+	function replaceSpecialChars($text,$nochmal_erlauben) {
+		# $nochmal_erlauben = für Tags mit src z.B. img dann muss das % auch gewndelt werden
+		$text = str_replace('/','ssslashhh',$text);
+
+		if(preg_match('#\%([0-9a-f]{2})#ie',$text) < 1)
+			$text = rawurlencode(stripslashes($text));
+		if($nochmal_erlauben)
+			$text = rawurlencode(stripslashes($text));
+		$text = str_replace('ssslashhh','/',$text);
+
+/*		$text = htmlentities(stripslashes($text));
+
 		// Leerzeichen
 		$text = preg_replace("/(\s| |\240|&nbsp;)/", "-nbsp~", $text);
 		$text = preg_replace("/\"/", "-quot~", $text);
@@ -78,7 +88,7 @@ class SpecialChars {
 		$text = preg_replace("/@/", "-at~", $text);
 		$text = preg_replace("/\?/", "-ques~", $text);
 		// Alle HTML-Entities in mozilo-Entities umwandeln
-		$text = preg_replace("/&(.*);/U", "-$1~", $text);
+		$text = preg_replace("/&(.*);/U", "-$1~", $text);*/
 		return $text;
 	}
 
@@ -86,8 +96,17 @@ class SpecialChars {
 // ------------------------------------------------------------------------------    
 // Umlaute in Inhaltsseiten/Kategorien für Anzeige 
 // ------------------------------------------------------------------------------
-	function rebuildSpecialChars($text, $rebuildnbsp) {
+	function rebuildSpecialChars($text, $rebuildnbsp, $html) {
+		$text = rawurldecode($text);
+		if($html)
+			$text = htmlentities($text, ENT_COMPAT, 'ISO-8859-1');
 		// Leerzeichen
+		if ($rebuildnbsp and !$html)
+			$text = preg_replace("/ /", "&nbsp;", $text);
+		elseif(!$rebuildnbsp and $html)
+			$text = preg_replace("/&nbsp;/", " ", $text);
+
+/*		// Leerzeichen
 		if ($rebuildnbsp)
 			$text = preg_replace("/-nbsp~/", "&nbsp;", $text);
 		else
@@ -96,9 +115,11 @@ class SpecialChars {
 		$text = preg_replace("/-at~/", "@", $text);
 		$text = preg_replace("/-ques~/", "?", $text);
 		// Alle mozilo-Entities in HTML-Entities umwandeln!
-		$text = preg_replace("/-([^-~]+)~/U", "&$1;", $text);
+		$text = preg_replace("/-([^-~]+)~/U", "&$1;", $text);*/
 		// & escapen 
 		//$text = preg_replace("/&+(?!(.+);)/U", "&amp;", $text);
+		
+		$text = html_entity_decode($text, ENT_COMPAT, 'ISO-8859-1');
 		return $text;
 	}
 
@@ -107,7 +128,7 @@ class SpecialChars {
 // Für Datei-Uploads erlaubte Sonderzeichen als RegEx zurückgeben
 // ------------------------------------------------------------------------------
 	function getFileCharsRegex() {
-		$regex = "/^[a-zA-Z0-9_\-\.]+$/";
+		$regex = "/^[a-zA-Z0-9_\%\-\.]+$/";
 		return $regex;
 	}
 	
@@ -134,7 +155,7 @@ class SpecialChars {
 // ------------------------------------------------------------------------------    
 // String für SEO-Links umlaut- und sonderzeichenbereinigen 
 // ------------------------------------------------------------------------------
-	function replaceSeoSpecialChars($text) {
+/*	function replaceSeoSpecialChars($text) {
 		$text = preg_replace("/ä/", "ae", $text);
 		$text = preg_replace("/ö/", "oe", $text);
 		$text = preg_replace("/ü/", "ue", $text);
@@ -152,6 +173,6 @@ class SpecialChars {
 		$text = preg_replace("/>/", "+", $text);
 		$text = preg_replace("/@/", "at", $text);
 		return $text;
-	}
+	}*/
 }
 ?>

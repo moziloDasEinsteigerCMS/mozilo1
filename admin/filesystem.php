@@ -92,7 +92,7 @@ function show_dirs($maindir, $selecteddir)
 			if (addFrontZero($pos)."_".specialNrDir($maindir, addFrontZero($pos)) == $selecteddir)
 			$selected = "selected=\"selected\" ";
 			$content .= "<option style=\"color:lightgrey;\"$selected>";
-			$content .= addFrontZero($pos)." ".$specialchars->rebuildSpecialChars(specialNrDir($maindir, addFrontZero($pos)), true);
+			$content .= addFrontZero($pos)." ".$specialchars->rebuildSpecialChars(specialNrDir($maindir, addFrontZero($pos)), true, true);
 			$content .= "</option>";
 		}
 	  
@@ -142,7 +142,7 @@ function show_files($dir, $currentfile, $includedrafts)
 				$selected = " ";
 			}
 			$content .= "<option ".$selected."style=\"color:lightgrey;\">";
-			$fullname = $specialchars->rebuildSpecialChars(specialNrFile($dir, addFrontZero($pos)), true);
+			$fullname = $specialchars->rebuildSpecialChars(specialNrFile($dir, addFrontZero($pos)), true, true);
 			$content .= addFrontZero($pos)." ".substr($fullname, 0, strlen($fullname)-strlen(".txt"));
 			$content .= "</option>";
 		}
@@ -253,7 +253,7 @@ function createCategory()
 	global $specialchars;
 	global $ADMIN_CONF;
 	
-	$betterString = $specialchars->replaceSpecialChars($_REQUEST["name"]);
+	$betterString = $specialchars->replaceSpecialChars($_REQUEST["name"],false);
 	mkdir ("../kategorien/".$_REQUEST["position"]."_".$betterString, 0777);
 	mkdir ("../kategorien/".$_REQUEST["position"]."_".$betterString."/dateien", 0777);
 	// chmod, wenn so eingestellt
@@ -297,9 +297,9 @@ function getCatsAsSelect($selectedcat) {
 	$select = "<select name=\"cat\">";
 	foreach ($dirs as $file) {
 		if (($selectedcat <> "") && ($file == $selectedcat))
-		$select .= "<option selected=\"selected\" value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</option>";
+		$select .= "<option selected=\"selected\" value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true, true)."</option>";
 		else
-		$select .= "<option value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true)."</option>";
+		$select .= "<option value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true, true)."</option>";
 	}
 	$select .= "</select>";
 	return $select;
@@ -318,9 +318,9 @@ function getGalleriesAsSelect($selectedgallery) {
 	$select = "<select name=\"gal\">";
 	foreach ($dirs as $file) {
 		if (($selectedgallery <> "") && ($file == $selectedgallery))
-		$select .= "<option selected=\"selected\" value=\"".$file."\">".$specialchars->rebuildSpecialChars($file, true)."</option>";
+		$select .= "<option selected=\"selected\" value=\"".$file."\">".$specialchars->rebuildSpecialChars($file, true, true)."</option>";
 		else
-		$select .= "<option value=\"".$file."\">".$specialchars->rebuildSpecialChars($file, true)."</option>";
+		$select .= "<option value=\"".$file."\">".$specialchars->rebuildSpecialChars($file, true, true)."</option>";
 	}
 	$select .= "</select>";
 	return $select;
@@ -432,28 +432,35 @@ function convertFileSizeUnit($filesize){
 		global $specialchars;
 		global $CONTENT_DIR_REL;
 
-		$pos_currentPagesCategory 	= $specialchars->rebuildSpecialChars($currentPagesCategory,false);
-		$pos_oldCategory		= $specialchars->rebuildSpecialChars($oldCategory,false);
-		$pos_oldPage			= $specialchars->rebuildSpecialChars($oldPage,false);
-		$pos_newCategory 		= $specialchars->rebuildSpecialChars($newCategory,false);
-		$pos_newPage 			= $specialchars->rebuildSpecialChars($newPage,false);
-		$movedPage 			= $specialchars->rebuildSpecialChars($movedPage,false);
+		$pos_currentPagesCategory 	= $specialchars->rebuildSpecialChars($currentPagesCategory,false,false);
+		$pos_oldCategory		= $specialchars->rebuildSpecialChars($oldCategory,false,false);
+		$pos_oldPage			= $specialchars->rebuildSpecialChars($oldPage,false,false);
+		$pos_newCategory 		= $specialchars->rebuildSpecialChars($newCategory,false,false);
+		$pos_newPage 			= $specialchars->rebuildSpecialChars($newPage,false,false);
+		$movedPage 			= $specialchars->rebuildSpecialChars($movedPage,false,false);
 
 		$changesmade = false;
-	
-		$oldCategory	= html_entity_decode(substr($pos_oldCategory,3),ENT_COMPAT,'ISO-8859-1');
-		$oldPage	= html_entity_decode(substr($pos_oldPage,3,-4),ENT_COMPAT,'ISO-8859-1');
-		$newCategory 	= html_entity_decode(substr($pos_newCategory,3),ENT_COMPAT,'ISO-8859-1');
-		$newPage 	= html_entity_decode(substr($pos_newPage,3,-4),ENT_COMPAT,'ISO-8859-1');
 
+		# ein Hack weil in Inhaltsete ein ^ vor [ und ] ist im Dateinamen aber nicht
+		$hack_eckigeklamern = str_replace(array("[","]"),array("&#94;[","&#94;]"),array($pos_oldCategory,$pos_oldPage,$pos_newCategory,$pos_newPage));
+
+		$oldCategory	= html_entity_decode(substr($hack_eckigeklamern[0],3),ENT_COMPAT,'ISO-8859-1');
+		$oldPage	= html_entity_decode(substr($hack_eckigeklamern[1],3,-4),ENT_COMPAT,'ISO-8859-1');
+		$newCategory 	= html_entity_decode(substr($hack_eckigeklamern[2],3),ENT_COMPAT,'ISO-8859-1');
+		$newPage 	= html_entity_decode(substr($hack_eckigeklamern[3],3,-4),ENT_COMPAT,'ISO-8859-1');
+
+		# ein Hack weil dieses preg_match_all nicht mit ^, [ und ] im attribut umgehen kann
+		$currentPagesContentmatches = str_replace(array("^[","^]"),array("&#94;&#091;","&#94;&#093;"),$currentPagesContent);
 		// Nach Texten in eckigen Klammern suchen
-		preg_match_all("/\[([^\[\]]+)\|([^\[\]]*)\]/Um", $currentPagesContent, $matches);
+		preg_match_all("/\[([^\[\]]+)\|([^\[\]]*)\]/Um", $currentPagesContentmatches, $matches);
 		$i = 0;
 	
 		$allowed_attributes = array("seite","kategorie","datei","bild","bildlinks","bildrechts","include");
 	
 		// Für jeden Treffer...
 		foreach ($matches[0] as $match) {
+			# ein Hack weil dieses preg_match_all nicht mit ^, [ und ] im attribut umgehen kann
+			$match = str_replace(array("&#94;&#091;","&#94;&#093;"),array("^[","^]"),$match);
 			// ...Auswertung und Verarbeitung der Informationen
 			$attribute = $matches[1][$i];
 			$replace_match = "";
@@ -472,7 +479,7 @@ if($debug) echo "datei = $pos_currentPagesCategory/$movedPage<br>\n";
 				if(!empty($oldCategory) and !empty($newCategory) and empty($oldPage) and empty($newPage))
 				{
 					# einfach alle oldCategory -> newCategory
-					if(strstr($match,"|".$oldCategory.":") or strstr($match,"|".$oldCategory."]"))  
+					if(strstr($match,"|".$oldCategory.":") or strstr($match,"|".$oldCategory."]"))
 					{
 						$replace_match = str_replace($oldCategory,$newCategory,$match);
 if($debug) echo "cat = $match -> $replace_match<br>\n";
@@ -521,6 +528,8 @@ if($debug) echo "cat_page = $match -> $replace_match<br>\n";
 				}
 				# änderung nur wenn was geändert wurde
 				if(!empty($replace_match) and $matches[0][$i] != $replace_match) {
+					# ein Hack weil dieses preg_match_all nicht mit ^, [ und ] im attribut umgehen kann
+					$matches[0][$i] = str_replace(array("&#94;&#091;","&#94;&#093;"),array("^[","^]"),$matches[0][$i]);
 					$currentPagesContent = str_replace ($matches[0][$i], $replace_match, $currentPagesContent);
 if($debug) echo "diff == match = ".$matches[0][$i]." | replace_match = $replace_match<br>\n";
 					$changesmade = true;
