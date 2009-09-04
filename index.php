@@ -179,8 +179,8 @@ echo "</pre>";
        // [1] = Name der Kategorie (leer bei getSiteMap, getSearchResult)
        // [2] = Name des Inhalts
     $pagecontent = "";
-       $cattitle = "";
-       $pagetitle = "";
+    $cattitle = "";
+    $pagetitle = "";
      
     if ($ACTION_REQUEST == "sitemap") {
         $pagecontentarray = getSiteMap();
@@ -204,17 +204,18 @@ echo "</pre>";
         $pagecontentarray = getContent();
         $pagecontent    = $pagecontentarray[0];
         $cattitle         = $pagecontentarray[1];
-          $pagetitle         = $pagecontentarray[2];
-      }
+        $pagetitle         = $pagecontentarray[2];
+    }
       
-      // Smileys ersetzen
-         if ($mainconfig->get("replaceemoticons") == "true")
-          $pagecontent = $smileys->replaceEmoticons($pagecontent);
+    // Smileys ersetzen
+    if ($mainconfig->get("replaceemoticons") == "true") {
+        $pagecontent = $smileys->replaceEmoticons($pagecontent);
+    }
 
-        // Gesuchte Phrasen hervorheben
-        if ($HIGHLIGHT_REQUEST <> "") {
-            $pagecontent = highlight($pagecontent, $HIGHLIGHT_REQUEST);
-        }
+    // Gesuchte Phrasen hervorheben
+    if ($HIGHLIGHT_REQUEST <> "") {
+        $pagecontent = highlight($pagecontent, $HIGHLIGHT_REQUEST);
+    }
 
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
@@ -225,26 +226,42 @@ echo "</pre>";
     $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle), $HTML);
 
     // Meta-Tag "keywords"
-       $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $mainconfig->get("websitekeywords"), $HTML);
+    $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $mainconfig->get("websitekeywords"), $HTML);
     // Meta-Tag "description"
-       $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $mainconfig->get("websitedescription"), $HTML);
+    $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $mainconfig->get("websitedescription"), $HTML);
 
-        $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
+    $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
     $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
 
-        // Detailmenü nicht zeigen, wenn Submenüs aktiviert sind
-        if ($mainconfig->get("usesubmenu") > 0) {
-            $HTML = preg_replace('/{DETAILMENU}/', "", $HTML);
-        }
-        else {
+    // Detailmenü (nicht zeigen, wenn Submenüs aktiviert sind)
+    if ($mainconfig->get("usesubmenu") > 0) {
+        $HTML = preg_replace('/{DETAILMENU}/', "", $HTML);
+    }
+    else {
         $HTML = preg_replace('/{DETAILMENU}/', getDetailMenu($CAT_REQUEST), $HTML);
     }
+    // Suchformular
     $HTML = preg_replace('/{SEARCH}/', getSearchForm(), $HTML);
-    $HTML = preg_replace('/{LASTCHANGE}/', getLastChangedContentPage(), $HTML);
+
+    // Letzte Änderung
+    $lastchangeinfo = getLastChangedContentPageAndDate();
+    // - Name der zuletzt geänderten Inhaltsseite
+    // - kompletter Link auf diese Inhaltsseite  
+    // - formatiertes Datum der letzten Änderung
+    $HTML = preg_replace('/{LASTCHANGEDTEXT}/', $language->getLanguageValue0("message_lastchange_0"), $HTML);
+    $HTML = preg_replace('/{LASTCHANGEDPAGE}/', $lastchangeinfo[0], $HTML);
+    $HTML = preg_replace('/{LASTCHANGEDPAGELINK}/', $lastchangeinfo[1], $HTML);
+    $HTML = preg_replace('/{LASTCHANGEDATE}/', $lastchangeinfo[2], $HTML);
+    // Platzhalter {LASTCHANGE} ist obsolet seit 1.12! Wird nur aus Gründen der Abwärtskompatibilität noch ersetzt 
+    $HTML = preg_replace('/{LASTCHANGE}/', $language->getLanguageValue0("message_lastchange_0")." ".$lastchangeinfo[1]." (".$lastchangeinfo[2].")", $HTML); 
+    
+    // Sitemap-Link
     $HTML = preg_replace('/{SITEMAPLINK}/', "<a href=\"index.php?action=sitemap\" id=\"sitemaplink\"".getTitleAttribute($language->getLanguageValue0("tooltip_showsitemap_0")).">".$language->getLanguageValue0("message_sitemap_0")."</a>", $HTML);
+    
+    // CMS-Info-Link
     $HTML = preg_replace('/{CMSINFO}/', getCmsInfo(), $HTML);
       
-         // Kontaktformular
+    // Kontaktformular
     $HTML = preg_replace('/{CONTACT}/', buildContactForm(), $HTML);
     }
 
@@ -561,9 +578,12 @@ echo "</pre>";
 
 
 // ------------------------------------------------------------------------------
-// Einlesen des Inhalts-Verzeichnisses, Rückgabe der zuletzt geänderten Datei
+// Rückgabe eines Array, bestehend aus:
+// - Name der zuletzt geänderten Inhaltsseite
+// - kompletter Link auf diese Inhaltsseite  
+// - formatiertes Datum der letzten Änderung
 // ------------------------------------------------------------------------------
-    function getLastChangedContentPage(){
+    function getLastChangedContentPageAndDate(){
         global $CONTENT_DIR_REL;
         global $language;
         global $specialchars;
@@ -581,9 +601,13 @@ echo "</pre>";
         }
         }
         closedir($currentdir);
-        return $language->getLanguageValue0("message_lastchange_0")." <a href=\"index.php?cat=".$latestchanged['cat']."&amp;page=".substr($latestchanged['file'], 0, strlen($latestchanged['file'])-4)."\"".getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true), $specialchars->rebuildSpecialChars(substr($latestchanged['cat'], 3, strlen($latestchanged['cat'])-3), true, true)))." id=\"lastchangelink\">".$specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true)."</a> (".strftime($language->getLanguageValue0("_dateformat_0"), date($latestchanged['time'])).")";
+        
+        $lastchangedpage = $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true);
+        $linktolastchangedpage = "<a href=\"index.php?cat=".$latestchanged['cat']."&amp;page=".substr($latestchanged['file'], 0, strlen($latestchanged['file'])-4)."\"".getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true), $specialchars->rebuildSpecialChars(substr($latestchanged['cat'], 3, strlen($latestchanged['cat'])-3), true, true)))." id=\"lastchangelink\">".$lastchangedpage."</a>";
+        $lastchangedate = strftime($language->getLanguageValue0("_dateformat_0"), date($latestchanged['time']));
+        
+        return array($lastchangedpage, $linktolastchangedpage,$lastchangedate);
     }
-
 
 
 // ------------------------------------------------------------------------------
