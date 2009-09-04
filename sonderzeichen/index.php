@@ -2,9 +2,9 @@
 
 /* 
 * 
-* $Revision: 73 $
-* $LastChangedDate: 2009-01-05 17:12:45 +0100 (Mo, 05 Jan 2009) $
-* $Author: arvid $
+* $Revision$
+* $LastChangedDate$
+* $Author$
 *
 */
 
@@ -85,7 +85,7 @@
 
 		$form = "<form accept-charset=\"ISO-8859-1\" method=\"get\" action=\"index.php\" name=\"form\" >\n"
 		."<input type=\"text\" id=\"input\" name=\"input\" value=\""
-		.htmlentities($input)
+		.htmlentities($input,ENT_COMPAT,'ISO-8859-1')
 		."\" /> \n"
 		."<input type=\"submit\" id=\"ok\" value=\" OK \" /><br />\n"
 		."<input type=\"radio\" name=\"type\" value=\"0\"$checked0 />Sonderzeichen ersetzen / replace special characters <br />\n"

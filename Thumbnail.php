@@ -2,9 +2,9 @@
 
 /* 
 * 
-* $Revision: 186 $
-* $LastChangedDate: 2009-04-06 20:42:30 +0200 (Mo, 06 Apr 2009) $
-* $Author: arvid $
+* $Revision$
+* $LastChangedDate$
+* $Author$
 *
 */
 

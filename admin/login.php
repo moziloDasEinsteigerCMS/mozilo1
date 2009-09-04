@@ -2,9 +2,9 @@
 
 /* 
 * 
-* $Revision: 190 $
-* $LastChangedDate: 2009-04-23 21:42:09 +0200 (Do, 23 Apr 2009) $
-* $Author: arvid $
+* $Revision$
+* $LastChangedDate$
+* $Author$
 *
 */
 
@@ -138,7 +138,7 @@ function login_formular($enabled) {
 	else
 		$form .= "<div id=\"loginform_maindiv_disabled\">";
 	if ($enabled)
-		$form .= "<form accept-charset=\"ISO-8859-1\" name=\"loginform\" action=\"".htmlentities($_SERVER['PHP_SELF'])."\" method=\"POST\">";
+		$form .= "<form accept-charset=\"ISO-8859-1\" name=\"loginform\" action=\"".htmlentities($_SERVER['PHP_SELF'],ENT_COMPAT,'ISO-8859-1')."\" method=\"POST\">";
   $form .= "<table>"
   	."<tr>"
   	."<td class=\"loginImage\" rowspan=\"2\">"

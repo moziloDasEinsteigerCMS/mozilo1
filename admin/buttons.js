@@ -1,8 +1,8 @@
 /* 
 * 
-* $Revision: 74 $
-* $LastChangedDate: 2009-01-08 19:43:18 +0100 (Do, 08 Jan 2009) $
-* $Author: arvid $
+* $Revision$
+* $LastChangedDate$
+* $Author$
 *
 */
 

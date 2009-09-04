@@ -2,9 +2,9 @@
 
 /* 
 * 
-* $Revision: 198 $
-* $LastChangedDate: 2009-05-13 20:09:42 +0200 (Mi, 13 Mai 2009) $
-* $Author: arvid $
+* $Revision$
+* $LastChangedDate$
+* $Author$
 *
 */
 
@@ -54,7 +54,7 @@ function setLastBackup()
 function getLanguageValue($confpara)
 {
 	$BASIC_LANGUAGE 	= new Properties("conf/language_".getLanguage().".conf");
-	return htmlentities($BASIC_LANGUAGE->get($confpara));
+	return htmlentities($BASIC_LANGUAGE->get($confpara),ENT_COMPAT,'ISO-8859-1');
 }
 
 /**--------------------------------------------------------------------------------
@@ -441,10 +441,10 @@ function convertFileSizeUnit($filesize){
 
 		$changesmade = false;
 	
-		$oldCategory	= html_entity_decode(substr($pos_oldCategory,3));
-		$oldPage	= html_entity_decode(substr($pos_oldPage,3,-4));
-		$newCategory 	= html_entity_decode(substr($pos_newCategory,3));
-		$newPage 	= html_entity_decode(substr($pos_newPage,3,-4));
+		$oldCategory	= html_entity_decode(substr($pos_oldCategory,3),ENT_COMPAT,'ISO-8859-1');
+		$oldPage	= html_entity_decode(substr($pos_oldPage,3,-4),ENT_COMPAT,'ISO-8859-1');
+		$newCategory 	= html_entity_decode(substr($pos_newCategory,3),ENT_COMPAT,'ISO-8859-1');
+		$newPage 	= html_entity_decode(substr($pos_newPage,3,-4),ENT_COMPAT,'ISO-8859-1');
 
 		// Nach Texten in eckigen Klammern suchen
 		preg_match_all("/\[([^\[\]]+)\|([^\[\]]*)\]/Um", $currentPagesContent, $matches);

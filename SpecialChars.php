@@ -2,9 +2,9 @@
 
 /* 
 * 
-* $Revision: 115 $
-* $LastChangedDate: 2009-01-27 21:14:39 +0100 (Di, 27 Jan 2009) $
-* $Author: arvid $
+* $Revision$
+* $LastChangedDate$
+* $Author$
 *
 */
 
@@ -41,7 +41,7 @@ class SpecialChars {
 // Erlaubte Sonderzeichen als RegEx zurückgeben
 // ------------------------------------------------------------------------------
 	function getSpecialCharsRegex() {
-		$regex = "/^[a-zA-Z0-9_\-\s\?\!\@\.€".addslashes(html_entity_decode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES))))."]+$/";
+		$regex = "/^[a-zA-Z0-9_\-\s\?\!\@\.€".addslashes(html_entity_decode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)),ENT_COMPAT,'ISO-8859-1'))."]+$/";
 		$regex = preg_replace("/&#39;/", "\'", $regex);
 		return $regex;
 	}
@@ -58,9 +58,9 @@ class SpecialChars {
 			$specialcharsstring .= chr($i);
 		for ($i=48; $i<=57;$i++)
 			$specialcharsstring .= chr($i);
-		$specialcharsstring .= html_entity_decode("_- ?!€@.".stripslashes(preg_replace("/&#39;/", "\'", implode(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)))));
+		$specialcharsstring .= html_entity_decode("_- ?!€@.".stripslashes(preg_replace("/&#39;/", "\'", implode(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)))),ENT_COMPAT,'ISO-8859-1');
 		for ($i=0; $i<=strlen($specialcharsstring); $i+=$charsperline) {
-			$specialcharshtml .= htmlentities(substr($specialcharsstring, $i, $charsperline))."<br />";
+			$specialcharshtml .= htmlentities(substr($specialcharsstring, $i, $charsperline),ENT_COMPAT,'ISO-8859-1')."<br />";
 		}
 		return $specialcharshtml;
 	}
@@ -69,7 +69,7 @@ class SpecialChars {
 // Inhaltsseiten/Kategorien für Speicherung umlaut- und sonderzeichenbereinigen 
 // ------------------------------------------------------------------------------
 	function replaceSpecialChars($text) {
-		$text = htmlentities(stripslashes($text));
+		$text = htmlentities(stripslashes($text),ENT_COMPAT,'ISO-8859-1');
 		// Leerzeichen
 		$text = preg_replace("/(\s| |\240|&nbsp;)/", "-nbsp~", $text);
 		$text = preg_replace("/\"/", "-quot~", $text);
@@ -125,7 +125,7 @@ class SpecialChars {
 			$filecharsstring .= chr($i);
 		$filecharsstring .= "_-.";
 		for ($i=0; $i<=strlen($filecharsstring); $i+=$charsperline) {
-			$filecharshtml .= htmlentities(substr($filecharsstring, $i, $charsperline))."<br />";
+			$filecharshtml .= htmlentities(substr($filecharsstring, $i, $charsperline),ENT_COMPAT,'ISO-8859-1')."<br />";
 		}
 		return $filecharshtml;
 	}

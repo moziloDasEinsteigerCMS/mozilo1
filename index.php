@@ -2,9 +2,9 @@
 
 /* 
 * 
-* $Revision: 197 $
-* $LastChangedDate: 2009-05-13 18:08:41 +0200 (Mi, 13 Mai 2009) $
-* $Author: arvid $
+* $Revision$
+* $LastChangedDate$
+* $Author$
 *
 */
 
@@ -215,7 +215,7 @@ echo "</pre>";
 
 		// Gesuchte Phrasen hervorheben
 		if ($HIGHLIGHT_REQUEST <> "") {
-			$pagecontent = highlight($pagecontent, html_entity_decode($HIGHLIGHT_REQUEST));
+			$pagecontent = highlight($pagecontent, html_entity_decode($HIGHLIGHT_REQUEST,ENT_COMPAT,'ISO-8859-1'));
 		}
 
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
@@ -489,7 +489,7 @@ echo "</pre>";
 			$detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=sitemap\" class=\"".$cssprefix."active\">".$language->getLanguageValue0("message_sitemap_0")."</a></li>";
 		// Suchergebnis
 		elseif (($ACTION_REQUEST == "search") && ($mainconfig->get("usesubmenu") == 0))
-			$detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=search&amp;query=".$QUERY_REQUEST."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", html_entity_decode($QUERY_REQUEST))."</a></li>";
+			$detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=search&amp;query=".$QUERY_REQUEST."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", html_entity_decode($QUERY_REQUEST,ENT_COMPAT,'ISO-8859-1'))."</a></li>";
 		// Entwurfsansicht
 		elseif (($ACTION_REQUEST == "draft") && ($mainconfig->get("usesubmenu") == 0))
 			$detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?cat=$cat&amp;page=$PAGE_REQUEST&amp;action=draft\" class=\"".$cssprefix."active\">".pageToName($PAGE_REQUEST.$EXT_DRAFT, false)." (".$language->getLanguageValue0("message_draft_0").")</a></li>";
@@ -765,7 +765,7 @@ echo "</pre>";
 				$valuearray = explode(":", $matches[1][$i]);
 				// Inhaltsseite in aktueller Kategorie
 				if (count($valuearray) == 1) {
-					$includedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($matches[1][$i])), $cat);
+					$includedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($matches[1][$i],ENT_COMPAT,'ISO-8859-1')), $cat);
 					// verhindern, daß in der includierten Seite includierte Seiten auch noch durchsucht werden
 					if ($firstrecursion) {
 						// includierte Seite durchsuchen!
@@ -776,8 +776,8 @@ echo "</pre>";
 				}
 				// Inhaltsseite in anderer Kategorie
 				else {
-					$includedpagescat = nameToCategory($specialchars->replaceSpecialChars(html_entity_decode($valuearray[0])));
-					$includedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($valuearray[1])), $includedpagescat);
+					$includedpagescat = nameToCategory($specialchars->replaceSpecialChars(html_entity_decode($valuearray[0],ENT_COMPAT,'ISO-8859-1')));
+					$includedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($valuearray[1],ENT_COMPAT,'ISO-8859-1')), $includedpagescat);
 					// verhindern, daß in der includierten Seite includierte Seiten auch noch durchsucht werden
 					if ($firstrecursion) {
 						// includierte Seite durchsuchen!
@@ -803,7 +803,7 @@ echo "</pre>";
 			// ...der aktuelle Suchbegriff im Seitennamen...
 			(substr_count(strtolower(pageToName($page, false)), strtolower($query)) > 0)
 			// ...oder im eigentlichen Seiteninhalt vorkommt (überprüft werden nur Seiten, die nicht leer sind), ...
-			|| ((filesize($filepath) > 0) && (substr_count(strtolower($content), strtolower(html_entity_decode($query))) > 0))
+			|| ((filesize($filepath) > 0) && (substr_count(strtolower($content), strtolower(html_entity_decode($query,ENT_COMPAT,'ISO-8859-1'))) > 0))
 			) {
 			// ...dann setze das Treffer-Flag
 			$ismatch = true;
@@ -858,7 +858,7 @@ echo "</pre>";
 // ------------------------------------------------------------------------------
 	function highlight($content, $phrasestring) {
 		// Zu highlightende Begriffe kommen kommasepariert ("begriff1,begriff2")-> in Array wandeln
-		$phrasearray = explode(",", htmlentities($phrasestring));
+		$phrasearray = explode(",", htmlentities($phrasestring,ENT_COMPAT,'ISO-8859-1'));
 		// jeden Begriff highlighten
 		foreach($phrasearray as $phrase) {
 			// Regex-Zeichen im zu highlightenden Text escapen (.\+*?[^]$(){}=!<>|:)
@@ -1045,7 +1045,7 @@ echo "</pre>";
 				if ($config_message[0] == "true") {
 					$mailcontent .= "\r\n".$language->getLanguageValue0("contactform_message_0").":\r\n".$message."\r\n";
 				}
-				$mailsubject = $language->getLanguageValue1("contactform_mailsubject_1", html_entity_decode($WEBSITE_NAME));
+				$mailsubject = $language->getLanguageValue1("contactform_mailsubject_1", html_entity_decode($WEBSITE_NAME,ENT_COMPAT,'ISO-8859-1'));
 				// Wenn Mail-Adresse gesetzt ist: Als Absender für die Mail nutzen
 				if ($mail <> "") {
 					$mailfunctions->sendMailToAdminWithFrom($mailsubject, $mailcontent, $mail);
@@ -1110,11 +1110,11 @@ echo "</pre>";
 // ------------------------------------------------------------------------------
 	function cleanInput($input) {
 		if (function_exists("mb_convert_encoding")) {
-            $input = htmlentities(@mb_convert_encoding($input, "ISO-8859-1"));
+            $input = @mb_convert_encoding($input, "ISO-8859-1");
 		}
 		return htmlentities($input, ENT_QUOTES, 'ISO8859-1');	
 	}
-
+	
 // ------------------------------------------------------------------------------
 // Hilfsfunktion: Prüft einen Requestparameter
 // ------------------------------------------------------------------------------

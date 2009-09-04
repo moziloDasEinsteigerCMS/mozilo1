@@ -2,9 +2,9 @@
 
 /* 
 * 
-* $Revision: 197 $
-* $LastChangedDate: 2009-05-13 18:08:41 +0200 (Mi, 13 Mai 2009) $
-* $Author: arvid $
+* $Revision$
+* $LastChangedDate$
+* $Author$
 *
 */
 
@@ -66,7 +66,7 @@ $CSS_FILE                = "layouts/$LAYOUT_DIR/css/style.css";
 $FAVICON_FILE        = "layouts/$LAYOUT_DIR/favicon.ico";
 
 // Übergebene Parameter überprüfen
-$GAL_REQUEST = htmlentities($_GET['gal']);
+$GAL_REQUEST = htmlentities($_GET['gal'],ENT_COMPAT,'ISO-8859-1');
 $DIR_GALLERY = "./galerien/".$GAL_REQUEST."/";
 $DIR_THUMBS = $DIR_GALLERY."vorschau/";
 if (($GAL_REQUEST == "") || (!file_exists($DIR_GALLERY)))
@@ -332,7 +332,7 @@ echo $HTML;
         $alldescriptions = new Properties($DIR_GALLERY."texte.conf");
         $description = $alldescriptions->get($picname);
         if(strlen($description) > 0) {
-            return htmlentities($description);
+            return htmlentities($description,ENT_COMPAT,'ISO-8859-1');
         } else {
             return "&nbsp;";
         }

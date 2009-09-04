@@ -2,9 +2,9 @@
 
 /*
  *
- * $Revision: 198 $
- * $LastChangedDate: 2009-05-13 20:09:42 +0200 (Mi, 13 Mai 2009) $
- * $Author: arvid $
+ * $Revision$
+ * $LastChangedDate$
+ * $Author$
  *
  */
 
@@ -28,13 +28,15 @@ $ADMIN_TITLE = "moziloAdmin";
 
 // Login überprüfen
  session_start();
- if (!$_SESSION['login_okay']) {
+ if (!isset($_SESSION['login_okay']) || !$_SESSION['login_okay']) {
     header("location:login.php?logout=true");
     die("");
  }
  
  // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
  @ini_set("display_errors", 0);
+ // ISO 8859-1 erzwingen - experimentell!
+ // @ini_set("default_charset", "ISO-8859-1");
 
  // Session Fixation durch Vergabe einer neuen Session-ID beim ersten Login verhindern
  if (!isset($_SESSION['PHPSESSID'])) {
@@ -261,7 +263,8 @@ $html .= "</body>";
 $html .= "</html>";
 
 
-
+// Ausgabe als ISO 8859-1 deklarieren
+header('content-type: text/html; charset=iso-8859-1');
 /* Ausgabe der kompletten Seite */
 echo $html;
 
@@ -311,7 +314,7 @@ function initialSetup() {
         && isValidRequestParameter("loginpw", 4)
         && ($_REQUEST['loginpwrepeat'] == $_REQUEST['loginpw'])
         ) {
-            $CMS_CONF->set("websitetitle", htmlentities(stripslashes($_REQUEST['websitetitle'])));
+            $CMS_CONF->set("websitetitle", htmlentities(stripslashes($_REQUEST['websitetitle']),ENT_COMPAT,'ISO-8859-1'));
             /*
              $CMS_CONF->set("cmslanguage", $_REQUEST['cmslang']);
              $ADMIN_CONF->set("language", $_REQUEST['adminlang']);
@@ -528,19 +531,19 @@ function newCategory() {
             $message3 = getLanguageValue("category_empty");
         }
         elseif(strlen($_REQUEST["position"])>2 or $nameconflict) {
-            $message1 = htmlentities($name).": ".getLanguageValue("category_exist");
+            $message1 = htmlentities($name,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("category_exist");
         }
         elseif(!(preg_match($ALLOWED_SPECIALCHARS_REGEX, $name))) {
-            $message4 = htmlentities($name).": ".getLanguageValue("category_name_wrong");
+            $message4 = htmlentities($name,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("category_name_wrong");
             $nameconflict = true;
         }
         elseif(strlen($specialchars->replaceSpecialChars($name))>64) {
-            $message4 = htmlentities($name).": ".getLanguageValue("name_too_long");
+            $message4 = htmlentities($name,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("name_too_long");
             $nameconflict = true;
         }
         if(strlen($_REQUEST["position"])<3 && strlen($name) != 0 && !$nameconflict) {
             createCategory();
-            $message2 = htmlentities($name).": ".getLanguageValue("category_created_ok");
+            $message2 = htmlentities($name,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("category_created_ok");
         }
     }
 
@@ -731,7 +734,7 @@ function editCategory() {
 		}
 		if($nameconflict) {
 			$newname = "";
-			$pagecontent .= returnMessage(false, htmlentities(substr($_REQUEST["position"],0,2)."_".$_REQUEST["newname"]).": ".getLanguageValue("category_exist"));
+			$pagecontent .= returnMessage(false, htmlentities(substr($_REQUEST["position"],0,2)."_".$_REQUEST["newname"],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("category_exist"));
 		}
 	}
 
@@ -748,18 +751,18 @@ function editCategory() {
 					renameCategoryInDownloadStats($_REQUEST["cat"], substr($_REQUEST["position"],0,2)."_".$newname);
 					// Referenzen auf die umbenannte Kategorie in allen Inhaltsseiten ändern
 					updateReferencesInAllContentPages($_REQUEST["cat"], "", substr($_REQUEST["position"], 0, 2)."_".$newname, "");
-					$pagecontent .= returnMessage(true, htmlentities($_REQUEST["newname"]).": ".getLanguageValue("category_edited"));
+					$pagecontent .= returnMessage(true, htmlentities($_REQUEST["newname"],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("category_edited"));
 					$_REQUEST["cat"] = substr($_REQUEST["position"],0,2)."_".$newname;
 					$done = true;
 				}
 			}
 			else
-				$pagecontent .= returnMessage(false, htmlentities($_REQUEST["cat"]).": ".getLanguageValue("invalid_values"));
+				$pagecontent .= returnMessage(false, htmlentities($_REQUEST["cat"],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("invalid_values"));
 		}
 		// Position mit anderer Kategorie belegt
         else
         {
-            $pagecontent .= returnMessage(false, htmlentities($_REQUEST["cat"]).": ".getLanguageValue("position_in_use"));
+            $pagecontent .= returnMessage(false, htmlentities($_REQUEST["cat"],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("position_in_use"));
         }
     }
 
@@ -966,9 +969,9 @@ function newSite() {
             if (strlen($name) == 0)
             $pagecontent .= returnMessage(false, getLanguageValue("page_empty"));
             elseif (!preg_match($ALLOWED_SPECIALCHARS_REGEX, $name))
-            $pagecontent .= returnMessage(false, htmlentities($name).": ".getLanguageValue("invalid_values"));
+            $pagecontent .= returnMessage(false, htmlentities($name,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("invalid_values"));
             elseif (strlen($_POST["position"])>2 or $nameconflict)
-            $pagecontent .= returnMessage(false, htmlentities($name).": ".getLanguageValue("page_exist"));
+            $pagecontent .= returnMessage(false, htmlentities($name,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("page_exist"));
         }
         $pagecontent .= "<form accept-charset=\"ISO-8859-1\"action=\"index.php\" method=\"POST\"><input type=\"hidden\" name=\"action\" value=\"newsite\"><input type=\"hidden\" name=\"cat\" value=\"".$cat."\">";
         $pagecontent .= "<table class=\"data\">";
@@ -1026,10 +1029,12 @@ function editSite() {
 
     $pagecontent = "<h2>".getLanguageValue("button_site_edit")."</h2>";
 
-    if (isset($_POST['page']))
-    $page = stripcslashes($_POST['page']);
-    if (isset($_POST['cat']))
-    $cat = stripcslashes($_POST['cat']);
+    if (isset($_POST['page'])) {
+        $page = getRequestParam('page', true);
+    }
+    if (isset($_POST['cat'])) {
+        $cat = getRequestParam('cat', true);
+    }
     // Wenn nach dem Editieren "Speichern" gedrückt wurde
     if (isset($_POST['save']) || isset($_POST['savetemp'])) {
         $pagenamewithoutextension = substr($page, 0, strlen($page)-4);
@@ -1072,8 +1077,8 @@ function editSite() {
     }
     // Editieransicht der Inhaltsseite
     if (isset($_REQUEST['file']) && isset($_REQUEST['cat'])) {
-        $file = stripslashes($_REQUEST['file']);
-        $cat = stripslashes($_REQUEST['cat']);
+        $file = getRequestParam('file', true);
+        $cat = getRequestParam('cat', true);
         $pagecontent .= "<form accept-charset=\"ISO-8859-1\"name=\"form\" method=\"post\" action=\"index.php\">";
         $status = "";
         if (substr($file, strlen($file)-4, strlen($file)) == $EXT_DRAFT) {
@@ -1217,11 +1222,11 @@ function copymoveSite() {
             if(@rename($sourcefile,$destinationfile))
             {
                 updateReferencesInAllContentPages($_POST[CAT_PARAM], $pagevalue, "", substr($_POST["position"],0,2) . "_" . $specialchars->replaceSpecialChars($_POST[NEW_PAGE_NAME]).substr($sourcefile,strlen($sourcefile) - 4,4));
-                $pagecontent = returnMessage(true, htmlentities($messagefile).": ".getLanguageValue("copymove_type_move_success"));
+                $pagecontent = returnMessage(true, htmlentities($messagefile,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("copymove_type_move_success"));
             }
             else
             {
-                $pagecontent = returnMessage(false, htmlentities($messagefile).": ".getLanguageValue("page_exist"));
+                $pagecontent = returnMessage(false, htmlentities($messagefile,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("page_exist"));
             }
         }
         elseif(strlen($_POST["position"]) <= 2 and $nameconflict and preg_match($ALLOWED_SPECIALCHARS_REGEX, $_POST[NEW_PAGE_NAME]))
@@ -1235,17 +1240,17 @@ function copymoveSite() {
                     if(@unlink($sourcefile))
                     {
                         updateReferencesInAllContentPages($catvalue, $pagevalue, $specialchars->replaceSpecialChars($_POST[CURRENT_CAT]), $_POST["position"] . "_" . $specialchars->replaceSpecialChars($_POST[NEW_PAGE_NAME]).substr($sourcefile,strlen($sourcefile) - 4,4));
-                        $pagecontent = returnMessage(true, htmlentities($messagefile).": ".getLanguageValue("copymove_type_move_success"));
+                        $pagecontent = returnMessage(true, htmlentities($messagefile,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("copymove_type_move_success"));
                         $unlink = "ja";
                     }
                 }
                 if($unlink == "nein") {
-                    $pagecontent = returnMessage(true, htmlentities($messagefile).": ".getLanguageValue("copymove_type_copy_success"));
+                    $pagecontent = returnMessage(true, htmlentities($messagefile,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("copymove_type_copy_success"));
                 }
             }
             else
             {
-                $pagecontent = returnMessage(false, htmlentities($messagefile).": ".getLanguageValue("page_exist"));
+                $pagecontent = returnMessage(false, htmlentities($messagefile,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("page_exist"));
             }
             if(!preg_match($ALLOWED_SPECIALCHARS_REGEX, $_POST[NEW_PAGE_NAME])) {
                 $pagecontent = returnMessage(false, $specialchars->rebuildSpecialChars($_POST[NEW_PAGE_NAME], true, true).": ".getLanguageValue("invalid_values")); 
@@ -1253,7 +1258,7 @@ function copymoveSite() {
         }
         else
         {
-        $pagecontent = returnMessage(false, htmlentities($messagefile).": ".getLanguageValue("page_exist"));
+        $pagecontent = returnMessage(false, htmlentities($messagefile,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("page_exist"));
         }
         unset($_REQUEST["cat"]);
         unset($_REQUEST["file"]);
@@ -1447,17 +1452,17 @@ function newGallery() {
                     if ($ADMIN_CONF->get("chmodnewfiles") == "true")
                     chmod ($filename, octdec($ADMIN_CONF->get("chmodnewfilesatts")));
                     fclose($fp);
-                    $pagecontent .= returnMessage(true, htmlentities($galleryname).": ".getLanguageValue("gallery_create_success"));
+                    $pagecontent .= returnMessage(true, htmlentities($galleryname,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("gallery_create_success"));
                 }
                 else
-                $pagecontent .= returnMessage(false, htmlentities($galleryname).": ".getLanguageValue("gallery_create_error"));
+                $pagecontent .= returnMessage(false, htmlentities($galleryname,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("gallery_create_error"));
             }
             else {
-                $pagecontent .= returnMessage(false, htmlentities($galleryname).": ".getLanguageValue("gallery_exists_error"));
+                $pagecontent .= returnMessage(false, htmlentities($galleryname,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("gallery_exists_error"));
             }
         }
         else
-        $pagecontent .= returnMessage(false, htmlentities($galleryname).": ".getLanguageValue("invalid_values"));
+        $pagecontent .= returnMessage(false, htmlentities($galleryname,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("invalid_values"));
     }
     $pagecontent .= "<form accept-charset=\"ISO-8859-1\"method=\"post\" action=\"index.php\" enctype=\"multipart/form-data\"><input type=\"hidden\" name=\"action\" value=\"newgallery\" />";
     $pagecontent .= "<table class=\"data\">";
@@ -1507,11 +1512,11 @@ function editGallery() {
         if (isset($_FILES['uploadfile']) and !$_FILES['uploadfile']['error']) {
             $gallerydir = "$GALLERIES_DIR_REL/".$mygallery;
             if (!fileHasExtension($_FILES['uploadfile']['name'], array("jpg", "jpeg", "jpe", "gif", "png", "svg")))
-            $pagecontent .= returnMessage(false, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("gallery_uploadfile_wrongtype"));
+            $pagecontent .= returnMessage(false, htmlentities($_FILES['uploadfile']['name'],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("gallery_uploadfile_wrongtype"));
             elseif (file_exists($gallerydir."/".$_FILES['uploadfile']['name']))
-            $pagecontent .= returnMessage(false, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("gallery_uploadfile_exists"));
+            $pagecontent .= returnMessage(false, htmlentities($_FILES['uploadfile']['name'],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("gallery_uploadfile_exists"));
             elseif (!preg_match($specialchars->getFileCharsRegex(), $_FILES['uploadfile']['name'])) {
-                $pagecontent .= returnMessage(false, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("invalid_values"));
+                $pagecontent .= returnMessage(false, htmlentities($_FILES['uploadfile']['name'],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("invalid_values"));
             }
             else {
                 // Bild und Kommentar speichern
@@ -1530,7 +1535,7 @@ function editGallery() {
                     if ($ADMIN_CONF->get("chmodnewfiles") == "true")
                     chmod ($gallerydir."/$PREVIEW_DIR_NAME/".$_FILES['uploadfile']['name'], octdec($ADMIN_CONF->get("chmodnewfilesatts")));
                 }
-                $pagecontent .= returnMessage(true, htmlentities($_FILES['uploadfile']['name']).": ".getLanguageValue("gallery_upload_success"));
+                $pagecontent .= returnMessage(true, htmlentities($_FILES['uploadfile']['name'],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("gallery_upload_success"));
             }
         }
         // Wenn "Speichern" bei "Galerie umbenennen" gedrückt wurde
@@ -1539,14 +1544,14 @@ function editGallery() {
             $newname = stripslashes($_REQUEST["newname"]);
             // Fehlermeldung, wenn bereits Galerie mit gewünschtem Namen existiert
             if (file_exists("$GALLERIES_DIR_REL/".$specialchars->replaceSpecialChars($newname)))
-            $pagecontent .= returnMessage(false, htmlentities($newname).": ".getLanguageValue("gallery_exists_error"));
+            $pagecontent .= returnMessage(false, htmlentities($newname,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("gallery_exists_error"));
             // Fehlermeldung, wenn kein Name angegeben oder nicht erlaubte Zeichen enthalten
             elseif (($newname == "") || (!preg_match($ALLOWED_SPECIALCHARS_REGEX, $newname)))
-            $pagecontent .= returnMessage(false, htmlentities($newname).": ".getLanguageValue("invalid_values"));
+            $pagecontent .= returnMessage(false, htmlentities($newname,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("invalid_values"));
             // sonst: Galerieverzeichnis umbenennen
             else {
                 if (@rename("$GALLERIES_DIR_REL/".$gal, "$GALLERIES_DIR_REL/".$specialchars->replaceSpecialChars($newname))) {
-                    $pagecontent .= returnMessage(true, htmlentities($newname).": ".getLanguageValue("gallery_edited"));
+                    $pagecontent .= returnMessage(true, htmlentities($newname,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("gallery_edited"));
                     $mygallery = $specialchars->replaceSpecialChars($newname);
                 }
             }
@@ -1554,7 +1559,7 @@ function editGallery() {
         // Wenn "Speichern" bei einem Galeriebild gedrückt wurde
         elseif (isset($_REQUEST['save'])) {
             $galleryconf->set($_REQUEST['image'], stripslashes($_REQUEST['comment']));
-            $pagecontent .= returnMessage(true, htmlentities($_REQUEST['image']).": ".getLanguageValue("changes_applied"));
+            $pagecontent .= returnMessage(true, htmlentities($_REQUEST['image'],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("changes_applied"));
         }
         // Wenn "Löschen" bei einem Galeriebild gedrückt wurde
         elseif (isset($_REQUEST['delete'])) {
@@ -1565,13 +1570,13 @@ function editGallery() {
                 @unlink("$GALLERIES_DIR_REL/".$mygallery."/".$_REQUEST['image'])
                 && (!file_exists("$GALLERIES_DIR_REL/".$mygallery."/$PREVIEW_DIR_NAME/".$_REQUEST['image']) || @unlink("$GALLERIES_DIR_REL/".$mygallery."/$PREVIEW_DIR_NAME/".$_REQUEST['image']))
                 )
-                $pagecontent .= returnMessage(true, htmlentities($_REQUEST['image']).": ".getLanguageValue("gallery_image_deleted"));
+                $pagecontent .= returnMessage(true, htmlentities($_REQUEST['image'],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("gallery_image_deleted"));
                 else
-                $pagecontent .= returnMessage(false, htmlentities($_REQUEST['image']).": ".getLanguageValue("data_file_delete_error"));
+                $pagecontent .= returnMessage(false, htmlentities($_REQUEST['image'],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("data_file_delete_error"));
             }
             // Löschbestätigung erfragen
             else
-            $pagecontent .= returnMessage(false, htmlentities($_REQUEST['image']).": ".getLanguageValue("gallery_confirm_delete")." <a href=\"index.php?action=editgallery&amp;delete=true&amp;gal=".$mygallery."&amp;image=".$_REQUEST['image']."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=editgallery&amp;gal=".$mygallery."\">".getLanguageValue("no")."</a>");
+            $pagecontent .= returnMessage(false, htmlentities($_REQUEST['image'],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("gallery_confirm_delete")." <a href=\"index.php?action=editgallery&amp;delete=true&amp;gal=".$mygallery."&amp;image=".$_REQUEST['image']."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=editgallery&amp;gal=".$mygallery."\">".getLanguageValue("no")."</a>");
         }
         $pagecontent .= "<h3>".getLanguageValue("chosen_gallery")." ".$specialchars->rebuildSpecialChars($mygallery, true)."</h3>";
         $pagecontent .= "<p>".getLanguageValue("gallery_edit_text")."</p>";
@@ -1637,7 +1642,7 @@ function editGallery() {
             $pagecontent .= "<td class=\"config_row1\"".$lastsavedanchor."><img src=\"$GALLERIES_DIR_REL/".$mygallery."/$PREVIEW_DIR_NAME/".$file."\" alt=\"$file\" style=\"width:100px;\" /><br />".$file."</td>";
             else
             $pagecontent .= "<td class=\"config_row1\"".$lastsavedanchor."><img src=\"$GALLERIES_DIR_REL/".$mygallery."/".$file."\" alt=\"$file\" style=\"width:100px;\" /><br />".$file."</td>";
-            $pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"comment\" value=\"".htmlentities($galleryconf->get($file))."\" /><br /><input type=\"submit\" name=\"save\" value=\"".getLanguageValue("button_save")."\" class=\"submit\" /> <input type=\"submit\" name=\"delete\" value=\"".getLanguageValue("button_delete")."\" class=\"submit\" /></td>";
+            $pagecontent .= "<td class=\"config_row2\"><input type=\"text\" class=\"text1\" name=\"comment\" value=\"".htmlentities($galleryconf->get($file),ENT_COMPAT,'ISO-8859-1')."\" /><br /><input type=\"submit\" name=\"save\" value=\"".getLanguageValue("button_save")."\" class=\"submit\" /> <input type=\"submit\" name=\"delete\" value=\"".getLanguageValue("button_delete")."\" class=\"submit\" /></td>";
             $pagecontent .= "</tr>";
             $pagecontent .= "</table>";
             $pagecontent .= "</form>";
@@ -1877,14 +1882,14 @@ function deleteFile() {
         if (isset($_REQUEST['confirm']) && ($_REQUEST['confirm'] == "true")) {
             if (@unlink("$CONTENT_DIR_REL/".$cat."/dateien/".$file)) {
                 // Datei und dazugehörigen Downloadcounter löschen
-                $pagecontent .= returnMessage(true, htmlentities($file).": ".getLanguageValue("data_file_deleted"));
+                $pagecontent .= returnMessage(true, htmlentities($file,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("data_file_deleted"));
                 $DOWNLOAD_COUNTS->delete($cat.":".$file);
             }
             else
-            $pagecontent .= returnMessage(false, htmlentities($file).": ".getLanguageValue("data_file_delete_error"));
+            $pagecontent .= returnMessage(false, htmlentities($file,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("data_file_delete_error"));
         }
         else
-        $pagecontent .= returnMessage(false, htmlentities($file).": ".getLanguageValue("data_file_delete_confirm")." <a href=\"index.php?action=deletefile&amp;cat=".$cat."&amp;file=".$file."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=deletefile\">".getLanguageValue("no")."</a>");
+        $pagecontent .= returnMessage(false, htmlentities($file,ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("data_file_delete_confirm")." <a href=\"index.php?action=deletefile&amp;cat=".$cat."&amp;file=".$file."&amp;confirm=true\">".getLanguageValue("yes")."</a> - <a href=\"index.php?action=deletefile\">".getLanguageValue("no")."</a>");
     }
     $pagecontent .= "<p>".getLanguageValue("data_delete_text")."</p>";
     $dirs = getDirs("$CONTENT_DIR_REL");
@@ -1957,9 +1962,9 @@ function configCMSDisplay() {
         && isValidRequestParameter("lang", 2)
         && isValidRequestParameter("titlebarformat", 2)
         ) {
-            $CMS_CONF->set("websitetitle", htmlentities(stripslashes($_REQUEST['title'])));
-            $CMS_CONF->set("websitedescription", htmlentities(stripslashes($_REQUEST['description'])));
-            $CMS_CONF->set("websitekeywords", htmlentities(stripslashes($_REQUEST['keywords'])));
+            $CMS_CONF->set("websitetitle", htmlentities(stripslashes($_REQUEST['title']),ENT_COMPAT,'ISO-8859-1'));
+            $CMS_CONF->set("websitedescription", htmlentities(stripslashes($_REQUEST['description']),ENT_COMPAT,'ISO-8859-1'));
+            $CMS_CONF->set("websitekeywords", htmlentities(stripslashes($_REQUEST['keywords']),ENT_COMPAT,'ISO-8859-1'));
             $CMS_CONF->set("galleryusethumbs", $_REQUEST['gthumbs']);
             $CMS_CONF->set("gallerypicsperrow", $_REQUEST['gppr']);
             $CMS_CONF->set("gallerymaxwidth", $_REQUEST['gmw']);
@@ -2192,7 +2197,7 @@ function configCMSDisplay() {
                     $usersyntaxdefs = @fread($handle, @filesize($USER_SYNTAX_FILE));
                     @fclose($handle);
                 }
-                $pagecontent .= "<input type=\"hidden\" name=\"usersyntax\" value=\"".htmlentities($usersyntaxdefs)."\" />";
+                $pagecontent .= "<input type=\"hidden\" name=\"usersyntax\" value=\"".htmlentities($usersyntaxdefs,ENT_COMPAT,'ISO-8859-1')."\" />";
                 // Ersetze Emoticons
                 if ($CMS_CONF->get("replaceemoticons") == "true")
                 $replacethem = "on";
@@ -2249,7 +2254,7 @@ function configCMSDisplay() {
                     @fclose($handle);
                 }
                 $pagecontent .= "<tr><td class=\"config_row1\" colspan=\"2\">".getLanguageValue("usersyntax_text")."<br />";
-                $pagecontent .= "<textarea class=\"usersyntaxarea\" name=\"usersyntax\">".htmlentities($usersyntaxdefs)."</textarea></td></tr>";
+                $pagecontent .= "<textarea class=\"usersyntaxarea\" name=\"usersyntax\">".htmlentities($usersyntaxdefs,ENT_COMPAT,'ISO-8859-1')."</textarea></td></tr>";
                 // Zeile "ERSETZE EMOTICONS"
                 $pagecontent .= "<tr>";
                 $pagecontent .= "<td class=\"config_row1\">".getLanguageValue("replaceemoticons_text")."</td>";
@@ -2721,7 +2726,7 @@ function showEditPageForm($cat, $page, $action, $tempfile)    {
         // Inhaltsseite schon vorhanden: Inhalt ins Textfeld holen
         $handle=fopen($file, "r");
         if (filesize($file) > 0)
-        $pagecontent = htmlentities(fread($handle, filesize($file)));
+        $pagecontent = htmlentities(fread($handle, filesize($file)),ENT_COMPAT,'ISO-8859-1');
         else
         $pagecontent = "";
         fclose($handle);
@@ -3153,15 +3158,15 @@ function uploadFile($uploadfile, $cat, $forceoverwrite){
     if (isset($uploadfile) and !$uploadfile['error']) {
         // nicht erlaubte Endung
         if (fileHasExtension($uploadfile['name'], explode(",", $ADMIN_CONF->get("noupload")))) {
-            return returnMessage(false, htmlentities($uploadfile['name']).": ".getLanguageValue("data_uploadfile_wrongext"));
+            return returnMessage(false, htmlentities($uploadfile['name'],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("data_uploadfile_wrongext"));
         }
         // ungültige Zeichen im Dateinamen
         elseif(!preg_match($specialchars->getFileCharsRegex(), $uploadfile['name'])) {
-            return returnMessage(false, htmlentities($uploadfile['name']).": ".getLanguageValue("invalid_values"));
+            return returnMessage(false, htmlentities($uploadfile['name'],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("invalid_values"));
         }
         // Datei vorhanden und "Überschreiben"-Checkbox nicht aktiviert
         elseif (file_exists("$CONTENT_DIR_REL/".$specialchars->replaceSpecialChars($cat)."/dateien/".$uploadfile['name']) && ($forceoverwrite != "on")) {
-            return returnMessage(false, htmlentities($uploadfile['name']).": ".getLanguageValue("data_uploadfile_exists"));
+            return returnMessage(false, htmlentities($uploadfile['name'],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("data_uploadfile_exists"));
         }
         // alles okay, hochladen!
         else {
@@ -3244,7 +3249,7 @@ function uploadFile($uploadfile, $cat, $forceoverwrite){
                 }
             }
                 
-            return returnMessage(true, htmlentities($uploadfile['name']).": ".getLanguageValue("data_upload_success"));
+            return returnMessage(true, htmlentities($uploadfile['name'],ENT_COMPAT,'ISO-8859-1').": ".getLanguageValue("data_upload_success"));
         }
     }
 }
@@ -3325,5 +3330,37 @@ function getActionIcon($iconname, $titletext) {
     }
     
 }
+
+// ------------------------------------------------------------------------------
+// Hilfsfunktion: Sichert einen Input-Wert
+// ------------------------------------------------------------------------------
+	function cleanInput($input) {
+		if (function_exists("mb_convert_encoding")) {
+            $input = @mb_convert_encoding($input, "ISO-8859-1");
+		}
+		return htmlentities($input, ENT_QUOTES, 'ISO8859-1');	
+	}
+	
+// ------------------------------------------------------------------------------
+// Hilfsfunktion: Prüft einen Requestparameter
+// ------------------------------------------------------------------------------
+	function getRequestParam($param, $clean) {
+		if (isset($_REQUEST[$param])) {
+		  // Nullbytes abfangen!
+			if (strpos($_REQUEST[$param], "\x00") > 0) {
+		  	die();
+		  }
+			if ($clean) {
+				return cleanInput($_REQUEST[$param]);
+			}
+			else {
+				return $_REQUEST[$param];
+			}
+		}
+		// Parameter ist nicht im Request vorhanden
+		else {
+			return "";
+		}
+	}
 
 ?>

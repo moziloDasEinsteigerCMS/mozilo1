@@ -2,9 +2,9 @@
 
 /* 
 * 
-* $Revision: 190 $
-* $LastChangedDate: 2009-04-23 21:42:09 +0200 (Do, 23 Apr 2009) $
-* $Author: arvid $
+* $Revision$
+* $LastChangedDate$
+* $Author$
 *
 */
 
@@ -40,7 +40,7 @@ class Mail {
 	// Sendet eine Mail an die konfigurierte Admin-Adresse (mit definierter Absender-Adresse) 
 	function sendMailToAdminWithFrom($subject, $content, $from) {
 		$to = $this->ADMINCONF->get("adminmail");
-		@mail(html_entity_decode($to), html_entity_decode($subject), html_entity_decode($content), $this->getHeader(html_entity_decode($to), html_entity_decode($from)));
+		@mail(html_entity_decode($to,ENT_COMPAT,'ISO-8859-1'), html_entity_decode($subject), html_entity_decode($content), $this->getHeader(html_entity_decode($to), html_entity_decode($from)));
 	}
 	
 
