@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!--  
+ 
+ $Revision:19 $
+ $LastChangedDate:2008-03-12 18:06:54 +0100 (Mi, 12 Mrz 2008) $
+ $Author:arvid $
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta name="keywords" content="{WEBSITE_KEYWORDS}" />
+		<meta name="description" content="{WEBSITE_DESCRIPTION}" />
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>{WEBSITE_TITLE}</title>
+		<link rel="stylesheet" type="text/css" href="layouts/{LAYOUT_DIR}/css/style.css" />
+		<link rel="SHORTCUT ICON" href="layouts/{LAYOUT_DIR}/favicon.ico" />
+	</head>
+
+	<body>
+		<div id="container">
+			<div id="header">
+			</div>
+		
+			<div id="linkbar">
+				<div id="navcontainer">
+
+					<div id="navlist">
+						{MAINMENU}
+					</div>
+				</div>
+			</div>
+
+			<div id="content">
+				<div id="right_menu">
+					<h4>Inhalt</h4>
+					<div class="navcontainer">
+						<div class="navlist">
+							{DETAILMENU}
+						</div>
+					</div>
+				</div>
+
+				<div class="inhalt">
+					{CONTENT}
+					<div class="clearer"></div>
+				</div>
+
+				<div id="footer">
+					| {CMSINFO} | {SITEMAPLINK} | {LASTCHANGE} |
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

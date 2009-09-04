@@ -1,0 +1,63 @@
+/* 
+* 
+* $Revision$
+* $LastChangedDate$
+* $Author$
+*
+*/
+
+* {
+	font-family: Verdana, Sans-Serif;
+	font-size:11px;
+	color:#444444;
+}
+body {
+	text-align:center;
+	background-color:#DDDDDD;
+}
+	
+div.content {
+	margin:0px auto;
+	border:2px solid #777777;
+	background-color:#FFFFFF;
+	padding:10px;
+	width:760px;
+	-moz-border-radius:10px;
+}
+
+table {
+	border-collapse:collapse;
+	width:100%;
+}
+td {
+	vertical-align:top;
+	width:50%;
+}
+
+h1 {
+	font-size:1.6em;
+}
+
+h2 {
+	font-size:1.4em;
+}
+
+span.output {
+	font-weight:bold;
+}
+
+input#input {
+	color:#444444;
+	border:1px solid #777777;
+}
+input#ok {
+	color:#444444;
+	border:1px solid #777777;
+}
+
+a {
+text-decoration: none;
+}
+a:HOVER {
+	text-decoration: underline;
+}
