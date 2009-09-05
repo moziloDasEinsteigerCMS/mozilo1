@@ -69,9 +69,9 @@ else
 $FIRST = 1;
 $LAST = count($ALLINDEXES);
 if (!in_array($INDEX-1, $ALLINDEXES))
-    $BEFORE = $LAST;
+    $PREVIOUS = $LAST;
 else
-    $BEFORE = $INDEX-1;
+    $PREVIOUS = $INDEX-1;
 if (!in_array($INDEX+1, $ALLINDEXES))
     $NEXT = 1;
 else
@@ -101,6 +101,8 @@ echo $HTML;
         global $FAVICON_FILE;
         global $PICARRAY;
         global $INDEX;
+        global $PREVIOUS;
+        global $NEXT;
         global $specialchars;
         global $TEMPLATE_FILE;
         global $USE_CMS_SYNTAX;
@@ -143,6 +145,9 @@ echo $HTML;
                 $HTML = preg_replace('/{CURRENTDESCRIPTION}/', "", $HTML);
             }
             $HTML = preg_replace('/{XOUTOFY}/', getXoutofY(), $HTML);
+            $HTML = preg_replace('/{CURRENT_INDEX}/', $INDEX, $HTML);
+            $HTML = preg_replace('/{PREVIOUS_INDEX}/', $PREVIOUS, $HTML);
+            $HTML = preg_replace('/{NEXT_INDEX}/', $NEXT, $HTML);
         }
     }
     
@@ -152,7 +157,7 @@ echo $HTML;
 // ------------------------------------------------------------------------------
     function getGalleryMenu() {
         global $ALLINDEXES;
-        global $BEFORE;
+        global $PREVIOUS;
         global $GAL_REQUEST;
         global $FIRST;
         global $INDEX;
@@ -174,7 +179,7 @@ echo $HTML;
             $linkclass = "gallerymenu";
         $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$FIRST\" class=\"$linkclass\">".$language->getLanguageValue0("message_firstimage_0")."</a></li>";
         // Link "Voriges Bild"
-        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$BEFORE\" class=\"detailmenu\">".$language->getLanguageValue0("message_previousimage_0")."</a></li>";
+        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$PREVIOUS\" class=\"detailmenu\">".$language->getLanguageValue0("message_previousimage_0")."</a></li>";
         // Link "Nächstes Bild"
         $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$NEXT\" class=\"detailmenu\">".$language->getLanguageValue0("message_nextimage_0")."</a></li>";
         // Link "Letztes Bild"
