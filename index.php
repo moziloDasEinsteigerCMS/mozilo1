@@ -115,6 +115,7 @@ echo "</pre>";
         global $EXT_DRAFT;
         global $EXT_HIDDEN;
         global $EXT_PAGE;
+        global $mainconfig;
 
         // Überprüfung der gegebenen Parameter
         if (
@@ -130,7 +131,7 @@ echo "</pre>";
 
 
         // Kategorie-Verzeichnis einlesen
-        $pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true, true);
+        $pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true, $mainconfig->get("showhiddenpagesasdefaultpage") == "true");
 
         // Wenn Contentseite nicht explizit angefordert wurde oder nicht vorhanden ist...
         if (
