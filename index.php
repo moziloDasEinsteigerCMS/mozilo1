@@ -961,26 +961,40 @@ echo "</pre>";
         $content = preg_replace('/{WEBSITE_NAME}/', $mainconfig->get("websitetitle"), $content);
 
         if ($CAT_REQUEST != "") {
-            // "unbehandelter" Name der aktuellen Kategorie ("10_M-uuml-llers-nbsp-Kuh")
+            // "unbehandelter" Name der aktuellen Kategorie ("10_M%FCllers%20Kuh")
             $content = preg_replace('/{CATEGORY}/', $CAT_REQUEST, $content);
             // "sauberer" Name der aktuellen Kategorie ("Müllers Kuh")
             $content = preg_replace('/{CATEGORY_NAME}/', catToName($CAT_REQUEST, true), $content);
         }
         // Suche, Sitemap
         else {
-            // "unbehandelter" Name der aktuellen Kategorie ("10_M-uuml-llers-nbsp-Kuh")
+            // "unbehandelter" Name der aktuellen Kategorie ("10_M%FCllers%20Kuh")
             $content = preg_replace('/{CATEGORY}/', $cattitle, $content);
             // "sauberer" Name der aktuellen Kategorie ("Müllers Kuh")
             $content = preg_replace('/{CATEGORY_NAME}/', $cattitle, $content);
         }
 
         if ($PAGE_REQUEST != "") {
-            // "unbehandelter" Name der aktuellen Inhaltsseite ("10_M-uuml-llers-nbsp-Kuh")
+            // "unbehandelter" Name der aktuellen Inhaltsseite ("10_M%FCllers%20Kuh")
             $content = preg_replace('/{PAGE}/', $PAGE_REQUEST, $content);
-            // Dateiname der aktuellen Inhaltsseite ("10_M-uuml-llers-nbsp-Kuh.txt")
+            // Dateiname der aktuellen Inhaltsseite ("10_M%FCllers%20Kuh.txt")
             $content = preg_replace('/{PAGE_FILE}/', $PAGE_FILE, $content);
             // "sauberer" Name der aktuellen Inhaltsseite ("Müllers Kuh")
             $content = preg_replace('/{PAGE_NAME}/', pageToName($PAGE_FILE, true), $content);
+            
+            $neighbourPages = getNeighbourPages($PAGE_REQUEST);
+            // "unbehandelter" Name der vorigen Inhaltsseite ("00_Der%20M%FCller")
+            $content = preg_replace('/{PREVIOUS_PAGE}/', substr($neighbourPages[0], 0, strlen($neighbourPages[0]) - 4), $content);
+            // Dateiname der vorigen Inhaltsseite ("00_Der%20M%FCller.txt")
+            $content = preg_replace('/{PREVIOUS_PAGE_FILE}/', $neighbourPages[0], $content);
+            // "sauberer" Name der vorigen Inhaltsseite ("Der Müller")
+            $content = preg_replace('/{PREVIOUS_PAGE_NAME}/', pageToName($neighbourPages[0], true), $content);
+            // "unbehandelter" Name der nächsten Inhaltsseite ("20_M%FCllers%20M%FChle")
+            $content = preg_replace('/{NEXT_PAGE}/', substr($neighbourPages[1], 0, strlen($neighbourPages[1]) - 4), $content);
+            // Dateiname der nächsten Inhaltsseite ("20_M%FCllers%20M%FChle.txt")
+            $content = preg_replace('/{NEXT_PAGE_FILE}/', $neighbourPages[1], $content);
+            // "sauberer" Name der nächsten Inhaltsseite ("Müllers Mühle")
+            $content = preg_replace('/{NEXT_PAGE_NAME}/', pageToName($neighbourPages[1], true), $content);
         }
         // Suche, Sitemap
         else {
@@ -1182,6 +1196,38 @@ echo "</pre>";
             return " title=\"".$value."\"";
         }
         return "";
+    }
+
+
+// ------------------------------------------------------------------------------
+// Rückgabe der Dateinamen der vorigen und nächsten Seite
+// ------------------------------------------------------------------------------
+    function getNeighbourPages($page) {
+    	global $CONTENT_DIR_ABS;
+    	global $CAT_REQUEST;
+    	global $mainconfig;
+    	
+    	// leer initialisieren
+    	$neighbourPages = array("", "");
+    	// aktuelle Kategorie einlesen
+    	$pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true, $mainconfig->get("showhiddenpagesincmsvariables") == "true");
+    	// Schleife über alle Seiten
+    	for ($i = 0; $i < count($pagesarray); $i++) {
+    		if ($page == substr($pagesarray[$i], 0, strlen($pagesarray[$i]) - 4)) {
+    		    // vorige Seite (nur setzen, wenn aktuelle nicht die erste ist)
+    			if ($i > 0) {
+    			    $neighbourPages[0] = $pagesarray[$i-1];
+    			}
+    			// nächste Seite (nur setzen, wenn aktuelle nicht die letzte ist)
+    			if($i < count($pagesarray)-1) {
+    			    $neighbourPages[1] = $pagesarray[$i+1];
+    			}
+    			// Schleife kann abgebrochen werden
+    			break;
+    		}
+    	}
+
+    	return $neighbourPages;
     }
 
 ?>
