@@ -43,8 +43,8 @@ class Thumbnail {
 		// --------------------------------------------------------------------
 		// Variablen
 		// --------------------------------------------------------------------
-		$maxWidth  = 120; // Maximal Breite des Bildes
-		$maxHeight = 120; // Maximal höhe des Bildes
+		$maxWidth  = 134; // Maximal Breite des Bildes
+		$maxHeight = 100; // Maximal höhe des Bildes
 
 
 		// --------------------------------------------------------------------

@@ -8,27 +8,6 @@
 *
 */
 
-/*
-######
-INHALT
-######
-        
-        Projekt "Flatfile-basiertes CMS für Einsteiger"
-        Mai 2006
-        Klasse ITF04-1
-        Industrieschule Chemnitz
-
-        Ronny Monser
-        Arvid Zimmermann
-        Oliver Lorenz
-        www.mozilo.de
-
-        Dieses Dokument ist die Galeriefunktion für
-        moziloCMS.
-        
-######
-*/
-
 require_once("Language.php");
 require_once("Properties.php");
 require_once("SpecialChars.php");
@@ -60,18 +39,19 @@ $WEBSITE_TITLE            = $mainconf->get("websitetitle");
 if ($WEBSITE_TITLE == "")
     $WEBSITE_TITLE = "Titel der Website";
 
-$LAYOUT_DIR            = $mainconf->get("cmslayout");
-$TEMPLATE_FILE    = "layouts/$LAYOUT_DIR/gallerytemplate.html";
-$CSS_FILE                = "layouts/$LAYOUT_DIR/css/style.css";
-$FAVICON_FILE        = "layouts/$LAYOUT_DIR/favicon.ico";
+$LAYOUT_DIR         = $mainconf->get("cmslayout");
+$TEMPLATE_FILE      = "layouts/$LAYOUT_DIR/gallerytemplate.html";
+$CSS_FILE           = "layouts/$LAYOUT_DIR/css/style.css";
+$FAVICON_FILE       = "layouts/$LAYOUT_DIR/favicon.ico";
 
 // Übergebene Parameter überprüfen
-$GAL_REQUEST = $specialchars->replaceSpecialChars($_GET['gal'],false);
-$DIR_GALLERY = "./galerien/".$GAL_REQUEST."/";
-$DIR_THUMBS = $DIR_GALLERY."vorschau/";
-if (($GAL_REQUEST == "") || (!file_exists($DIR_GALLERY)))
+$GAL_REQUEST        = $specialchars->replaceSpecialChars($_GET['gal'],false);
+$DIR_GALLERY        = "./galerien/".$GAL_REQUEST."/";
+$DIR_THUMBS         = $DIR_GALLERY."vorschau/";
+if (($GAL_REQUEST == "") || (!file_exists($DIR_GALLERY))) {
     die ($language->getLanguageValue1("message_gallerydir_error_1", $GAL_REQUEST));
-$GAL_NAME = $specialchars->rebuildSpecialChars($GAL_REQUEST, true, true);
+}
+$GAL_NAME           = $specialchars->rebuildSpecialChars($GAL_REQUEST, true, true);
 
 // Galerieverzeichnis einlesen
 $PICARRAY = getPicsAsArray($DIR_GALLERY, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
@@ -136,9 +116,9 @@ echo $HTML;
         fclose($file);
         
         // Platzhalter des Templates mit Inhalt füllen
-        $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
-        $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
-        $HTML = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR, $HTML);
+        $HTML = preg_replace('/{CSS_FILE}/', $specialchars->replaceSpecialChars($CSS_FILE, true), $template);
+        $HTML = preg_replace('/{FAVICON_FILE}/', $specialchars->replaceSpecialChars($FAVICON_FILE, true), $HTML);
+        $HTML = preg_replace('/{LAYOUT_DIR}/', $specialchars->replaceSpecialChars($LAYOUT_DIR, true), $HTML);
         $HTML = preg_replace('/{CMSINFO}/', getCmsInfo(), $HTML);
         $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_TITLE, $language->getLanguageValue0("message_galleries_0"), $GAL_NAME), $HTML);
         $HTML = preg_replace('/{CURRENTGALLERY}/', $language->getLanguageValue1("message_gallery_1", $GAL_NAME), $HTML);
