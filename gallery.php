@@ -124,6 +124,9 @@ echo $HTML;
         $HTML = preg_replace('/{LAYOUT_DIR}/', $specialchars->replaceSpecialChars($LAYOUT_DIR, true), $HTML);
         $HTML = preg_replace('/{CMSINFO}/', getCmsInfo(), $HTML);
         $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_TITLE, $language->getLanguageValue0("message_galleries_0"), $GAL_NAME), $HTML);
+        $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $mainconf->get("websitekeywords"), $HTML);
+        $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $mainconf->get("websitedescription"), $HTML);
+        
         $HTML = preg_replace('/{CURRENTGALLERY}/', $language->getLanguageValue1("message_gallery_1", $GAL_NAME), $HTML);
         if (count($PICARRAY) == 0) {
             $HTML = preg_replace('/{NUMBERMENU}/', $language->getLanguageValue0("message_galleryempty_0"), $HTML);
