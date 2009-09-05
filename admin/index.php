@@ -50,25 +50,26 @@ $ADMIN_TITLE = "moziloAdmin";
  require_once("../SpecialChars.php");
  require_once("../Mail.php");
 
- $ADMIN_CONF    = new Properties("conf/basic.conf");
- $CMS_CONF    = new Properties("../conf/main.conf");
- $DOWNLOAD_COUNTS = new Properties("../conf/downloads.conf");
- $LOGINCONF = new Properties("conf/logindata.conf");
- $MAILFUNCTIONS = new Mail(true);
- $USER_SYNTAX_FILE = "../conf/syntax.conf";
- $USER_SYNTAX = new Properties($USER_SYNTAX_FILE);
- $CONTACT_CONF = new Properties("../formular/formular.conf");
+ $ADMIN_CONF        = new Properties("conf/basic.conf");
+ $CMS_CONF          = new Properties("../conf/main.conf");
+ $VERSION_CONF      = new Properties("../conf/version.conf");
+ $DOWNLOAD_COUNTS   = new Properties("../conf/downloads.conf");
+ $LOGINCONF         = new Properties("conf/logindata.conf");
+ $MAILFUNCTIONS     = new Mail(true);
+ $USER_SYNTAX_FILE  = "../conf/syntax.conf";
+ $USER_SYNTAX       = new Properties($USER_SYNTAX_FILE);
+ $CONTACT_CONF      = new Properties("../formular/formular.conf");
 
  // Abwärtskompatibilität: Downloadcounter initalisieren
  if ($DOWNLOAD_COUNTS->get("_downloadcounterstarttime") == "")
  $DOWNLOAD_COUNTS->set("_downloadcounterstarttime", time());
 
 // Pfade
-$CONTENT_DIR_NAME        = "kategorien";
-$CONTENT_DIR_REL        = "../".$CONTENT_DIR_NAME;
-$GALLERIES_DIR_NAME    = "galerien";
-$GALLERIES_DIR_REL    = "../".$GALLERIES_DIR_NAME;
-$PREVIEW_DIR_NAME        = "vorschau";
+$CONTENT_DIR_NAME   = "kategorien";
+$CONTENT_DIR_REL    = "../".$CONTENT_DIR_NAME;
+$GALLERIES_DIR_NAME = "galerien";
+$GALLERIES_DIR_REL  = "../".$GALLERIES_DIR_NAME;
+$PREVIEW_DIR_NAME   = "vorschau";
 
 // RegEx für erlaubte Zeichen in Inhaltsseiten, Kategorien, Dateien und Galerien 
 $specialchars = new SpecialChars();
@@ -434,6 +435,7 @@ function initialSetup() {
 
 function sysInfo() {
     global $CMS_CONF;
+    global $VERSION_CONF;
 
     $safemode = getLanguageValue("no");
     if (ini_get('safe_mode')) {
@@ -453,7 +455,7 @@ function sysInfo() {
     // Zeile "CMS-VERSION"
     ."<tr>"
     ."<td class=\"config_row1\">".getLanguageValue("cmsversion_text")."</td>"
-    ."<td class=\"config_row2\">".$CMS_CONF->get("cmsversion")."</td>"
+    ."<td class=\"config_row2\">".$VERSION_CONF->get("cmsversion")."</td>"
     ."</tr>"
     // Zeile "Gesamtgröße des CMS"
     ."<tr>"

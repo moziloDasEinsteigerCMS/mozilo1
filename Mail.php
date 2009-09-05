@@ -15,6 +15,7 @@ class Mail {
 	
 	var $ADMIN_CONF;
 	var $CMS_CONF;
+	var $VERSION_CONF;
 	
 	// Konstruktor
 	function Mail($callFromAdmin) {
@@ -22,11 +23,13 @@ class Mail {
 			require_once("../Properties.php");
 			$this->ADMINCONF = new Properties("conf/basic.conf");
 			$this->CMSCONF = new Properties("../conf/main.conf");
+			$this->VERSION_CONF = new Properties("../conf/version.conf");
 		}
 		else {
 			require_once("Properties.php");
 			$this->ADMINCONF = new Properties("admin/conf/basic.conf");
 			$this->CMSCONF = new Properties("conf/main.conf");
+			$this->VERSION_CONF = new Properties("conf/version.conf");
 		}
 	}
 	
@@ -52,7 +55,7 @@ class Mail {
 			."Reply-To: ".$replyto."\r\n"
 			."X-Priority: 0\r\n"
 			."X-MimeOLE: \r\n"
-			."X-mailer: moziloCMS ".$this->CMSCONF->get("cmsversion");
+			."X-mailer: moziloCMS ".$this->VERSION_CONF->get("cmsversion");
 	}
 	
 	// Prüft ob die Mail-Funktion verfügbar ist

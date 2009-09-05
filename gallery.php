@@ -15,9 +15,10 @@ require_once("SpecialChars.php");
 // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 # @ini_set("display_errors", 0);
 
-$language = new Language();
-$mainconf = new Properties("conf/main.conf");
-$specialchars = new SpecialChars();
+$language       = new Language();
+$mainconf       = new Properties("conf/main.conf");
+$versionconf    = new Properties("conf/version.conf");
+$specialchars   = new SpecialChars();
 
 // Vorschaubilder nach Benutzereinstellung und wenn GDlib installiert
 if (!extension_loaded("gd"))
@@ -406,7 +407,8 @@ function checkThumbs() {
     function getCmsInfo() {
         global $mainconf;
         global $language;
-        return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" id=\"cmsinfolink\"".getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", "http://cms.mozilo.de")).">moziloCMS ".$mainconf->get("cmsversion")."</a>";
+        global $versionconf;
+        return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" id=\"cmsinfolink\"".getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", "http://cms.mozilo.de")).">moziloCMS ".$versionconf->get("cmsversion")."</a>";
     }
 
 // ------------------------------------------------------------------------------

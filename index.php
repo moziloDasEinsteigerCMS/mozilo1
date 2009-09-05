@@ -27,40 +27,41 @@ echo "</pre>";
     // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
     @ini_set("display_errors", 0);
 
-    $language = new Language();
-    $mainconfig = new Properties("conf/main.conf");
-    $adminconfig = new Properties("admin/conf/basic.conf");
-    $specialchars = new SpecialChars();
-    $syntax = new Syntax();
-    $smileys = new Smileys("smileys");
-    $mailfunctions = new Mail(false);
+    $language       = new Language();
+    $mainconfig     = new Properties("conf/main.conf");
+    $versionconfig  = new Properties("conf/version.conf");
+    $adminconfig    = new Properties("admin/conf/basic.conf");
+    $specialchars   = new SpecialChars();
+    $syntax         = new Syntax();
+    $smileys        = new Smileys("smileys");
+    $mailfunctions  = new Mail(false);
 
     // Dateiendungen für Inhaltsseiten
-    $EXT_PAGE     = ".txt";
-    $EXT_HIDDEN = ".hid";
-    $EXT_DRAFT     = ".tmp";
+    $EXT_PAGE       = ".txt";
+    $EXT_HIDDEN     = ".hid";
+    $EXT_DRAFT      = ".tmp";
 
     // Config-Parameter auslesen
-    $LAYOUT_DIR                 = $specialchars->replaceSpecialChars($mainconfig->get("cmslayout"),true);
-    $TEMPLATE_FILE            = "layouts/$LAYOUT_DIR/template.html";
-    $CSS_FILE                        = "layouts/$LAYOUT_DIR/css/style.css";
-    $FAVICON_FILE                = "layouts/$LAYOUT_DIR/favicon.ico";
+    $LAYOUT_DIR     = $specialchars->replaceSpecialChars($mainconfig->get("cmslayout"),true);
+    $TEMPLATE_FILE  = "layouts/$LAYOUT_DIR/template.html";
+    $CSS_FILE       = "layouts/$LAYOUT_DIR/css/style.css";
+    $FAVICON_FILE   = "layouts/$LAYOUT_DIR/favicon.ico";
     // Template für Kontaktformular
     $contactformconfig = new Properties("formular/formular.conf");
 
-    $WEBSITE_NAME            = $mainconfig->get("websitetitle");
+    $WEBSITE_NAME = $mainconfig->get("websitetitle");
     if ($WEBSITE_NAME == "")
         $WEBSITE_NAME = "Titel der Website";
 
-    $DEFAULT_CATEGORY        = $mainconfig->get("defaultcat");
+    $DEFAULT_CATEGORY = $mainconfig->get("defaultcat");
     if ($DEFAULT_CATEGORY == "")
         $DEFAULT_CATEGORY = "10_Willkommen";
 
-    $DEFAULT_PAGE                = $mainconfig->get("defaultpage");
+    $DEFAULT_PAGE = $mainconfig->get("defaultpage");
     if ($DEFAULT_PAGE == "")
         $DEFAULT_PAGE = "10_Willkommen";
 
-    $USE_CMS_SYNTAX            = true;
+    $USE_CMS_SYNTAX = true;
     if ($mainconfig->get("usecmssyntax") == "false")
         $USE_CMS_SYNTAX = false;
         
@@ -71,12 +72,12 @@ echo "</pre>";
     $QUERY_REQUEST = getRequestParam('query', true);
     $HIGHLIGHT_REQUEST = getRequestParam('highlight', false);
 
-    $CONTENT_DIR_REL        = "kategorien";
-    $CONTENT_DIR_ABS         = getcwd() . "/$CONTENT_DIR_REL";
-    $CONTENT_FILES_DIR    = "dateien";
-    $GALLERIES_DIR            = "galerien";
-    $CONTENT                         = "";
-    $HTML                                = "";
+    $CONTENT_DIR_REL    = "kategorien";
+    $CONTENT_DIR_ABS    = getcwd() . "/$CONTENT_DIR_REL";
+    $CONTENT_FILES_DIR  = "dateien";
+    $GALLERIES_DIR      = "galerien";
+    $CONTENT            = "";
+    $HTML               = "";
 
     // Überprüfen: Ist die Startkategorie vorhanden? Wenn nicht, nimm einfach die allererste als Standardkategorie
     if (!file_exists("$CONTENT_DIR_REL/$DEFAULT_CATEGORY")) {
@@ -941,7 +942,8 @@ echo "</pre>";
     function getCmsInfo() {
         global $mainconfig;
         global $language;
-        return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" id=\"cmsinfolink\"".getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", "http://cms.mozilo.de")).">moziloCMS ".$mainconfig->get("cmsversion")."</a>";
+        global $versionconfig;
+        return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" id=\"cmsinfolink\"".getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", "http://cms.mozilo.de")).">moziloCMS ".$versionconfig->get("cmsversion")."</a>";
     }
 
 
