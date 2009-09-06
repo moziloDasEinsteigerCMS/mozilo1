@@ -8,26 +8,6 @@
 *
 */
 
-
-
-/*
-######
-INHALT
-######
-        
-        Projekt "Flatfile-basiertes CMS für Einsteiger"
-        Syntaxersetzung
-        Klasse ITF04-1
-        Industrieschule Chemnitz
-
-        Ronny Monser
-        Arvid Zimmermann
-        Oliver Lorenz
-        www.mozilo.de
-
-######
-*/
-
 class Syntax {
     
     var $CMS_CONF;
@@ -38,6 +18,7 @@ class Syntax {
     var $TARGETBLANK_LINK;
     var $TARGETBLANK_GALLERY;
     var $TARGETBLANK_DOWNLOAD;
+    var $anchorcounter;
 
     
 // ------------------------------------------------------------------------------    
@@ -79,6 +60,7 @@ class Syntax {
         else {
             $this->TARGETBLANK_DOWNLOAD = "";
         }
+        $this->anchorcounter            = 1;
     }
     
 
@@ -105,6 +87,20 @@ class Syntax {
 
             // Platzhalter ersetzen
             $content = replacePlaceholders($content, "", "");
+            
+            // "absatz"-Links vorbereiten: Alle Überschriften einlesen
+            preg_match_all("/\[(ueber([\d]))\|([^\[\]]+)\]/", $content, $matches);
+            // $headlines besteht aus Arrays, die zwei Werte beinhalten: Überschriftstyp (1/2/3) und Wert
+            $headlines = array();
+            $headlines[0] = array("0", $this->LANG->getLanguageValue1("anchor_top_0"));
+
+            $i = 0;
+            foreach ($matches[0] as $match) {
+                // gefundene Überschriften im Array $headlines merken
+                $headlines[$i+1] = (array($matches[2][$i], $matches[3][$i]));
+                $i++;
+            }
+
         }
 
         // Nach Texten in eckigen Klammern suchen
@@ -176,9 +172,9 @@ class Syntax {
             // Kategorie-Link (überprüfen, ob Kategorie existiert)
             // Kategorie-Link mit eigenem Text
             elseif ($attribute == "kategorie" or substr($attribute,0,10) == "kategorie=") {
-		$link_text = $value;
-		if(substr($attribute,0,10) == "kategorie=")
-			$link_text = substr($attribute, 10, strlen($attribute)-10);
+        $link_text = $value;
+        if(substr($attribute,0,10) == "kategorie=")
+            $link_text = substr($attribute, 10, strlen($attribute)-10);
                 $requestedcat = nameToCategory($specialchars->replaceSpecialChars(html_entity_decode($value,ENT_COMPAT,'ISO-8859-1'),false));
                 if ((!$requestedcat=="") && (file_exists("./$CONTENT_DIR_REL/$requestedcat")))
                     $content = str_replace ($match, "<a class=\"category\" href=\"index.php?cat=$requestedcat\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_category_1", $value)).">$link_text</a>", $content);
@@ -191,9 +187,9 @@ class Syntax {
             elseif ($attribute == "seite" or substr($attribute,0,6) == "seite=") {
                 $seite = html_entity_decode($value,ENT_COMPAT,'ISO-8859-1');
                 $valuearray = explode(":", $seite);
-		$link_text = "";
-		if(substr($attribute,0,6) == "seite=")
-			$link_text = substr($attribute, 6, strlen($attribute)-6);
+                $link_text = "";
+                if(substr($attribute,0,6) == "seite=")
+                    $link_text = substr($attribute, 6, strlen($attribute)-6);
                 // Inhaltsseite in aktueller Kategorie
                 if (count($valuearray) == 1) {
                     $requestedpage = nameToPage($specialchars->replaceSpecialChars($seite,false), $cat);
@@ -223,14 +219,41 @@ class Syntax {
                 }
             }
 
+            // Verweise auf Absätze innerhalb der Inhaltsseite
+            elseif (($attribute == "absatz") || (substr($attribute,0,7) == "absatz=")) {
+                // Beschreibungstext extrahieren
+                if(substr($attribute,0,7) == "absatz=") {
+                    $link_text = substr($attribute, 7, strlen($attribute)-7);
+                }
+                else {
+                    $link_text = $value;
+                } 
+                $pos = 0;
+                foreach ($headlines as $headline_info) {
+                    // $headline_info besteht aus Überschriftstyp (1/2/3) und Wert
+                    if ($headline_info[1] == $value) {
+                        // "Nach oben"-Verweis
+                        if ($pos == 0)
+                            $content = str_replace ($match, "<a class=\"page\" href=\"#a$pos\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_anchor_gototop_0")).">$link_text</a>", $content);
+                        // sonstige Anker-Verweise
+                        else
+                            $content = str_replace ($match, "<a class=\"page\" href=\"#a$pos\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_anchor_goto_1", $value)).">$link_text</a>", $content);
+                    }
+                    $pos++;
+                }
+                //$content = str_replace ($match, "<em class=\"deadlink\" title=\"".$wikilanguage->get("LANG_INVALIDPARAGRAPH")." &quot;$value&quot;\">$value</em>", $content);
+                $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_anchor_error_1", $value)).">".$value."</span>", $content);
+            }
+            
+
             // Datei aus dem Dateiverzeichnis (überprüfen, ob Datei existiert)
             // Datei aus dem Dateiverzeichnis mit beliebigem Text
             elseif ($attribute == "datei" or substr($attribute,0,6) == "datei=") {
                 $datei = html_entity_decode($value,ENT_COMPAT,'ISO-8859-1');
                 $valuearray = explode(":", $datei);
-		$link_text = "";
-		if(substr($attribute,0,6) == "datei=")
-			$link_text = substr($attribute, 6, strlen($attribute)-6);
+        $link_text = "";
+        if(substr($attribute,0,6) == "datei=")
+            $link_text = substr($attribute, 6, strlen($attribute)-6);
                 // Datei in aktueller Kategorie
                 if (count($valuearray) == 1) {
                     $datei = $specialchars->replaceSpecialChars($datei,false);
@@ -271,7 +294,7 @@ class Syntax {
                         $j++;
                     }
                     }
-		    closedir($handle);
+            closedir($handle);
                     $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">$value</a>", $content);
                 }
                 // Galerie nicht vorhanden
@@ -291,7 +314,7 @@ class Syntax {
                         $j++;
                     }
                     }
-		    closedir($handle);
+            closedir($handle);
                     $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">".substr($attribute, 8, strlen($attribute)-8)."</a>", $content);
                 }
                 // Galerie nicht vorhanden
@@ -322,7 +345,7 @@ class Syntax {
                 $imgsrc = "";
                 $error = false;
 
-		$value = html_entity_decode($value,ENT_COMPAT,'ISO-8859-1');
+        $value = html_entity_decode($value,ENT_COMPAT,'ISO-8859-1');
                 // Bei externen Bildern: $value NICHT nach ":" aufsplitten!
                 if (preg_match($this->LINK_REGEX, $value))
                     $valuearray = $specialchars->replaceSpecialChars($value,false);
@@ -330,11 +353,11 @@ class Syntax {
                 // Ansonsten: Nach ":" aufsplitten
                 else {
                     $valuearray = explode(":", $value);
-		    if(count($valuearray) > 1) {
-		        $valuearray[0] = $specialchars->replaceSpecialChars($valuearray[0],false);
-		        $valuearray[1] = $specialchars->replaceSpecialChars($valuearray[1],false);
-		    }
-		}
+            if(count($valuearray) > 1) {
+                $valuearray[0] = $specialchars->replaceSpecialChars($valuearray[0],false);
+                $valuearray[1] = $specialchars->replaceSpecialChars($valuearray[1],false);
+            }
+        }
                 // Bild in aktueller Kategorie
                 if (count($valuearray) == 1) {
                     // Bilddatei existiert
@@ -375,7 +398,7 @@ class Syntax {
                 
                 // Nun aber das Bild ersetzen!
                 if (!$error) {
-		    $alt = $specialchars->rebuildSpecialChars($value,true,true);
+            $alt = $specialchars->rebuildSpecialChars($value,true,true);
                     // "bildlinks" / "bildrechts"
                     if (($attribute == "bildlinks") || ($attribute == "bildrechts")) {
                         $cssclass = "";
@@ -447,17 +470,20 @@ class Syntax {
 
             // Überschrift groß
             elseif ($attribute == "ueber1"){
-                $content = str_replace ("$match", "<h1>$value</h1>", $content);
+                $content = str_replace ("$match", "<h1 id=\"a".$this->anchorcounter."\">$value</h1>", $content);
+                $this->anchorcounter++;
             }
 
             // Überschrift mittel
             elseif ($attribute == "ueber2"){
-                $content = str_replace ("$match", "<h2>$value</h2>", $content);
+                $content = str_replace ("$match", "<h2 id=\"a".$this->anchorcounter."\">$value</h2>", $content);
+                $this->anchorcounter++;
             }
 
             // Überschrift normal
             elseif ($attribute == "ueber3"){
-                $content = str_replace ("$match", "<h3>$value</h3>", $content);
+                $content = str_replace ("$match", "<h3 id=\"a".$this->anchorcounter."\">$value</h3>", $content);
+                $this->anchorcounter++;
             }
 
             // Listenpunkt
@@ -663,6 +689,9 @@ verwendet werden sollte!
             // Immer ersetzen: Horizontale Linen
             $content = preg_replace('/\[----\]/', '<hr />', $content);
 
+            // Inhaltsverzeichnis            
+            $content = preg_replace('/\[inhalte\]/', $this->getToC($headlines), $content);
+
             $i++;
         }
  
@@ -707,6 +736,38 @@ verwendet werden sollte!
         return "";
     }
     
+
+// ------------------------------------------------------------------------------
+// Inhaltsverzeichnis aus den übergebenen Überschrift-Infos aufbauen
+// ------------------------------------------------------------------------------
+    function getToC($headlines) {
+        $tableofcontents = "<div class=\"tableofcontents\">";
+        if (count($headlines) > 1) {
+            $tableofcontents .= "<ul>";
+            // Schleife über Überschriften-Array (0 ist der Seitenanfang - auslassen)
+            for ($toc_counter=1; $toc_counter < count($headlines); $toc_counter++) {
+                $link = "<a class=\"page\" href=\"#a$toc_counter\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_anchor_goto_1", $headlines[$toc_counter][1])).">".$headlines[$toc_counter][1]."</a>";
+                if ($headlines[$toc_counter][0] >= "2") {
+                    $tableofcontents .= "<li class=\"blind\"><ul>";
+                }
+                if ($headlines[$toc_counter][0] >= "3") {
+                    $tableofcontents .= "<li class=\"blind\"><ul>";
+                }
+                $tableofcontents .= "<li class=\"toc_".$headlines[$toc_counter][0]."\">".$link."</li>";
+                if ($headlines[$toc_counter][0] >= "2") {
+                    $tableofcontents .= "</ul></li>";
+                }
+                if ($headlines[$toc_counter][0] >= "3") {
+                    $tableofcontents .= "</ul></li>";
+                }
+            }
+            $tableofcontents .= "</ul>";
+        }
+        $tableofcontents .= "</div>";
+        return $tableofcontents;
+    }
+
+
 }
 
 ?>

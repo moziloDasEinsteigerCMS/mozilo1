@@ -451,3 +451,13 @@ td.contenttable2 {
 .alignjustify {
     text-align:justify;
 }
+
+/* -------------------------------------------------------- */
+/* [inhalte] */
+/* --------- */
+div.tableofcontents ul ul {
+    /*padding-left:15px;*/
+}
+div.tableofcontents li.blind {
+    list-style-type:none;
+}
