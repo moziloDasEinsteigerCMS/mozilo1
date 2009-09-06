@@ -506,7 +506,7 @@ echo "</pre>";
             $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=sitemap\" class=\"".$cssprefix."active\">".$language->getLanguageValue0("message_sitemap_0")."</a></li>";
         // Suchergebnis
         elseif (($ACTION_REQUEST == "search") && ($mainconfig->get("usesubmenu") == 0))
-            $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=search&amp;query=".$QUERY_REQUEST."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", html_entity_decode($QUERY_REQUEST,ENT_COMPAT,'ISO-8859-1'))."</a></li>";
+            $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=search&amp;query=".$specialchars->replaceSpecialChars($QUERY_REQUEST, true)."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", html_entity_decode($QUERY_REQUEST,ENT_COMPAT,'ISO-8859-1'))."</a></li>";
         // Entwurfsansicht
         elseif (($ACTION_REQUEST == "draft") && ($mainconfig->get("usesubmenu") == 0))
             $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?cat=$cat&amp;page=$PAGE_REQUEST&amp;action=draft\" class=\"".$cssprefix."active\">".pageToName($PAGE_REQUEST.$EXT_DRAFT, false)." (".$language->getLanguageValue0("message_draft_0").")</a></li>";
