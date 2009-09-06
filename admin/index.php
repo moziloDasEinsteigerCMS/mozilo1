@@ -2772,10 +2772,12 @@ function returnFormatToolbar($currentcat) {
     .returnFormatToolbarIcon("ueber1")
     .returnFormatToolbarIcon("ueber2")
     .returnFormatToolbarIcon("ueber3")
+    .returnFormatToolbarIcon("absatz")
     .returnFormatToolbarIcon("liste")
     .returnFormatToolbarIcon("numliste")
     ."<img class=\"js\" alt=\"Tabelle\" title=\"[tabelle| ... ] - ".getLanguageValue("toolbar_desc_tabelle")."\" src=\"gfx/jsToolbar/tabelle.png\" onClick=\"insert('[tabelle|\\n<< ', ' |  >>\\n<  |  >\\n]', true)\">"
     ."<img class=\"js\" alt=\"Horizontale Linie\" title=\"[----] - ".getLanguageValue("toolbar_desc_linie")."\" src=\"gfx/jsToolbar/linie.png\" onClick=\"insert('[----]', '', false)\">"
+    ."<img class=\"js\" alt=\"Horizontale Linie\" title=\"[inhalte] - ".getLanguageValue("toolbar_desc_inhalte")."\" src=\"gfx/jsToolbar/inhalte.png\" onClick=\"insert('[inhalte]', '', false)\">"
     .returnFormatToolbarIcon("html")
     .returnFormatToolbarIcon("include")
     ."</td>"
