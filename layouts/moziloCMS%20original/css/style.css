@@ -405,6 +405,9 @@ form.searchform:hover {
 	border:1px solid #C0C0C0;
 	background-color:#D0D0D0;
 }
+fieldset#searchfieldset {
+    border:none;
+}
 
 
 
@@ -702,4 +705,5 @@ div.tableofcontents ul ul {
 }
 div.tableofcontents li.blind {
     list-style-type:none;
+    list-style-image:none;
 }

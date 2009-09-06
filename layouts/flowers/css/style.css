@@ -118,6 +118,9 @@ input.searchbutton {
 	border:none;
 	background-color:transparent;
 }
+fieldset#searchfieldset {
+    border:none;
+}
 
 
 /******************************* MENU ****************************************/
@@ -480,4 +483,5 @@ div.tableofcontents ul ul {
 }
 div.tableofcontents li.blind {
     list-style-type:none;
+    list-style-image:none;
 }

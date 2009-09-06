@@ -359,6 +359,9 @@ form.searchform {
 	margin:2px 5px;
 	font-weight:bold;
 }
+fieldset#searchfieldset {
+    border:none;
+}
 
 
 
@@ -659,4 +662,5 @@ div.tableofcontents ul ul {
 }
 div.tableofcontents li.blind {
     list-style-type:none;
+    list-style-image:none;
 }

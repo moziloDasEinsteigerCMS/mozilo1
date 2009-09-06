@@ -74,6 +74,9 @@ text-decoration:line-through;
 	border:1px solid #49515C;
 	-moz-opacity:0.8; /* Transparenz - nur für Mozilla-Browser */
 }
+fieldset#searchfieldset {
+	border:none;
+}
 
 /*------------------------------------------------------------*
 **  Nav
@@ -424,4 +427,5 @@ div.tableofcontents ul ul {
 }
 div.tableofcontents li.blind {
     list-style-type:none;
+    list-style-image:none;
 }

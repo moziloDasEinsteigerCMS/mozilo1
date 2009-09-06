@@ -570,7 +570,7 @@ echo "</pre>";
         global $mainconfig;
         global $specialchars;
 
-        $form = "<form accept-charset=\"ISO-8859-1\" method=\"get\" action=\"index.php\" class=\"searchform\"><fieldset>"
+        $form = "<form accept-charset=\"ISO-8859-1\" method=\"get\" action=\"index.php\" class=\"searchform\"><fieldset id=\"searchfieldset\">"
         ."<input type=\"hidden\" name=\"action\" value=\"search\" />"
         ."<input type=\"text\" name=\"query\" value=\"\" class=\"searchtextfield\" accesskey=\"s\" />"
         ."<input type=\"image\" name=\"action\" value=\"search\" src=\"layouts/".$specialchars->replaceSpecialChars($mainconfig->get("cmslayout"), true)."/grafiken/searchicon.gif\" alt=\"".$language->getLanguageValue0("message_search_0")."\" class=\"searchbutton\"".getTitleAttribute($language->getLanguageValue0("message_search_0"))." />"

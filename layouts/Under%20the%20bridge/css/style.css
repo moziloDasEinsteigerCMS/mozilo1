@@ -378,4 +378,5 @@ div.tableofcontents ul ul {
 }
 div.tableofcontents li.blind {
     list-style-type:none;
+    list-style-image:none;
 }
