@@ -2777,7 +2777,7 @@ function returnFormatToolbar($currentcat) {
     .returnFormatToolbarIcon("numliste")
     ."<img class=\"js\" alt=\"Tabelle\" title=\"[tabelle| ... ] - ".getLanguageValue("toolbar_desc_tabelle")."\" src=\"gfx/jsToolbar/tabelle.png\" onClick=\"insert('[tabelle|\\n<< ', ' |  >>\\n<  |  >\\n]', true)\">"
     ."<img class=\"js\" alt=\"Horizontale Linie\" title=\"[----] - ".getLanguageValue("toolbar_desc_linie")."\" src=\"gfx/jsToolbar/linie.png\" onClick=\"insert('[----]', '', false)\">"
-    ."<img class=\"js\" alt=\"Horizontale Linie\" title=\"[inhalte] - ".getLanguageValue("toolbar_desc_inhalte")."\" src=\"gfx/jsToolbar/inhalte.png\" onClick=\"insert('[inhalte]', '', false)\">"
+    ."<img class=\"js\" alt=\"Horizontale Linie\" title=\"{TABLEOFCONTENTS} - ".getLanguageValue("toolbar_desc_inhalte")."\" src=\"gfx/jsToolbar/inhalte.png\" onClick=\"insert('{TABLEOFCONTENTS}', '', false)\">"
     .returnFormatToolbarIcon("html")
     .returnFormatToolbarIcon("include")
     ."</td>"

@@ -19,6 +19,7 @@ class Syntax {
     var $TARGETBLANK_GALLERY;
     var $TARGETBLANK_DOWNLOAD;
     var $anchorcounter;
+    var $headlininfos;
 
     
 // ------------------------------------------------------------------------------    
@@ -77,31 +78,11 @@ class Syntax {
         global $specialchars;
         
         if ($firstrecursion) {
-            // Inhaltsformatierungen
-            $content = htmlentities($content,ENT_COMPAT,'ISO-8859-1');
-            $content = preg_replace("/&amp;#036;/Umsi", "&#036;", $content);
-            $content = preg_replace("/&amp;#092;/Umsi", "&#092;", $content);
-            $content = preg_replace("/\^(.)/Umsie", "'&#'.ord('\\1').';'", $content);
-            // Für Einrückungen
-            $content = str_replace("  ","&nbsp;&nbsp;",$content);
-
-            // Platzhalter ersetzen
-            $content = replacePlaceholders($content, "", "");
-            
-            // "absatz"-Links vorbereiten: Alle Überschriften einlesen
-            preg_match_all("/\[(ueber([\d]))\|([^\[\]]+)\]/", $content, $matches);
-            // $headlines besteht aus Arrays, die zwei Werte beinhalten: Überschriftstyp (1/2/3) und Wert
-            $headlines = array();
-            $headlines[0] = array("0", $this->LANG->getLanguageValue1("anchor_top_0"));
-
-            $i = 0;
-            foreach ($matches[0] as $match) {
-                // gefundene Überschriften im Array $headlines merken
-                $headlines[$i+1] = (array($matches[2][$i], $matches[3][$i]));
-                $i++;
-            }
-
+            $content = $this->prepareContent($content);
+            // Überschriften einlesen
+            $this->headlineinfos = $this->getHeadlineInfos($content);
         }
+        
 
         // Nach Texten in eckigen Klammern suchen
         preg_match_all("/\[([^\[\]]+)\|([^\[\]]*)\]/Um", $content, $matches);
@@ -229,7 +210,7 @@ class Syntax {
                     $link_text = $value;
                 } 
                 $pos = 0;
-                foreach ($headlines as $headline_info) {
+                foreach ($this->headlineinfos as $headline_info) {
                     // $headline_info besteht aus Überschriftstyp (1/2/3) und Wert
                     if ($headline_info[1] == $value) {
                         // "Nach oben"-Verweis
@@ -470,20 +451,17 @@ class Syntax {
 
             // Überschrift groß
             elseif ($attribute == "ueber1"){
-                $content = str_replace ("$match", "<h1 id=\"a".$this->anchorcounter."\">$value</h1>", $content);
-                $this->anchorcounter++;
+                $content = preg_replace("/".preg_quote($match)."/", "<h1 id=\"a".$this->anchorcounter++."\">$value</h1>", $content,1);
             }
 
             // Überschrift mittel
             elseif ($attribute == "ueber2"){
-                $content = str_replace ("$match", "<h2 id=\"a".$this->anchorcounter."\">$value</h2>", $content);
-                $this->anchorcounter++;
+                $content = preg_replace("/".preg_quote($match)."/", "<h2 id=\"a".$this->anchorcounter++."\">$value</h2>", $content,1);
             }
 
             // Überschrift normal
             elseif ($attribute == "ueber3"){
-                $content = str_replace ("$match", "<h3 id=\"a".$this->anchorcounter."\">$value</h3>", $content);
-                $this->anchorcounter++;
+                $content = preg_replace("/".preg_quote($match)."/", "<h3 id=\"a".$this->anchorcounter++."\">$value</h3>", $content,1);
             }
 
             // Listenpunkt
@@ -689,9 +667,6 @@ verwendet werden sollte!
             // Immer ersetzen: Horizontale Linen
             $content = preg_replace('/\[----\]/', '<hr />', $content);
 
-            // Inhaltsverzeichnis            
-            $content = preg_replace('/\[inhalte\]/', $this->getToC($headlines), $content);
-
             $i++;
         }
  
@@ -702,13 +677,13 @@ verwendet werden sollte!
             // Zeilenwechsel setzen
             $content = preg_replace('/(\r\n|\r|\n)/', '$1<br />', $content);
             // Zeilenwechsel nach Blockelementen entfernen
-            // Tag-Beginn                                                                                            <
-            // optional: Slash bei schließenden Tags                                    (\/?)
-            // Blockelemente                                                                                     (address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)
-            // optional: sonstige Zeichen (z.B. Attribute)                        ([^>]*)
-            // Tag-Ende                                                                                                >
-            // optional: Zeilenwechsel                                                                 (\r\n|\r|\n)?
-            // <br /> mit oder ohne Slash (das, was raus muß!)                <br \/? >
+            // Tag-Beginn                                       <
+            // optional: Slash bei schließenden Tags            (\/?)
+            // Blockelemente                                    (address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)
+            // optional: sonstige Zeichen (z.B. Attribute)      ([^>]*)
+            // Tag-Ende                                         >
+            // optional: Zeilenwechsel                          (\r\n|\r|\n)?
+            // <br /> mit oder ohne Slash (das, was raus muß!)  <br \/? >
             $content = preg_replace('/<(\/?)(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)([^>]*)>(\r\n|\r|\n)?<br \/?>/', "<$1$2$3>$4",$content);
             // direkt aufeinanderfolgende Listen zusammenführen
             $content = preg_replace('/<\/ul>(\r\n|\r|\n)?<ul>/', '', $content);
@@ -740,24 +715,24 @@ verwendet werden sollte!
 // ------------------------------------------------------------------------------
 // Inhaltsverzeichnis aus den übergebenen Überschrift-Infos aufbauen
 // ------------------------------------------------------------------------------
-    function getToC($headlines) {
+    function getToC($pagerequest) {
         $tableofcontents = "<div class=\"tableofcontents\">";
-        if (count($headlines) > 1) {
+        if (count($this->headlineinfos) > 1) {
             $tableofcontents .= "<ul>";
             // Schleife über Überschriften-Array (0 ist der Seitenanfang - auslassen)
-            for ($toc_counter=1; $toc_counter < count($headlines); $toc_counter++) {
-                $link = "<a class=\"page\" href=\"#a$toc_counter\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_anchor_goto_1", $headlines[$toc_counter][1])).">".$headlines[$toc_counter][1]."</a>";
-                if ($headlines[$toc_counter][0] >= "2") {
+            for ($toc_counter=1; $toc_counter < count($this->headlineinfos); $toc_counter++) {
+                $link = "<a class=\"page\" href=\"#a$toc_counter\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_anchor_goto_1", $this->headlineinfos[$toc_counter][1])).">".$this->headlineinfos[$toc_counter][1]."</a>";
+                if ($this->headlineinfos[$toc_counter][0] >= "2") {
                     $tableofcontents .= "<li class=\"blind\"><ul>";
                 }
-                if ($headlines[$toc_counter][0] >= "3") {
+                if ($this->headlineinfos[$toc_counter][0] >= "3") {
                     $tableofcontents .= "<li class=\"blind\"><ul>";
                 }
-                $tableofcontents .= "<li class=\"toc_".$headlines[$toc_counter][0]."\">".$link."</li>";
-                if ($headlines[$toc_counter][0] >= "2") {
+                $tableofcontents .= "<li class=\"toc_".$this->headlineinfos[$toc_counter][0]."\">".$link."</li>";
+                if ($this->headlineinfos[$toc_counter][0] >= "2") {
                     $tableofcontents .= "</ul></li>";
                 }
-                if ($headlines[$toc_counter][0] >= "3") {
+                if ($this->headlineinfos[$toc_counter][0] >= "3") {
                     $tableofcontents .= "</ul></li>";
                 }
             }
@@ -767,6 +742,45 @@ verwendet werden sollte!
         return $tableofcontents;
     }
 
+// ------------------------------------------------------------------------------
+// Hilfsfunktion: Überschrift-Infos einlesen
+// ------------------------------------------------------------------------------
+    function getHeadlineInfos($content) {
+        // "absatz"-Links vorbereiten: Alle Überschriften einlesen
+        preg_match_all("/\[(ueber([\d]))\|([^\[\]]+)\]/", $content, $matches);
+        // $headlines besteht aus Arrays, die zwei Werte beinhalten: Überschriftstyp (1/2/3) und Wert
+        $headlines = array();
+        $headlines[0] = array("0", $this->LANG->getLanguageValue1("anchor_top_0"));
+
+        $i = 0;
+        foreach ($matches[0] as $match) {
+            // gefundene Überschriften im Array $headlines merken
+            $headlines[$i+1] = (array($matches[2][$i], $matches[3][$i]));
+            //echo ($i+1) ." >>> ". $matches[2][$i].", ".$matches[3][$i]."<hr>";
+            $i++;
+        }
+        
+        return $headlines;
+    }
+
+
+// ------------------------------------------------------------------------------
+// Hilfsfunktion: Inhalte vorbereiten
+// ------------------------------------------------------------------------------
+    function prepareContent($content) {
+        // Inhaltsformatierungen
+        $content = htmlentities($content,ENT_COMPAT,'ISO-8859-1');
+        $content = preg_replace("/&amp;#036;/Umsi", "&#036;", $content);
+        $content = preg_replace("/&amp;#092;/Umsi", "&#092;", $content);
+        $content = preg_replace("/\^(.)/Umsie", "'&#'.ord('\\1').';'", $content);
+        // Für Einrückungen
+        $content = str_replace("  ","&nbsp;&nbsp;",$content);
+
+        // Platzhalter ersetzen
+        $content = replacePlaceholders($content, "", "");
+        
+        return $content;
+    }
 
 }
 

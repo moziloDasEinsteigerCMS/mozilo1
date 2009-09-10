@@ -8,8 +8,7 @@
 *
 */
 
-
-
+    session_start(); 
 
 /*
 echo "<pre style=\"position:fixed;background-color:#000;color:#0f0;padding:5px;font-family:monospace;border:2px solid #777;\">";
@@ -46,8 +45,10 @@ echo "</pre>";
     $TEMPLATE_FILE  = "layouts/$LAYOUT_DIR/template.html";
     $CSS_FILE       = "layouts/$LAYOUT_DIR/css/style.css";
     $FAVICON_FILE   = "layouts/$LAYOUT_DIR/favicon.ico";
-    // Template für Kontaktformular
-    $contactformconfig = new Properties("formular/formular.conf");
+    // Einstellungen für Kontaktformular
+    $contactformconfig  = new Properties("formular/formular.conf");
+    $contactformcalcs   = new Properties("formular/aufgaben.conf");
+
 
     $WEBSITE_NAME = $mainconfig->get("websitetitle");
     if ($WEBSITE_NAME == "")
@@ -164,6 +165,7 @@ echo "</pre>";
         global $ACTION_REQUEST;
         global $HIGHLIGHT_REQUEST;
         global $CAT_REQUEST;
+        global $PAGE_REQUEST;
         global $language;
         global $syntax;
         global $mainconfig;
@@ -265,6 +267,10 @@ echo "</pre>";
       
     // Kontaktformular
     $HTML = preg_replace('/{CONTACT}/', buildContactForm(), $HTML);
+
+    // Kontaktformular
+    $HTML = preg_replace('/{TABLEOFCONTENTS}/', $syntax->getToC($pagecontent), $HTML);
+    
     }
 
 
@@ -1055,27 +1061,34 @@ echo "</pre>";
         $mail = getRequestParam('mail', false);
         $website = getRequestParam('website', false);
         $message = getRequestParam('message', false);
+        $calcresult = getRequestParam('calculation', false);
 
         // Das Formular wurde abgesendet
         if (getRequestParam('submit', false) <> "") { 
 
             // Bot-Schutz: Wurde das Formular innerhalb von 5 Sekunden abgeschickt?
             if (time() - getRequestParam('loadtime', false) < 5) {
-                die ("Netter Versuch.");
+                $errormessage = $language->getLanguageValue0("contactform_wrongresult_0");
             }
-            
-            // Eines der Pflichtfelder leer?
-            if (($config_name[1] == "true") && ($name == "")) {
-                $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_name_0");
+            // Nochmal Spamschutz: Ergebnis der Rechenaufgabe auswerten
+            if (strtolower($calcresult) != strtolower($_SESSION['calculation_result'])) {
+                $errormessage = $language->getLanguageValue0("contactform_wrongresult_0");
             }
-            else if (($config_mail[1] == "true") && ($mail == "")) {
-                $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_mail_0");
-            }
-            else if (($config_website[1] == "true") && ($website == "")) {
-                $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_website_0");
-            }
-            else if (($config_message[1] == "true") && ($message == "")) {
-                $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_message_0");
+            // Es ist ein Fehler aufgetreten!
+            if ($errormessage == "") {
+                // Eines der Pflichtfelder leer?
+                if (($config_name[1] == "true") && ($name == "")) {
+                    $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_name_0");
+                }
+                else if (($config_mail[1] == "true") && ($mail == "")) {
+                    $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_mail_0");
+                }
+                else if (($config_website[1] == "true") && ($website == "")) {
+                    $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_website_0");
+                }
+                else if (($config_message[1] == "true") && ($message == "")) {
+                    $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_message_0");
+                }
             }
             // Es ist ein Fehler aufgetreten!
             if ($errormessage <> "") {
@@ -1147,6 +1160,12 @@ echo "</pre>";
             }
             $form .= "</td><td><textarea rows=\"10\" cols=\"50\" id=\"contact_message\" name=\"message\">".$message."</textarea></td></tr>";
         }
+        // Rechenaufgabe
+        $calculation_data = getRandomCalculationData();
+        $_SESSION['calculation_result'] = $calculation_data[1];
+        $form .= "<tr><td style=\"padding-right:10px;\">".$calculation_data[0]."</td>";
+        $form .= "<td><input type=\"text\" id=\"contact_calculation\" name=\"calculation\" value=\"\" /></td></tr>";
+        
         $form .= "<tr><td style=\"padding-right:10px;\">&nbsp;</td><td>".$language->getLanguageValue0("contactform_mandatory_fields_0")."</td></tr>"
         ."<tr><td style=\"padding-right:10px;\">&nbsp;</td><td><input type=\"submit\" class=\"submit\" id=\"contact_submit\" name=\"submit\" value=\"".$language->getLanguageValue0("contactform_submit_0")."\" /></td></tr>"
         ."</table>"
@@ -1230,5 +1249,22 @@ echo "</pre>";
 
     	return $neighbourPages;
     }
+
+// ------------------------------------------------------------------------------
+// Hilfsfunktion: Zufällige Spamschutz-Rechenaufgabe und deren Ergebnis zurückgeben
+// ------------------------------------------------------------------------------
+    function getRandomCalculationData() {
+        global $contactformcalcs;
+        $confarray = $contactformcalcs->toArray();
+        $randnum = rand(0, count($confarray)-1);
+        $i = 0;
+        foreach ($confarray as $calculation => $result) {
+            if ($randnum == $i) {
+                return array($calculation, $result);
+            }
+            $i++;
+        }
+    }
+
 
 ?>

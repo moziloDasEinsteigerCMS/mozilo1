@@ -405,7 +405,7 @@ span#contact_successmessage{
   color:#008800;
   font-weight:bold;
 }
-input#contact_name, input#contact_mail, input#contact_website {
+input#contact_name, input#contact_mail, input#contact_website, input#contact_calculation {
 	border:1px solid #C0C0C0;
   width:200px;
 }

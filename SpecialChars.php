@@ -78,17 +78,6 @@ class SpecialChars {
 			$text = rawurlencode(stripslashes($text));
 		$text = str_replace('ssslashhh','/',$text);
 
-/*		$text = htmlentities(stripslashes($text));
-
-		// Leerzeichen
-		$text = preg_replace("/(\s| |\240|&nbsp;)/", "-nbsp~", $text);
-		$text = preg_replace("/\"/", "-quot~", $text);
-		// Ä, @, ?
-		$text = preg_replace("/Ä/", "-euro~", $text);
-		$text = preg_replace("/@/", "-at~", $text);
-		$text = preg_replace("/\?/", "-ques~", $text);
-		// Alle HTML-Entities in mozilo-Entities umwandeln
-		$text = preg_replace("/&(.*);/U", "-$1~", $text);*/
 		return $text;
 	}
 
@@ -106,20 +95,11 @@ class SpecialChars {
 		elseif(!$rebuildnbsp and $html)
 			$text = preg_replace("/&nbsp;/", " ", $text);
 
-/*		// Leerzeichen
-		if ($rebuildnbsp)
-			$text = preg_replace("/-nbsp~/", "&nbsp;", $text);
-		else
-			$text = preg_replace("/-nbsp~/", " ", $text);
-		// @, ?
-		$text = preg_replace("/-at~/", "@", $text);
-		$text = preg_replace("/-ques~/", "?", $text);
-		// Alle mozilo-Entities in HTML-Entities umwandeln!
-		$text = preg_replace("/-([^-~]+)~/U", "&$1;", $text);*/
-		// & escapen 
-		//$text = preg_replace("/&+(?!(.+);)/U", "&amp;", $text);
-		
 		$text = html_entity_decode($text, ENT_COMPAT, 'ISO-8859-1');
+		
+		// & muﬂ allerdings als Entity dargestellt werden!
+        $text = preg_replace("/\&/", "&amp;", $text);
+        
 		return $text;
 	}
 

@@ -23,7 +23,7 @@
 		."<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"de\" lang=\"de\">\n"
 		."<head>\n"
 		."<meta http-equiv=\"Content-Type\" content=\"text/html;charset=iso-8859-1\" />\n"
-		."<title>mozilo-Sonderzeichenkonverter / mozilo special character converter</title>\n"
+		."<title>moziloCMS-Sonderzeichenkonverter / moziloCMS special character converter</title>\n"
 		."<script type=\"text/javascript\"><!--\n"
 		."function setInputFocus() {\n"
 		."if (document.form) {\n"
@@ -35,10 +35,10 @@
 		."<style type=\"text/css\"> @import \"converter.css\"; </style>\n"
 		."</head>\n"
 		."<body onload=\"setInputFocus();\">\n"
-		."<h1>mozilo-Sonderzeichenkonverter / mozilo special character converter</h1>\n"
+		."<h1>moziloCMS-Sonderzeichenkonverter / moziloCMS special character converter</h1>\n"
 		."<div class=\"content\">\n";
 	$htmlend = "</div>\n"
-	."<a href=\"http://www.mozilo.de\" target=\"_blank\">www.mozilo.de</a>\n"
+	."<a href=\"http://cms.mozilo.de\" target=\"_blank\">cms.mozilo.de</a>\n"
 	."</body>\n"
 	."</html>\n";
 	
@@ -51,7 +51,7 @@
 		
 
 	$html = $htmlstart
-	."<table>\n"
+	."<table summary=\"\">\n"
 	."<tr>\n"
 	."<td>\n"
 	."<h2>Eingabe / Input</h2>\n"
@@ -63,11 +63,11 @@
 	."</td>\n"
 	."</tr>\n"
 	."<tr>\n"
-	."<td colspan=\"2\">\n"
+/*	."<td colspan=\"2\">\n"
 	."<h2>Unterstützte Zeichen / Supported characters</h2>\n"
 	.$specialchars->getSpecialCharsString(" ", 52)."\n"
 	."</td>\n"
-	."</tr>\n"
+	."</tr>\n"*/
 	."</table>\n"
 	.$htmlend;
 	
@@ -100,18 +100,13 @@
 			return "";
 		}
 		switch ($type) {
-			// ersetzen (vorher prüfen)
+			// ersetzen
 			case 0:
-				if(!(preg_match($specialchars->getSpecialCharsRegEx(), $text))) {
-					return "Nicht unterstützte Zeichen in der Eingabe! / Input contains unsupported characters!";
-				} 
-				else {
-					return $specialchars->replaceSpecialChars($text, true);
-				}
+				return $specialchars->replaceSpecialChars($text, false);
 				break;
 			// wiederherstellen
 			case 1:
-				return $specialchars->rebuildSpecialChars($text, true);
+				return $specialchars->rebuildSpecialChars($text, false, false);
 				break;
 		}
 
