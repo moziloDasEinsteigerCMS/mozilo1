@@ -446,6 +446,8 @@ echo "</pre>";
         global $PAGE_REQUEST;
         global $specialchars;
         global $mainconfig;
+        global $language;
+        global $syntax;
 
         $mainmenu = "<ul class=\"mainmenu\">";
         // Kategorien-Verzeichnis einlesen
@@ -461,10 +463,11 @@ echo "</pre>";
             // Aktuelle Kategorie als aktiven Menüpunkt anzeigen...
             elseif ($currentcategory == $CAT_REQUEST) {
                 $currentaccesskey++;
-                //$mainmenu .= "<li class=\"mainmenu\"><a href=\"index.php?cat=$currentcategory\" class=\"menuactive\" accesskey=\"$currentaccesskey\">".catToName($currentcategory, false)."</a></li>";
-                $mainmenu .= "<li class=\"mainmenu\"><a href=\"index.php?cat=".$currentcategory."\" class=\"menuactive\" accesskey=\"$currentaccesskey\">".catToName($currentcategory, false)."</a>";
+                $mainmenu .= "<li class=\"mainmenu\">".
+                    "<a href=\"index.php?cat=".$currentcategory."\" class=\"menuactive\" accesskey=\"$currentaccesskey\"".
+                    $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_category_1", catToName($currentcategory, false))).
+                    ">".catToName($currentcategory, false)."</a>";
                 if ($mainconfig->get("usesubmenu") > 0) {
-                    // $mainmenu .= "<li class=\"mainmenu_submenu\">".getDetailMenu($currentcategory)."</li>";
                     $mainmenu .= getDetailMenu($currentcategory);
                 }
                 $mainmenu .= "</li>";
@@ -472,10 +475,11 @@ echo "</pre>";
             // ...alle anderen als normalen Menüpunkt.
             else {
                 $currentaccesskey++;
-                //$mainmenu .= "<li class=\"mainmenu\"><a href=\"index.php?cat=$currentcategory\" class=\"menu\" accesskey=\"$currentaccesskey\">".catToName($currentcategory, false)."</a></li>";
-                $mainmenu .= "<li class=\"mainmenu\"><a href=\"index.php?cat=".$currentcategory."\" class=\"menu\" accesskey=\"$currentaccesskey\">".catToName($currentcategory, false)."</a>";
+                $mainmenu .= "<li class=\"mainmenu\">".
+                    "<a href=\"index.php?cat=".$currentcategory."\" class=\"menu\" accesskey=\"$currentaccesskey\"".
+                    $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_category_1", catToName($currentcategory, false))).
+                    ">".catToName($currentcategory, false)."</a>";
                 if ($mainconfig->get("usesubmenu") == 2) {
-                    //$mainmenu .= "<li class=\"mainmenu_submenu\">".getDetailMenu($currentcategory)."</li>";
                     $mainmenu .= getDetailMenu($currentcategory);
                 }
                 $mainmenu .= "</li>";
@@ -500,6 +504,7 @@ echo "</pre>";
         global $language;
         global $specialchars;
         global $mainconfig;
+        global $syntax;
 
         if ($mainconfig->get("usesubmenu") > 0)
             $cssprefix = "submenu";
@@ -546,10 +551,15 @@ echo "</pre>";
                     }
                 }
                 // Aktuelle Inhaltsseite als aktiven Menüpunkt anzeigen...
-                if (substr($currentcontent, 0, strlen($currentcontent) - 4) == $PAGE_REQUEST) {
+                if (
+                    ($CAT_REQUEST == $cat) // aktive Kategorie
+                    && (substr($currentcontent, 0, strlen($currentcontent) - 4) == $PAGE_REQUEST) // aktive Seite
+                ) {
                     $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?cat=".$cat."&amp;page=".
                                                     substr($currentcontent, 0, strlen($currentcontent) - 4).
-                                                    "\" class=\"".$cssprefix."active\" accesskey=\"".chr($currentaccesskey+96)."\">".
+                                                    "\" class=\"".$cssprefix."active\" accesskey=\"".chr($currentaccesskey+96)."\"".
+                                                    $syntax->getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", pageToName($currentcontent, false), catToName($cat, false))).
+                                                    ">".
                                                     pageToName($currentcontent, false).
                                                     "</a></li>";
                 }
@@ -557,7 +567,9 @@ echo "</pre>";
                 else {
                     $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?cat=".$cat."&amp;page=".
                                                     substr($currentcontent, 0, strlen($currentcontent) - 4).
-                                                    "\" class=\"".$cssprefix."\" accesskey=\"".chr($currentaccesskey+96)."\">".
+                                                    "\" class=\"".$cssprefix."\" accesskey=\"".chr($currentaccesskey+96)."\"".
+                                                    $syntax->getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", pageToName($currentcontent, false), catToName($cat, false))).
+                                                    ">".
                                                     pageToName($currentcontent, false).
                                                     "</a></li>";
                 }
@@ -1036,11 +1048,12 @@ echo "</pre>";
 // Gibt das Kontaktformular zurück
 // ------------------------------------------------------------------------------
     function buildContactForm() {
+        global $adminconfig;
         global $contactformconfig;
         global $language;
         global $mailfunctions;
+        global $mainconfig;
         global $WEBSITE_NAME;
-        global $adminconfig;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         
@@ -1048,6 +1061,9 @@ echo "</pre>";
         if ($adminconfig->get("sendadminmail") != "true") {
             return "<span class=\"deadlink\"".getTitleAttribute($language->getLanguageValue0("tooltip_no_mail_error_0")).">{CONTACT}</span>";
         }
+        
+        // Sollen die Spamschutz-Aufgaben verwendet werden?
+        $usespamprotection = $mainconfig->get("contactformusespamprotection") == "true";
 
         $config_name = explode(",", ($contactformconfig->get("name")));
         $config_mail = explode(",", ($contactformconfig->get("mail")));
@@ -1057,22 +1073,28 @@ echo "</pre>";
         $errormessage = "";
         $form = "";
         
-        $name = getRequestParam('name', false);
-        $mail = getRequestParam('mail', false);
-        $website = getRequestParam('website', false);
-        $message = getRequestParam('message', false);
-        $calcresult = getRequestParam('calculation', false);
+        $name       = getRequestParam($_SESSION['contactform_name'], false);
+        $mail       = getRequestParam($_SESSION['contactform_mail'], false);
+        $website    = getRequestParam($_SESSION['contactform_website'], false);
+        $message    = getRequestParam($_SESSION['contactform_message'], false);
+        $calcresult = getRequestParam($_SESSION['contactform_calculation'], false);
 
         // Das Formular wurde abgesendet
         if (getRequestParam('submit', false) <> "") { 
 
-            // Bot-Schutz: Wurde das Formular innerhalb von 5 Sekunden abgeschickt?
-            if (time() - getRequestParam('loadtime', false) < 5) {
-                $errormessage = $language->getLanguageValue0("contactform_wrongresult_0");
+            // Bot-Schutz: Wurde das Formular innerhalb von x Sekunden abgeschickt?
+            $sendtime = $mainconfig->get("contactformwaittime");
+            if (($sendtime == "") || !preg_match("/^[\d+]+$/", $sendtime)) {
+                $sendtime = 15;
             }
-            // Nochmal Spamschutz: Ergebnis der Rechenaufgabe auswerten
-            if (strtolower($calcresult) != strtolower($_SESSION['calculation_result'])) {
-                $errormessage = $language->getLanguageValue0("contactform_wrongresult_0");
+            if (time() - $_SESSION['contactform_loadtime'] < $sendtime) {
+                $errormessage = $language->getLanguageValue1("contactform_senttoofast_1", $sendtime);
+            }
+            if ($usespamprotection) {
+                // Nochmal Spamschutz: Ergebnis der Spamschutz-Aufgabe auswerten
+                if (strtolower($calcresult) != strtolower($_SESSION['calculation_result'])) {
+                    $errormessage = $language->getLanguageValue0("contactform_wrongresult_0");
+                }
             }
             // Es ist ein Fehler aufgetreten!
             if ($errormessage == "") {
@@ -1127,48 +1149,58 @@ echo "</pre>";
             }
         }
 
+        // Wenn das Formular nicht abgesendet wurde: die Feldnamen neu bestimmen
+        else {
+            renameContactInputs();
+        }
+        
+        // aktuelle Zeit merken
+        $_SESSION['contactform_loadtime'] = time();
+
         $form .= "<form accept-charset=\"ISO-8859-1\" method=\"post\" action=\"index.php\" name=\"contact_form\" id=\"contact_form\">"
         ."<input type=\"hidden\" name=\"cat\" value=\"".$CAT_REQUEST."\" />"
         ."<input type=\"hidden\" name=\"page\" value=\"".$PAGE_REQUEST."\" />"
-        ."<input type=\"hidden\" name=\"loadtime\" value=\"".time()."\" />"
         ."<table id=\"contact_table\" summary=\"contact form table\">";
         if ($config_name[0] == "true") {
             $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_name_0");
             if ($config_name[1] == "true") {
                 $form .= "*";
             }
-            $form .= "</td><td><input type=\"text\" id=\"contact_name\" name=\"name\" value=\"".$name."\" /></td></tr>";
+            $form .= "</td><td><input type=\"text\" id=\"contact_name\" name=\"".$_SESSION['contactform_name']."\" value=\"".$name."\" /></td></tr>";
         }
         if ($config_mail[0] == "true") {
             $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_mail_0");
             if ($config_mail[1] == "true") {
                 $form .= "*";
             }
-            $form .= "</td><td><input type=\"text\" id=\"contact_mail\" name=\"mail\" value=\"".$mail."\" /></td></tr>";
+            $form .= "</td><td><input type=\"text\" id=\"contact_mail\" name=\"".$_SESSION['contactform_mail']."\" value=\"".$mail."\" /></td></tr>";
         }
         if ($config_website[0] == "true") {
             $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_website_0");
             if ($config_website[1] == "true") {
                 $form .= "*";
             }
-            $form .= "</td><td><input type=\"text\" id=\"contact_website\" name=\"website\" value=\"".$website."\" /></td></tr>";
+            $form .= "</td><td><input type=\"text\" id=\"contact_website\" name=\"".$_SESSION['contactform_website']."\" value=\"".$website."\" /></td></tr>";
         }
         if ($config_message[0] == "true") {
             $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_message_0");
             if ($config_message[1] == "true") {
                 $form .= "*";
             }
-            $form .= "</td><td><textarea rows=\"10\" cols=\"50\" id=\"contact_message\" name=\"message\">".$message."</textarea></td></tr>";
+            $form .= "</td><td><textarea rows=\"10\" cols=\"50\" id=\"contact_message\" name=\"".$_SESSION['contactform_message']."\">".$message."</textarea></td></tr>";
         }
-        // Rechenaufgabe
-        $calculation_data = getRandomCalculationData();
-        $_SESSION['calculation_result'] = $calculation_data[1];
-        $form .= "<tr><td style=\"padding-right:10px;\">".$calculation_data[0]."</td>";
-        $form .= "<td><input type=\"text\" id=\"contact_calculation\" name=\"calculation\" value=\"\" /></td></tr>";
-        
-        $form .= "<tr><td style=\"padding-right:10px;\">&nbsp;</td><td>".$language->getLanguageValue0("contactform_mandatory_fields_0")."</td></tr>"
-        ."<tr><td style=\"padding-right:10px;\">&nbsp;</td><td><input type=\"submit\" class=\"submit\" id=\"contact_submit\" name=\"submit\" value=\"".$language->getLanguageValue0("contactform_submit_0")."\" /></td></tr>"
-        ."</table>"
+        if ($usespamprotection) {
+            // Spamschutz-Aufgabe
+            $calculation_data = getRandomCalculationData();
+            $_SESSION['calculation_result'] = $calculation_data[1];
+            $form .= "<tr><td colspan=\"2\">".$language->getLanguageValue0("contactform_spamprotection_text_0")."</td></tr>"
+                ."<tr><td style=\"padding-right:10px;\">".$calculation_data[0]."</td>"
+                ."<td><input type=\"text\" id=\"contact_calculation\" name=\"".$_SESSION['contactform_calculation']."\" value=\"\" /></td></tr>";
+            
+            $form .= "<tr><td style=\"padding-right:10px;\">&nbsp;</td><td>".$language->getLanguageValue0("contactform_mandatory_fields_0")."</td></tr>"
+            ."<tr><td style=\"padding-right:10px;\">&nbsp;</td><td><input type=\"submit\" class=\"submit\" id=\"contact_submit\" name=\"submit\" value=\"".$language->getLanguageValue0("contactform_submit_0")."\" /></td></tr>";
+        }
+        $form .= "</table>"
         ."</form>";
         
         return $form;
@@ -1223,32 +1255,33 @@ echo "</pre>";
 // Rückgabe der Dateinamen der vorigen und nächsten Seite
 // ------------------------------------------------------------------------------
     function getNeighbourPages($page) {
-    	global $CONTENT_DIR_ABS;
-    	global $CAT_REQUEST;
-    	global $mainconfig;
-    	
-    	// leer initialisieren
-    	$neighbourPages = array("", "");
-    	// aktuelle Kategorie einlesen
-    	$pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true, $mainconfig->get("showhiddenpagesincmsvariables") == "true");
-    	// Schleife über alle Seiten
-    	for ($i = 0; $i < count($pagesarray); $i++) {
-    		if ($page == substr($pagesarray[$i], 0, strlen($pagesarray[$i]) - 4)) {
-    		    // vorige Seite (nur setzen, wenn aktuelle nicht die erste ist)
-    			if ($i > 0) {
-    			    $neighbourPages[0] = $pagesarray[$i-1];
-    			}
-    			// nächste Seite (nur setzen, wenn aktuelle nicht die letzte ist)
-    			if($i < count($pagesarray)-1) {
-    			    $neighbourPages[1] = $pagesarray[$i+1];
-    			}
-    			// Schleife kann abgebrochen werden
-    			break;
-    		}
-    	}
+        global $CONTENT_DIR_ABS;
+        global $CAT_REQUEST;
+        global $mainconfig;
+        
+        // leer initialisieren
+        $neighbourPages = array("", "");
+        // aktuelle Kategorie einlesen
+        $pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true, $mainconfig->get("showhiddenpagesincmsvariables") == "true");
+        // Schleife über alle Seiten
+        for ($i = 0; $i < count($pagesarray); $i++) {
+            if ($page == substr($pagesarray[$i], 0, strlen($pagesarray[$i]) - 4)) {
+                // vorige Seite (nur setzen, wenn aktuelle nicht die erste ist)
+                if ($i > 0) {
+                    $neighbourPages[0] = $pagesarray[$i-1];
+                }
+                // nächste Seite (nur setzen, wenn aktuelle nicht die letzte ist)
+                if($i < count($pagesarray)-1) {
+                    $neighbourPages[1] = $pagesarray[$i+1];
+                }
+                // Schleife kann abgebrochen werden
+                break;
+            }
+        }
 
-    	return $neighbourPages;
+        return $neighbourPages;
     }
+
 
 // ------------------------------------------------------------------------------
 // Hilfsfunktion: Zufällige Spamschutz-Rechenaufgabe und deren Ergebnis zurückgeben
@@ -1266,5 +1299,16 @@ echo "</pre>";
         }
     }
 
+
+// ------------------------------------------------------------------------------
+// Hilfsfunktion: Bestimmt die Inputnamen neu
+// ------------------------------------------------------------------------------    
+    function renameContactInputs() {
+        $_SESSION['contactform_name'] = time()-rand(30, 40);
+        $_SESSION['contactform_mail'] = time()-rand(10, 20);
+        $_SESSION['contactform_website'] = time()-rand(0, 10);
+        $_SESSION['contactform_message'] = time()-rand(40, 50);
+        $_SESSION['contactform_calculation'] = time()-rand(50, 60);
+    }
 
 ?>
