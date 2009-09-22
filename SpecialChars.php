@@ -85,23 +85,19 @@ class SpecialChars {
 // ------------------------------------------------------------------------------    
 // Umlaute in Inhaltsseiten/Kategorien für Anzeige 
 // ------------------------------------------------------------------------------
-	function rebuildSpecialChars($text, $rebuildnbsp, $html) {
-		$text = rawurldecode($text);
-		if($html)
-			$text = htmlentities($text, ENT_COMPAT, 'ISO-8859-1');
-		// Leerzeichen
-		if ($rebuildnbsp and !$html)
-			$text = preg_replace("/ /", "&nbsp;", $text);
-		elseif(!$rebuildnbsp and $html)
-			$text = preg_replace("/&nbsp;/", " ", $text);
-
-		$text = html_entity_decode($text, ENT_COMPAT, 'ISO-8859-1');
-		
-		// & muß allerdings als Entity dargestellt werden!
-        $text = preg_replace("/\&/", "&amp;", $text);
-        
-		return $text;
-	}
+    function rebuildSpecialChars($text, $rebuildnbsp, $html) {
+        $text = rawurldecode($text);
+        if($html) {
+            $text = htmlentities($text,ENT_COMPAT,'ISO-8859-1');
+            $text = str_replace('&amp;#','&#',$text);
+        }
+        // Leerzeichen
+        if ($rebuildnbsp and !$html)
+            $text = str_replace(" ", "&nbsp;", $text);
+        elseif(!$rebuildnbsp and $html)
+            $text = str_replace("&nbsp;", " ", $text);
+        return $text;
+    }
 
 
 // ------------------------------------------------------------------------------    
