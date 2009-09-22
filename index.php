@@ -975,9 +975,12 @@ echo "</pre>";
         global $PAGE_REQUEST;
         global $PAGE_FILE;
         global $EXT_PAGE;
+        global $LAYOUT_DIR;
 
         // Titel der Website
         $content = preg_replace('/{WEBSITE_NAME}/', $mainconfig->get("websitetitle"), $content);
+        // Layout-Verzeichnis
+        $content = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR, $content);
 
         if ($CAT_REQUEST != "") {
             // "unbehandelter" Name der aktuellen Kategorie ("10_M%FCllers%20Kuh")
