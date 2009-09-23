@@ -235,14 +235,17 @@ echo "</pre>";
     $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $mainconfig->get("websitedescription"), $HTML);
 
     $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
-    $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
-
-    // Detailmenü (nicht zeigen, wenn Submenüs aktiviert sind)
-    if ($mainconfig->get("usesubmenu") > 0) {
-        $HTML = preg_replace('/{DETAILMENU}/', "", $HTML);
-    }
-    else {
-        $HTML = preg_replace('/{DETAILMENU}/', getDetailMenu($CAT_REQUEST), $HTML);
+    
+    if (strpos($HTML,'{MAINMENU}')===FALSE) $HTML = insertMenus($HTML); // Menü aus Templatevorgabe erzeugen, falls vom Template gefordert
+		else {
+        $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
+        // Detailmenü (nicht zeigen, wenn Submenüs aktiviert sind)
+        if ($mainconfig->get("usesubmenu") > 0) {
+            $HTML = preg_replace('/{DETAILMENU}/', "", $HTML);
+        }
+        else {
+            $HTML = preg_replace('/{DETAILMENU}/', getDetailMenu($CAT_REQUEST), $HTML);
+        }
     }
     // Suchformular
     $HTML = preg_replace('/{SEARCH}/', getSearchForm(), $HTML);
@@ -434,7 +437,75 @@ echo "</pre>";
             sort($files);
         return $files;
     }
+    
+// ------------------------------------------------------------------------------
+// Kategorien- und Inhaltsseitennamen zwecks Menüerzeugung in Array einlesen
+// ------------------------------------------------------------------------------
+	function getMenuAsArray() {
+		global $CONTENT_DIR_ABS;
+		// TODO: wenn erwünscht, Inhaltsseiten inaktiver Kategorien ausblenden
+    // TODO: folgendes einbauen
+    // if ($mainconfig->get("hidecatnamedpages") == "true") 
+		$categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false, false);
+		$menuarray = array();
+		// Jedes Element des Arrays ans Menü anhängen
+		foreach ($categoriesarray as $currentcategory) {
+			// aber nur inhaltsseiten ins menü nehmen, die auch inhaltsseiten haben
+			$contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true, false);
+			if ($contentarray != "") $menuarray[$currentcategory] = $contentarray;
+		}
+		return $menuarray;
+	}
+  
+// ------------------------------------------------------------------------------
+// eigenes Menü aus Template erzeugen und direkt in HTML einfügen
+// ------------------------------------------------------------------------------
+	function insertMenus($template) {
+		global $CONTENT_DIR_ABS;	
+		
+		// TODO:  es fehlen die Sonderfunktionen für Suche, Sitemap, Hervorhebung der aktuellen Kategorie
+		// und überhaupt
+		
+		// Hilfsfunktionen
+			// sucht den korrespondierenden schließenden Tag zu einem bestimmten öffnenden Tag
+			function findClosingTagPos($html,$tag,$pos) {
+			$endtagpos = 0;
+			while ($endtagpos == 0) { // so lange der schließende tag nicht gefunden wurde
+				if (($aussumedendtagpos = stripos($html,"</$tag",$pos+1)) === FALSE) die ("Menu Template Parsing Error: $tag-tag at $pos is never closed."); // suche einfach den nächstbesten schließenden tag
+				if ((($opentagpos=stripos($html,"<$tag",$pos+1))!==FALSE) && ($opentagpos<$aussumedendtagpos)) $pos = $aussumedendtagpos; // falls der aber hinter einem innernen öffnenden tag liegt, suche nochmal
+				else $endtagpos = $aussumedendtagpos; // ansonsten ist das wohl der richtige schließende tag
+				}
+			return $endtagpos;
+			}
 
+			// extrahiert ein Templatebit aus dem benutzerdefinierten Navigationsbeispiel
+			function getBit($bitname,$template) {
+			$muster = ' class="'.$bitname.'"';
+			$classpos = stripos($template,$muster);
+			$openbracketpos = strripos(substr($template,0,$classpos),"<");
+			$tag = substr($template,$openbracketpos+1,stripos($template," ",$openbracketpos)-$openbracketpos-1);
+			$closingtag = findClosingTagPos($template,$tag,$openbracketpos);
+			return substr($template,$openbracketpos,$closingtag-$openbracketpos+strlen($tag)+3);
+			}
+
+		//hier geht die eigentliche insertMenus-Funktion los
+		$seitenbit=getBit("inhaltsseite",$template);
+		$kategoriebit=getBit("kategorie",$template);
+		$navarray = getMenuAsArray();
+		$kategorienamen = array_keys($navarray);
+		$kategorien = "";
+		foreach ($kategorienamen as $kategorie) { // für alle kategorien
+			$seiten = "";
+			foreach ($navarray[$kategorie] as $seite) { // und für alle inhaltsseiten
+				$seiten .= strtr($seitenbit,array("{URL}"=>"index.php?cat=$kategorie&amp;page=".substr($seite,0,strlen($seite)-4),"{LABEL}"=>pageToName($seite,true))); // wird die liste aus inhaltsseiten über die seitenbits in menüpunkte umgewandelt
+				}
+			// die menüpunkte der inhaltsseiten werden....
+			$kategorien .= strtr($kategoriebit,array("{URL}"=>"index.php?cat=$kategorie","{LABEL}"=>catToName($kategorie,true),$seitenbit=>$seiten)); // in den menüpunkt der kategorie eingefügt (ermöglicht ständig aufgeklappte untermenüs) 
+			if (($navarray[$kategorie]!=array()) && (strpos($kategoriebit,$seitenbit)===FALSE)) // oder falls das seitenbit gar nicht innerhalb des kategoriebits liegt
+				$template = strtr($template,array($seitenbit=>$seiten)); // direkt ins template geschrieben (ermöglicht freie positionierung der untermenüpunkte)
+			}
+		return strtr($template,array($kategoriebit=>$kategorien));
+	}
 
 // ------------------------------------------------------------------------------
 // Aufbau des Hauptmenüs, Rückgabe als String

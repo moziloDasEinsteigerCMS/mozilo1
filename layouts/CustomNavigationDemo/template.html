@@ -1,0 +1,22 @@
+<html>
+<head>
+<title>Templatebeispiel</title>
+</head>
+<body>
+<h2>Menü</h2>
+<table border="0" style="border-collapse:collapse;">
+<!--
+Kurzanleitung zur Verwendung von Menütemplates:
+Durch die class-Eigenschaft "kategorie" markiert man ein beliebiges Syntaxelement als Template zur Erstellung der Kategorieübersicht.
+Die Platzhalter darin werden mit den Kategorienamen und -links versehen und ausgegeben.
+Das Inhaltsseitentemplate kann innerhalb und außerhalb Kategorietemplates liegen.
+-->
+<tr class="kategorie" style="border-bottom: 1px solid grey;">
+	<td valign="top"><a href="{URL}">{LABEL}</a></td>
+	<td><span class="inhaltsseite"><a href="{URL}">{LABEL}</a><br/></span></td>
+</tr>
+</table>
+<h2>Inhalt</h2>
+{CONTENT}
+</body>
+</html>
