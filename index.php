@@ -171,6 +171,7 @@ echo "</pre>";
         global $mainconfig;
         global $smileys;
         global $specialchars;
+        global $CONTENT_DIR_ABS;
 
     if (!$file = @fopen($specialchars->rebuildSpecialChars($TEMPLATE_FILE, false, false), "r"))
         die($language->getLanguageValue1("message_template_error_1", $TEMPLATE_FILE));
@@ -206,19 +207,38 @@ echo "</pre>";
         $cattitle         = $pagecontentarray[1];
         $pagetitle        = $pagecontentarray[2];
     }
-    elseif ($USE_CMS_SYNTAX) {
-        $pagecontentarray = getContent();
-        $pagecontent    = $syntax->convertContent($pagecontentarray[0], $CAT_REQUEST, true);
-        $cattitle         = $pagecontentarray[1];
-        $pagetitle         = $pagecontentarray[2];
-      }
-    else {
-        $pagecontentarray = getContent();
-        $pagecontent    = $pagecontentarray[0];
-        $cattitle         = $pagecontentarray[1];
-        $pagetitle         = $pagecontentarray[2];
-    }
-      
+    else { 
+        $passwordok = false;
+        $passwordfile = "$CONTENT_DIR_ABS/$CAT_REQUEST/.htpass_".substr($PAGE_REQUEST, 3, strlen($PAGE_REQUEST) - 3);
+        if (file_exists($passwordfile)) {
+            $cattitle    = catToName($CAT_REQUEST, true);
+            $pagetitle   = "Passwortabfrage"; // TODO: in Sprachdatei
+            if (!isset($_POST) || ($_POST == array())) 
+                $pagecontent = getPasswordForm();
+            else {
+                if (checkPassword())
+                    $passwordok = true;
+                else
+                    $pagecontent = "Falsches Passwort.";
+            }
+        }
+        else
+            $passwordok = true;
+        if ($passwordok) {
+            if ($USE_CMS_SYNTAX) {
+                $pagecontentarray = getContent();
+                $pagecontent    = $syntax->convertContent($pagecontentarray[0], $CAT_REQUEST, true);
+                $cattitle         = $pagecontentarray[1];
+                $pagetitle         = $pagecontentarray[2];
+              }
+            else {
+                $pagecontentarray = getContent();
+                $pagecontent    = $pagecontentarray[0];
+                $cattitle         = $pagecontentarray[1];
+                $pagetitle         = $pagecontentarray[2];
+            }
+        }
+    }  
     // Smileys ersetzen
     if ($mainconfig->get("replaceemoticons") == "true") {
         $pagecontent = $smileys->replaceEmoticons($pagecontent);
@@ -280,7 +300,35 @@ echo "</pre>";
     $HTML = preg_replace('/{TABLEOFCONTENTS}/', $syntax->getToC($pagecontent), $HTML);
     
     }
-
+    
+// ------------------------------------------------------------------------------
+// Formular zur Passworteingabe anzeigen
+// ------------------------------------------------------------------------------
+    function checkPassword() {
+        global $CONTENT_DIR_ABS;
+        global $CAT_REQUEST;
+        global $PAGE_REQUEST;
+        
+        $passwordfile = "$CONTENT_DIR_ABS/$CAT_REQUEST/.htpass_".substr($PAGE_REQUEST, 3, strlen($PAGE_REQUEST) - 3);
+        $file = @fopen($passwordfile,"r");
+        $md5password = fread($file, filesize($passwordfile));
+        fclose($file);
+        return $md5password == md5($_POST["password"]);
+    }
+    
+    
+// ------------------------------------------------------------------------------
+// Formular zur Passworteingabe anzeigen
+// ------------------------------------------------------------------------------
+    function getPasswordForm() {
+        // TODO: sollte auch wahlweise über ein Template gehen
+        // TODO: sprachunabhängig gestalten
+        return '<form action="index.php?'.$_SERVER['QUERY_STRING'].'" method="post">
+        Bitte Passwort für diese Seite eingeben: 
+        <input type="Password" name="password">
+        <input type="Submit" value="OK">
+        </form>';
+    }
 
 // ------------------------------------------------------------------------------
 // Zu einem Kategorienamen passendes Kategorieverzeichnis suchen und zurückgeben
@@ -351,8 +399,8 @@ echo "</pre>";
         global $specialchars;
         return $specialchars->rebuildSpecialChars(substr($page, 3, strlen($page) - 7), $rebuildnbsp, true);
     }
-
-
+    
+    
 // ------------------------------------------------------------------------------
 // Inhalt einer Content-Datei einlesen, Rückgabe als String
 // ------------------------------------------------------------------------------
