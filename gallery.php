@@ -12,145 +12,171 @@ require_once("Language.php");
 require_once("Properties.php");
 require_once("SpecialChars.php");
 
-// Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
-# @ini_set("display_errors", 0);
+class Gallery {
 
-$language       = new Language();
-$mainconf       = new Properties("conf/main.conf");
-$versionconf    = new Properties("conf/version.conf");
-$specialchars   = new SpecialChars();
+    // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
+    # @ini_set("display_errors", 0);
 
-// Vorschaubilder nach Benutzereinstellung und wenn GDlib installiert
-if (!extension_loaded("gd"))
-    $mainconf->set("galleryusethumbs", "false");
-if ($mainconf->get("galleryusethumbs") == "true")
-    $USETHUMBS = true;
-else
-    $USETHUMBS = false;
+    var $language;
+    var $mainconf;
+    var $versionconf;
+    var $specialchars;
 
-$MAX_IMG_WIDTH             = $mainconf->get("gallerymaxwidth");
-if ($MAX_IMG_WIDTH == "")
-    $MAX_IMG_WIDTH = 500;
+    // ------------------------------------------------------------------------------    
+    // Konstruktor
+    // ------------------------------------------------------------------------------
+    function Gallery() {
 
-$MAX_IMG_HEIGHT         = $mainconf->get("gallerymaxheight");
-if ($MAX_IMG_HEIGHT == "")
-    $MAX_IMG_HEIGHT = 350;
+        $this->language       = new Language();
+        $this->mainconf       = new Properties("conf/main.conf");
+        $this->versionconf    = new Properties("conf/version.conf");
+        $this->specialchars   = new SpecialChars();
+        
+        $this->embedded = $this->mainconf->get("embeddedgallery") == "true";
 
-$WEBSITE_TITLE            = $mainconf->get("websitetitle");
-if ($WEBSITE_TITLE == "")
-    $WEBSITE_TITLE = "Titel der Website";
+        // Vorschaubilder nach Benutzereinstellung und wenn GDlib installiert
+        if (!extension_loaded("gd"))
+            $this->mainconf->set("galleryusethumbs", "false");
+        if ($this->mainconf->get("galleryusethumbs") == "true")
+            $this->usethumbs = true;
+        else
+            $this->usethumbs = false;
 
-$LAYOUT_DIR         = $mainconf->get("cmslayout");
-$TEMPLATE_FILE      = "layouts/$LAYOUT_DIR/gallerytemplate.html";
-$CSS_FILE           = "layouts/$LAYOUT_DIR/css/style.css";
-$FAVICON_FILE       = "layouts/$LAYOUT_DIR/favicon.ico";
+        $this->max_img_width             = $this->mainconf->get("gallerymaxwidth");
+        if ($this->max_img_width == "")
+            $this->max_img_width = 500;
 
-// Übergebene Parameter überprüfen
-$GAL_REQUEST        = $specialchars->replaceSpecialChars($_GET['gal'],false);
-$DIR_GALLERY        = "./galerien/".$GAL_REQUEST."/";
-$DIR_THUMBS         = $DIR_GALLERY."vorschau/";
-if (($GAL_REQUEST == "") || (!file_exists($DIR_GALLERY))) {
-    die ($language->getLanguageValue1("message_gallerydir_error_1", $GAL_REQUEST));
-}
-$GAL_NAME           = $specialchars->rebuildSpecialChars($GAL_REQUEST, true, true);
+        $this->max_img_height         = $this->mainconf->get("gallerymaxheight");
+        if ($this->max_img_height == "")
+            $this->max_img_height = 350;
 
-// Galerieverzeichnis einlesen
-$PICARRAY = getPicsAsArray($DIR_GALLERY, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
-$ALLINDEXES = array();
-for ($i=1; $i<=count($PICARRAY); $i++) 
-    array_push($ALLINDEXES, $i);
-// globaler Index
-if ((!isset($_GET['index'])) || (!in_array($_GET['index'], $ALLINDEXES)))
-    $INDEX = 1;
-else
-    $INDEX = $_GET['index'];
+        $this->website_title            = $this->mainconf->get("websitetitle");
+        if ($this->website_title == "")
+            $this->website_title = "Titel der Website";
 
-// Bestimmung der Positionen
-$FIRST = 1;
-$LAST = count($ALLINDEXES);
-if (!in_array($INDEX-1, $ALLINDEXES))
-    $PREVIOUS = $LAST;
-else
-    $PREVIOUS = $INDEX-1;
-if (!in_array($INDEX+1, $ALLINDEXES))
-    $NEXT = 1;
-else
-    $NEXT = $INDEX+1;
+        $this->layout_dir         = $this->mainconf->get("cmslayout");
+        if ($this->embedded)
+            $this->template_file      = "layouts/".$this->layout_dir."/embeddedgallerytemplate.html";
+        else
+            $this->template_file      = "layouts/".$this->layout_dir."/gallerytemplate.html";
+        $this->css_file           = "layouts/".$this->layout_dir."/css/style.css";
+        $this->favicon_file       = "layouts/".$this->layout_dir."/favicon.ico";
+
+        // Übergebene Parameter überprüfen
+        $this->gal_request        = $this->specialchars->replacespecialchars($_GET['gal'],false);
+        $this->dir_gallery        = "./galerien/".$this->gal_request."/";
+        $this->dir_thumbs         = $this->dir_gallery."vorschau/";
+        if (($this->gal_request == "") || (!file_exists($this->dir_gallery))) {
+            die ($this->language->getlanguagevalue1("message_gallerydir_error_1", $this->gal_request));
+        }
+        $this->gal_name           = $this->specialchars->rebuildSpecialChars($this->gal_request, true, true);
+
+        // Galerieverzeichnis einlesen
+        $this->picarray = $this->getpicsasarray($this->dir_gallery, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
+        $allindexes = array();
+        for ($i=1; $i<=count($this->picarray); $i++) 
+            array_push($allindexes, $i);
+        // globaler Index
+        if ((!isset($_GET['index'])) || (!in_array($_GET['index'], $allindexes)))
+            $this->index = 1;
+        else
+            $this->index = $_GET['index'];
+
+        // Bestimmung der Positionen
+        $this->first = 1;
+        $this->last = count($allindexes);
+        if (!in_array($this->index-1, $allindexes))
+            $this->previous = $this->last;
+        else
+            $this->previous = $this->index-1;
+        if (!in_array($this->index+1, $allindexes))
+            $this->next = 1;
+        else
+            $this->next = $this->index+1;
+            
+        if ($this->usethumbs) {
+            checkthumbs();
+            $this->thumbarray = getPcsAsArray($this->dir_thumbs, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
+        }
+
+        $this->linkprefix = "gallery.php?";
+        
+        if (!$this->embedded) {
+            echo $this->renderGallery();
+        }
+        else if (basename($_SERVER['PHP_SELF']) == "gallery.php") {
+            die ($this->language->getLanguageValue0("message_galleryembed_error_0"));
+        }
+    }
     
-if ($USETHUMBS) {
-    checkThumbs();
-    $THUMBARRAY = getPicsAsArray($DIR_THUMBS, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
-}
-
-// Galerie aufbauen und ausgeben
-$HTML = "";
-readTemplate();
-echo $HTML;
-
-
-
-
 // ------------------------------------------------------------------------------
-// HTML-Template einlesen und verarbeiten
+// Gallerie aufbauen und ausgeben
+// ------------------------------------------------------------------------------
+    function renderGallery() {
+        $this->html = "";
+        $this->readTemplate();
+        return $this->html;
+    }
+    
+// ------------------------------------------------------------------------------
+// Gallerienamen herausgeben
+// ------------------------------------------------------------------------------
+    function getGalleryName() {
+        return $this->gal_name;
+    }
+    
+// ------------------------------------------------------------------------------
+// Index herausgeben
+// ------------------------------------------------------------------------------
+    function getCurrentIndex() {
+        return $this->index;
+    }
+    
+// ------------------------------------------------------------------------------
+// html-Template einlesen und verarbeiten
 // ------------------------------------------------------------------------------
     function readTemplate() {
-        global $CSS_FILE;
-        global $LAYOUT_DIR;
-        global $GAL_NAME;
-        global $HTML;
-        global $FAVICON_FILE;
-        global $PICARRAY;
-        global $INDEX;
-        global $PREVIOUS;
-        global $NEXT;
-        global $specialchars;
-        global $TEMPLATE_FILE;
-        global $USE_CMS_SYNTAX;
-        global $USETHUMBS;
-        global $WEBSITE_TITLE;
-        global $language;
-        global $mainconf;
-        
+       
         // Template-Datei auslesen
-        if (!$file = @fopen($TEMPLATE_FILE, "r")) {
-            die($language->getLanguageValue1("message_template_error_1", $TEMPLATE_FILE));
+        if (!$file = @fopen($this->template_file, "r")) {
+            die($this->language->getLanguageValue1("message_template_error_1", $this->template_file));
         }
-        $template = fread($file, filesize($TEMPLATE_FILE));
+        $template = fread($file, filesize($this->template_file));
         fclose($file);
-        
+
         // Platzhalter des Templates mit Inhalt füllen
-        $HTML = preg_replace('/{CSS_FILE}/', $specialchars->replaceSpecialChars($CSS_FILE, true), $template);
-        $HTML = preg_replace('/{FAVICON_FILE}/', $specialchars->replaceSpecialChars($FAVICON_FILE, true), $HTML);
-        $HTML = preg_replace('/{LAYOUT_DIR}/', $specialchars->replaceSpecialChars($LAYOUT_DIR, true), $HTML);
-        $HTML = preg_replace('/{CMSINFO}/', getCmsInfo(), $HTML);
-        $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_TITLE, $language->getLanguageValue0("message_galleries_0"), $GAL_NAME), $HTML);
-        $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $mainconf->get("websitekeywords"), $HTML);
-        $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $mainconf->get("websitedescription"), $HTML);
+        $this->html = preg_replace('/{CSS_FILE}/', $this->specialchars->replaceSpecialChars($this->css_file, true), $template);
+        $this->html = preg_replace('/{FAVICON_FILE}/', $this->specialchars->replaceSpecialChars($this->favicon_file, true), $this->html);
+        $this->html = preg_replace('/{LAYOUT_DIR}/', $this->specialchars->replaceSpecialChars($this->layout_dir, true), $this->html);
+        $this->html = preg_replace('/{CMSINFO}/', $this->getCmsInfo(), $this->html);
+        $this->html = preg_replace('/{WEBSITE_TITLE}/', $this->getwebsitetitle($this->website_title, $this->language->getlanguagevalue0("message_galleries_0"), $this->gal_name), $this->html);
+        $this->html = preg_replace('/{WEBSITE_KEYWORDS}/', $this->mainconf->get("websitekeywords"), $this->html);
+        $this->html = preg_replace('/{WEBSITE_DESCRIPTION}/', $this->mainconf->get("websitedescription"), $this->html);
         
-        $HTML = preg_replace('/{CURRENTGALLERY}/', $language->getLanguageValue1("message_gallery_1", $GAL_NAME), $HTML);
-        if (count($PICARRAY) == 0) {
-            $HTML = preg_replace('/{NUMBERMENU}/', $language->getLanguageValue0("message_galleryempty_0"), $HTML);
+        $this->html = preg_replace('/{CURRENTGALLERY}/', $this->language->getLanguageValue1("message_gallery_1", $this->gal_name), $this->html);
+        if (count($this->picarray) == 0) {
+            $this->html = preg_replace('/{NUMBERMENU}/', $this->language->getLanguageValue0("message_galleryempty_0"), $this->html);
         }
-        if ($USETHUMBS) {
-            $HTML = preg_replace('/{GALLERYMENU}/', "&nbsp;", $HTML);
-            $HTML = preg_replace('/{NUMBERMENU}/', getThumbnails(), $HTML);
-            $HTML = preg_replace('/{CURRENTPIC}/', "&nbsp;", $HTML);
-            $HTML = preg_replace('/{CURRENTDESCRIPTION}/', "&nbsp;", $HTML);
-            $HTML = preg_replace('/{XOUTOFY}/', "&nbsp;", $HTML);
+        if ($this->usethumbs) {
+            $this->html = preg_replace('/{GALLERYMENU}/', "&nbsp;", $this->html);
+            $this->html = preg_replace('/{NUMBERMENU}/', getThumbnails(), $this->html);
+            $this->html = preg_replace('/{CURRENTPIC}/', "&nbsp;", $this->html);
+            $this->html = preg_replace('/{CURRENTDESCRIPTION}/', "&nbsp;", $this->html);
+            $this->html = preg_replace('/{XOUTOFY}/', "&nbsp;", $this->html);
         }
         else {
-            $HTML = preg_replace('/{GALLERYMENU}/', getGalleryMenu(), $HTML);
-            $HTML = preg_replace('/{NUMBERMENU}/', getNumberMenu(), $HTML);
-            $HTML = preg_replace('/{CURRENTPIC}/', getCurrentPic(), $HTML);
-            if (count($PICARRAY) > 0) {
-                $HTML = preg_replace('/{CURRENTDESCRIPTION}/', getCurrentDescription($PICARRAY[$INDEX-1]), $HTML);
+            $this->html = preg_replace('/{GALLERYMENU}/', $this->getGalleryMenu(), $this->html);
+            $this->html = preg_replace('/{NUMBERMENU}/', $this->getNumberMenu(), $this->html);
+            $this->html = preg_replace('/{CURRENTPIC}/', $this->getCurrentPic(), $this->html);
+            if (count($this->picarray) > 0) {
+                $this->html = preg_replace('/{CURRENTDESCRIPTION}/', $this->getCurrentDescription($this->picarray[$this->index-1]), $this->html);
             } else {
-                $HTML = preg_replace('/{CURRENTDESCRIPTION}/', "", $HTML);
+                $this->html = preg_replace('/{CURRENTDESCRIPTION}/', "", $this->html);
             }
-            $HTML = preg_replace('/{XOUTOFY}/', getXoutofY(), $HTML);
-            $HTML = preg_replace('/{CURRENT_INDEX}/', $INDEX, $HTML);
-            $HTML = preg_replace('/{PREVIOUS_INDEX}/', $PREVIOUS, $HTML);
-            $HTML = preg_replace('/{NEXT_INDEX}/', $NEXT, $HTML);
+            $this->html = preg_replace('/{XOUTOFY}/', $this->getXoutofY(), $this->html);
+            $this->html = preg_replace('/{CURRENT_INDEX}/', $this->index, $this->html);
+            $this->html = preg_replace('/{PREVIOUS_INDEX}/', $this->previous, $this->html);
+            $this->html = preg_replace('/{NEXT_INDEX}/', $this->next, $this->html);
         }
     }
     
@@ -159,38 +185,29 @@ echo $HTML;
 // Galeriemenü erzeugen
 // ------------------------------------------------------------------------------
     function getGalleryMenu() {
-        global $ALLINDEXES;
-        global $PREVIOUS;
-        global $GAL_REQUEST;
-        global $FIRST;
-        global $INDEX;
-        global $PICARRAY;
-        global $LAST;
-        global $NEXT;
-        global $language;
         
         // Keine Bilder im Galerieverzeichnis?
-        if (count($PICARRAY) == 0)
+        if (count($this->picarray) == 0)
             return "&nbsp;";
         
         $gallerymenu = "<ul class=\"gallerymenu\">";
         
         // Link "Erstes Bild"
-        if ($INDEX == $FIRST)
+        if ($this->index == $this->first)
             $linkclass = "gallerymenuactive";
         else
             $linkclass = "gallerymenu";
-        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$FIRST\" class=\"$linkclass\">".$language->getLanguageValue0("message_firstimage_0")."</a></li>";
+        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$this->linkprefix."gal=".$this->gal_request."&amp;index=".$this->first."\" class=\"linkclass\">".$this->language->getLanguageValue0("message_firstimage_0")."</a></li>";
         // Link "Voriges Bild"
-        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$PREVIOUS\" class=\"detailmenu\">".$language->getLanguageValue0("message_previousimage_0")."</a></li>";
+        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$this->linkprefix."gal=".$this->gal_request."&amp;index=".$this->previous."\" class=\"detailmenu\">".$this->language->getLanguageValue0("message_previousimage_0")."</a></li>";
         // Link "Nächstes Bild"
-        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$NEXT\" class=\"detailmenu\">".$language->getLanguageValue0("message_nextimage_0")."</a></li>";
+        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$this->linkprefix."gal=".$this->gal_request."&amp;index=".$this->next."\" class=\"detailmenu\">".$this->language->getLanguageValue0("message_nextimage_0")."</a></li>";
         // Link "Letztes Bild"
-        if ($INDEX == $LAST)
+        if ($this->index == $this->last)
             $linkclass = "gallerymenuactive";
         else
             $linkclass = "gallerymenu";
-        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$LAST\" class=\"$linkclass\">".$language->getLanguageValue0("message_lastimage_0")."</a></li>";
+        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$this->linkprefix."gal=".$this->gal_request."&amp;index=".$this->last."\" class=\"$linkclass\">".$this->language->getLanguageValue0("message_lastimage_0")."</a></li>";
         // Rückgabe des Menüs
         return $gallerymenu."</ul>";
     }
@@ -200,23 +217,17 @@ echo $HTML;
 // Nummernmenü erzeugen
 // ------------------------------------------------------------------------------
     function getNumberMenu() {
-        global $mainconf;
-        global $GAL_REQUEST;
-        global $FIRST;
-        global $INDEX;
-        global $LAST;
-        global $PICARRAY;
 
         // Keine Bilder im Galerieverzeichnis?
-        if (count($PICARRAY) == 0)
+        if (count($this->picarray) == 0)
             return "&nbsp;";
 
         $numbermenu = "";
-        for ($i=$FIRST; $i<=$LAST; $i++) {
-            if ($INDEX == $i)
+        for ($i=$this->first; $i<=$this->last; $i++) {
+            if ($this->index == $i)
                     $numbermenu .= "<em class=\"bold\">".$i."</em> | ";
             else
-                    $numbermenu .= "<a href=\"gallery.php?gal=".$GAL_REQUEST."&amp;index=".$i."\">".$i."</a> | ";
+                    $numbermenu .= "<a href=\"".$this->linkprefix."gal=".$this->gal_request."&amp;index=".$i."\">".$i."</a> | ";
         }
         // Rückgabe des Menüs
         return substr($numbermenu, 0, strlen($numbermenu)-2);
@@ -227,13 +238,7 @@ echo $HTML;
 // Nummernmenü erzeugen
 // ------------------------------------------------------------------------------
     function getThumbnails() {
-        global $DIR_GALLERY;
-        global $DIR_THUMBS;
-        global $PICARRAY;
-        global $THUMBARRAY;
-        global $language;
-        global $mainconf;
-        global $specialchars;
+    
         // Aus Config auslesen: Wieviele Bilder pro Tabellenzeile?
         $picsperrow = $mainconf->get("gallerypicsperrow");
         if (($picsperrow == "") || ($picsperrow == 0))
@@ -241,17 +246,17 @@ echo $HTML;
 
         $thumbs = "<table class=\"gallerytable\" summary=\"gallery table\"><tr>";
         $i = 0;
-        for ($i=0; $i<count($THUMBARRAY); $i++) {
+        for ($i=0; $i<count($this->thumbarray); $i++) {
             // Bildbeschreibung holen
-            $description = getCurrentDescription($THUMBARRAY[$i]);
+            $description = getCurrentDescription($this->thumbarray[$i]);
             if ($description == "")
                 $description = "&nbsp;";
             // Neue Tabellenzeile aller picsperrow Zeichen
             if (($i > 0) && ($i % $picsperrow == 0))
                 $thumbs .= "</tr><tr>";
             $thumbs .= "<td class=\"gallerytd\" style=\"width:".floor(100 / $picsperrow)."%;\">"
-            ."<a href=\"".$specialchars->replaceSpecialChars($DIR_GALLERY.$PICARRAY[$i],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($PICARRAY[$i],true,true))."\">"
-            ."<img src=\"".$specialchars->replaceSpecialChars($DIR_THUMBS.$THUMBARRAY[$i],true)."\" alt=\"".$specialchars->rebuildSpecialChars($THUMBARRAY[$i],true,true)."\" class=\"thumbnail\" />"
+            ."<a href=\"".$specialchars->replaceSpecialChars($this->dir_gallery.$this->picarray[$i],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($this->picarray[$i],true,true))."\">"
+            ."<img src=\"".$specialchars->replaceSpecialChars($this->dir_thumbs.$this->thumbarray[$i],true)."\" alt=\"".$specialchars->rebuildSpecialChars($this->thumbarray[$i],true,true)."\" class=\"thumbnail\" />"
             ."</a><br />"
             .$description
             ."</td>";
@@ -270,37 +275,31 @@ echo $HTML;
 // Aktuelles Bild anzeigen
 // ------------------------------------------------------------------------------
     function getCurrentPic() {
-        global $DIR_GALLERY;
-        global $INDEX;
-        global $MAX_IMG_HEIGHT;
-        global $MAX_IMG_WIDTH;
-        global $PICARRAY;
-        global $language;
-        global $specialchars;
+    
         // Keine Bilder im Galerieverzeichnis?
-        if (count($PICARRAY) == 0)
+        if (count($this->picarray) == 0)
             return "&nbsp;";
         // Link zur Vollbildansicht öffnen
-        $currentpic = "<a href=\"".$specialchars->replaceSpecialChars($DIR_GALLERY.$PICARRAY[$INDEX-1],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($PICARRAY[$INDEX-1],true,true))."\">";
+        $currentpic = "<a href=\"".$this->specialchars->replaceSpecialChars($this->dir_gallery.$this->picarray[$this->index-1],true)."\" target=\"_blank\" title=\"".$this->language->getLanguageValue1("tooltip_gallery_fullscreen_1", $this->specialchars->rebuildSpecialChars($this->picarray[$this->index-1],true,true))."\">";
         // Bilder für die Anzeige skalieren
         if (extension_loaded('gd')) {
-            $size = getimagesize($DIR_GALLERY.$PICARRAY[$INDEX-1]);
+            $size = getimagesize($this->dir_gallery.$this->picarray[$this->index-1]);
             $w = $size[0];
             $h = $size[1];
             // Breite skalieren
-            if ($w > $MAX_IMG_WIDTH) {
-                $w=$MAX_IMG_WIDTH;
-                $h=round(($MAX_IMG_WIDTH*$size[1])/$size[0]);
+            if ($w > $this->max_img_width) {
+                $w=$this->max_img_width;
+                $h=round(($this->max_img_width*$size[1])/$size[0]);
             }
             // Höhe skalieren
-            if ($h > $MAX_IMG_HEIGHT){
-                $h=$MAX_IMG_HEIGHT;
-                $w=round(($MAX_IMG_HEIGHT*$size[0])/$size[1]);
+            if ($h > $this->max_img_height){
+                $h=$this->max_img_height;
+                $w=round(($this->max_img_height*$size[0])/$size[1]);
             }
-            $currentpic .= "<img src=\"".$specialchars->replaceSpecialChars($DIR_GALLERY.$PICARRAY[$INDEX-1],true)."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $specialchars->rebuildSpecialChars($PICARRAY[$INDEX-1],true,true))."\"  style=\"width:".$w."px;height:".$h."px;\" />";
+            $currentpic .= "<img src=\"".$this->specialchars->replaceSpecialChars($this->dir_gallery.$this->picarray[$this->index-1],true)."\" alt=\"".$this->language->getLanguageValue1("alttext_galleryimage_1", $this->specialchars->rebuildSpecialChars($this->picarray[$this->index-1],true,true))."\"  style=\"width:".$w."px;height:".$h."px;\" />";
         }
         else
-            $currentpic .= "<img src=\"".$specialchars->replaceSpecialChars($DIR_GALLERY.$PICARRAY[$INDEX-1],true)."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $specialchars->rebuildSpecialChars($PICARRAY[$INDEX-1],true,true))."\"  style=\"max-width:".$MAX_IMG_WIDTH."px;max-height:".$MAX_IMG_HEIGHT."px;\" />";
+            $currentpic .= "<img src=\"".$this->specialchars->replaceSpecialChars($this->dir_gallery.$this->picarray[$this->index-1],true)."\" alt=\"".$this->language->getLanguageValue1("alttext_galleryimage_1", $this->specialchars->rebuildSpecialChars($this->picarray[$this->index-1],true,true))."\"  style=\"max-width:".$this->max_img_width."px;max-height:".$this->max_img_height."px;\" />";
             // Link zur Vollbildansicht schließen
             $currentpic .= "</a>";
         // Rückgabe des Bildes
@@ -312,14 +311,12 @@ echo $HTML;
 // Beschreibung zum aktuellen Bild anzeigen
 // ------------------------------------------------------------------------------
     function getCurrentDescription($picname) {
-        global $DIR_GALLERY;
-        global $INDEX;
-        global $PICARRAY;
+    
         // Keine Bilder im Galerieverzeichnis?
-        if (count($PICARRAY) == 0)
+        if (count($this->picarray) == 0)
             return "&nbsp;";
         // Texte einlesen
-        $alldescriptions = new Properties($DIR_GALLERY."texte.conf");
+        $alldescriptions = new Properties($this->dir_gallery."texte.conf");
         $description = $alldescriptions->get($picname);
         if(strlen($description) > 0) {
             return htmlentities($description,ENT_COMPAT,'ISO-8859-1');
@@ -333,14 +330,11 @@ echo $HTML;
 // Position in der Galerie anzeigen
 // ------------------------------------------------------------------------------
     function getXoutofY() {
-        global $INDEX;
-        global $LAST;
-        global $PICARRAY;
-        global $language;
+    
         // Keine Bilder im Galerieverzeichnis?
-        if (count($PICARRAY) == 0)
+        if (count($this->picarray) == 0)
             return "&nbsp;";
-        return $language->getLanguageValue2("message_gallery_xoutofy_2", $INDEX, $LAST);
+        return $this->language->getLanguageValue2("message_gallery_xoutofy_2", $this->index, $this->last);
     }
     
     
@@ -371,20 +365,15 @@ function checkThumbs() {
     // Thumbnail-Funktionalität
     require_once("Thumbnail.php");
     $thumbnailfunction = new Thumbnail();
-
-    global $DIR_GALLERY;
-    global $DIR_THUMBS;
-    global $PICARRAY;
-    global $language;
     
     // Vorschauverzeichnis prüfen
-    if (!file_exists($DIR_THUMBS))
-        die ($language->getLanguageValue1("tooltip_link_category_error_1", $DIR_THUMBS));
+    if (!file_exists($this->dir_thumbs))
+        die ($language->getLanguageValue1("tooltip_link_category_error_1", $this->dir_thumbs));
     // alle Bilder überprüfen: Vorschau dazu vorhanden?
-    foreach($PICARRAY as $pic) {
+    foreach($this->picarray as $pic) {
         // Vorschaubild anlegen, wenn nicht vorhanden
-        if (!file_exists($DIR_THUMBS.$pic))
-            $thumbnailfunction->createThumb($pic, $DIR_GALLERY, $DIR_THUMBS);
+        if (!file_exists($this->dir_thumbs.$pic))
+            $thumbnailfunction->createThumb($pic, $this->dir_gallery, $this->dir_thumbs);
     }
 }
 
@@ -393,10 +382,9 @@ function checkThumbs() {
 // Rückgabe des Website-Titels
 // ------------------------------------------------------------------------------
     function getWebsiteTitle($websitetitle, $cattitle, $pagetitle) {
-        global $mainconf;
 
-        $title = $mainconf->get("titlebarformat");
-        $sep = $mainconf->get("titlebarseparator");
+        $title = $this->mainconf->get("titlebarformat");
+        $sep = $this->mainconf->get("titlebarseparator");
         
     $title = preg_replace('/{WEBSITE}/', $websitetitle, $title);
         if ($cattitle == "")
@@ -413,21 +401,26 @@ function checkThumbs() {
 // Anzeige der Informationen zum System
 // ------------------------------------------------------------------------------
     function getCmsInfo() {
-        global $mainconf;
-        global $language;
-        global $versionconf;
-        return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" id=\"cmsinfolink\"".getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", "http://cms.mozilo.de")).">moziloCMS ".$versionconf->get("cmsversion")."</a>";
+        return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" id=\"cmsinfolink\"".$this->getTitleAttribute($this->language->getLanguageValue1("tooltip_link_extern_1", "http://cms.mozilo.de")).">moziloCMS ".$this->versionconf->get("cmsversion")."</a>";
     }
 
 // ------------------------------------------------------------------------------
 // Hilfsfunktion: "title"-Attribut zusammenbauen (oder nicht, wenn nicht konfiguriert)
 // ------------------------------------------------------------------------------
     function getTitleAttribute($value) {
-        global $mainconf;
-        if ($mainconf->get("showsyntaxtooltips") == "true") {
+        if ($this->mainconf->get("showsyntaxtooltips") == "true") {
             return " title=\"".$value."\"";
         }
         return "";
     }
-    
+
+// ------------------------------------------------------------------------------
+// Hilfsfunktion: "title"-Attribut zusammenbauen (oder nicht, wenn nicht konfiguriert)
+// ------------------------------------------------------------------------------
+    function setLinkPrefix($prefix) {
+        $this->linkprefix = $prefix;
+    }
+}
+
+$gallery = new Gallery();
 ?>

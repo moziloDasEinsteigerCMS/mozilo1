@@ -275,8 +275,11 @@ class Syntax {
                         $j++;
                     }
                     }
-            closedir($handle);
-                    $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">$value</a>", $content);
+                    closedir($handle);
+                    if ($this->CMS_CONF->get("embeddedgallery") == "true")
+                        $content = str_replace ($match, "<a class=\"gallery\" href=\"index.php?action=gallery&amp;gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">$value</a>", $content);
+                    else
+                        $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">$value</a>", $content);
                 }
                 // Galerie nicht vorhanden
                 else {
@@ -295,8 +298,11 @@ class Syntax {
                         $j++;
                     }
                     }
-            closedir($handle);
-                    $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">".substr($attribute, 8, strlen($attribute)-8)."</a>", $content);
+                    closedir($handle);
+                    if ($this->CMS_CONF->get("embeddedgallery") == "true")
+                        $content = str_replace ($match, "<a class=\"gallery\" href=\"index.php?action=gallery&amp;gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">".substr($attribute, 8, strlen($attribute)-8)."</a>", $content);
+                    else
+                        $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">".substr($attribute, 8, strlen($attribute)-8)."</a>", $content);
                 }
                 // Galerie nicht vorhanden
                 else {

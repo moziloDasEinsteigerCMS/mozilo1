@@ -198,11 +198,19 @@ echo "</pre>";
         $cattitle         = $pagecontentarray[1];
         $pagetitle         = $pagecontentarray[2];
     }
+    elseif ($ACTION_REQUEST == "gallery") {
+        if ($mainconfig->get("embeddedgallery") != "true")
+            die($language->getLanguageValue0("message_gallerynoembed_error_0"));
+        $pagecontentarray = getEmbeddedGallery();
+        $pagecontent      = $pagecontentarray[0];
+        $cattitle         = $pagecontentarray[1];
+        $pagetitle        = $pagecontentarray[2];
+    }
     elseif ($USE_CMS_SYNTAX) {
         $pagecontentarray = getContent();
         $pagecontent    = $syntax->convertContent($pagecontentarray[0], $CAT_REQUEST, true);
         $cattitle         = $pagecontentarray[1];
-          $pagetitle         = $pagecontentarray[2];
+        $pagetitle         = $pagecontentarray[2];
       }
     else {
         $pagecontentarray = getContent();
@@ -1302,7 +1310,18 @@ echo "</pre>";
         }
     }
 
-
+// ------------------------------------------------------------------------------
+// zeigt Gallerie anstelle eines Seiteninhalts an
+// ------------------------------------------------------------------------------    
+    function getEmbeddedGallery() { 
+        global $language;
+        
+        include("gallery.php");
+        $gallery->setLinkPrefix("index.php?action=gallery&amp;");        
+        return array($gallery->renderGallery(),
+                     $language->getLanguageValue1("message_gallery_1", $gallery->getGalleryName()),
+                     $gallery->getCurrentIndex());
+    }
 // ------------------------------------------------------------------------------
 // Hilfsfunktion: Bestimmt die Inputnamen neu
 // ------------------------------------------------------------------------------    
