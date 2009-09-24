@@ -422,8 +422,8 @@ td.contenttable2 {
 }
 
 /* -------------------------------------------------------- */
-/* [inhalte] */
-/* --------- */
+/* {TABLEOFCONTENTS} */
+/* ----------------- */
 div.tableofcontents ul ul {
     /*padding-left:15px;*/
 }

@@ -478,8 +478,8 @@ td.contenttable2 {vertical-align   : top;
 }
 
 /* -------------------------------------------------------- */
-/* [inhalte] */
-/* --------- */
+/* {TABLEOFCONTENTS} */
+/* ----------------- */
 div.tableofcontents ul ul {
     /*padding-left:15px;*/
 }

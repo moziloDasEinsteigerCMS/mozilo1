@@ -73,12 +73,12 @@ echo "</pre>";
     $QUERY_REQUEST = getRequestParam('query', true);
     $HIGHLIGHT_REQUEST = getRequestParam('highlight', false);
 
-    $CONTENT_DIR_REL    = "kategorien";
-    $CONTENT_DIR_ABS    = getcwd() . "/$CONTENT_DIR_REL";
-    $CONTENT_FILES_DIR  = "dateien";
-    $GALLERIES_DIR      = "galerien";
-    $CONTENT            = "";
-    $HTML               = "";
+    $CONTENT_DIR_REL        = "kategorien";
+    $CONTENT_DIR_ABS        = getcwd() . "/$CONTENT_DIR_REL";
+    $CONTENT_FILES_DIR      = "dateien";
+    $GALLERIES_DIR          = "galerien";
+    $CUSTOMVARIABLES_DIR    = "variablen";
+    $HTML                   = "";
 
     // Überprüfen: Ist die Startkategorie vorhanden? Wenn nicht, nimm einfach die allererste als Standardkategorie
     if (!file_exists("$CONTENT_DIR_REL/$DEFAULT_CATEGORY")) {
@@ -108,7 +108,6 @@ echo "</pre>";
 // ------------------------------------------------------------------------------
     function checkParameters() {
         global $CONTENT_DIR_ABS;
-        global $CONTENT_FILES_DIR;
         global $DEFAULT_CATEGORY;
         global $ACTION_REQUEST;
         global $CAT_REQUEST;
@@ -279,6 +278,9 @@ echo "</pre>";
     // Kontaktformular
     $HTML = preg_replace('/{TABLEOFCONTENTS}/', $syntax->getToC($pagecontent), $HTML);
     
+    // Benutzer-Variablen ersetzen
+    $HTML = replaceCustomVariables($HTML);
+    
     }
 
 
@@ -309,7 +311,6 @@ echo "</pre>";
 // ------------------------------------------------------------------------------
     function nameToPage($pagename, $currentcat) {
         global $CONTENT_DIR_ABS;
-        global $CONTENT_FILES_DIR;
         global $EXT_DRAFT;
         global $EXT_HIDDEN;
         global $EXT_PAGE;
@@ -358,7 +359,6 @@ echo "</pre>";
 // ------------------------------------------------------------------------------
     function getContent() {
         global $CONTENT_DIR_ABS;
-        global $CONTENT_FILES_DIR;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $EXT_HIDDEN;
@@ -449,7 +449,6 @@ echo "</pre>";
 // ------------------------------------------------------------------------------
     function getMainMenu() {
         global $CONTENT_DIR_ABS;
-        global $CONTENT_FILES_DIR;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $specialchars;
@@ -505,7 +504,6 @@ echo "</pre>";
         global $ACTION_REQUEST;
         global $QUERY_REQUEST;
         global $CONTENT_DIR_ABS;
-        global $CONTENT_FILES_DIR;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $EXT_DRAFT;
@@ -677,7 +675,6 @@ echo "</pre>";
 // ------------------------------------------------------------------------------
     function getSiteMap() {
         global $CONTENT_DIR_ABS;
-        global $CONTENT_FILES_DIR;
         global $language;
         global $specialchars;
         global $mainconfig;
@@ -719,7 +716,6 @@ echo "</pre>";
     function getSearchResult() {
         global $CONTENT_DIR_ABS;
         global $CONTENT_DIR_REL;
-        global $CONTENT_FILES_DIR;
         global $USE_CMS_SYNTAX;
         global $QUERY_REQUEST;
         global $language;
@@ -951,14 +947,6 @@ echo "</pre>";
     $title = preg_replace('/{PAGE}/', $pagetitle, $title);
     $title = preg_replace('/{SEP}/', $sep, $title);
     return $title;
-    }
-
-
-
-// ------------------------------------------------------------------------------
-// Überprüfung auf
-// ------------------------------------------------------------------------------
-    function hasValidContentExtension($filename) {
     }
 
 
@@ -1332,5 +1320,52 @@ echo "</pre>";
         $_SESSION['contactform_message'] = time()-rand(40, 50);
         $_SESSION['contactform_calculation'] = time()-rand(50, 60);
     }
+    
 
+// ------------------------------------------------------------------------------
+// Hilfsfunktion: Benutzer-Variablen ersetzen
+// ------------------------------------------------------------------------------    
+    function replaceCustomVariables($content) {
+        global $CUSTOMVARIABLES_DIR;
+        
+        $customvariables = array();
+        
+        // alle PHP-Dateien aus dem Variablen-Verzeichnis einlesen
+        $dircontent = getDirContentAsArray(getcwd()."/$CUSTOMVARIABLES_DIR", false, false);
+        foreach ($dircontent as $currentelement) {
+            if (substr($currentelement, strlen($currentelement)-4, strlen($currentelement)) == ".php") {
+                array_push($customvariables, substr($currentelement, 0, strlen($currentelement)-4));
+            }
+        }
+
+        // Alle Variablen aus dem Inhalt heraussuchen
+        preg_match_all("/\{(.+)\}/Um", $content, $matches);
+        // Für jeden Treffer...
+        $i = 0;
+        foreach ($matches[0] as $match) {
+            // ...erstmal schauen, ob ein Wert dabeisteht, z.B. {VARIABLE|wert}
+            $valuearray = explode("|", $matches[1][$i]);
+            if (sizeof($valuearray) > 1) {
+                $currentvariable = $valuearray[0];
+                $currentvalue = $valuearray[1];
+            }
+            // Sonst den Wert leer vorbelegen
+            else {
+                $currentvariable = $matches[1][$i];
+                $currentvalue = "";
+            }
+            
+            // ...überprüfen, ob es eine zugehörige Variablen-PHP-Datei gibt
+            if (in_array($currentvariable, $customvariables)) {
+                // NAME_DER_VARIABLEN.php includieren 
+                require_once(getcwd()."/$CUSTOMVARIABLES_DIR/".$currentvariable.".php");
+                // Variable durch den Rückgabewert von getNAME_DER_VARIABLEN($value) ersetzen
+                $content = preg_replace('/{'.preg_quote($matches[1][$i]).'}/Um', call_user_func("get".$currentvariable, $currentvalue), $content);
+            }
+            $i++;
+        }
+        return $content;
+    }
+    
+    
 ?>
