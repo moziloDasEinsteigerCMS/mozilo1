@@ -75,6 +75,7 @@ class Syntax {
         global $GALLERIES_DIR;
         global $PAGE_REQUEST;
         global $EXT_PAGE;
+        global $CAT_REQUEST;
         global $specialchars;
         
         if ($firstrecursion) {
@@ -276,8 +277,15 @@ class Syntax {
                     }
                     }
                     closedir($handle);
-                    if ($this->CMS_CONF->get("embeddedgallery") == "true")
-                        $content = str_replace ($match, "<a class=\"gallery\" href=\"index.php?action=gallery&amp;gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">$value</a>", $content);
+                    if ($this->CMS_CONF->get("embeddedgallery") == "true") {
+                        require_once("gallery.php");
+                        if (isset($_GET["gal"]) and $_GET["gal"]==$cleanedvalue)
+                            $gallery->parseGalleryParameters($cleanedvalue,$_GET["index"]);
+                        else 
+                            $gallery->parseGalleryParameters($cleanedvalue,null);
+                        $gallery->setLinkPrefix("index.php?cat=$CAT_REQUEST&amp;page=$PAGE_REQUEST&amp;"); 
+                        $content = str_replace ($match, $gallery->renderGallery(), $content);
+                        }
                     else
                         $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">$value</a>", $content);
                 }
@@ -299,10 +307,7 @@ class Syntax {
                     }
                     }
                     closedir($handle);
-                    if ($this->CMS_CONF->get("embeddedgallery") == "true")
-                        $content = str_replace ($match, "<a class=\"gallery\" href=\"index.php?action=gallery&amp;gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">".substr($attribute, 8, strlen($attribute)-8)."</a>", $content);
-                    else
-                        $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">".substr($attribute, 8, strlen($attribute)-8)."</a>", $content);
+                    $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">".substr($attribute, 8, strlen($attribute)-8)."</a>", $content);
                 }
                 // Galerie nicht vorhanden
                 else {
@@ -332,7 +337,7 @@ class Syntax {
                 $imgsrc = "";
                 $error = false;
 
-        $value = html_entity_decode($value,ENT_COMPAT,'ISO-8859-1');
+                $value = html_entity_decode($value,ENT_COMPAT,'ISO-8859-1');
                 // Bei externen Bildern: $value NICHT nach ":" aufsplitten!
                 if (preg_match($this->LINK_REGEX, $value))
                     $valuearray = $specialchars->replaceSpecialChars($value,false);

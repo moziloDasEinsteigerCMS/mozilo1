@@ -62,8 +62,20 @@ class Gallery {
         $this->css_file           = "layouts/".$this->layout_dir."/css/style.css";
         $this->favicon_file       = "layouts/".$this->layout_dir."/favicon.ico";
 
+        $this->linkprefix = "gallery.php?";
+        
+        if (!$this->embedded) {
+            $this->parseGalleryParameters($_GET['gal'],$_GET['index']);
+            echo $this->renderGallery();
+        }
+        else if (basename($_SERVER['PHP_SELF']) == "gallery.php") {
+            die ($this->language->getLanguageValue0("message_galleryembed_error_0"));
+        }
+    }
+    
+    function parseGalleryParameters($gallery,$index) {
         // Übergebene Parameter überprüfen
-        $this->gal_request        = $this->specialchars->replacespecialchars($_GET['gal'],false);
+        $this->gal_request        = $this->specialchars->replacespecialchars($gallery,false);
         $this->dir_gallery        = "./galerien/".$this->gal_request."/";
         $this->dir_thumbs         = $this->dir_gallery."vorschau/";
         if (($this->gal_request == "") || (!file_exists($this->dir_gallery))) {
@@ -77,10 +89,10 @@ class Gallery {
         for ($i=1; $i<=count($this->picarray); $i++) 
             array_push($allindexes, $i);
         // globaler Index
-        if ((!isset($_GET['index'])) || (!in_array($_GET['index'], $allindexes)))
+        if ((!isset($index)) || (!in_array($index, $allindexes)))
             $this->index = 1;
         else
-            $this->index = $_GET['index'];
+            $this->index = $index;
 
         // Bestimmung der Positionen
         $this->first = 1;
@@ -97,16 +109,7 @@ class Gallery {
         if ($this->usethumbs) {
             checkthumbs();
             $this->thumbarray = getPcsAsArray($this->dir_thumbs, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
-        }
-
-        $this->linkprefix = "gallery.php?";
-        
-        if (!$this->embedded) {
-            echo $this->renderGallery();
-        }
-        else if (basename($_SERVER['PHP_SELF']) == "gallery.php") {
-            die ($this->language->getLanguageValue0("message_galleryembed_error_0"));
-        }
+        } 
     }
     
 // ------------------------------------------------------------------------------
