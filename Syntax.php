@@ -756,7 +756,7 @@ verwendet werden sollte!
         preg_match_all("/\[(ueber([\d]))\|([^\[\]]+)\]/", $content, $matches);
         // $headlines besteht aus Arrays, die zwei Werte beinhalten: Überschriftstyp (1/2/3) und Wert
         $headlines = array();
-        $headlines[0] = array("0", $this->LANG->getLanguageValue1("anchor_top_0"));
+        $headlines[0] = array("0", $this->LANG->getLanguageValue0("anchor_top_0"));
 
         $i = 0;
         foreach ($matches[0] as $match) {

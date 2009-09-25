@@ -77,7 +77,7 @@ echo "</pre>";
     $CONTENT_DIR_ABS        = getcwd() . "/$CONTENT_DIR_REL";
     $CONTENT_FILES_DIR      = "dateien";
     $GALLERIES_DIR          = "galerien";
-    $CUSTOMVARIABLES_DIR    = "variablen";
+    $PLUGIN_DIR             = "plugins";
     $HTML                   = "";
 
     // Überprüfen: Ist die Startkategorie vorhanden? Wenn nicht, nimm einfach die allererste als Standardkategorie
@@ -279,7 +279,7 @@ echo "</pre>";
     $HTML = preg_replace('/{TABLEOFCONTENTS}/', $syntax->getToC($pagecontent), $HTML);
     
     // Benutzer-Variablen ersetzen
-    $HTML = replaceCustomVariables($HTML);
+    $HTML = replacePluginVariables($HTML);
     
     }
 
@@ -1323,18 +1323,18 @@ echo "</pre>";
     
 
 // ------------------------------------------------------------------------------
-// Hilfsfunktion: Benutzer-Variablen ersetzen
+// Hilfsfunktion: Plugin-Variablen ersetzen
 // ------------------------------------------------------------------------------    
-    function replaceCustomVariables($content) {
-        global $CUSTOMVARIABLES_DIR;
+    function replacePluginVariables($content) {
+        global $PLUGIN_DIR;
         
-        $customvariables = array();
+        $availableplugins = array();
         
-        // alle PHP-Dateien aus dem Variablen-Verzeichnis einlesen
-        $dircontent = getDirContentAsArray(getcwd()."/$CUSTOMVARIABLES_DIR", false, false);
+        // alle Plugins einlesen
+        $dircontent = getDirContentAsArray(getcwd()."/$PLUGIN_DIR", false, false);
         foreach ($dircontent as $currentelement) {
-            if (substr($currentelement, strlen($currentelement)-4, strlen($currentelement)) == ".php") {
-                array_push($customvariables, substr($currentelement, 0, strlen($currentelement)-4));
+            if (file_exists(getcwd()."/$PLUGIN_DIR/".$currentelement."/index.php")) {
+                array_push($availableplugins, $currentelement);
             }
         }
 
@@ -1355,12 +1355,12 @@ echo "</pre>";
                 $currentvalue = "";
             }
             
-            // ...überprüfen, ob es eine zugehörige Variablen-PHP-Datei gibt
-            if (in_array($currentvariable, $customvariables)) {
+            // ...überprüfen, ob es eine zugehörige Plugin-PHP-Datei gibt
+            if (in_array($currentvariable, $availableplugins)) {
                 // NAME_DER_VARIABLEN.php includieren 
-                require_once(getcwd()."/$CUSTOMVARIABLES_DIR/".$currentvariable.".php");
+                require_once(getcwd()."/$PLUGIN_DIR/".$currentvariable."/index.php");
                 // Variable durch den Rückgabewert von getNAME_DER_VARIABLEN($value) ersetzen
-                $content = preg_replace('/{'.preg_quote($matches[1][$i]).'}/Um', call_user_func("get".$currentvariable, $currentvalue), $content);
+                $content = preg_replace('/{'.preg_quote($matches[1][$i]).'}/Um', call_user_func("get_".$currentvariable."_content", $currentvalue), $content);
             }
             $i++;
         }
