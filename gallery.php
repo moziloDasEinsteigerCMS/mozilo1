@@ -107,8 +107,8 @@ class Gallery {
             $this->next = $this->index+1;
             
         if ($this->usethumbs) {
-            checkthumbs();
-            $this->thumbarray = getPcsAsArray($this->dir_thumbs, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
+            $this->checkthumbs();
+            $this->thumbarray = $this->getPicsAsArray($this->dir_thumbs, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
         } 
     }
     
@@ -162,7 +162,7 @@ class Gallery {
         }
         if ($this->usethumbs) {
             $this->html = preg_replace('/{GALLERYMENU}/', "&nbsp;", $this->html);
-            $this->html = preg_replace('/{NUMBERMENU}/', getThumbnails(), $this->html);
+            $this->html = preg_replace('/{NUMBERMENU}/', $this->getThumbnails(), $this->html);
             $this->html = preg_replace('/{CURRENTPIC}/', "&nbsp;", $this->html);
             $this->html = preg_replace('/{CURRENTDESCRIPTION}/', "&nbsp;", $this->html);
             $this->html = preg_replace('/{XOUTOFY}/', "&nbsp;", $this->html);
@@ -241,9 +241,8 @@ class Gallery {
 // Nummernmenü erzeugen
 // ------------------------------------------------------------------------------
     function getThumbnails() {
-    
         // Aus Config auslesen: Wieviele Bilder pro Tabellenzeile?
-        $picsperrow = $mainconf->get("gallerypicsperrow");
+        $picsperrow = $this->mainconf->get("gallerypicsperrow");
         if (($picsperrow == "") || ($picsperrow == 0))
             $picsperrow = 4;
 
@@ -251,15 +250,15 @@ class Gallery {
         $i = 0;
         for ($i=0; $i<count($this->thumbarray); $i++) {
             // Bildbeschreibung holen
-            $description = getCurrentDescription($this->thumbarray[$i]);
+            $description = $this->getCurrentDescription($this->thumbarray[$i]);
             if ($description == "")
                 $description = "&nbsp;";
             // Neue Tabellenzeile aller picsperrow Zeichen
             if (($i > 0) && ($i % $picsperrow == 0))
                 $thumbs .= "</tr><tr>";
             $thumbs .= "<td class=\"gallerytd\" style=\"width:".floor(100 / $picsperrow)."%;\">"
-            ."<a href=\"".$specialchars->replaceSpecialChars($this->dir_gallery.$this->picarray[$i],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($this->picarray[$i],true,true))."\">"
-            ."<img src=\"".$specialchars->replaceSpecialChars($this->dir_thumbs.$this->thumbarray[$i],true)."\" alt=\"".$specialchars->rebuildSpecialChars($this->thumbarray[$i],true,true)."\" class=\"thumbnail\" />"
+            ."<a href=\"".$this->specialchars->replaceSpecialChars($this->dir_gallery.$this->picarray[$i],true)."\" target=\"_blank\" title=\"".$this->language->getLanguageValue1("tooltip_gallery_fullscreen_1", $this->specialchars->rebuildSpecialChars($this->picarray[$i],true,true))."\">"
+            ."<img src=\"".$this->specialchars->replaceSpecialChars($this->dir_thumbs.$this->thumbarray[$i],true)."\" alt=\"".$this->specialchars->rebuildSpecialChars($this->thumbarray[$i],true,true)."\" class=\"thumbnail\" />"
             ."</a><br />"
             .$description
             ."</td>";
