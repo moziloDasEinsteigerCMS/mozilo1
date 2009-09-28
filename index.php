@@ -234,12 +234,12 @@ echo "</pre>";
 
     // Platzhalter ersetzen
     $HTML = replacePlaceholders($HTML, $cattitle, $pagetitle);
-    $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle), $HTML);
+    $HTML = preg_replace('/{WEBSITE_TITLE}/', $specialchars->numeric_entities_decode(getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle)), $HTML);
 
     // Meta-Tag "keywords"
-    $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $mainconfig->get("websitekeywords"), $HTML);
+    $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $specialchars->numeric_entities_decode($mainconfig->get("websitekeywords")), $HTML);
     // Meta-Tag "description"
-    $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $mainconfig->get("websitedescription"), $HTML);
+    $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $specialchars->numeric_entities_decode($mainconfig->get("websitedescription")), $HTML);
 
     $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
     $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
@@ -939,14 +939,16 @@ echo "</pre>";
         $title = $mainconfig->get("titlebarformat");
         $sep = $mainconfig->get("titlebarseparator");
 
-    $title = preg_replace('/{WEBSITE}/', $websitetitle, $title);
-        if ($cattitle == "")
+        $title = preg_replace('/{WEBSITE}/', $websitetitle, $title);
+        if ($cattitle == "") {
             $title = preg_replace('/{CATEGORY}/', "", $title);
-        else
+        }
+        else {
             $title = preg_replace('/{CATEGORY}/', $cattitle, $title);
-    $title = preg_replace('/{PAGE}/', $pagetitle, $title);
-    $title = preg_replace('/{SEP}/', $sep, $title);
-    return $title;
+        }
+        $title = preg_replace('/{PAGE}/', $pagetitle, $title);
+        $title = preg_replace('/{SEP}/', $sep, $title);
+        return $title;
     }
 
 
@@ -967,6 +969,7 @@ echo "</pre>";
 // ------------------------------------------------------------------------------
     function replacePlaceholders($content, $cattitle, $pagetitle) {
         global $mainconfig;
+        global $specialchars;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $PAGE_FILE;
@@ -974,7 +977,7 @@ echo "</pre>";
         global $LAYOUT_DIR;
 
         // Titel der Website
-        $content = preg_replace('/{WEBSITE_NAME}/', $mainconfig->get("websitetitle"), $content);
+        $content = preg_replace('/{WEBSITE_NAME}/', $specialchars->numeric_entities_decode($mainconfig->get("websitetitle")), $content);
         // Layout-Verzeichnis
         $content = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR, $content);
 

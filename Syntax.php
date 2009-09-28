@@ -779,11 +779,14 @@ verwendet werden sollte!
 // Hilfsfunktion: Inhalte vorbereiten
 // ------------------------------------------------------------------------------
     function prepareContent($content) {
+    	global $specialchars;
+    	
         // Inhaltsformatierungen
         $content = htmlentities($content,ENT_COMPAT,'ISO-8859-1');
         $content = preg_replace("/&amp;#036;/Umsi", "&#036;", $content);
         $content = preg_replace("/&amp;#092;/Umsi", "&#092;", $content);
         $content = preg_replace("/\^(.)/Umsie", "'&#'.ord('\\1').';'", $content);
+        $content = $specialchars->numeric_entities_decode($content); 
         // Für Einrückungen
         $content = str_replace("  ","&nbsp;&nbsp;",$content);
 
