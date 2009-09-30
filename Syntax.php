@@ -279,10 +279,11 @@ class Syntax {
                     closedir($handle);
                     if ($this->CMS_CONF->get("embeddedgallery") == "true") {
                         require_once("gallery.php");
-                        if (isset($_GET["gal"]) and $_GET["gal"]==$cleanedvalue)
-                            $gallery->parseGalleryParameters($cleanedvalue,$_GET["index"]);
+                        $gal_request = html_entity_decode($value,ENT_COMPAT,'ISO-8859-1');
+                        if (isset($_GET["gal"]) and $_GET["gal"]==$gal_request)
+                            $gallery->parseGalleryParameters($gal_request,$_GET["index"]);
                         else 
-                            $gallery->parseGalleryParameters($cleanedvalue,null);
+                            $gallery->parseGalleryParameters($gal_request,null);
                         $gallery->setLinkPrefix("index.php?cat=$CAT_REQUEST&amp;page=$PAGE_REQUEST&amp;"); 
                         $content = str_replace ($match, $gallery->renderGallery(), $content);
                         }
