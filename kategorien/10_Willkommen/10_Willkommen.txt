@@ -10,4 +10,4 @@ Ihr [link=mozilo-Team|http://www.mozilo.de]
 Hier noch als kleine Demonstration ein Bild, eine Datei und der Link zu einer Galerie:
 [bild|mozilo.jpg]
 [liste|eine [datei=Datei|text.txt] zum Herunterladen]
-[liste|ein [galerie=Link zu einer Galerie|moziloCMS]]
+[liste|ein [seite=Link zu einer Galerie|Eine Galerie]]
