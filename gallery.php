@@ -55,21 +55,21 @@ class Gallery {
             $this->website_title = "Titel der Website";
 
         $this->layout_dir         = $this->mainconf->get("cmslayout");
-        if ($this->embedded)
-            $this->template_file      = "layouts/".$this->layout_dir."/embeddedgallerytemplate.html";
-        else
-            $this->template_file      = "layouts/".$this->layout_dir."/gallerytemplate.html";
+        $this->template_file      = "layouts/".$this->layout_dir."/gallerytemplate.html";
         $this->css_file           = "layouts/".$this->layout_dir."/css/style.css";
         $this->favicon_file       = "layouts/".$this->layout_dir."/favicon.ico";
 
         $this->linkprefix = "gallery.php?";
         
         if (!$this->embedded) {
+            if (!isset($_GET['index'])) {
+                $_GET['index'] = "1";
+            }
             $this->parseGalleryParameters($_GET['gal'],$_GET['index']);
             echo $this->renderGallery();
         }
         else if (basename($_SERVER['PHP_SELF']) == "gallery.php") {
-            die ($this->language->getLanguageValue0("message_galleryembed_error_0"));
+            die($this->language->getLanguageValue0("message_galleryembed_error_0"));
         }
     }
     
@@ -79,15 +79,16 @@ class Gallery {
         $this->dir_gallery        = "./galerien/".$this->gal_request."/";
         $this->dir_thumbs         = $this->dir_gallery."vorschau/";
         if (($this->gal_request == "") || (!file_exists($this->dir_gallery))) {
-            die ($this->language->getlanguagevalue1("message_gallerydir_error_1", $this->gal_request));
+            die($this->language->getlanguagevalue1("message_gallerydir_error_1", $this->gal_request));
         }
         $this->gal_name           = $this->specialchars->rebuildSpecialChars($this->gal_request, true, true);
 
         // Galerieverzeichnis einlesen
         $this->picarray = $this->getpicsasarray($this->dir_gallery, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
         $allindexes = array();
-        for ($i=1; $i<=count($this->picarray); $i++) 
+        for ($i=1; $i<=count($this->picarray); $i++) {
             array_push($allindexes, $i);
+        }
         // globaler Index
         if ((!isset($index)) || (!in_array($index, $allindexes)))
             $this->index = 1;
@@ -117,7 +118,9 @@ class Gallery {
 // ------------------------------------------------------------------------------
     function renderGallery() {
         $this->html = "";
-        $this->readTemplate();
+        if ($this->readTemplate() == false) {
+            return false;
+        }
         return $this->html;
     }
     
@@ -146,6 +149,13 @@ class Gallery {
         }
         $template = fread($file, filesize($this->template_file));
         fclose($file);
+        
+        if ($this->embedded) {
+            $template = $this->extractEmbeddedTemplate($template);
+            if ($template == false) {
+                return false;
+            }
+        }
 
         // Platzhalter des Templates mit Inhalt füllen
         $this->html = preg_replace('/{CSS_FILE}/', $this->specialchars->replaceSpecialChars($this->css_file, true), $template);
@@ -181,6 +191,8 @@ class Gallery {
             $this->html = preg_replace('/{PREVIOUS_INDEX}/', $this->previous, $this->html);
             $this->html = preg_replace('/{NEXT_INDEX}/', $this->next, $this->html);
         }
+        
+        return true;
     }
     
     
@@ -370,7 +382,7 @@ function checkThumbs() {
     
     // Vorschauverzeichnis prüfen
     if (!file_exists($this->dir_thumbs))
-        die ($language->getLanguageValue1("tooltip_link_category_error_1", $this->dir_thumbs));
+        die($language->getLanguageValue1("tooltip_link_category_error_1", $this->dir_thumbs));
     // alle Bilder überprüfen: Vorschau dazu vorhanden?
     foreach($this->picarray as $pic) {
         // Vorschaubild anlegen, wenn nicht vorhanden
@@ -422,6 +434,22 @@ function checkThumbs() {
     function setLinkPrefix($prefix) {
         $this->linkprefix = $prefix;
     }
+    
+    
+// ------------------------------------------------------------------------------
+// Hilfsfunktion: Extrahiert das Embedded-Template aus dem Gesamt-Template
+// ------------------------------------------------------------------------------
+    function extractEmbeddedTemplate($template) {
+        //preg_match("/\<!--\s*\{EMBEDDED_TEMPLATE_START\}\s*--\>(.*)\<!--\s*\{EMBEDDED_TEMPLATE_END\}\s*--\>/Umsi", $template, $matches);
+        preg_match("/\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_START\}[\s|\t]*--\>(.*)\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_END\}[\s|\t]*--\>/Umsi", $template, $matches);
+        if (sizeof($matches) > 1) {
+            return $matches[1];
+        }
+        else {
+            return false;
+        }
+    }
+    
 }
 
 $gallery = new Gallery();

@@ -197,14 +197,6 @@ echo "</pre>";
         $cattitle         = $pagecontentarray[1];
         $pagetitle         = $pagecontentarray[2];
     }
-    elseif ($ACTION_REQUEST == "gallery") {
-        if ($mainconfig->get("embeddedgallery") != "true")
-            die($language->getLanguageValue0("message_gallerynoembed_error_0"));
-        $pagecontentarray = getEmbeddedGallery();
-        $pagecontent      = $pagecontentarray[0];
-        $cattitle         = $pagecontentarray[1];
-        $pagetitle        = $pagecontentarray[2];
-    }
     elseif ($USE_CMS_SYNTAX) {
         $pagecontentarray = getContent();
         $pagecontent    = $syntax->convertContent($pagecontentarray[0], $CAT_REQUEST, true);
@@ -1302,7 +1294,7 @@ echo "</pre>";
     }
 
 // ------------------------------------------------------------------------------
-// zeigt Gallerie anstelle eines Seiteninhalts an
+// zeigt Galerie anstelle eines Seiteninhalts an
 // ------------------------------------------------------------------------------    
     function getEmbeddedGallery() { 
         global $language;
