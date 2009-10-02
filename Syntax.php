@@ -216,10 +216,10 @@ class Syntax {
                     if ($headline_info[1] == $value) {
                         // "Nach oben"-Verweis
                         if ($pos == 0)
-                            $content = str_replace ($match, "<a class=\"page\" href=\"#a$pos\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_anchor_gototop_0")).">$link_text</a>", $content);
+                            $content = str_replace ($match, "<a class=\"paragraph\" href=\"#a$pos\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_anchor_gototop_0")).">$link_text</a>", $content);
                         // sonstige Anker-Verweise
                         else
-                            $content = str_replace ($match, "<a class=\"page\" href=\"#a$pos\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_anchor_goto_1", $value)).">$link_text</a>", $content);
+                            $content = str_replace ($match, "<a class=\"paragraph\" href=\"#a$pos\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_anchor_goto_1", $value)).">$link_text</a>", $content);
                     }
                     $pos++;
                 }
