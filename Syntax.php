@@ -216,7 +216,7 @@ class Syntax {
                     if ($headline_info[1] == $value) {
                         // "Nach oben"-Verweis
                         if ($pos == 0)
-                            $content = str_replace ($match, "<a class=\"paragraph\" href=\"#a$pos\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_anchor_gototop_0")).">$link_text</a>", $content);
+                            $content = str_replace ($match, "<a class=\"paragraph\" href=\"#a$pos\"".$this->getTitleAttribute($this->LANG->getLanguageValue0("tooltip_anchor_gototop_0")).">$link_text</a>", $content);
                         // sonstige Anker-Verweise
                         else
                             $content = str_replace ($match, "<a class=\"paragraph\" href=\"#a$pos\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_anchor_goto_1", $value)).">$link_text</a>", $content);
@@ -233,18 +233,22 @@ class Syntax {
             elseif ($attribute == "datei" or substr($attribute,0,6) == "datei=") {
                 $datei = html_entity_decode($value,ENT_COMPAT,'ISO-8859-1');
                 $valuearray = explode(":", $datei);
-        $link_text = "";
-        if(substr($attribute,0,6) == "datei=")
-            $link_text = substr($attribute, 6, strlen($attribute)-6);
+                $link_text = "";
+                if(substr($attribute,0,6) == "datei=") {
+                    $link_text = substr($attribute, 6, strlen($attribute)-6);
+                }
                 // Datei in aktueller Kategorie
                 if (count($valuearray) == 1) {
                     $datei = $specialchars->replaceSpecialChars($datei,false);
-                    if(empty($link_text))
+                    if(empty($link_text)) {
                         $link_text = $value;
-                    if (file_exists("./$CONTENT_DIR_REL/$cat/$CONTENT_FILES_DIR/$datei"))
+                    }
+                    if (file_exists("./$CONTENT_DIR_REL/$cat/$CONTENT_FILES_DIR/$datei")) {
                         $content = str_replace ($match, "<a class=\"file\" href=\"download.php?cat=$cat&amp;file=$datei\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_file_1", $value))."".$this->TARGETBLANK_DOWNLOAD.">$link_text</a>", $content);
-                    else
+                    }
+                    else {
                         $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_file_error_1", $value)).">$value</span>", $content);
+                    }
                 }
                 // Datei in anderer Kategorie
                 else {
@@ -255,64 +259,66 @@ class Syntax {
                     if(empty($link_text))
                         $link_text = $specialchars->rebuildSpecialChars($datei,true,true);
                     if ((!$datei_cat == "") && (file_exists("./$CONTENT_DIR_REL/$datei_cat"))) {
-                        if (file_exists("./$CONTENT_DIR_REL/$datei_cat/$CONTENT_FILES_DIR/$datei"))
+                        if (file_exists("./$CONTENT_DIR_REL/$datei_cat/$CONTENT_FILES_DIR/$datei")) {
                             $content = str_replace ($match, "<a class=\"file\" href=\"download.php?cat=$datei_cat&amp;file=$datei\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_file_2", $html_datei, $html_datei_cat)).$this->TARGETBLANK_DOWNLOAD.">".$link_text."</a>", $content);
-                        else
+                        }
+                        else {
                             $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_file_error_2", $html_datei, $html_datei_cat)).">".$html_datei."</span>", $content);
+                        }
                     }
-                    else
+                    else {
                         $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_category_error_1", $html_datei_cat)).">".$html_datei."</span>", $content);
+                    }
                 }
             }
 
             // Galerie
-            elseif ($attribute == "galerie") {
-                $cleanedvalue = $specialchars->replaceSpecialChars(html_entity_decode($value,ENT_COMPAT,'ISO-8859-1'),false);
+            elseif (($attribute == "galerie") || (substr($attribute,0,8) == "galerie=")) {
+                $cleanedvalue = $specialchars->replaceSpecialChars(html_entity_decode($value, ENT_COMPAT, 'ISO-8859-1'),false);
+                $link_text = "";
+                if(substr($attribute,0,8) == "galerie=") {
+                    $link_text = substr($attribute, 8, strlen($attribute)-8);
+                }
+                else {
+                    $link_text = $value;
+                }
+                
                 if (file_exists("./$GALLERIES_DIR/$cleanedvalue")) {
                     $handle = opendir("./$GALLERIES_DIR/$cleanedvalue");
                     $j=0;
                     while ($file = readdir($handle)) {
                         if (is_file("./$GALLERIES_DIR/$cleanedvalue/".$file) && ($file <> "texte.conf")) {
-                        $j++;
-                    }
+                            $j++;
+                        }
                     }
                     closedir($handle);
+                    // Galerie einbetten
                     if ($this->CMS_CONF->get("embeddedgallery") == "true") {
                         require_once("gallery.php");
                         $gal_request = html_entity_decode($value,ENT_COMPAT,'ISO-8859-1');
-                        if (isset($_GET["gal"]) and $_GET["gal"]==$gal_request)
+                        if (isset($_GET["gal"]) and $_GET["gal"]==$gal_request) {
                             $gallery->parseGalleryParameters($gal_request,$_GET["index"]);
-                        else 
-                            $gallery->parseGalleryParameters($gal_request,null);
-                        $gallery->setLinkPrefix("index.php?cat=$CAT_REQUEST&amp;page=$PAGE_REQUEST&amp;"); 
-                        $content = str_replace ($match, $gallery->renderGallery(), $content);
                         }
-                    else
-                        $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">$value</a>", $content);
+                        else {
+                            $gallery->parseGalleryParameters($gal_request,null);
+                        }
+                        $gallery->setLinkPrefix("index.php?cat=$CAT_REQUEST&amp;page=$PAGE_REQUEST&amp;"); 
+                        $gallerycontent = $pagecontent = preg_replace('/(\r\n|\r|\n)/', '{newline_in_include_tag}', $gallery->renderGallery());
+                        // Embedded-Template nicht gefunden
+                        if ($gallerycontent == null) {
+                            $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue0("tooltip_embeddedgallery_template_error_0")).">$value</span>", $content);
+                        }
+                        else {
+                            $content = str_replace ($match, $gallerycontent, $content);
+                        }
+                    }
+                    else {
+                        $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">$link_text</a>", $content);
+                    }
                 }
                 // Galerie nicht vorhanden
                 else {
                     $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_gallery_error_1", $value)).">$value</span>", $content);
-                }
-            }
-
-            // Galerielink mit eigenem Text
-            elseif (substr($attribute,0,8) == "galerie=") {
-                $cleanedvalue = $specialchars->replaceSpecialChars(html_entity_decode($value,ENT_COMPAT,'ISO-8859-1'),false);
-                if (file_exists("./$GALLERIES_DIR/$cleanedvalue")) {
-                    $handle = opendir("./$GALLERIES_DIR/$cleanedvalue");
-                    $j=0;
-                    while ($file = readdir($handle)) {
-                        if (is_file("./$GALLERIES_DIR/$cleanedvalue/".$file) && ($file <> "texte.conf")) {
-                        $j++;
-                    }
-                    }
-                    closedir($handle);
-                    $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">".substr($attribute, 8, strlen($attribute)-8)."</a>", $content);
-                }
-                // Galerie nicht vorhanden
-                else {
-                    $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_gallery_error_1", $value)).">".substr($attribute, 8, strlen($attribute)-8)."</span>", $content);
                 }
             }
 
@@ -780,8 +786,8 @@ verwendet werden sollte!
 // Hilfsfunktion: Inhalte vorbereiten
 // ------------------------------------------------------------------------------
     function prepareContent($content) {
-    	global $specialchars;
-    	
+        global $specialchars;
+        
         // Inhaltsformatierungen
         $content = htmlentities($content,ENT_COMPAT,'ISO-8859-1');
         $content = preg_replace("/&amp;#036;/Umsi", "&#036;", $content);

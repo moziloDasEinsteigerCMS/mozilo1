@@ -443,7 +443,7 @@ function checkThumbs() {
         //preg_match("/\<!--\s*\{EMBEDDED_TEMPLATE_START\}\s*--\>(.*)\<!--\s*\{EMBEDDED_TEMPLATE_END\}\s*--\>/Umsi", $template, $matches);
         preg_match("/\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_START\}[\s|\t]*--\>(.*)\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_END\}[\s|\t]*--\>/Umsi", $template, $matches);
         if (sizeof($matches) > 1) {
-            return $matches[1];
+            return "<div class=\"embeddedgallery\">".$matches[1]."</div>";
         }
         else {
             return false;
