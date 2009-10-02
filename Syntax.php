@@ -123,7 +123,7 @@ class Syntax {
                     $content = str_replace ($match, "<a class=\"link\" href=\"$value\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_extern_1", $value)).$this->TARGETBLANK_LINK.">$shortenendlink</a>", $content);
                 }
                 else
-                    $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_extern_error_1", $value)).">$value</span>", $content);
+                    $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_link_extern_error_1", $value)), $content);
             }
 
             // externer Link mit eigenem Text
@@ -132,7 +132,7 @@ class Syntax {
                 if (preg_match($this->LINK_REGEX, $value))
                     $content = str_replace ($match, "<a class=\"link\" href=\"$value\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_extern_1", $value)).$this->TARGETBLANK_LINK.">".substr($attribute, 5, strlen($attribute)-5)."</a>", $content);
                 else
-                    $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_extern_error_1", $value)).">".substr($attribute, 5, strlen($attribute)-5)."</span>", $content);
+                    $content = str_replace ($match, $this->createDeadlink(substr($attribute, 5, strlen($attribute)-5), $this->LANG->getLanguageValue1("tooltip_link_extern_error_1", $value)), $content);
             }
 
             // Mail-Link mit eigenem Text
@@ -141,14 +141,14 @@ class Syntax {
                 if (preg_match($this->MAIL_REGEX, $value))
                     $content = str_replace ($match, "<a class=\"mail\" href=\"".obfuscateAdress("mailto:$value", 3)."\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_mail_1", obfuscateAdress("$value", 3))).">".substr($attribute, 5, strlen($attribute)-5)."</a>", $content);
                 else
-                    $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_mail_error_1", $value)).">".substr($attribute, 5, strlen($attribute)-5)."</span>", $content);
+                    $content = str_replace ($match, $this->createDeadlink(substr($attribute, 5, strlen($attribute)-5), $this->LANG->getLanguageValue1("tooltip_link_mail_error_1", $value)), $content);
             }
             elseif ($attribute == "mail"){
                 // Überprüfung auf Validität
                 if (preg_match("/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/", $value))
                     $content = str_replace ($match, "<a class=\"mail\" href=\"".obfuscateAdress("mailto:$value", 3)."\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_mail_1", obfuscateAdress("$value", 3))).">".obfuscateAdress("$value", 3)."</a>", $content);
                 else
-                    $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_mail_error_1", $value)).">$value</span>", $content);
+                    $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_link_mail_error_1", $value)), $content);
             }
 
             // Kategorie-Link (überprüfen, ob Kategorie existiert)
@@ -161,7 +161,7 @@ class Syntax {
                 if ((!$requestedcat=="") && (file_exists("./$CONTENT_DIR_REL/$requestedcat")))
                     $content = str_replace ($match, "<a class=\"category\" href=\"index.php?cat=$requestedcat\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_category_1", $value)).">$link_text</a>", $content);
                 else
-                    $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_category_error_1", $value)).">$value</span>", $content);
+                    $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_link_category_error_1", $value)), $content);
             }
 
             // Link auf Inhaltsseite in aktueller oder anderer Kategorie (überprüfen, ob Inhaltsseite existiert)
@@ -180,24 +180,28 @@ class Syntax {
                     if ((!$requestedpage == "") && (file_exists("./$CONTENT_DIR_REL/$cat/$requestedpage")))
                         $content = str_replace ($match, "<a class=\"page\" href=\"index.php?cat=$cat&amp;page=".substr($requestedpage, 0, strlen($requestedpage) - strlen($EXT_PAGE))."\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_page_1", $value)).">$link_text</a>", $content);
                     else
-                        $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_page_error_1", $value)).">$value</span>", $content);
+                        $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_link_page_error_1", $value)), $content);
                 }
                 // Inhaltsseite in anderer Kategorie
                 else {
                     $requestedcat = nameToCategory($specialchars->replaceSpecialChars($valuearray[0],false));
                     $html_seite = $specialchars->rebuildSpecialChars($valuearray[1],true,true);
                     $html_seite_cat = $specialchars->rebuildSpecialChars($valuearray[0],true,true);
-                    if(empty($link_text))
+                    if(empty($link_text)) {
                         $link_text = $html_seite;
+                    }
                     if ((!$requestedcat == "") && (file_exists("./$CONTENT_DIR_REL/$requestedcat"))) {
                         $requestedpage = nameToPage($specialchars->replaceSpecialChars($valuearray[1],false), $requestedcat);
-                        if ((!$requestedpage == "") && (file_exists("./$CONTENT_DIR_REL/$requestedcat/$requestedpage")))
+                        if ((!$requestedpage == "") && (file_exists("./$CONTENT_DIR_REL/$requestedcat/$requestedpage"))) {
                             $content = str_replace ($match, "<a class=\"page\" href=\"index.php?cat=$requestedcat&amp;page=".substr($requestedpage, 0, strlen($requestedpage) - strlen($EXT_PAGE))."\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_page_2", $html_seite, $html_seite_cat)).">".$link_text."</a>", $content);
-                        else
-                            $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_page_error_2", $html_seite, $html_seite_cat)).">".$html_seite."</span>", $content);    
+                        }
+                        else {
+                            $content = str_replace ($match, $this->createDeadlink($html_seite, $this->LANG->getLanguageValue2("tooltip_link_page_error_2", $html_seite, $html_seite_cat)), $content);    
+                        }
                     }
-                    else
-                        $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_category_error_1", $valuearray[0])).">".$html_seite."</span>", $content);
+                    else {
+                        $content = str_replace ($match, $this->createDeadlink($html_seite, $this->LANG->getLanguageValue1("tooltip_link_category_error_1", $valuearray[0])), $content);
+                    }
                 }
             }
 
@@ -223,8 +227,7 @@ class Syntax {
                     }
                     $pos++;
                 }
-                //$content = str_replace ($match, "<em class=\"deadlink\" title=\"".$wikilanguage->get("LANG_INVALIDPARAGRAPH")." &quot;$value&quot;\">$value</em>", $content);
-                $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_anchor_error_1", $value)).">".$value."</span>", $content);
+                $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_anchor_error_1", $value)), $content);
             }
             
 
@@ -247,7 +250,7 @@ class Syntax {
                         $content = str_replace ($match, "<a class=\"file\" href=\"download.php?cat=$cat&amp;file=$datei\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_file_1", $value))."".$this->TARGETBLANK_DOWNLOAD.">$link_text</a>", $content);
                     }
                     else {
-                        $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_file_error_1", $value)).">$value</span>", $content);
+                        $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_link_file_error_1", $value)), $content);
                     }
                 }
                 // Datei in anderer Kategorie
@@ -263,11 +266,11 @@ class Syntax {
                             $content = str_replace ($match, "<a class=\"file\" href=\"download.php?cat=$datei_cat&amp;file=$datei\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_file_2", $html_datei, $html_datei_cat)).$this->TARGETBLANK_DOWNLOAD.">".$link_text."</a>", $content);
                         }
                         else {
-                            $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_file_error_2", $html_datei, $html_datei_cat)).">".$html_datei."</span>", $content);
+                            $content = str_replace ($match, $this->createDeadlink($html_datei, $this->LANG->getLanguageValue2("tooltip_link_file_error_2", $html_datei, $html_datei_cat)), $content);
                         }
                     }
                     else {
-                        $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_category_error_1", $html_datei_cat)).">".$html_datei."</span>", $content);
+                        $content = str_replace ($match, $this->createDeadlink($html_datei, $this->LANG->getLanguageValue1("tooltip_link_category_error_1", $html_datei_cat)), $content);
                     }
                 }
             }
@@ -306,7 +309,7 @@ class Syntax {
                         $gallerycontent = $pagecontent = preg_replace('/(\r\n|\r|\n)/', '{newline_in_include_tag}', $gallery->renderGallery());
                         // Embedded-Template nicht gefunden
                         if ($gallerycontent == null) {
-                            $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue0("tooltip_embeddedgallery_template_error_0")).">$value</span>", $content);
+                            $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue0("tooltip_embeddedgallery_template_error_0")), $content);
                         }
                         else {
                             $content = str_replace ($match, $gallerycontent, $content);
@@ -318,7 +321,7 @@ class Syntax {
                 }
                 // Galerie nicht vorhanden
                 else {
-                    $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_gallery_error_1", $value)).">$value</span>", $content);
+                    $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_link_gallery_error_1", $value)), $content);
                 }
             }
 
@@ -370,7 +373,7 @@ class Syntax {
                     // Bilddatei existiert nicht
                     else {
                         $error = true;
-                        $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_image_error_1", $value)).">$value</span>", $content);
+                        $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_image_error_1", $value)), $content);
                     }
                 }
                 // Bild in anderer Kategorie
@@ -384,13 +387,13 @@ class Syntax {
                         }
                         // Bilddatei existiert nicht
                         else {
-                            $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_image_error_2", $valuearray[1], $valuearray[0])).">".$valuearray[1]."</span>", $content);
+                            $content = str_replace ($match, $this->createDeadlink($valuearray[1], $this->LANG->getLanguageValue2("tooltip_image_error_2", $valuearray[1], $valuearray[0])), $content);
                             $error = true;
                         }
                     }
                     // Kategorie existiert nicht
                     else {
-                        $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_category_error_1", $valuearray[0])).">".$valuearray[1]."</span>", $content);
+                        $content = str_replace ($match, $this->createDeadlink($valuearray[1], $this->LANG->getLanguageValue1("tooltip_link_category_error_1", $valuearray[0])), $content);
                         $error = true;
                     }
                 }
@@ -579,7 +582,7 @@ verwendet werden sollte!
                     if ((!$requestedpage=="") && (file_exists("./$CONTENT_DIR_REL/$cat/$requestedpage"))) {
                         // Seite darf sich nicht selbst includen!
                         if (substr($requestedpage, 0, strlen($requestedpage)-strlen($EXT_PAGE)) == $PAGE_REQUEST) {
-                            $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue0("tooltip_include_recursion_error_0")).">$value</span>", $content);
+                            $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue0("tooltip_include_recursion_error_0")), $content);
                         }
                         // Includierte Inhaltsseite parsen
                         else {
@@ -599,7 +602,7 @@ verwendet werden sollte!
                         }
                     }
                     else
-                        $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_page_error_1", $value)).">$value</span>", $content);
+                        $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_link_page_error_1", $value)), $content);
                 }
                 // Inhaltsseite in anderer Kategorie
                 else {
@@ -609,7 +612,7 @@ verwendet werden sollte!
                         if ((!$requestedpage=="") && (file_exists("./$CONTENT_DIR_REL/$requestedcat/$requestedpage")))
                             // Seite darf sich nicht selbst includen!
                             if (($requestedcat == $cat) && (substr($requestedpage, 0, strlen($requestedpage)-strlen($EXT_PAGE)) == $PAGE_REQUEST)) {
-                                $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue0("tooltip_include_recursion_error_0")).">$value</span>", $content);
+                                $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue0("tooltip_include_recursion_error_0")), $content);
                             }
                             // Includierte Inhaltsseite parsen
                             else {
@@ -628,10 +631,10 @@ verwendet werden sollte!
                                 $content = str_replace ($match, $pagecontent, $content);
                             }
                         else
-                            $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_page_error_2", $valuearray[1], $valuearray[0])).">".$valuearray[1]."</span>", $content);    
+                            $content = str_replace ($match, $this->createDeadlink($valuearray[1], $this->LANG->getLanguageValue2("tooltip_link_page_error_2", $valuearray[1], $valuearray[0])), $content);    
                     }
                     else
-                        $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_category_error_1", $valuearray[0])).">".$valuearray[1]."</span>", $content);
+                        $content = str_replace ($match, $this->createDeadlink($valuearray[1], $this->LANG->getLanguageValue1("tooltip_link_category_error_1", $valuearray[0])), $content);
                 }
             }
 
@@ -641,7 +644,7 @@ verwendet werden sollte!
                 if (preg_match("/^([a-f]|\d){6}$/i", substr($attribute, 6, strlen($attribute)-6))) 
                     $content = str_replace ("$match", "<span style=\"color:#".substr($attribute, 6, strlen($attribute)-6).";\">".$value."</span>", $content);
                 else
-                    $content = str_replace ("$match", "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_color_error_1", substr($attribute, 6, strlen($attribute)-6))).">$value</span>", $content);
+                    $content = str_replace ("$match", $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_color_error_1", substr($attribute, 6, strlen($attribute)-6))), $content);
             }
 
             // Attribute, die nicht zugeordnet werden können
@@ -678,7 +681,7 @@ verwendet werden sollte!
                 }
                 // Wenn das Attribut unbekannt ist: Fehler ausgeben
                 else {
-                    $content = str_replace ($match, "<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_attribute_error_1", $attribute)).">".$value."</span>", $content);
+                    $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_attribute_error_1", $attribute)), $content);
                 }
             }
 
@@ -801,6 +804,14 @@ verwendet werden sollte!
         $content = replacePlaceholders($content, "", "");
         
         return $content;
+    }
+    
+    
+// ------------------------------------------------------------------------------
+// Hilfsfunktion: Deadlink erstellen
+// ------------------------------------------------------------------------------
+    function createDeadlink($content, $title) {
+        return "<span class=\"deadlink\"".$this->getTitleAttribute($title).">$content</span>";
     }
 
 }

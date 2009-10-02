@@ -22,6 +22,7 @@ echo "</pre>";
     require_once("Syntax.php");
     require_once("Smileys.php");
     require_once("Mail.php");
+    require_once("Plugin.php");
     
     // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
     //@ini_set("display_errors", 0);
@@ -1322,6 +1323,8 @@ echo "</pre>";
 // ------------------------------------------------------------------------------    
     function replacePluginVariables($content) {
         global $PLUGIN_DIR;
+        global $syntax;
+        global $language;
         
         $availableplugins = array();
         
@@ -1352,15 +1355,26 @@ echo "</pre>";
             
             // ...überprüfen, ob es eine zugehörige Plugin-PHP-Datei gibt
             if (in_array($currentvariable, $availableplugins)) {
-                // NAME_DER_VARIABLEN.php includieren 
+                $replacement = "";
+                // Plugin-Code includieren
                 require_once(getcwd()."/$PLUGIN_DIR/".$currentvariable."/index.php");
-                // Variable durch den Rückgabewert von getNAME_DER_VARIABLEN($value) ersetzen
-                $content = preg_replace('/{'.preg_quote($matches[1][$i]).'}/Um', call_user_func("get_".$currentvariable."_content", $currentvalue), $content);
+                // Enthält der Code eine Klasse mit dem Namen des Plugins?
+                if (class_exists($currentvariable)) {
+                    // Objekt instanziieren und Inhalt holen!
+                    eval('$currentpluginobject = new '.$currentvariable.'();');
+                    $replacement = $currentpluginobject->getPluginContent($currentvalue);
+                }
+                else {
+                    $replacement = $syntax->createDeadlink($matches[0][$i], $language->getLanguageValue1("plugin_error_1", $currentvariable));
+                }
+                // Variable durch Plugin-Inhalt (oder Fehlermeldung) ersetzen
+                $content = preg_replace('/{'.preg_quote($matches[1][$i]).'}/Um', $replacement, $content);
             }
             $i++;
         }
         return $content;
     }
+
     
     
 ?>
