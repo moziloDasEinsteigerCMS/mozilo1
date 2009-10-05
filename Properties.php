@@ -81,11 +81,13 @@ class Properties {
      */
     function loadProperties() {
         if (!file_exists($this->file)) {
-            if (!@fopen($this->file, "w")) 
+            if (!@fopen($this->file, "a+")) 
             die("Properties.php: Kann ".$this->file." nicht schreiben - bitte Existenz der Datei und vergebene Dateirechte prüfen.");
         }
 
-        $lines = file($this->file);
+        if(!$lines = @file($this->file)) {
+            die("Properties.php: Kann ".$this->file." nicht öffnen - bitte Existenz der Datei und vergebene Dateirechte prüfen.");
+        }
         foreach ($lines as $line) {
             // comments
             if (preg_match("/^#/",$line) || preg_match("/^\s*$/",$line)) {

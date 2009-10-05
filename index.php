@@ -1361,7 +1361,7 @@ echo "</pre>";
                 // Enthält der Code eine Klasse mit dem Namen des Plugins?
                 if (class_exists($currentvariable)) {
                     // Objekt instanziieren und Inhalt holen!
-                    eval('$currentpluginobject = new '.$currentvariable.'();');
+                    $currentpluginobject = new $currentvariable();
                     $replacement = $currentpluginobject->getPluginContent($currentvalue);
                 }
                 else {
