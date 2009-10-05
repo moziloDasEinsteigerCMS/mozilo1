@@ -591,7 +591,7 @@ verwendet werden sollte!
                             $pagecontent = "";
                             if (filesize($file) > 0) {
                                 // "include"-Tags in includierten Seiten sind nicht erlaubt, um Rekursionen zu vermeiden
-                                $pagecontent = preg_replace("/\[include\|([^\[\]]*)\]/Um", "[html|<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue0("tooltip_include_reinclude_error_0")).">$1</span>]", fread($handle, filesize($file)));
+                                $pagecontent = preg_replace("/\[include\|([^\[\]]*)\]/Um", "[html|".$this->createDeadlink("$1", $this->LANG->getLanguageValue0("tooltip_include_reinclude_error_0"))."]", fread($handle, filesize($file)));
                                 // Zeilenwechsel sichern
                                 $pagecontent = preg_replace('/(\r\n|\r|\n)/', '{newline_in_include_tag}', $pagecontent);
                                 // Seiteninhalt konvertieren
@@ -621,7 +621,7 @@ verwendet werden sollte!
                                 $pagecontent = "";
                                 if (filesize($file) > 0) {
                                     // "include"-Tags in includierten Seiten sind nicht erlaubt, um Rekursionen zu vermeiden
-                                    $pagecontent = preg_replace("/\[include\|([^\[\]]*)\]/Um", "[html|<span class=\"deadlink\"".$this->getTitleAttribute($this->LANG->getLanguageValue0("tooltip_include_reinclude_error_0")).">$1</span>]", fread($handle, filesize($file)));
+                                    $pagecontent = preg_replace("/\[include\|([^\[\]]*)\]/Um", "[html|".$this->createDeadlink("$1", $this->LANG->getLanguageValue0("tooltip_include_reinclude_error_0"))."]", fread($handle, filesize($file)));
                                     // Zeilenwechsel sichern
                                     $pagecontent = preg_replace('/(\r\n|\r|\n)/', '{newline_in_include_tag}', $pagecontent);
                                     // Seiteninhalt konvertieren
