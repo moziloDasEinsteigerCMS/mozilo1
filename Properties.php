@@ -162,7 +162,7 @@ class Properties {
      * @return array an associtive array of values
      */
     function get($key) {
-        if (isSet($this->properties[$key]) && ($this->properties[$key])) {
+        if (isset($this->properties[$key])) {
             return $this->properties[$key];
         }
         return null;
