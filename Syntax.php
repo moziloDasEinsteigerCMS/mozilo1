@@ -472,17 +472,17 @@ class Syntax {
 
             // ‹berschrift groﬂ
             elseif ($attribute == "ueber1"){
-                $content = preg_replace("/".preg_quote($match)."/", "<h1 id=\"a".$this->anchorcounter++."\">$value</h1>", $content,1);
+                $content = preg_replace("/".preg_quote($match, '/')."/", "<h1 id=\"a".$this->anchorcounter++."\">$value</h1>", $content,1);
             }
 
             // ‹berschrift mittel
             elseif ($attribute == "ueber2"){
-                $content = preg_replace("/".preg_quote($match)."/", "<h2 id=\"a".$this->anchorcounter++."\">$value</h2>", $content,1);
+                $content = preg_replace("/".preg_quote($match, '/')."/", "<h2 id=\"a".$this->anchorcounter++."\">$value</h2>", $content,1);
             }
 
             // ‹berschrift normal
             elseif ($attribute == "ueber3"){
-                $content = preg_replace("/".preg_quote($match)."/", "<h3 id=\"a".$this->anchorcounter++."\">$value</h3>", $content,1);
+                $content = preg_replace("/".preg_quote($match, '/')."/", "<h3 id=\"a".$this->anchorcounter++."\">$value</h3>", $content,1);
             }
 
             // Listenpunkt

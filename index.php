@@ -1368,7 +1368,7 @@ echo "</pre>";
                     $replacement = $syntax->createDeadlink($matches[0][$i], $language->getLanguageValue1("plugin_error_1", $currentvariable));
                 }
                 // Variable durch Plugin-Inhalt (oder Fehlermeldung) ersetzen
-                $content = preg_replace('/{'.preg_quote($matches[1][$i]).'}/Um', $replacement, $content);
+                $content = preg_replace('/{'.preg_quote($matches[1][$i], '/').'}/Um', $replacement, $content);
             }
             $i++;
         }
