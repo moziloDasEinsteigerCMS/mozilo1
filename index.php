@@ -22,6 +22,7 @@ echo "</pre>";
     require_once("Syntax.php");
     require_once("Smileys.php");
     require_once("Mail.php");
+    require_once("Plugin.php");
     
     // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
     @ini_set("display_errors", 0);
@@ -73,12 +74,12 @@ echo "</pre>";
     $QUERY_REQUEST = getRequestParam('query', true);
     $HIGHLIGHT_REQUEST = getRequestParam('highlight', false);
 
-    $CONTENT_DIR_REL    = "kategorien";
-    $CONTENT_DIR_ABS    = getcwd() . "/$CONTENT_DIR_REL";
-    $CONTENT_FILES_DIR  = "dateien";
-    $GALLERIES_DIR      = "galerien";
-    $CONTENT            = "";
-    $HTML               = "";
+    $CONTENT_DIR_REL        = "kategorien";
+    $CONTENT_DIR_ABS        = getcwd() . "/$CONTENT_DIR_REL";
+    $CONTENT_FILES_DIR      = "dateien";
+    $GALLERIES_DIR          = "galerien";
+    $PLUGIN_DIR             = "plugins";
+    $HTML                   = "";
 
     // Überprüfen: Ist die Startkategorie vorhanden? Wenn nicht, nimm einfach die allererste als Standardkategorie
     if (!file_exists("$CONTENT_DIR_REL/$DEFAULT_CATEGORY")) {
@@ -108,7 +109,6 @@ echo "</pre>";
 // ------------------------------------------------------------------------------
     function checkParameters() {
         global $CONTENT_DIR_ABS;
-        global $CONTENT_FILES_DIR;
         global $DEFAULT_CATEGORY;
         global $ACTION_REQUEST;
         global $CAT_REQUEST;
@@ -199,30 +199,32 @@ echo "</pre>";
         $cattitle         = $pagecontentarray[1];
         $pagetitle         = $pagecontentarray[2];
     }
-    elseif ($ACTION_REQUEST == "gallery") {
-        if ($mainconfig->get("embeddedgallery") != "true")
-            die($language->getLanguageValue0("message_gallerynoembed_error_0"));
-        $pagecontentarray = getEmbeddedGallery();
-        $pagecontent      = $pagecontentarray[0];
-        $cattitle         = $pagecontentarray[1];
-        $pagetitle        = $pagecontentarray[2];
-    }
+    // Inhalte aus Inhaltsseiten durch Passwort schützen
     else { 
+        // zunächst Passwort als gesetzt und nicht eingegeben annehmen
         $passwordok = false;
-        $passwordfile = "$CONTENT_DIR_ABS/$CAT_REQUEST/.htpass_".substr($PAGE_REQUEST, 3, strlen($PAGE_REQUEST) - 3);
-        if (file_exists($passwordfile)) {
-            $cattitle    = catToName($CAT_REQUEST, true);
-            $pagetitle   = "Passwortabfrage"; // TODO: in Sprachdatei
-            if (!isset($_POST) || ($_POST == array())) 
-                $pagecontent = getPasswordForm();
-            else {
-                if (checkPassword())
-                    $passwordok = true;
-                else
-                    $pagecontent = "Falsches Passwort.";
+        if (file_exists("conf/passwords.conf")) {
+            $passwords = new Properties("conf/passwords.conf"); // alle Passwörter laden
+            if ($passwords->keyExists($CAT_REQUEST.'/'.$PAGE_REQUEST)) { // nach Passwort für diese Seite suchen
+                $cattitle    = catToName($CAT_REQUEST, true);
+                $pagetitle   = $language->getLanguageValue0("passwordform_title_0");
+                if (!isset($_POST) || ($_POST == array())) // sofern kein Passwort eingegeben, nach einem Fragen
+                    $pagecontent = getPasswordForm();
+                else {
+                    if (md5($_POST["password"]) == $passwords->get($CAT_REQUEST.'/'.$PAGE_REQUEST))
+                    // richtiges Passwort eingegeben
+                        $passwordok = true;
+                    else
+                    // falsches Passwort eingegeben - Zugriff verweigern
+                        $pagecontent = $language->getLanguageValue0("passwordform_message_passwordwrong_0");
+                }
             }
+            else
+            // diese Seite hat ein Passwort - lasse Zugriff zu
+                $passwordok = true;
         }
         else
+        // keine Seite hat ein Passwort - lasse Zugriff zu
             $passwordok = true;
         if ($passwordok) {
             if ($USE_CMS_SYNTAX) {
@@ -255,12 +257,12 @@ echo "</pre>";
 
     // Platzhalter ersetzen
     $HTML = replacePlaceholders($HTML, $cattitle, $pagetitle);
-    $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle), $HTML);
+    $HTML = preg_replace('/{WEBSITE_TITLE}/', $specialchars->numeric_entities_decode(getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle)), $HTML);
 
     // Meta-Tag "keywords"
-    $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $mainconfig->get("websitekeywords"), $HTML);
+    $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $specialchars->numeric_entities_decode($mainconfig->get("websitekeywords")), $HTML);
     // Meta-Tag "description"
-    $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $mainconfig->get("websitedescription"), $HTML);
+    $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $specialchars->numeric_entities_decode($mainconfig->get("websitedescription")), $HTML);
 
     $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
     $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
@@ -299,32 +301,19 @@ echo "</pre>";
     // Kontaktformular
     $HTML = preg_replace('/{TABLEOFCONTENTS}/', $syntax->getToC($pagecontent), $HTML);
     
-    }
+    // Benutzer-Variablen ersetzen
+    $HTML = replacePluginVariables($HTML);
     
-// ------------------------------------------------------------------------------
-// Formular zur Passworteingabe anzeigen
-// ------------------------------------------------------------------------------
-    function checkPassword() {
-        global $CONTENT_DIR_ABS;
-        global $CAT_REQUEST;
-        global $PAGE_REQUEST;
-        
-        $passwordfile = "$CONTENT_DIR_ABS/$CAT_REQUEST/.htpass_".substr($PAGE_REQUEST, 3, strlen($PAGE_REQUEST) - 3);
-        $file = @fopen($passwordfile,"r");
-        $md5password = fread($file, filesize($passwordfile));
-        fclose($file);
-        return $md5password == md5($_POST["password"]);
     }
-    
     
 // ------------------------------------------------------------------------------
 // Formular zur Passworteingabe anzeigen
 // ------------------------------------------------------------------------------
     function getPasswordForm() {
+        global $language;
         // TODO: sollte auch wahlweise über ein Template gehen
-        // TODO: sprachunabhängig gestalten
         return '<form action="index.php?'.$_SERVER['QUERY_STRING'].'" method="post">
-        Bitte Passwort für diese Seite eingeben: 
+        '.$language->getLanguageValue0("passwordform_pagepasswordplease_0").' 
         <input type="Password" name="password">
         <input type="Submit" value="OK">
         </form>';
@@ -357,7 +346,6 @@ echo "</pre>";
 // ------------------------------------------------------------------------------
     function nameToPage($pagename, $currentcat) {
         global $CONTENT_DIR_ABS;
-        global $CONTENT_FILES_DIR;
         global $EXT_DRAFT;
         global $EXT_HIDDEN;
         global $EXT_PAGE;
@@ -406,7 +394,6 @@ echo "</pre>";
 // ------------------------------------------------------------------------------
     function getContent() {
         global $CONTENT_DIR_ABS;
-        global $CONTENT_FILES_DIR;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $EXT_HIDDEN;
@@ -497,7 +484,6 @@ echo "</pre>";
 // ------------------------------------------------------------------------------
     function getMainMenu() {
         global $CONTENT_DIR_ABS;
-        global $CONTENT_FILES_DIR;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $specialchars;
@@ -553,7 +539,6 @@ echo "</pre>";
         global $ACTION_REQUEST;
         global $QUERY_REQUEST;
         global $CONTENT_DIR_ABS;
-        global $CONTENT_FILES_DIR;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $EXT_DRAFT;
@@ -725,7 +710,6 @@ echo "</pre>";
 // ------------------------------------------------------------------------------
     function getSiteMap() {
         global $CONTENT_DIR_ABS;
-        global $CONTENT_FILES_DIR;
         global $language;
         global $specialchars;
         global $mainconfig;
@@ -767,7 +751,6 @@ echo "</pre>";
     function getSearchResult() {
         global $CONTENT_DIR_ABS;
         global $CONTENT_DIR_REL;
-        global $CONTENT_FILES_DIR;
         global $USE_CMS_SYNTAX;
         global $QUERY_REQUEST;
         global $language;
@@ -991,22 +974,16 @@ echo "</pre>";
         $title = $mainconfig->get("titlebarformat");
         $sep = $mainconfig->get("titlebarseparator");
 
-    $title = preg_replace('/{WEBSITE}/', $websitetitle, $title);
-        if ($cattitle == "")
+        $title = preg_replace('/{WEBSITE}/', $websitetitle, $title);
+        if ($cattitle == "") {
             $title = preg_replace('/{CATEGORY}/', "", $title);
-        else
+        }
+        else {
             $title = preg_replace('/{CATEGORY}/', $cattitle, $title);
-    $title = preg_replace('/{PAGE}/', $pagetitle, $title);
-    $title = preg_replace('/{SEP}/', $sep, $title);
-    return $title;
-    }
-
-
-
-// ------------------------------------------------------------------------------
-// Überprüfung auf
-// ------------------------------------------------------------------------------
-    function hasValidContentExtension($filename) {
+        }
+        $title = preg_replace('/{PAGE}/', $pagetitle, $title);
+        $title = preg_replace('/{SEP}/', $sep, $title);
+        return $title;
     }
 
 
@@ -1027,6 +1004,7 @@ echo "</pre>";
 // ------------------------------------------------------------------------------
     function replacePlaceholders($content, $cattitle, $pagetitle) {
         global $mainconfig;
+        global $specialchars;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $PAGE_FILE;
@@ -1034,7 +1012,7 @@ echo "</pre>";
         global $LAYOUT_DIR;
 
         // Titel der Website
-        $content = preg_replace('/{WEBSITE_NAME}/', $mainconfig->get("websitetitle"), $content);
+        $content = preg_replace('/{WEBSITE_NAME}/', $specialchars->numeric_entities_decode($mainconfig->get("websitetitle")), $content);
         // Layout-Verzeichnis
         $content = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR, $content);
 
@@ -1359,7 +1337,7 @@ echo "</pre>";
     }
 
 // ------------------------------------------------------------------------------
-// zeigt Gallerie anstelle eines Seiteninhalts an
+// zeigt Galerie anstelle eines Seiteninhalts an
 // ------------------------------------------------------------------------------    
     function getEmbeddedGallery() { 
         global $language;
@@ -1380,5 +1358,65 @@ echo "</pre>";
         $_SESSION['contactform_message'] = time()-rand(40, 50);
         $_SESSION['contactform_calculation'] = time()-rand(50, 60);
     }
+    
 
+// ------------------------------------------------------------------------------
+// Hilfsfunktion: Plugin-Variablen ersetzen
+// ------------------------------------------------------------------------------    
+    function replacePluginVariables($content) {
+        global $PLUGIN_DIR;
+        global $syntax;
+        global $language;
+        
+        $availableplugins = array();
+        
+        // alle Plugins einlesen
+        $dircontent = getDirContentAsArray(getcwd()."/$PLUGIN_DIR", false, false);
+        foreach ($dircontent as $currentelement) {
+            if (file_exists(getcwd()."/$PLUGIN_DIR/".$currentelement."/index.php")) {
+                array_push($availableplugins, $currentelement);
+            }
+        }
+
+        // Alle Variablen aus dem Inhalt heraussuchen
+        preg_match_all("/\{(.+)\}/Um", $content, $matches);
+        // Für jeden Treffer...
+        $i = 0;
+        foreach ($matches[0] as $match) {
+            // ...erstmal schauen, ob ein Wert dabeisteht, z.B. {VARIABLE|wert}
+            $valuearray = explode("|", $matches[1][$i]);
+            if (sizeof($valuearray) > 1) {
+                $currentvariable = $valuearray[0];
+                $currentvalue = $valuearray[1];
+            }
+            // Sonst den Wert leer vorbelegen
+            else {
+                $currentvariable = $matches[1][$i];
+                $currentvalue = "";
+            }
+            
+            // ...überprüfen, ob es eine zugehörige Plugin-PHP-Datei gibt
+            if (in_array($currentvariable, $availableplugins)) {
+                $replacement = "";
+                // Plugin-Code includieren
+                require_once(getcwd()."/$PLUGIN_DIR/".$currentvariable."/index.php");
+                // Enthält der Code eine Klasse mit dem Namen des Plugins?
+                if (class_exists($currentvariable)) {
+                    // Objekt instanziieren und Inhalt holen!
+                    $currentpluginobject = new $currentvariable();
+                    $replacement = $currentpluginobject->getPluginContent($currentvalue);
+                }
+                else {
+                    $replacement = $syntax->createDeadlink($matches[0][$i], $language->getLanguageValue1("plugin_error_1", $currentvariable));
+                }
+                // Variable durch Plugin-Inhalt (oder Fehlermeldung) ersetzen
+                $content = preg_replace('/{'.preg_quote($matches[1][$i], '/').'}/Um', $replacement, $content);
+            }
+            $i++;
+        }
+        return $content;
+    }
+
+    
+    
 ?>

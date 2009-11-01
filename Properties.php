@@ -80,19 +80,27 @@ class Properties {
      * @param string $file The file name to load the properties from
      */
     function loadProperties() {
+        // Datei exisiert nicht
         if (!file_exists($this->file)) {
-            if (!@fopen($this->file, "w")) 
-            die("Properties.php: Kann ".$this->file." nicht schreiben - bitte Existenz der Datei und vergebene Dateirechte prüfen.");
-        }
-
-        $lines = file($this->file);
-        foreach ($lines as $line) {
-            // comments
-            if (preg_match("/^#/",$line) || preg_match("/^\s*$/",$line)) {
-                continue;
+            // Einfach nur anlegen
+            if (!@touch($this->file)) {
+                die("Properties.php: Kann ".$this->file." nicht schreiben - bitte Existenz der Datei und vergebene Dateirechte prüfen.");
             }
-            if (preg_match("/^([^=]*)=(.*)/",$line,$matches)) {
-                $this->properties[trim($matches[1])] = trim($matches[2]);
+        }
+        // Datei existiert bereits
+        else {
+            // Zeilenweise einlesen
+            if(!$lines = @file($this->file)) {
+                die("Properties.php: Kann ".$this->file." nicht öffnen - bitte Existenz der Datei und vergebene Dateirechte prüfen.");
+            }
+            foreach ($lines as $line) {
+                // Kommentare
+                if (preg_match("/^#/",$line) || preg_match("/^\s*$/",$line)) {
+                    continue;
+                }
+                if (preg_match("/^([^=]*)=(.*)/",$line,$matches)) {
+                    $this->properties[trim($matches[1])] = trim($matches[2]);
+                }
             }
         }
         @fclose($this->file);
@@ -160,7 +168,7 @@ class Properties {
      * @return array an associtive array of values
      */
     function get($key) {
-        if (isSet($this->properties[$key]) && ($this->properties[$key])) {
+        if (isset($this->properties[$key])) {
             return $this->properties[$key];
         }
         return null;

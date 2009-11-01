@@ -8,27 +8,6 @@
 *
 */
 
-
-
-/*
-######
-INHALT
-######
-		
-		Projekt "Flatfile-basiertes CMS für Einsteiger"
-		Umlautersetzung
-		Mai 2006
-		Klasse ITF04-1
-		Industrieschule Chemnitz
-
-		Ronny Monser
-		Arvid Zimmermann
-		Oliver Lorenz
-		www.mozilo.de
-
-######
-*/
-
 class SpecialChars {
 	
 // ------------------------------------------------------------------------------    
@@ -128,27 +107,14 @@ class SpecialChars {
 	}
 
 	
-// ------------------------------------------------------------------------------    
-// String für SEO-Links umlaut- und sonderzeichenbereinigen 
+
+
 // ------------------------------------------------------------------------------
-/*	function replaceSeoSpecialChars($text) {
-		$text = preg_replace("/ä/", "ae", $text);
-		$text = preg_replace("/ö/", "oe", $text);
-		$text = preg_replace("/ü/", "ue", $text);
-		$text = preg_replace("/Ä/", "Ae", $text);
-		$text = preg_replace("/Ö/", "Oe", $text);
-		$text = preg_replace("/Ü/", "Ue", $text);
-		$text = preg_replace("/ß/", "ss", $text);
-		$text = preg_replace("/\s/", "+", $text);
-		$text = preg_replace("/ /", "+", $text);
-		$text = preg_replace("/\240/", "+", $text); // für den IE: Zeichen "ð", warum auch immer -.-
-		$text = preg_replace("/\?/", "", $text);
-		$text = preg_replace("/&/", "+", $text);
-		$text = preg_replace("/€/", "euro", $text);
-		$text = preg_replace("/</", "+", $text);
-		$text = preg_replace("/>/", "+", $text);
-		$text = preg_replace("/@/", "at", $text);
-		return $text;
-	}*/
+// Hilfsfunktion: Wandelt numerische Entities im übergebenen Text in Zeichen
+// ------------------------------------------------------------------------------
+	function numeric_entities_decode($text) {
+	    return str_replace('&amp;#', '&#', $text);
+	}
+
 }
 ?>

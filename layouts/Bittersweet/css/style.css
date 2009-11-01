@@ -339,7 +339,7 @@ textarea#contact_message {
 }
 input#contact_submit {
   width:200px;
-}s
+}
 /* -------------------------------------------------------- */
 /* [bild|...] */
 /* ---------- */
@@ -440,8 +440,8 @@ td.contenttable2 {
 }
 
 /* -------------------------------------------------------- */
-/* [inhalte] */
-/* --------- */
+/* {TABLEOFCONTENTS} */
+/* ----------------- */
 div.tableofcontents ul ul {
     /*padding-left:15px;*/
 }
