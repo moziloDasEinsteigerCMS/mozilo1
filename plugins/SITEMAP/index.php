@@ -1,18 +1,22 @@
 <?php
 
 /***************************************************************
+*
 * Sitemap-Plugin für moziloCMS.
 * 
 * Mit der Variablen {SITEMAP} kann an beliebiger Stelle des CMS
 * (Template oder Inhaltsseiten) die aktuelle Sitemap eingefügt 
 * werden.
+* 
 ***************************************************************/
 
 class SITEMAP extends Plugin {
 
     /***************************************************************
     * 
-    * Gibt den HTML-Code zurück, mit dem die Plugin-Variable ersetzt wird.
+    * Gibt den HTML-Code zurück, mit dem die Plugin-Variable ersetzt 
+    * wird. Der String-Parameter $value ist Pflicht, kann aber leer 
+    * sein.
     * 
     ***************************************************************/
     function getContent($value) {
@@ -24,18 +28,25 @@ class SITEMAP extends Plugin {
     
     /***************************************************************
     * 
-    * Gibt den HTML-Code für die Plugin-Settings im Admin zurück.
+    * Gibt die Konfigurationsoptionen als Array zurück.
+    * Ist keine Konfiguration nötig, gibt die Funktion false zurück.
     * 
     ***************************************************************/
     function getConfig() {
-        return "Keine Einstellungen möglich bzw. nötig. No settings available or required.";
+        return false; // keine Konfiguration nötig
     } // function getConfig
     
     
     
     /***************************************************************
     * 
-    * Gibt die Plugin-Infos als Array zurück.
+    * Gibt die Plugin-Infos als Array zurück - in dieser 
+    * Reihenfolge:
+    *   - Name des Plugins
+    *   - Version des Plugins
+    *   - Kurzbeschreibung
+    *   - Name des Autors
+    *   - Download-URL
     * 
     ***************************************************************/
     function getInfo() {
@@ -45,7 +56,7 @@ class SITEMAP extends Plugin {
             // Plugin-Version
             "1.0",
             // Kurzbeschreibung
-            "Sitemap zum Einfügen an beliebiger Stelle",
+            "Standard-Sitemap zum Einfügen an beliebiger Stelle",
             // Name des Autors
             "mozilo",
             // Download-URL

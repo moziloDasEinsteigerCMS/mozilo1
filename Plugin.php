@@ -22,7 +22,11 @@
 
 class Plugin {
     
+    // Membervariable für eventuelle Fehlermeldungen
     var $error;
+    
+    // Membervariable für bequemen Zugriff auf die Plugin-Settings
+    var $settings; 
     
     /*
     * Konstruktor
@@ -38,6 +42,17 @@ class Plugin {
         $this->checkForMethod("getContent");
         $this->checkForMethod("getConfig");
         $this->checkForMethod("getInfo");
+        
+        // Settings-Variable als Properties-Objekt der plugin.conf instanziieren
+        if (file_exists("plugins/".get_class($this)."/plugin.conf")) {
+            $this->settings = new Properties("plugins/".get_class($this)."/plugin.conf");
+        }
+        // Wenn plugin.conf nicht vorhanden ist, wird die Fehlervariable gefüllt
+        else {
+            $syntax = new Syntax();
+            $language = new Language();
+            $this->error = $syntax->createDeadlink("{".get_class($this)."}", $language->getLanguageValue1("plugin_error_missing_pluginconf_1", get_class($this)));
+        }
     }
     
     /*

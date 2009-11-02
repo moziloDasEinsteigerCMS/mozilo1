@@ -88,7 +88,7 @@ class Properties {
             }
         }
         // Datei existiert bereits
-        else {
+        else if (filesize($this->file) > 0) {
             // Zeilenweise einlesen
             if(!$lines = @file($this->file)) {
                 die("Properties.php: Kann ".$this->file." nicht öffnen - bitte Existenz der Datei und vergebene Dateirechte prüfen.");
