@@ -1027,16 +1027,23 @@ echo "</pre>";
 // Handelt es sich um ein valides Verzeichnis / eine valide Datei?
 // ------------------------------------------------------------------------------
     function isValidDirOrFile($file) {
-        return (!in_array($file, array(
-                ".", // aktuelles Verzeichnis 
-                "..", // Parent-Verzeichnis
-                "Thumbs.db", // Windows-spezifisch
-                ".DS_Store", // Mac-spezifisch
-                "__MACOSX", // Mac-spezifisch
-                ".svn",    // SVN
-                ".cache", // Eclipse
-                "settings" // Eclipse 
-                )));
+	    # Alles, was einen Punkt vor der Datei hat
+	    if(strpos($file,".") === 0) {
+	        return false;
+	    }
+	    # alle PHP-Dateien
+	    if(substr($file,-4) == ".php") {
+	        return false;
+	    }
+	    # ...und der Rest
+	    if(in_array($file, array(
+	            "Thumbs.db", // Windows-spezifisch
+	            "__MACOSX", // Mac-spezifisch
+	            "settings" // Eclipse
+	            ))) {
+	        return false;
+	    }
+	    return true;
     }
 
 // ------------------------------------------------------------------------------
