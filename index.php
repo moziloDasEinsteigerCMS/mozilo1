@@ -198,19 +198,48 @@ echo "</pre>";
         $cattitle         = $pagecontentarray[1];
         $pagetitle         = $pagecontentarray[2];
     }
-    elseif ($USE_CMS_SYNTAX) {
-        $pagecontentarray = getContent();
-        $pagecontent    = $syntax->convertContent($pagecontentarray[0], $CAT_REQUEST, true);
-        $cattitle         = $pagecontentarray[1];
-        $pagetitle         = $pagecontentarray[2];
-      }
-    else {
-        $pagecontentarray = getContent();
-        $pagecontent    = $pagecontentarray[0];
-        $cattitle         = $pagecontentarray[1];
-        $pagetitle         = $pagecontentarray[2];
-    }
-      
+    // Inhalte aus Inhaltsseiten durch Passwort schützen
+    else { 
+        // zunächst Passwort als gesetzt und nicht eingegeben annehmen
+        $passwordok = false;
+        if (file_exists("conf/passwords.conf")) {
+            $passwords = new Properties("conf/passwords.conf"); // alle Passwörter laden
+            if ($passwords->keyExists($CAT_REQUEST.'/'.$PAGE_REQUEST)) { // nach Passwort für diese Seite suchen
+                $cattitle    = catToName($CAT_REQUEST, true);
+                $pagetitle   = $language->getLanguageValue0("passwordform_title_0");
+                if (!isset($_POST) || ($_POST == array())) // sofern kein Passwort eingegeben, nach einem Fragen
+                    $pagecontent = getPasswordForm();
+                else {
+                    if (md5($_POST["password"]) == $passwords->get($CAT_REQUEST.'/'.$PAGE_REQUEST))
+                    // richtiges Passwort eingegeben
+                        $passwordok = true;
+                    else
+                    // falsches Passwort eingegeben - Zugriff verweigern
+                        $pagecontent = $language->getLanguageValue0("passwordform_message_passwordwrong_0");
+                }
+            }
+            else
+            // diese Seite hat ein Passwort - lasse Zugriff zu
+                $passwordok = true;
+        }
+        else
+        // keine Seite hat ein Passwort - lasse Zugriff zu
+            $passwordok = true;
+        if ($passwordok) {
+            if ($USE_CMS_SYNTAX) {
+                $pagecontentarray = getContent();
+                $pagecontent    = $syntax->convertContent($pagecontentarray[0], $CAT_REQUEST, true);
+                $cattitle         = $pagecontentarray[1];
+                $pagetitle         = $pagecontentarray[2];
+              }
+            else {
+                $pagecontentarray = getContent();
+                $pagecontent    = $pagecontentarray[0];
+                $cattitle         = $pagecontentarray[1];
+                $pagetitle         = $pagecontentarray[2];
+            }
+        }
+    }  
     // Smileys ersetzen
     if ($mainconfig->get("replaceemoticons") == "true") {
         $pagecontent = $smileys->replaceEmoticons($pagecontent);
@@ -275,7 +304,19 @@ echo "</pre>";
     $HTML = replacePluginVariables($HTML);
     
     }
-
+    
+// ------------------------------------------------------------------------------
+// Formular zur Passworteingabe anzeigen
+// ------------------------------------------------------------------------------
+    function getPasswordForm() {
+        global $language;
+        // TODO: sollte auch wahlweise über ein Template gehen
+        return '<form action="index.php?'.$_SERVER['QUERY_STRING'].'" method="post">
+        '.$language->getLanguageValue0("passwordform_pagepasswordplease_0").' 
+        <input type="Password" name="password">
+        <input type="Submit" value="OK">
+        </form>';
+    }
 
 // ------------------------------------------------------------------------------
 // Zu einem Kategorienamen passendes Kategorieverzeichnis suchen und zurückgeben
