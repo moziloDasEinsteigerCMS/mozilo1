@@ -210,7 +210,7 @@ echo "</pre>";
                 if (!isset($_POST) || ($_POST == array())) // sofern kein Passwort eingegeben, nach einem Fragen
                     $pagecontent = getPasswordForm();
                 else {
-                    if (md5($_POST["password"]) == $passwords->get($CAT_REQUEST.'/'.$PAGE_REQUEST))
+                    if (md5(getRequestParam("password", false)) == $passwords->get($CAT_REQUEST.'/'.$PAGE_REQUEST))
                     // richtiges Passwort eingegeben
                         $passwordok = true;
                     else
@@ -313,8 +313,8 @@ echo "</pre>";
         // TODO: sollte auch wahlweise über ein Template gehen
         return '<form action="index.php?'.$_SERVER['QUERY_STRING'].'" method="post">
         '.$language->getLanguageValue0("passwordform_pagepasswordplease_0").' 
-        <input type="Password" name="password">
-        <input type="Submit" value="OK">
+        <input type="password" name="password" />
+        <input type="submit" value="'.$language->getLanguageValue0("passwordform_send_0").'" />
         </form>';
     }
 
