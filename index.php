@@ -1101,16 +1101,16 @@ echo "</pre>";
             // Es ist ein Fehler aufgetreten!
             if ($errormessage == "") {
                 // Eines der Pflichtfelder leer?
-                if (($config_name[1] == "true") && ($name == "")) {
+                if (($config_name[2] == "true") && ($name == "")) {
                     $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_name_0");
                 }
-                else if (($config_mail[1] == "true") && ($mail == "")) {
+                else if (($config_mail[2] == "true") && ($mail == "")) {
                     $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_mail_0");
                 }
-                else if (($config_website[1] == "true") && ($website == "")) {
+                else if (($config_website[2] == "true") && ($website == "")) {
                     $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_website_0");
                 }
-                else if (($config_message[1] == "true") && ($message == "")) {
+                else if (($config_message[2] == "true") && ($message == "")) {
                     $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_message_0");
                 }
             }
@@ -1120,16 +1120,16 @@ echo "</pre>";
             }
             else {
                 $mailcontent = "";
-                if ($config_name[0] == "true") {
+                if ($config_name[1] == "true") {
                     $mailcontent .= $language->getLanguageValue0("contactform_name_0").":\t".$name."\r\n";
                 }
-                if ($config_mail[0] == "true") {
+                if ($config_mail[1] == "true") {
                     $mailcontent .= $language->getLanguageValue0("contactform_mail_0").":\t".$mail."\r\n";
                 }
-                if ($config_website[0] == "true") {
+                if ($config_website[1] == "true") {
                     $mailcontent .= $language->getLanguageValue0("contactform_website_0").":\t".$website."\r\n";
                 }
-                if ($config_message[0] == "true") {
+                if ($config_message[1] == "true") {
                     $mailcontent .= "\r\n".$language->getLanguageValue0("contactform_message_0").":\r\n".$message."\r\n";
                 }
                 $mailsubject = $language->getLanguageValue1("contactform_mailsubject_1", html_entity_decode($WEBSITE_NAME,ENT_COMPAT,'ISO-8859-1'));
@@ -1163,30 +1163,50 @@ echo "</pre>";
         ."<input type=\"hidden\" name=\"cat\" value=\"".$CAT_REQUEST."\" />"
         ."<input type=\"hidden\" name=\"page\" value=\"".$PAGE_REQUEST."\" />"
         ."<table id=\"contact_table\" summary=\"contact form table\">";
-        if ($config_name[0] == "true") {
-            $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_name_0");
-            if ($config_name[1] == "true") {
+        if ($config_name[1] == "true") {
+            // Bezeichner aus formular.conf nutzen, wenn gesetzt
+            if ($config_name[0] != "") {
+                $form .= "<tr><td style=\"padding-right:10px;\">".$config_name[0];
+            } else {
+                $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_name_0");
+            }
+            if ($config_name[2] == "true") {
                 $form .= "*";
             }
             $form .= "</td><td><input type=\"text\" id=\"contact_name\" name=\"".$_SESSION['contactform_name']."\" value=\"".$name."\" /></td></tr>";
         }
-        if ($config_mail[0] == "true") {
-            $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_mail_0");
-            if ($config_mail[1] == "true") {
+        if ($config_mail[1] == "true") {
+            // Bezeichner aus formular.conf nutzen, wenn gesetzt
+            if ($config_mail[0] != "") {
+                $form .= "<tr><td style=\"padding-right:10px;\">".$config_mail[0];
+            } else {
+                $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_mail_0");
+            }
+            if ($config_mail[2] == "true") {
                 $form .= "*";
             }
             $form .= "</td><td><input type=\"text\" id=\"contact_mail\" name=\"".$_SESSION['contactform_mail']."\" value=\"".$mail."\" /></td></tr>";
         }
-        if ($config_website[0] == "true") {
-            $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_website_0");
-            if ($config_website[1] == "true") {
+        if ($config_website[1] == "true") {
+            // Bezeichner aus formular.conf nutzen, wenn gesetzt
+            if ($config_website[0] != "") {
+                $form .= "<tr><td style=\"padding-right:10px;\">".$config_website[0];
+            } else {
+                $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_website_0");
+            }
+            if ($config_website[2] == "true") {
                 $form .= "*";
             }
             $form .= "</td><td><input type=\"text\" id=\"contact_website\" name=\"".$_SESSION['contactform_website']."\" value=\"".$website."\" /></td></tr>";
         }
-        if ($config_message[0] == "true") {
-            $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_message_0");
-            if ($config_message[1] == "true") {
+        if ($config_message[1] == "true") {
+            // Bezeichner aus formular.conf nutzen, wenn gesetzt
+            if ($config_message[0] != "") {
+                $form .= "<tr><td style=\"padding-right:10px;\">".$config_message[0];
+            } else {
+                $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_message_0");
+            }
+            if ($config_message[2] == "true") {
                 $form .= "*";
             }
             $form .= "</td><td><textarea rows=\"10\" cols=\"50\" id=\"contact_message\" name=\"".$_SESSION['contactform_message']."\">".$message."</textarea></td></tr>";
