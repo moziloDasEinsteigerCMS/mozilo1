@@ -446,28 +446,28 @@ class Syntax {
 
             // Text fett
             elseif ($attribute == "fett"){
-                $content = str_replace ($match, "<b>$value</b>", $content);
+                $content = str_replace ($match, "<b class=\"contentbold\">$value</b>", $content);
             }
 
             // Text kursiv
             elseif ($attribute == "kursiv"){
-                $content = str_replace ($match, "<i>$value</i>", $content);
+                $content = str_replace ($match, "<i class=\"contentitalic\">$value</i>", $content);
             }
 
             // Text fettkursiv 
             // (veraltet seit Version 1.7 - nur aus Gründen der Abwärtskompatibilität noch mitgeführt)
             elseif ($attribute == "fettkursiv"){
-                $content = str_replace ($match, "<b><i>$value</i></b>", $content);
+                $content = str_replace ($match, "<b class=\"contentbold\"><i class=\"contentitalic\">$value</i></b>", $content);
             }
 
             // Text unterstrichen
             elseif ($attribute == "unter"){
-                $content = str_replace ($match, "<u>$value</u>", $content);
+                $content = str_replace ($match, "<u class=\"contentunderlined\">$value</u>", $content);
             }
 
             // Text durchgestrichen
             elseif ($attribute == "durch"){
-                $content = str_replace ($match, "<s>$value</s>", $content);
+                $content = str_replace ($match, "<s class=\"contentstrikethrough \">$value</s>", $content);
             }
 
             // Überschrift groß
