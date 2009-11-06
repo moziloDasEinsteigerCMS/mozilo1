@@ -146,13 +146,140 @@ class DEMOPLUGIN extends Plugin {
     /***************************************************************
     * 
     * Gibt die Konfigurationsoptionen als Array zurück.
-    * Ist keine Konfiguration nötig, gibt die Funktion false zurück.
+    * Ist keine Konfiguration nötig, ist dieses Array leer.
     * 
     ***************************************************************/
     function getConfig() {
-        return false; // keine Konfiguration nötig
-    } // function getConfig
-    
+
+    	/***************************************************************
+        * 
+        * Details (Beispiele folgen weiter unten):
+        * 
+        * Die Funktion liefert ein Array zurück. Dieses enthält die 
+        * Eingabefelder, mit denen der User im moziloAdmin Einstellungen 
+        * am Plugin vornehmen kann.
+        * Der "type"-Parameter der Eingabefelder bestimmt, um welche Art 
+        * Eingabefeld es sich handelt und ist Pflicht. Folgende Werte
+        * stehen zur Verfügung:
+        *   text            Textfeld (beliebiger Text)
+        *   textarea        mehrzeilige Texteingabe
+        *   password        Passwortfeld (Anzeige des Inhalts als ***)
+        *   checkbox        Checkbox (ja/nein)
+        *   radio           Radio-Buttons (entweder/oder)
+        *   select          Auswahlliste
+        *   file            Datei-Upload
+        * 
+        * Die Werte der Eingabefelder werden in die plugin.conf des 
+        * Plugins geschrieben - der Name des Eingabefelds ist dabei der 
+        * Schlüssel in der plugin.conf (siehe Beispiele).
+        * 
+        ***************************************************************/
+        
+    	
+    	// Rückgabe-Array initialisieren
+    	// Das muß auf jeden Fall geschehen!
+        $config = array();
+        
+        
+        /***************************************************************
+        * Beispiel: Normales Textfeld, beliebige Eingaben
+        * - das Textfeld heißt "texteingabe"; gibt der Benutzer "abc" 
+        *   ein und speichert die Plugin-Einstellungen, wird in der 
+        *   plugin.conf folgende Zeile angelegt bzw. überschrieben:
+        *   texteingabe = abc 
+        ***************************************************************/
+        
+        $config['texteingabe']  = array(
+            "type" => "text",                           // Pflicht:  Eingabetyp
+            "description" => "Bitte Wert eingeben",     // optional: Beschreibung
+            "maxlength" => "4",                         // optional: maximale Länge
+            "size" => "4",                              // optional: dargestellte Zeichen
+            "regex" => "[a-z]{3}"                       // optional: Erlaubte Werte als regulärer Ausdruck (hier: drei kleine Buchstaben; wird beim Speichern der Einstellungen überprüft)
+            );
+
+            
+        /***************************************************************
+        * Beispiel: Mehrzeiliges Textfeld, beliebige Eingaben
+        ***************************************************************/
+            
+        $config['mehrzeiligertext'] = array(
+            "type" => "textarea",                       // Pflicht:  Eingabetyp 
+            "cols" => "4",                              // Pflicht:  Spaltenanzahl 
+            "rows" => "4",                              // Pflicht:  Zeilenanzahl
+            "description" => "Bitte Text eingeben",     // optional: Beschreibung
+            "regex" => ".*"                             // optional: Erlaubte Werte als regulärer Ausdruck (hier: beliebige Zeichen; wird beim Speichern der Einstellungen überprüft)
+            );
+
+            
+        /***************************************************************
+        * Beispiel: Passwortfeld, beliebige Eingaben
+        ***************************************************************/
+        
+        $config['passwort']  = array(
+            "type" => "password",                       // Pflicht:  Eingabetyp
+            "saveasmd5" => "true",                      // Pflicht:  soll das Passwort MD5-verschlüsselt in der plugin.conf abgelegt werden? (true/false)
+            "description" => "Bitte Passwort eingeben", // optional: Beschreibung
+            "maxlength" => "4",                         // optional: maximale Länge
+            "size" => "4",                              // optional: dargestellte Zeichen
+            "regex" => "^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).*$" // optional: Erlaubte Werte als regulärer Ausdruck (hier: mindestens acht Zeichen, bestehend aus Klein- und Großbuchstaben sowie Ziffern); wird beim Speichern der Einstellungen überprüft
+            );
+
+            
+        /***************************************************************
+        * Beispiel: Checkbox (aktiv oder nicht aktiv)
+        ***************************************************************/
+        
+        $config['janeinoption'] = array(
+            "type" => "checkbox",                       // Pflicht:  Eingabetyp 
+            "description" => "Ja oder nein?"            // optional: Beschreibung
+            );
+
+        
+        /***************************************************************
+        * Beispiel: Radio-Buttons (entweder oder)
+        ***************************************************************/
+        
+        $config['entwederoder'] = array(
+            "type" => "radio",                          // Pflicht:  Eingabetyp
+            "contents" => array(                        // Pflicht:  Werte der einzelnen Optionen als Array
+                "blau",
+                "rot",
+                "gruen"
+                ),
+            "description" => "Welche Farbe?"           // optional: Beschreibung 
+            );
+        
+        
+        /***************************************************************
+        * Beispiel: Auswahlliste (Einzel- oder Mehrfachauswahl)
+        ***************************************************************/
+            
+        $config['auswahl'] = array(
+            "type" => "select",                         // Pflicht:  Eingabetyp
+            "contents" => array(                        // Pflicht:  Wählbare Elemente (kann auch ein leeres Array() sein)
+                "Australien",
+                "Venezuela",
+                "Chemnitz"),
+            "description" => "Ich mache Urlaub in...",  // optional: Beschreibung
+            "multiple" => "false",                      // optional: Mehrfachauswahl erlauben
+            "size" => "3"                               // optional: Größe
+            ); 
+
+        
+        /***************************************************************
+        * Beispiel: Datei-Upload
+        ***************************************************************/
+        
+        $config['datei'] = array(
+            "type" => "file",                           // Pflicht:  Eingabetyp
+            "uploaddir" => "",                          // Ablageverzeichnis für die hochgeladene Datei (relativer Pfad vom Plugin-Verzeichnis aus; leer lassen heißt, daß Dateien im Plugin-Wurzelverzeichnis abgelegt werden) 
+            "description" => "Diese Datei hochladen:"   // optional: Beschreibung
+            );
+
+            
+        // Nicht vergessen: Das gesamte Array zurückgeben
+        return $config;
+    } // function getConfig    
     
     
     /***************************************************************

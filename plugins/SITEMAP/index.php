@@ -33,7 +33,7 @@ class SITEMAP extends Plugin {
     * 
     ***************************************************************/
     function getConfig() {
-        return false; // keine Konfiguration nötig
+        return array(); // keine Konfiguration nötig
     } // function getConfig
     
     
