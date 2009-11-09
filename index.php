@@ -25,7 +25,7 @@ echo "</pre>";
     require_once("Plugin.php");
     
     // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
-    //@ini_set("display_errors", 0);
+    @ini_set("display_errors", 0);
 
     $language       = new Language();
     $mainconfig     = new Properties("conf/main.conf");
