@@ -246,7 +246,12 @@ class DEMOPLUGIN extends Plugin {
                 "rot",
                 "gruen"
                 ),
-            "description" => "Welche Farbe?"           // optional: Beschreibung 
+            "description" => "Welche Farbe?",           // optional: Beschreibung
+            "descriptions" => array(                    // optional: Beschreibung der einzelnen Auswahlmöglichkeiten
+                "blau",
+                "rot",
+                "grün"
+                )
             );
         
         
@@ -256,11 +261,17 @@ class DEMOPLUGIN extends Plugin {
             
         $config['auswahl'] = array(
             "type" => "select",                         // Pflicht:  Eingabetyp
-            "contents" => array(                        // Pflicht:  Wählbare Elemente (kann auch ein leeres Array() sein)
+            "contents" => array(                        // Pflicht:  Werte der einzelnen Optionen als Array
+                "AUS",
+                "VEN",
+                "CHE"
+                ),
+            "description" => "Ich mache Urlaub in...",  // optional: Beschreibung
+            "descriptions" => array(                    // optional: Beschreibung der einzelnen Auswahlmöglichkeiten
                 "Australien",
                 "Venezuela",
-                "Chemnitz"),
-            "description" => "Ich mache Urlaub in...",  // optional: Beschreibung
+                "Chemnitz"
+                ),
             "multiple" => "false",                      // optional: Mehrfachauswahl erlauben
             "size" => "3"                               // optional: Größe
             ); 
