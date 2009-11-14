@@ -26,7 +26,7 @@
 class DEMOPLUGIN extends Plugin {
 
 
-	/***************************************************************
+    /***************************************************************
     * 
     * Gibt den HTML-Code zurück, mit dem die Plugin-Variable ersetzt 
     * wird. Der String-Parameter $value ist Pflicht, kann aber leer 
@@ -73,18 +73,18 @@ class DEMOPLUGIN extends Plugin {
         * - Nutzung: {DEMOPLUGIN|moziloCMS rockt!}
         * - Ausgabe: Yeah! moziloCMS rockt!
         ***************************************************************/
-    	
+        
         // return ("Yeah! ".$value); // zum Testen entkommentieren!
 
-    	
-    	/***************************************************************
+        
+        /***************************************************************
         * Beispiel: Nutzung des Parameters $value (der mehrere 
         * kommaseparierte Werte enthält)
         * - Nutzung: {DEMOPLUGIN|Wert1,Wert2,Wert3,...}
         * - Ausgabe: Der erste Wert ist Wert1
         ***************************************************************/
         
-    	$values = explode(",", $value);
+        $values = explode(",", $value);
         // return ("Der erste Wert ist ".$values[0]); // zum Testen entkommentieren!
     
     
@@ -103,7 +103,7 @@ class DEMOPLUGIN extends Plugin {
         * Konfiguration 
         ***************************************************************/
 
-    	global $mainconfig; // eine globale Variable der index.php!
+        global $mainconfig; // eine globale Variable der index.php!
         // return $mainconfig->get("websitetitle"); // zum Testen entkommentieren!
     
     
@@ -151,7 +151,7 @@ class DEMOPLUGIN extends Plugin {
     ***************************************************************/
     function getConfig() {
 
-    	/***************************************************************
+        /***************************************************************
         * 
         * Details (Beispiele folgen weiter unten):
         * 
@@ -175,9 +175,9 @@ class DEMOPLUGIN extends Plugin {
         * 
         ***************************************************************/
         
-    	
-    	// Rückgabe-Array initialisieren
-    	// Das muß auf jeden Fall geschehen!
+        
+        // Rückgabe-Array initialisieren
+        // Das muß auf jeden Fall geschehen!
         $config = array();
         
         
@@ -191,10 +191,10 @@ class DEMOPLUGIN extends Plugin {
         
         $config['texteingabe']  = array(
             "type" => "text",                           // Pflicht:  Eingabetyp
-            "description" => "Bitte Wert eingeben",     // optional: Beschreibung
-            "maxlength" => "4",                         // optional: maximale Länge
-            "size" => "4",                              // optional: dargestellte Zeichen
-            "regex" => "[a-z]{3}"                       // optional: Erlaubte Werte als regulärer Ausdruck (hier: drei kleine Buchstaben; wird beim Speichern der Einstellungen überprüft)
+            "description" => "Bitte Wert eingeben",     // Pflicht:  Beschreibung
+            "maxlength" => "100",                       // optional: maximale Länge
+            "size" => "30",                             // optional: dargestellte Zeichen
+            "regex" => "/^[a-z]{3}$/"                   // optional: Erlaubte Werte als regulärer Ausdruck (hier: drei kleine Buchstaben; wird beim Speichern der Einstellungen überprüft)
             );
 
             
@@ -204,10 +204,10 @@ class DEMOPLUGIN extends Plugin {
             
         $config['mehrzeiligertext'] = array(
             "type" => "textarea",                       // Pflicht:  Eingabetyp 
-            "cols" => "4",                              // Pflicht:  Spaltenanzahl 
-            "rows" => "4",                              // Pflicht:  Zeilenanzahl
-            "description" => "Bitte Text eingeben",     // optional: Beschreibung
-            "regex" => ".*"                             // optional: Erlaubte Werte als regulärer Ausdruck (hier: beliebige Zeichen; wird beim Speichern der Einstellungen überprüft)
+            "cols" => "30",                             // Pflicht:  Spaltenanzahl 
+            "rows" => "5",                              // Pflicht:  Zeilenanzahl
+            "description" => "Bitte Text eingeben",     // Pflicht:  Beschreibung
+            "regex" => "/^.*$/"                         // optional: Erlaubte Werte als regulärer Ausdruck (hier: beliebige Zeichen; wird beim Speichern der Einstellungen überprüft)
             );
 
             
@@ -218,10 +218,10 @@ class DEMOPLUGIN extends Plugin {
         $config['passwort']  = array(
             "type" => "password",                       // Pflicht:  Eingabetyp
             "saveasmd5" => "true",                      // Pflicht:  soll das Passwort MD5-verschlüsselt in der plugin.conf abgelegt werden? (true/false)
-            "description" => "Bitte Passwort eingeben", // optional: Beschreibung
-            "maxlength" => "4",                         // optional: maximale Länge
-            "size" => "4",                              // optional: dargestellte Zeichen
-            "regex" => "^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).*$" // optional: Erlaubte Werte als regulärer Ausdruck (hier: mindestens acht Zeichen, bestehend aus Klein- und Großbuchstaben sowie Ziffern); wird beim Speichern der Einstellungen überprüft
+            "description" => "Bitte Passwort eingeben", // Pflicht:  Beschreibung
+            "maxlength" => "100",                       // optional: maximale Länge
+            "size" => "30",                             // optional: dargestellte Zeichen
+            "regex" => "/^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).*$/" // optional: Erlaubte Werte als regulärer Ausdruck (hier: mindestens acht Zeichen, bestehend aus Klein- und Großbuchstaben sowie Ziffern); wird beim Speichern der Einstellungen überprüft
             );
 
             
@@ -231,7 +231,7 @@ class DEMOPLUGIN extends Plugin {
         
         $config['janeinoption'] = array(
             "type" => "checkbox",                       // Pflicht:  Eingabetyp 
-            "description" => "Ja oder nein?"            // optional: Beschreibung
+            "description" => "Ja oder nein?"            // Pflicht:  Beschreibung
             );
 
         
@@ -241,17 +241,22 @@ class DEMOPLUGIN extends Plugin {
         
         $config['entwederoder'] = array(
             "type" => "radio",                          // Pflicht:  Eingabetyp
-            "contents" => array(                        // Pflicht:  Werte der einzelnen Optionen als Array
-                "blau",
+            "description" => "Welche Farbe?",           // Pflicht:  Beschreibung
+            // Pflicht: Beschreibung der einzelnen Auswahlmöglichkeiten
+            // entweder so...
+            "descriptions" => array(
+                "blau",                 // "blau" wird sowohl angezeigt als auch in die plugin.conf gespeichert
                 "rot",
                 "gruen"
-                ),
-            "description" => "Welche Farbe?",           // optional: Beschreibung
-            "descriptions" => array(                    // optional: Beschreibung der einzelnen Auswahlmöglichkeiten
-                "blau",
-                "rot",
-                "grün"
                 )
+            // ..oder so:
+/*
+            "descriptions" => array(
+                "blau" => "Blau",       // angezeigt wird "Blau", in die plugin.conf gespeichert wird "blau"
+                "rot" => "Rot",
+                "gruen" => "Grün"
+                )
+*/
             );
         
         
@@ -261,19 +266,23 @@ class DEMOPLUGIN extends Plugin {
             
         $config['auswahl'] = array(
             "type" => "select",                         // Pflicht:  Eingabetyp
-            "contents" => array(                        // Pflicht:  Werte der einzelnen Optionen als Array
-                "AUS",
-                "VEN",
-                "CHE"
-                ),
-            "description" => "Ich mache Urlaub in...",  // optional: Beschreibung
-            "descriptions" => array(                    // optional: Beschreibung der einzelnen Auswahlmöglichkeiten
-                "Australien",
+            "description" => "Ich mache Urlaub in...",  // Pflicht:  Beschreibung
+            // Pflicht:  Beschreibung der einzelnen Auswahlmöglichkeiten
+            // entweder so...
+            "descriptions" => array(
+                "Australien",           // "Australien" wird sowohl angezeigt als auch in die plugin.conf gespeichert
                 "Venezuela",
                 "Chemnitz"
                 ),
-            "multiple" => "false",                      // optional: Mehrfachauswahl erlauben
-            "size" => "3"                               // optional: Größe
+            // ...oder so:
+/*
+            "descriptions" => array(
+                "aus" => "Australien",  // angezeigt wird "Australien", in die plugin.conf gespeichert wird "aus"
+                "ven" => "Venezuela",
+                "che" => "Chemnitz"
+                ),
+*/
+            "multiple" => "true"                        // optional: Mehrfachauswahl erlauben
             ); 
 
         
