@@ -15,6 +15,7 @@ echo "<pre style=\"position:fixed;background-color:#000;color:#0f0;padding:5px;f
 print_r($_REQUEST);
 echo "</pre>";
 */
+$URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("index.php")));
 
     require_once("Language.php");
     require_once("Properties.php");
@@ -25,7 +26,7 @@ echo "</pre>";
     require_once("Plugin.php");
     
     // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
-    @ini_set("display_errors", 0);
+#    @ini_set("display_errors", 0);
 
     $language       = new Language();
     $mainconfig     = new Properties("conf/main.conf");
@@ -40,12 +41,13 @@ echo "</pre>";
     $EXT_PAGE       = ".txt";
     $EXT_HIDDEN     = ".hid";
     $EXT_DRAFT      = ".tmp";
+    $EXT_LINK       = ".lnk";
 
     // Config-Parameter auslesen
     $LAYOUT_DIR     = $specialchars->replaceSpecialChars($mainconfig->get("cmslayout"),true);
     $TEMPLATE_FILE  = "layouts/$LAYOUT_DIR/template.html";
-    $CSS_FILE       = "layouts/$LAYOUT_DIR/css/style.css";
-    $FAVICON_FILE   = "layouts/$LAYOUT_DIR/favicon.ico";
+    $CSS_FILE       = $URL_BASE."layouts/$LAYOUT_DIR/css/style.css";
+    $FAVICON_FILE   = $URL_BASE."layouts/$LAYOUT_DIR/favicon.ico";
     // Einstellungen für Kontaktformular
     $contactformconfig  = new Properties("formular/formular.conf");
     $contactformcalcs   = new Properties("formular/aufgaben.conf");
@@ -118,6 +120,8 @@ echo "</pre>";
         global $EXT_PAGE;
         global $mainconfig;
 
+#echo $CAT_REQUEST."<br>\n";
+#echo $PAGE_REQUEST."<br>\n";
         // Überprüfung der gegebenen Parameter
         if (
                 // Wenn keine Kategorie übergeben wurde...
@@ -171,6 +175,7 @@ echo "</pre>";
         global $mainconfig;
         global $smileys;
         global $specialchars;
+        global $URL_BASE;
 
     if (!$file = @fopen($specialchars->rebuildSpecialChars($TEMPLATE_FILE, false, false), "r"))
         die($language->getLanguageValue1("message_template_error_1", $TEMPLATE_FILE));
@@ -252,7 +257,7 @@ echo "</pre>";
 
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
-    $HTML = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR, $HTML);
+    $HTML = preg_replace('/{LAYOUT_DIR}/', $URL_BASE."layouts/".$LAYOUT_DIR, $HTML);
 
     // Platzhalter ersetzen
     $HTML = replacePlaceholders($HTML, $cattitle, $pagetitle);
@@ -433,7 +438,7 @@ echo "</pre>";
                                         );
         }
         else
-            return "";
+            return array("","","");
     }
 
 
@@ -447,7 +452,9 @@ echo "</pre>";
         global $EXT_DRAFT;
         global $EXT_HIDDEN;
         global $EXT_PAGE;
+        global $EXT_LINK;
 
+#echo "$dir<br>\n";
         $currentdir = opendir($dir);
         $i=0;
         $files = "";
@@ -459,6 +466,7 @@ echo "</pre>";
                     (
                         (!$iscatdir)
                         || (substr($file, strlen($file)-4, strlen($file)) == $EXT_PAGE)
+                        || (substr($file, strlen($file)-4, strlen($file)) == $EXT_LINK)
                         || ($showhidden && (substr($file, strlen($file)-4, strlen($file)) == $EXT_HIDDEN))
                     )
                     // ...und nicht $CONTENT_FILES_DIR
@@ -489,23 +497,37 @@ echo "</pre>";
         global $mainconfig;
         global $language;
         global $syntax;
+        global $URL_BASE;
+        global $EXT_LINK;
 
         $mainmenu = "<ul class=\"mainmenu\">";
         // Kategorien-Verzeichnis einlesen
         $categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false, false);
+/*
+echo "<pre>";
+print_r($categoriesarray);
+echo "</pre><br>\n";*/
         // numerische Accesskeys für angezeigte Menüpunkte
         $currentaccesskey = 0;
         // Jedes Element des Arrays ans Menü anhängen
         foreach ($categoriesarray as $currentcategory) {
+            # Mod Rewrite
+            $url = "index.php?cat=".$currentcategory;
+            if($mainconfig->get("modrewrite") == "true") {
+                $url = $URL_BASE.$currentcategory.".html";
+            }
+            if(substr($currentcategory,-(strlen($EXT_LINK))) == $EXT_LINK) {
+               $mainmenu .= '<li class="mainmenu">'.menuLink($currentcategory,"menu")."</li>";
+            }
             // Wenn die Kategorie keine Contentseiten hat, zeige sie nicht an
-            if (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true, false) == "") {
+            elseif (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true, false) == "") {
                 $mainmenu .= "";
             }
             // Aktuelle Kategorie als aktiven Menüpunkt anzeigen...
             elseif ($currentcategory == $CAT_REQUEST) {
                 $currentaccesskey++;
                 $mainmenu .= "<li class=\"mainmenu\">".
-                    "<a href=\"index.php?cat=".$currentcategory."\" class=\"menuactive\" accesskey=\"$currentaccesskey\"".
+                    "<a href=\"".$url."\" class=\"menuactive\" accesskey=\"$currentaccesskey\"".
                     $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_category_1", catToName($currentcategory, false))).
                     ">".catToName($currentcategory, false)."</a>";
                 if ($mainconfig->get("usesubmenu") > 0) {
@@ -517,9 +539,9 @@ echo "</pre>";
             else {
                 $currentaccesskey++;
                 $mainmenu .= "<li class=\"mainmenu\">".
-                    "<a href=\"index.php?cat=".$currentcategory."\" class=\"menu\" accesskey=\"$currentaccesskey\"".
-                    $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_category_1", catToName($currentcategory, false))).
-                    ">".catToName($currentcategory, false)."</a>";
+                    "<a href=\"".$url."\" class=\"menu\" accesskey=\"$currentaccesskey\"".
+                     $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_category_1", catToName($currentcategory, false))).
+                     ">".catToName($currentcategory, false)."</a>";
                 if ($mainconfig->get("usesubmenu") == 2) {
                     $mainmenu .= getDetailMenu($currentcategory);
                 }
@@ -545,6 +567,8 @@ echo "</pre>";
         global $specialchars;
         global $mainconfig;
         global $syntax;
+        global $URL_BASE;
+        global $EXT_LINK;
 
         if ($mainconfig->get("usesubmenu") > 0)
             $cssprefix = "submenu";
@@ -578,7 +602,7 @@ echo "</pre>";
                 $currentaccesskey++;
                 // Inhaltsseite nicht anzeigen, wenn sie genauso heißt wie die Kategorie
                 if ($mainconfig->get("hidecatnamedpages") == "true") {
-                    if(substr($currentcontent, 3, strlen($currentcontent) - 7) == substr($CAT_REQUEST, 3, strlen($CAT_REQUEST) - 3)) {
+                    if(substr($currentcontent, 3, strlen($currentcontent) - 7) == substr($CAT_REQUEST, 3, strlen($CAT_REQUEST) - 3) and substr($currentcontent,-(strlen($EXT_LINK))) != $EXT_LINK) {
                         // Wenn es in der Kategorie nur diese eine (dank hidecatnamedpages eh nicht angezeigte) Seite gibt,
                         // dann gib als Detailmenü gleich einen Leerstring zurück
                         if (count($contentarray) == 1) {
@@ -590,13 +614,18 @@ echo "</pre>";
                         }
                     }
                 }
+                # Mod Rewrite
+                $url = "index.php?cat=".$cat."&amp;page=".substr($currentcontent, 0, strlen($currentcontent) - 4);
+                if($mainconfig->get("modrewrite") == "true") {
+                    $url = $URL_BASE.$cat."/".substr($currentcontent, 0, strlen($currentcontent) - 4).".html";
+                }
                 // Aktuelle Inhaltsseite als aktiven Menüpunkt anzeigen...
                 if (
                     ($CAT_REQUEST == $cat) // aktive Kategorie
                     && (substr($currentcontent, 0, strlen($currentcontent) - 4) == $PAGE_REQUEST) // aktive Seite
+                    && (substr($currentcontent, -(strlen($EXT_LINK))) != $EXT_LINK) // aktive Seite
                 ) {
-                    $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?cat=".$cat."&amp;page=".
-                                                    substr($currentcontent, 0, strlen($currentcontent) - 4).
+                    $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$url.
                                                     "\" class=\"".$cssprefix."active\" accesskey=\"".chr($currentaccesskey+96)."\"".
                                                     $syntax->getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", pageToName($currentcontent, false), catToName($cat, false))).
                                                     ">".
@@ -605,13 +634,16 @@ echo "</pre>";
                 }
                 // ...alle anderen als normalen Menüpunkt.
                 else {
-                    $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?cat=".$cat."&amp;page=".
-                                                    substr($currentcontent, 0, strlen($currentcontent) - 4).
+                    if(substr($currentcontent,-(strlen($EXT_LINK))) == $EXT_LINK) {
+                        $detailmenu .= '<li class="detailmenu">'.menuLink($currentcontent,$cssprefix)."</li>";
+                    } else {
+                        $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$url.
                                                     "\" class=\"".$cssprefix."\" accesskey=\"".chr($currentaccesskey+96)."\"".
                                                     $syntax->getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", pageToName($currentcontent, false), catToName($cat, false))).
                                                     ">".
                                                     pageToName($currentcontent, false).
                                                     "</a></li>";
+            }
                 }
             }
         }
@@ -628,7 +660,7 @@ echo "</pre>";
         global $mainconfig;
         global $specialchars;
 
-        $form = "<form accept-charset=\"ISO-8859-1\" method=\"get\" action=\"index.php\" class=\"searchform\"><fieldset id=\"searchfieldset\">"
+        $form = "<form accept-charset=\"ISO-8859-1\" method=\"get\" action=\"index.php.html\" class=\"searchform\"><fieldset id=\"searchfieldset\">"
         ."<input type=\"hidden\" name=\"action\" value=\"search\" />"
         ."<input type=\"text\" name=\"query\" value=\"\" class=\"searchtextfield\" accesskey=\"s\" />"
         ."<input type=\"image\" name=\"action\" value=\"search\" src=\"layouts/".$specialchars->replaceSpecialChars($mainconfig->get("cmslayout"), true)."/grafiken/searchicon.gif\" alt=\"".$language->getLanguageValue0("message_search_0")."\" class=\"searchbutton\"".getTitleAttribute($language->getLanguageValue0("message_search_0"))." />"
@@ -661,6 +693,10 @@ echo "</pre>";
         }
         }
         closedir($currentdir);
+/*                        $url = "index.php?cat=$currentcategory&amp;page=".substr($matchingpage, 0, strlen($matchingpage) - 4);
+                        if($mainconfig->get("modrewrite") == "true") {
+                            $url = $URL_BASE.$currentcategory."/".substr($matchingpage, 0, strlen($matchingpage) - 4).".html";
+                        }*/
         
         $lastchangedpage = $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true);
         $linktolastchangedpage = "<a href=\"index.php?cat=".$latestchanged['cat']."&amp;page=".substr($latestchanged['file'], 0, strlen($latestchanged['file'])-4)."\"".getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true), $specialchars->rebuildSpecialChars(substr($latestchanged['cat'], 3, strlen($latestchanged['cat'])-3), true, true)))." id=\"lastchangelink\">".$lastchangedpage."</a>";
@@ -712,6 +748,8 @@ echo "</pre>";
         global $language;
         global $specialchars;
         global $mainconfig;
+        global $EXT_LINK;
+        global $URL_BASE;
         
         $showhiddenpages = ($mainconfig->get("showhiddenpagesinsitemap") == "true");
         
@@ -730,9 +768,15 @@ echo "</pre>";
             // Alle Inhaltsseiten der aktuellen Kategorie auflisten...
             // Jedes Element des Arrays an die Sitemap anhängen
             foreach ($contentarray as $currentcontent) {
-                $sitemap .= "<li><a href=\"index.php?cat=$currentcategory&amp;page=".
-                                                    substr($currentcontent, 0, strlen($currentcontent) - 4).
-                                                    "\"".getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", pageToName($currentcontent, false), catToName($currentcategory, false))).">".
+                # ist ein link
+                if(substr($currentcontent,-(strlen($EXT_LINK))) == $EXT_LINK) {
+                    continue;
+                }
+                $url = "index.php?cat=$currentcategory&amp;page=".substr($currentcontent, 0, strlen($currentcontent) - 4);
+                if($mainconfig->get("modrewrite") == "true") {
+                    $url = $URL_BASE.$currentcategory."/".substr($currentcontent, 0, strlen($currentcontent) - 4).".html";
+                }
+                $sitemap .= "<li><a href=\"$url\"".getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", pageToName($currentcontent, false), catToName($currentcategory, false))).">".
                                                     pageToName($currentcontent, false).
                                                     "</a></li>";
             }
@@ -755,7 +799,9 @@ echo "</pre>";
         global $language;
         global $specialchars;
         global $mainconfig;
-        
+        global $URL_BASE;
+        global $EXT_LINK;
+
         $showhiddenpages = ($mainconfig->get("showhiddenpagesinsearch") == "true");
         $matchesoverall = 0;
         $searchresults = "";
@@ -775,14 +821,19 @@ echo "</pre>";
 
                 // Wenn die Kategorie keine Contentseiten hat, direkt zur nächsten springen
                 $contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true, $showhiddenpages);
-                if ($contentarray == "")
+                if ($contentarray == "") {
                     continue;
+                }
 
                 $matchingpages = array();
                 $i = 0;
 
                 // Alle Inhaltsseiten durchsuchen
                 foreach ($contentarray as $currentcontent) {
+                    # wenns ein link ist
+                    if(substr($currentcontent,-(strlen($EXT_LINK))) == $EXT_LINK) {
+                        continue;
+                    }
                     // Jedes Suchwort
                     foreach($queryarray as $query) {
                         if ($query == "")
@@ -803,12 +854,15 @@ echo "</pre>";
                     $categoryname = catToName($currentcategory, false);
                     $searchresults .= "<h2>$categoryname</h2><ul>";
                     foreach ($matchingpages as $matchingpage) {
+                        $url = "index.php?cat=$currentcategory&amp;page=".substr($matchingpage, 0, strlen($matchingpage) - 4);
+                        if($mainconfig->get("modrewrite") == "true") {
+                            $url = $URL_BASE.$currentcategory."/".substr($matchingpage, 0, strlen($matchingpage) - 4).".html";
+                        }
                         $pagename = pageToName($matchingpage, false);
                         $filepath = $CONTENT_DIR_REL."/".$currentcategory."/".$matchingpage;
                         $searchresults .= "<li>".
-                            "<a href=\"index.php?cat=$currentcategory&amp;page=".
-                            substr($matchingpage, 0, strlen($matchingpage) - 4).
-                            "&amp;highlight=".rawurlencode($highlightparameter)."\"".
+                            "<a href=\"".$url.
+                            "?highlight=".rawurlencode($highlightparameter)."\"".
                             getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", $pagename, $categoryname)).">".
                             highlight($pagename,$highlightparameter).
                             "</a>".
@@ -1283,6 +1337,33 @@ echo "</pre>";
 // Hilfsfunktion: Prüft einen Requestparameter
 // ------------------------------------------------------------------------------
     function getRequestParam($param, $clean) {
+        global $URL_BASE;
+        global $mainconfig;
+
+        if(($mainconfig->get("modrewrite") == "true") and ($param == "cat" or $param == "page")) {
+            $request = NULL;
+            if($param == "cat") {
+                $url_get = str_replace($URL_BASE,"",$_SERVER['REQUEST_URI']);
+                $url_para = explode("/",$url_get);
+                if(count($url_para) > 1) {
+                    $request = $url_para[0];
+                } else {
+                    $request = substr($url_get,0,-5);
+                }
+            } elseif($param == "page") {
+                $url_get = str_replace($URL_BASE,"",$_SERVER['REQUEST_URI']);
+                $url_get = str_replace("?".$_SERVER['QUERY_STRING'],"",$url_get);
+#echo "$url_get<br>\n";
+                $url_para = explode("/",$url_get);
+                if(count($url_para) > 1) {
+                    $request = substr($url_para[1],0,-5);
+                } else {
+#                    $request = substr($url_get,0,-5);
+                    $request = NULL;
+                }
+            }
+            return $request;
+        }
         if (isset($_REQUEST[$param])) {
           // Nullbytes abfangen!
             if (strpos($_REQUEST[$param], "\x00") > 0) {
@@ -1443,6 +1524,25 @@ echo "</pre>";
         return $content;
     }
 
-    
+    function menuLink($link,$css) {
+        global $EXT_LINK;
+        global $specialchars;
+
+        if(!empty($css)) {
+             $css = ' class="'.$css.'"';
+        }
+        $target = "_blank";
+        if(strstr($link,"-_blank-")) {
+            $tmp_link = explode("-_blank-",$link);
+        }
+        if(strstr($link,"-_self-")) {
+            $tmp_link = explode("-_self-",$link);
+            $target = "_self";
+        }
+        if(substr($tmp_link[1], 0, 7) != "http://") {
+            $tmp_link[1] = "http://".$tmp_link[1];
+        }
+        return '<a href="'.substr($tmp_link[1],0,-(strlen($EXT_LINK))).'"'.$css.' target="'.$target.'">'.$specialchars->rebuildSpecialChars(substr($tmp_link[0],3), true, true).'</a> ';
+    }
     
 ?>

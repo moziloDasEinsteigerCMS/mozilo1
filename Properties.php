@@ -57,6 +57,14 @@
  * @author   David Giffin <david@giffin.org>
  * @package  Combine
  */
+
+/*
+properties['readonly'] = nur lesen
+properties['error'] = kann nicht lesen oder schreiben oder Sperdatei anlegen
+*/
+
+
+
 class Properties {
 
     var $file = "";
@@ -68,8 +76,16 @@ class Properties {
      * @param string $file The file name to load the properties from
      */
     function Properties($file = null) {
+        global $BASIC_LANGUAGE;
+        if(isset($BASIC_LANGUAGE->properties['_translator'])) {
+            $error_input = $BASIC_LANGUAGE->properties['properties_noinput'];
+        } else {
+            $error_input = "Keine Datei angegeben!";
+        }
+
         if ($file == "")
-            die("Properties: Keine Datei angegeben!");
+            return $this->properties['error'] = $error_input;
+#            die("Properties: Keine Datei angegeben!");
         $this->file = $file;
         $this->loadProperties();
     }
@@ -80,21 +96,38 @@ class Properties {
      * @param string $file The file name to load the properties from
      */
     function loadProperties() {
-        // Datei exisiert nicht
+        global $BASIC_LANGUAGE;
+        if(isset($BASIC_LANGUAGE->properties['_translator'])) {
+            $error_nofile = $BASIC_LANGUAGE->properties['properties_nofile'];
+            $error_readonly = $BASIC_LANGUAGE->properties['properties_readonly'];
+            $error_write = $BASIC_LANGUAGE->properties['properties_write'];
+            $error_read = $BASIC_LANGUAGE->properties['properties_read'];
+        } else {
+            $error_nofile = "die Datei Existiert nicht: ";
+            $error_readonly = "kann die Datei nur lesend öffnen (Dateirechte prüfen): ";
+            $error_write = "kann die Datei nicht schreibend öffnen (Dateirechte prüfen): ";
+            $error_read = "kann die Datei nicht Lesend oder schreibend öffnen (Dateirechte prüfen): ";
+        }
+
         if (!file_exists($this->file)) {
-            // Einfach nur anlegen
-            if (!@touch($this->file)) {
-                die("Properties.php: Kann ".$this->file." nicht schreiben - bitte Existenz der Datei und vergebene Dateirechte prüfen.");
+            return $this->properties['error'] = $error_nofile.$this->file;
+        } else {
+            if(@fopen($this->file, "r")) {
+                @fclose($this->file);
+                $this->properties['readonly'] = $error_readonly.$this->file;
+            } else {
+                $this->properties['error'] = $error_read.$this->file;
+            }
+            if(!isset($this->properties['error']) and !(@fopen($this->file, "a+"))) {
+                @fclose($this->file);
+                $this->properties['error'] = $error_write.$this->file;
             }
         }
-        // Datei existiert bereits
-        else if (filesize($this->file) > 0) {
-            // Zeilenweise einlesen
-            if(!$lines = @file($this->file)) {
-                die("Properties.php: Kann ".$this->file." nicht öffnen - bitte Existenz der Datei und vergebene Dateirechte prüfen.");
-            }
+
+        if(isset($this->properties['readonly'])) {
+            $lines = @file($this->file);
             foreach ($lines as $line) {
-                // Kommentare
+                // comments
                 if (preg_match("/^#/",$line) || preg_match("/^\s*$/",$line)) {
                     continue;
                 }
@@ -103,7 +136,6 @@ class Properties {
                 }
             }
         }
-        @fclose($this->file);
     }
 
     /**
@@ -112,44 +144,81 @@ class Properties {
      * @param string $file The file name to load the properties from
      */
     function saveProperties() {
+        global $BASIC_LANGUAGE;
+        if(isset($BASIC_LANGUAGE->properties['_translator'])) {
+            $error_lock_existed = $BASIC_LANGUAGE->properties['properties_lock_existed'];
+            $error_lock_touch = $BASIC_LANGUAGE->properties['properties_lock_touch'];
+            $error_lock_del = $BASIC_LANGUAGE->properties['properties_lock_del'];
+            $error_write = $BASIC_LANGUAGE->properties['properties_write'];
+        } else {
+            $error_lock_existed = "kann setings nicht schreiben es existiert eine Sperdatei: ";
+            $error_lock_touch = "kann Sperdatei Datei nicht anlegen (Dateirechte prüfen): ";
+            $error_lock_del = "kann Sperdatei Datei nicht löschen (Dateirechte prüfen): ";
+            $error_write = "kann die Datei nicht schreibend öffnen (Dateirechte prüfen): ";
+        }
         // Vorm Schreiben erst auf eine mögliche Sperre überprüfen (Schutz vor konkurrierenden Schreibzugriffen)
         $islocked = true;
         // 20 Mal versuchen
-        for ($i=0; $i<20; $i++) {
+#        for ($i=0; $i<20; $i++) {
             // für die aktuelle Properties-Datei existiert eine Sperrdatei, sie ist also bereits geöffnet!
             if (file_exists($this->file.".lck")) {
+                return $this->properties['error'] = $error_lock_existed.$this->file.".lck";
                 // nächster Versuch nach einer Sekunde
-                sleep(1);
-                continue;
+#                sleep(1);
+#                continue;
             }
             // keine Sperrdatei vorhanden, also darf geschrieben werden
             else {
                 $islocked = false;
-                break;
+#                break;
             }
-        }
+#            if($i == 19) {
+#                return $this->properties['error'] = "Properties.php: Es Existiert ein ".$this->file.".lck Sperrdatei kann die Setings nicht Schreiben.";
+
+#            }
+#        }
         
         // Existiert die Sperrdatei auch weiterhin?
-        if ($islocked) {
+#        if ($islocked) {
             // einfach nix machen
-        }
-        else {
+#        }
+#        else {
+        if($islocked === false) {
             // neue Sperrdatei anlegen
             if (!@touch($this->file.".lck")) {
-                die("Properties.php: Kann ".$this->file.".lck nicht schreiben - bitte vergebene Dateirechte prüfen.");
+                return $this->properties['error'] = $error_lock_touch.$this->file.".lck";
+#                die("Properties.php: Kann ".$this->file.".lck nicht schreiben - bitte vergebene Dateirechte prüfen.");
             }
             // Datei schreibend öffnen
-            if (!$file = @fopen($this->file, "w")) {
+            if (!@fopen($this->file, "a+")) {
+                @fclose($this->file);
+                return $this->properties['error'] = $error_write.$this->file;
                 // Löschen der Sperrdatei und Abbruch, wenn das Öffnen nicht klappt
                 @unlink($this->file.".lck");
-                die("Properties.php: Kann ".$this->file." nicht schreiben - bitte Existenz der Datei und vergebene Dateirechte prüfen.");
+                if (file_exists($this->file.".lck")) {
+                    return $this->properties['error'] = $error_lock_del.$this->file.".lck";
+                }
+            } else {
+                $file = @fopen($this->file, "w");
             }
+/*            if (!$file = @fopen($this->file, "w")) {
+                // Löschen der Sperrdatei und Abbruch, wenn das Öffnen nicht klappt
+                @unlink($this->file.".lck");
+                if (file_exists($this->file.".lck")) {
+                    return $this->properties['error'] = $error_lock_del.$this->file.".lck";
+                }
+                return $this->properties['error'] = $error_write.$this->file;
+#                die("Properties.php: Kann ".$this->file." nicht schreiben - bitte Existenz der Datei und vergebene Dateirechte prüfen.");
+            }*/
             $content = "";
             // alphabetisch sortieren
             if (!$this->properties == null)
                    ksort($this->properties);
             // auslesen...
             foreach ($this->properties as $key => $value) {
+                if($key == "error" or $key == "readonly") {
+                    continue;
+                }
                 $content .= "$key = $value\n";
             }
             // ...und speichern
@@ -158,6 +227,9 @@ class Properties {
             fclose($file);
             // Sperrdatei wieder löschen
             @unlink($this->file.".lck");
+            if (file_exists($this->file.".lck")) {
+                return $this->properties['error'] = $error_lock_del.$this->file.".lck";
+            }
         }
     }
 

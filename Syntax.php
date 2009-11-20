@@ -77,6 +77,7 @@ class Syntax {
         global $EXT_PAGE;
         global $CAT_REQUEST;
         global $specialchars;
+        global $URL_BASE;
         
         if ($firstrecursion) {
             $content = $this->prepareContent($content);
@@ -163,8 +164,12 @@ class Syntax {
                     $link_text = substr($attribute, 10, strlen($attribute)-10);
                 }
                 $requestedcat = nameToCategory($specialchars->replaceSpecialChars(html_entity_decode($value,ENT_COMPAT,'ISO-8859-1'),false));
+$url = "index.php?cat=$requestedcat";
+if($this->CMS_CONF->get("modrewrite") == "true") {
+    $url = $URL_BASE.$requestedcat.".html";
+}
                 if ((!$requestedcat=="") && (file_exists("./$CONTENT_DIR_REL/$requestedcat"))) {
-                    $content = str_replace ($match, "<a class=\"category\" href=\"index.php?cat=$requestedcat\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_category_1", $value)).">$link_text</a>", $content);
+                    $content = str_replace ($match, "<a class=\"category\" href=\"$url\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_category_1", $value)).">$link_text</a>", $content);
                 }
                 else {
                     $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_link_category_error_1", $value)), $content);
@@ -186,8 +191,12 @@ class Syntax {
                     if(empty($link_text)) {
                         $link_text = $value;
                     }
+$url = "index.php?cat=$cat&amp;page=".substr($requestedpage, 0, strlen($requestedpage) - strlen($EXT_PAGE));
+if($this->CMS_CONF->get("modrewrite") == "true") {
+    $url = $URL_BASE.$cat."/".substr($requestedpage, 0, strlen($requestedpage) - strlen($EXT_PAGE)).".html";
+}
                     if ((!$requestedpage == "") && (file_exists("./$CONTENT_DIR_REL/$cat/$requestedpage"))) {
-                        $content = str_replace ($match, "<a class=\"page\" href=\"index.php?cat=$cat&amp;page=".substr($requestedpage, 0, strlen($requestedpage) - strlen($EXT_PAGE))."\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_page_1", $value)).">$link_text</a>", $content);
+                        $content = str_replace ($match, "<a class=\"page\" href=\"$url\"".$this->getTitleAttribute($this->LANG->getLanguageValue1("tooltip_link_page_1", $value)).">$link_text</a>", $content);
                     }
                     else {
                         $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_link_page_error_1", $value)), $content);
@@ -203,8 +212,12 @@ class Syntax {
                     }
                     if ((!$requestedcat == "") && (file_exists("./$CONTENT_DIR_REL/$requestedcat"))) {
                         $requestedpage = nameToPage($specialchars->replaceSpecialChars($valuearray[1],false), $requestedcat);
+$url = "index.php?cat=$requestedcat&amp;page=".substr($requestedpage, 0, strlen($requestedpage) - strlen($EXT_PAGE));
+if($this->CMS_CONF->get("modrewrite") == "true") {
+    $url = $URL_BASE.$requestedcat."/".substr($requestedpage, 0, strlen($requestedpage) - strlen($EXT_PAGE)).".html";
+}
                         if ((!$requestedpage == "") && (file_exists("./$CONTENT_DIR_REL/$requestedcat/$requestedpage"))) {
-                            $content = str_replace ($match, "<a class=\"page\" href=\"index.php?cat=$requestedcat&amp;page=".substr($requestedpage, 0, strlen($requestedpage) - strlen($EXT_PAGE))."\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_page_2", $html_seite, $html_seite_cat)).">".$link_text."</a>", $content);
+                            $content = str_replace ($match, "<a class=\"page\" href=\"$url\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_page_2", $html_seite, $html_seite_cat)).">".$link_text."</a>", $content);
                         }
                         else {
                             $content = str_replace ($match, $this->createDeadlink($html_seite, $this->LANG->getLanguageValue2("tooltip_link_page_error_2", $html_seite, $html_seite_cat)), $content);    
@@ -316,7 +329,12 @@ class Syntax {
                         else {
                             $gallery->parseGalleryParameters($gal_request,null);
                         }
-                        $gallery->setLinkPrefix("index.php?cat=$CAT_REQUEST&amp;page=$PAGE_REQUEST&amp;"); 
+$url = "index.php?cat=$CAT_REQUEST&amp;page=$PAGE_REQUEST&amp;";
+if($this->CMS_CONF->get("modrewrite") == "true") {
+    $url = $URL_BASE.$CAT_REQUEST."/".$PAGE_REQUEST.".html&amp;";
+}
+
+                        $gallery->setLinkPrefix($url); 
                         $gallerycontent = $pagecontent = preg_replace('/(\r\n|\r|\n)/', '{newline_in_include_tag}', $gallery->renderGallery());
                         // Embedded-Template nicht gefunden
                         if ($gallerycontent == null) {

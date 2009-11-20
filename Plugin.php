@@ -49,9 +49,11 @@ class Plugin {
         }
         // Wenn plugin.conf nicht vorhanden ist, wird die Fehlervariable gefüllt
         else {
-            $syntax = new Syntax();
-            $language = new Language();
-            $this->error = $syntax->createDeadlink("{".get_class($this)."}", $language->getLanguageValue1("plugin_error_missing_pluginconf_1", get_class($this)));
+            if(class_exists("Syntax")) {
+                $syntax = new Syntax();
+                $language = new Language();
+                $this->error = $syntax->createDeadlink("{".get_class($this)."}", $language->getLanguageValue1("plugin_error_missing_pluginconf_1", get_class($this)));
+            }
         }
     }
     
