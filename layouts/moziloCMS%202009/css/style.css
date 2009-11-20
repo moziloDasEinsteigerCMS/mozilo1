@@ -247,13 +247,20 @@ ul.detailmenu {
 li.detailmenu {
     display:inline;
 }
-ul.gallerymenu {
+ul.gallerymenu, ul.gallerynumbermenu {
     margin: 0px;
     padding: 0px;
 }
-li.gallerymenu {
+li.gallerymenu, li.gallerynumbermenu {
     display:inline;
     padding-right: 7px;
+}
+a.gallerymenu, a.gallerynumbermenu {
+    text-decoration:none;
+}
+a.gallerymenuactive, a.gallerynumbermenuactive { 
+    color: #AE6427;
+    text-decoration:none;
 }
 
 /* -------------------------------------------------------- */

@@ -201,11 +201,11 @@ li.detailmenu {
 	display:inline;
 }
 
-ul.gallerymenu {
+ul.gallerymenu, ul.gallerynumbermenu {
 	margin: 0px;
 	padding: 0px;
 }
-li.gallerymenu {
+li.gallerymenu, li.gallerynumbermenu {
 	display:inline;
 	padding-right: 10px;
 }

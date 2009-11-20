@@ -198,9 +198,9 @@ ul.detailmenu {
 }
 li.detailmenu {
 }
-li.gallerymenu {
+li.gallerymenu, li.gallerynumbermenu {
     display:inline;
-/*    padding-right: 7px;*/
+    padding-right: 7px;
 }
 
 

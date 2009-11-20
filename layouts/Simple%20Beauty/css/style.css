@@ -49,7 +49,7 @@ body {
 	padding: 0 30px 0 30px;
 	font-size: 12px
 }
-.gallerymenu, .gallerynumbermenu{
+.gallerymenu, .gallerynumbermenu {
 	text-align:center;
 }
 .menubox {
@@ -121,11 +121,11 @@ ul.detailmenu {
 li.detailmenu {
 	display:inline;
 }
-ul.gallerymenu {
+ul.gallerymenu, ul.gallerynumbermenu {
 	margin: 0px;
 	padding: 0px;
 }
-li.gallerymenu {
+li.gallerymenu, li.gallerynumbermenu {
 	display:inline;
 	padding-right: 10px;
 }

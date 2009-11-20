@@ -212,11 +212,11 @@ class Gallery {
             $linkclass = "gallerymenuactive";
         else
             $linkclass = "gallerymenu";
-        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$this->linkprefix."gal=".$this->gal_request."&amp;index=".$this->first."\" class=\"linkclass\">".$this->language->getLanguageValue0("message_firstimage_0")."</a></li>";
+        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$this->linkprefix."gal=".$this->gal_request."&amp;index=".$this->first."\" class=\"$linkclass\">".$this->language->getLanguageValue0("message_firstimage_0")."</a></li>";
         // Link "Voriges Bild"
-        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$this->linkprefix."gal=".$this->gal_request."&amp;index=".$this->previous."\" class=\"detailmenu\">".$this->language->getLanguageValue0("message_previousimage_0")."</a></li>";
+        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$this->linkprefix."gal=".$this->gal_request."&amp;index=".$this->previous."\" class=\"gallerymenu\">".$this->language->getLanguageValue0("message_previousimage_0")."</a></li>";
         // Link "Nächstes Bild"
-        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$this->linkprefix."gal=".$this->gal_request."&amp;index=".$this->next."\" class=\"detailmenu\">".$this->language->getLanguageValue0("message_nextimage_0")."</a></li>";
+        $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$this->linkprefix."gal=".$this->gal_request."&amp;index=".$this->next."\" class=\"gallerymenu\">".$this->language->getLanguageValue0("message_nextimage_0")."</a></li>";
         // Link "Letztes Bild"
         if ($this->index == $this->last)
             $linkclass = "gallerymenuactive";
@@ -237,15 +237,16 @@ class Gallery {
         if (count($this->picarray) == 0)
             return "&nbsp;";
 
-        $numbermenu = "";
+        $numbermenu = "<ul class=\"gallerynumbermenu\">";
         for ($i=$this->first; $i<=$this->last; $i++) {
-            if ($this->index == $i)
-                    $numbermenu .= "<em class=\"bold\">".$i."</em> | ";
-            else
-                    $numbermenu .= "<a href=\"".$this->linkprefix."gal=".$this->gal_request."&amp;index=".$i."\">".$i."</a> | ";
+            $cssclass = $this->index == $i ? "gallerynumbermenuactive" : "gallerynumbermenu";
+            $numbermenu .= "<li class=\"gallerynumbermenu\">"
+                ."<a href=\"".$this->linkprefix."gal=".$this->gal_request."&amp;index=".$i."\" class=\"".$cssclass."\">".$i."</a>"
+                ."</li>";
         }
         // Rückgabe des Menüs
-        return substr($numbermenu, 0, strlen($numbermenu)-2);
+        $numbermenu .= "</ul>";
+        return $numbermenu;
     }
     
 
