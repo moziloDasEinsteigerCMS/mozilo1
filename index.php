@@ -765,7 +765,7 @@ echo "</pre>";
             // Damit die Links in der Ergbnisliste korrekt sind: Suchanfrage bereinigen
             $queryarray = explode(" ", preg_replace('/"/', "", $QUERY_REQUEST));
             $searchresults .= "<h1>".$language->getLanguageValue1("message_searchresult_1", (trim($specialchars->rebuildSpecialChars($QUERY_REQUEST,true,true))))."</h1>"
-            ."<div class=\"sitemap\">";
+            ."<div class=\"searchresults\">";
 
             // Kategorien-Verzeichnis einlesen
             $categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false, false);
