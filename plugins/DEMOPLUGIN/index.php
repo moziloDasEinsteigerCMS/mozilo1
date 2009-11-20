@@ -167,7 +167,6 @@ class DEMOPLUGIN extends Plugin {
         *   checkbox        Checkbox (ja/nein)
         *   radio           Radio-Buttons (entweder/oder)
         *   select          Auswahlliste
-        *   file            Datei-Upload
         * 
         * Die Werte der Eingabefelder werden in die plugin.conf des 
         * Plugins geschrieben - der Name des Eingabefelds ist dabei der 
@@ -286,17 +285,6 @@ class DEMOPLUGIN extends Plugin {
             ); 
 
         
-        /***************************************************************
-        * Beispiel: Datei-Upload
-        ***************************************************************/
-        
-        $config['datei'] = array(
-            "type" => "file",                           // Pflicht:  Eingabetyp
-            "uploaddir" => "",                          // Ablageverzeichnis für die hochgeladene Datei (relativer Pfad vom Plugin-Verzeichnis aus; leer lassen heißt, daß Dateien im Plugin-Wurzelverzeichnis abgelegt werden) 
-            "description" => "Diese Datei hochladen:"   // optional: Beschreibung
-            );
-
-            
         // Nicht vergessen: Das gesamte Array zurückgeben
         return $config;
     } // function getConfig    
