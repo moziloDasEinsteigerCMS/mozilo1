@@ -1,7 +1,5 @@
 Options -Indexes
 
 RewriteEngine On
-#RewriteBase /web/moziloCMS/moziloCMS_1.12.mein
 RewriteRule admin/index.php$ admin/index.php [QSA,L]
 RewriteRule .html$ index.php [QSA,L]
-#RewriteRule $ index.php [QSA,L]
