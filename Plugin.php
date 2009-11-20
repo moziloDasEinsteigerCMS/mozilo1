@@ -49,6 +49,7 @@ class Plugin {
         }
         // Wenn plugin.conf nicht vorhanden ist, wird die Fehlervariable gefüllt
         else {
+        	// im Admin wird die Klasse Plugin verwendet; die Klasse Syntax kann aber nicht geladen werden. Die Abfrage verhindert einfach eine Fehlermeldung. 
             if(class_exists("Syntax")) {
                 $syntax = new Syntax();
                 $language = new Language();
