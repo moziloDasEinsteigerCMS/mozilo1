@@ -1170,12 +1170,20 @@ echo "</pre><br>\n";*/
         $errormessage = "";
         $form = "";
         
-        $name       = getRequestParam($_SESSION['contactform_name'], false);
-        $mail       = getRequestParam($_SESSION['contactform_mail'], false);
-        $website    = getRequestParam($_SESSION['contactform_website'], false);
-        $message    = getRequestParam($_SESSION['contactform_message'], false);
-        $calcresult = getRequestParam($_SESSION['contactform_calculation'], false);
-
+        if (isset($_SESSION)) {
+            $name       = getRequestParam($_SESSION['contactform_name'], false);
+            $mail       = getRequestParam($_SESSION['contactform_mail'], false);
+            $website    = getRequestParam($_SESSION['contactform_website'], false);
+            $message    = getRequestParam($_SESSION['contactform_message'], false);
+            $calcresult = getRequestParam($_SESSION['contactform_calculation'], false);
+        }
+        else {
+            $name       = "";
+            $mail       = "";
+            $website    = "";
+            $message    = "";
+            $calcresult = "";
+        }
         // Das Formular wurde abgesendet
         if (getRequestParam('submit', false) <> "") { 
 
