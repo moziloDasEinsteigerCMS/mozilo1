@@ -15,7 +15,7 @@ echo "<pre style=\"position:fixed;background-color:#000;color:#0f0;padding:5px;f
 print_r($_REQUEST);
 echo "</pre>";
 */
-$URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("index.php")));
+    $URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("index.php")));
 
     require_once("Language.php");
     require_once("Properties.php");
@@ -257,7 +257,7 @@ $URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FIL
 
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
-    $HTML = preg_replace('/{LAYOUT_DIR}/', $URL_BASE."layouts/".$LAYOUT_DIR, $HTML);
+    $HTML = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR, $HTML);
 
     // Platzhalter ersetzen
     $HTML = replacePlaceholders($HTML, $cattitle, $pagetitle);
