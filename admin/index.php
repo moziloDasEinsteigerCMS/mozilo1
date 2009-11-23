@@ -128,6 +128,11 @@ if(!isset($CMS_CONF->properties['readonly'])) {
     die($CMS_CONF->properties['error']);
 }
 
+$VERSION_CONF    = new Properties("../conf/version.conf");
+if(!isset($VERSION_CONF->properties['readonly'])) {
+    die($VERSION_CONF->properties['error']);
+}
+
 if(!is_file("../conf/downloads.conf")) {
     $DOWNLOAD_COUNTS    = new Properties("../conf/downloads.conf");
     makeDefaultConf("../conf/downloads.conf","DOWNLOAD_COUNTS");
@@ -449,9 +454,10 @@ echo "$time Sekunden\n";*/
 #function sysInfo() {
 function home($post) {
     global $CMS_CONF;
+    global $VERSION_CONF;
     global $ADMIN_CONF;
     global $MAILFUNCTIONS;
-
+    
     $pagecontent = NULL;
 #    $post = NULL;
 
@@ -526,9 +532,9 @@ $path = dirname(dirname(__FILE__))."/";
     // Zeile "CMS-VERSION"
     ."<tr>"
     .'<td width="50%" class="td_cms_left">'.getLanguageValue("cmsversion_text")."</td>"
-    .'<td width="50%" class="td_cms_left">'.$CMS_CONF->get("cmsversion")."</td>"
+    .'<td width="50%" class="td_cms_left">'.$VERSION_CONF->get("cmsversion").' ("'.$VERSION_CONF->get("cmsname").'")</td>'
     ."</tr>"
-    // Zeile "GesamtgrÃ¶ÃŸe des CMS"
+    // Zeile "Gesamtgröße des CMS"
     ."<tr>"
     .'<td width="50%" class="td_cms_left">'.getLanguageValue("cmssize_text")."</td>"
     .'<td width="50%" class="td_cms_left">'.$cmssize."</td>"
@@ -2485,7 +2491,7 @@ function files($post) {
 #                    $downloadsperdaytext = "(".$downloadsperday." ".getLanguageValue("data_downloadsperday").")";
 #                else
                     $downloadsperdaytext = "";
-                // DateigrÃ¶ÃŸe
+                // Dateigröße
                 $filesize = filesize("$CONTENT_DIR_REL/$file/dateien/$subfile");
 
         $titel_dateien = NULL;
@@ -3343,12 +3349,12 @@ echo "</pre>";*/
             } elseif(strlen($post['newname']) < 5) {
                 $post['error_messages']['pw_error_tooshortname'][] = NULL;
                 $error_color['newname'] = ' style="background-color:#FF7029;"';
-            // Neues PaÃŸwort zweimal exakt gleich eingegeben?
+            // Neues Paßwort zweimal exakt gleich eingegeben?
             } elseif ($post['newpw'] != $post['newpwrepeat']) {
                 $post['error_messages']['pw_error_newpwmismatch'][] = NULL;
                 $error_color['newpw'] = ' style="background-color:#FF7029;"';
                 $error_color['newpwrepeat'] = ' style="background-color:#FF7029;"';
-            // Neues PaÃŸwort wenigstens sechs Zeichen lang und mindestens aus kleinen und groÃŸen Buchstaben sowie Zahlen bestehend?
+            // Neues Paßwort wenigstens sechs Zeichen lang und mindestens aus kleinen und großen Buchstaben sowie Zahlen bestehend?
             } elseif ((strlen($post['newpw']) <= 6) or !preg_match("/[0-9]/", $post['newpw']) or !preg_match("/[a-z]/", $post['newpw']) or !preg_match("/[A-Z]/", $post['newpw'])) {
                 $post['error_messages']['pw_error_newpwerror'][] = NULL;
                 $error_color['newpw'] = ' style="background-color:#FF7029;"';
@@ -4129,7 +4135,7 @@ function returnFormatToolbarIcon($tag) {
 }
 
 
-// RÃ¼ckgabe einer Selectbox mit Elementen, die per Klick in die Inhaltsseite Ã¼bernommen werden kÃ¶nnen
+// RÃ¼ckgabe einer Selectbox mit Elementen, die per Klick in die Inhaltsseite Ã¼bernommen werden können
 // $type: 1=Kategorien 2=Inhaltsseiten 3=Dateien 4=Galerien
 function returnOverviewSelectbox($type, $currentcat) {
     global $specialchars;
@@ -4247,13 +4253,13 @@ if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
 }
 
 
-// alle Dateien einer Kategorie aus der Download-Statistik lÃ¶schen
+// alle Dateien einer Kategorie aus der Download-Statistik löschen
 function deleteCategoryFromDownloadStats($catname) {
     global $DOWNLOAD_COUNTS;
     // Download-Statistik als Array holen
     $downloadsarray = $DOWNLOAD_COUNTS->toArray();
     foreach($downloadsarray as $key => $value) {
-        // Keys mit zu lÃ¶schendem Kategorienamen: aus dem Array nehmen
+        // Keys mit zu löschendem Kategorienamen: aus dem Array nehmen
         $data = explode(":", $key);
         if ($data[0] == $catname) {
             unset($downloadsarray[$key]);
@@ -4274,7 +4280,7 @@ function renameCategoryInDownloadStats($oldcatname, $newcatname) {
         $keyparts = explode(":", $key);
         if ($keyparts[0] == $oldcatname) {
             $downloadsarray[$newcatname.":".$keyparts[1]] = $value; // Element mit neuem Key ans Array hÃ¤ngen
-            unset($downloadsarray[$key]);                            // Element mit altem Key aus Array lÃ¶schen
+            unset($downloadsarray[$key]);                            // Element mit altem Key aus Array löschen
         }
     }
     // bearbeitetes Array wieder zurÃ¼ck in die Download-Statistik schreiben
@@ -4372,7 +4378,7 @@ return;
 // 1: nur Ziffern (wenigstens eine)
 // 2: beliebige Zeichen (wenigstens eins)
 // 3: Mail-Adresse
-// 4: PaÃŸwort
+// 4: Paßwort
 // 5: Benutzername
 // 6: beliebige Zeichen (darf leer sein)
 function isValidRequestParameter($index, $type) {
@@ -4441,7 +4447,7 @@ function checkBoxChecked($checkboxrequest) {
 // gibt das img-Tag fÃ¼r ein Action-Icon zurÃ¼ck (abhÃ¤ngig von der entsprechenden Einstellung)
 function getActionIcon($iconname, $titletext) {
     global $ADMIN_CONF;
-    // GroÃŸe Icons anzeigen?
+    // Große Icons anzeigen?
     if ($ADMIN_CONF->get("usebigactionicons") == "true") {
         return "<img src=\"gfx/actionsbig/".$iconname.".png\" alt=\"".$titletext."\" title=\"".$titletext."\" />";
 #        return '<input type="button" name="name" value="valu" alt="'.$titletext.'" src="'.$iconname.'">';

@@ -1353,12 +1353,10 @@ echo "</pre><br>\n";*/
             } elseif($param == "page") {
                 $url_get = str_replace($URL_BASE,"",$_SERVER['REQUEST_URI']);
                 $url_get = str_replace("?".$_SERVER['QUERY_STRING'],"",$url_get);
-#echo "$url_get<br>\n";
                 $url_para = explode("/",$url_get);
                 if(count($url_para) > 1) {
                     $request = substr($url_para[1],0,-5);
                 } else {
-#                    $request = substr($url_get,0,-5);
                     $request = NULL;
                 }
             }
