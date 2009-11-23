@@ -8,7 +8,7 @@ $error_color = array('check_name' => '#CCFFCC',
                 'check_name_too_long' => '#FFFF99',
                 'check_name_exist' => '#99FF99',
                 'check_new_name_empty' => '#FF6666',
-                'check_to_manny_page' => '#FFFF33',
+                'check_too_many_pages' => '#FFFF33',
                 'check_doubles_digit_copy_move' => '#4D9900',
                 'check_copy_same_cat' => '#33FFFF',
                 'file_error_exists' => '#33FFFF',
@@ -29,7 +29,7 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
     $cat_array = getDirs("$CONTENT_DIR_REL",true);
 
     if(count($cat_array) > $max_cat_page) {
-        $post['error_messages']['check_to_manny_cat'][] = NULL;
+        $post['error_messages']['check_too_many_categories'][] = NULL;
     }
 
     if($pages === false) {
@@ -71,9 +71,9 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
                 $post[$cat]['error_html']['cat_name'] = NULL;
             }
             if(count($page_array) > $max_cat_page) {
-                $post['error_messages']['check_to_manny_page']['color'] = $error_color['check_to_manny_page'];
-                #$post['error_messages']['check_to_manny_page'][] = $cat;
-                $post[$cat]['error_html']['cat_name'] = 'style="background-color:'.$error_color['check_to_manny_page'].';" ';
+                $post['error_messages']['check_too_many_pages']['color'] = $error_color['check_too_many_pages'];
+                #$post['error_messages']['check_too_many_pages'][] = $cat;
+                $post[$cat]['error_html']['cat_name'] = 'style="background-color:'.$error_color['check_too_many_pages'].';" ';
             }
             sort($page_array);
             # Wichtig wegen new Inhaltseite
@@ -186,19 +186,19 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
             $post[$cat]['error_html']['display_cat'] = 'style="display:block;" ';
         }
 
-#        $post[$cat]['error_html']['check_to_manny_cat'] = NULL;
+#        $post[$cat]['error_html']['check_too_many_categories'] = NULL;
         if(count($_POST['categories'][$cat]['position']) > $max_cat_page + 1) {
-            $post['error_messages']['check_to_manny_cat'][] = NULL;
-#            $post['error_messages']['check_to_manny_cat'][] = $cat;
-#            $post[$cat]['error_html']['check_to_manny_cat'] = 'style="background-color:'.$error_color['check_to_manny_cat'].';" ';
+            $post['error_messages']['check_too_many_categories'][] = NULL;
+#            $post['error_messages']['check_too_many_categories'][] = $cat;
+#            $post[$cat]['error_html']['check_too_many_categories'] = 'style="background-color:'.$error_color['check_too_many_categories'].';" ';
         }
         foreach ($_POST['categories'][$cat]['position'] as $pos => $tmp) {
 
             $post[$cat]['error_html']['cat_name'] = NULL;
             if(count($_POST['categories'][$cat]['position'][$pos]) > $max_cat_page + 1) {
-                $post['error_messages']['check_to_manny_page']['color'] = $error_color['check_to_manny_page'];
-                $post['error_messages']['check_to_manny_page'][] = $cat;
-                $post[$cat]['error_html']['cat_name'] = 'style="background-color:'.$error_color['check_to_manny_page'].';" ';
+                $post['error_messages']['check_too_many_pages']['color'] = $error_color['check_too_many_pages'];
+                $post['error_messages']['check_too_many_pages'][] = $cat;
+                $post[$cat]['error_html']['cat_name'] = 'style="background-color:'.$error_color['check_too_many_pages'].';" ';
             }
 
             if($cat == 'cat') {

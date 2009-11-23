@@ -10,7 +10,7 @@
 
 
 // DEEEEEEEEEEEBUG ;)
-// Ausgabe aller übergebenen Werte zu Testzwecken
+// Ausgabe aller uebergebenen Werte zu Testzwecken
 
 /*
  echo "<h2>POST</h2>";
@@ -152,7 +152,7 @@ $LOGINCONF = new Properties("conf/logindata.conf");
 if(isset($LOGINCONF->properties['error'])) {
     die($LOGINCONF->properties['error']);
 }
-// Login überprüfen
+// Login ueberpruefen
 if (!isset($_SESSION['login_okay']) or !$_SESSION['login_okay']) {
     header("location:login.php?logout=true");
     die("");
@@ -203,12 +203,12 @@ $GALLERIES_DIR_NAME    = "galerien";
 $GALLERIES_DIR_REL    = "../".$GALLERIES_DIR_NAME;
 $PREVIEW_DIR_NAME        = "vorschau";
 
-// RegEx für erlaubte Zeichen in Inhaltsseiten, Kategorien, Dateien und Galerien
+// RegEx fuer erlaubte Zeichen in Inhaltsseiten, Kategorien, Dateien und Galerien
 # $specialchars wurde schonn in filesystem.php erstelt!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #$specialchars = new SpecialChars();
 $ALLOWED_SPECIALCHARS_REGEX = $specialchars->getSpecialCharsRegex();
 
-// Dateiendungen für Inhaltsseiten 
+// Dateiendungen fuer Inhaltsseiten 
 $EXT_PAGE     = ".txt";
 $EXT_HIDDEN     = ".hid";
 $EXT_DRAFT     = ".tmp";
@@ -379,7 +379,7 @@ $html .= '<script type="text/javascript">document.write(\'<input type="hidden" n
 // Warnung, wenn seit dem letzten Login Logins fehlgeschlagen sind
 if ($LOGINCONF->get("falselogincount") > 0) {
     $html .= returnMessage(false, getLanguageValue("warning_false_logins")." ".$LOGINCONF->get("falselogincount"));
-    // Gesamt-Counter für falsche Logins zurücksetzen
+    // Gesamt-Counter fuer falsche Logins zuruecksetzen
     if(!isset($LOGINCONF->properties['error'])) {
         $LOGINCONF->set("falselogincount", 0);
     }
@@ -401,7 +401,7 @@ if (($intervallsetting != "") && preg_match("/^[0-9]+$/", $intervallsetting) && 
         }
 #        setLastBackup();
     }
-    // wenn schon gesetzt: prüfen und ggfs. warnen
+    // wenn schon gesetzt: pruefen und ggfs. warnen
     else {
         $nextbackup = $lastbackup + $intervallinseconds;
         if($nextbackup <= time())    {
@@ -636,16 +636,16 @@ function category($post) {
         $tooltip_category_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration&amp;page=30_Kategorien" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
     }
 
-    $pagecontent .= '<span class="titel">'.getLanguageValue("category_titel").'</span>';
+    $pagecontent .= '<span class="titel">'.getLanguageValue("category_button").'</span>';
     $pagecontent .= $tooltip_category_help;
     $pagecontent .= "<p>".getLanguageValue("category_text")."</p>";
 
     # Die getLanguageValue() und createTooltipWZ() erzeugen
-    $array_getLanguageValue = array("info_many_pages","info_many_files","info_url","titel_position","titel_name","titel_new_name",
-        "titel_url","titel_new_url","titel_new_url_only","titel_contents","category_button_change",
+    $array_getLanguageValue = array("pages","files","url","position","name","new_name",
+        "url_adress","url_new_adress","url_adress_description","contents","category_button_change",
         "category_button_edit","category_button_delete");
 
-    # Variable erzeugen z.B. info_many_pages = $text_info_many_pages
+    # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getLanguageValue as $language) {
         ${"text_".$language} = getLanguageValue($language);
     }
@@ -654,7 +654,7 @@ function category($post) {
         "category_help_new_position","category_help_new_name","category_help_position","category_help_delete",
         "category_help_name","category_help_edit");
 
-    # Variable erzeugen z.B. info_many_pages = $text_info_many_pages
+    # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getTooltipValue as $language) {
         if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
             ${"tooltip_".$language} = createTooltipWZ("",$language,",WIDTH,200,CLICKCLOSE,true");
@@ -679,7 +679,7 @@ function category($post) {
             if(count($post['categories']['cat']['position']) < $max_cat_page + 1) {
                 $pagecontent .= '<tr><td width="100%" class="td_toggle_new">';
                 $pagecontent .= '<table width="100%" class="table_new" border="0" cellspacing="0" cellpadding="0">';
-                $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_titel_position.'</b></td><td width="30%" class="td_left_title"><b>'.$text_titel_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_titel_url.'</b> '.$text_titel_new_url_only.'</td><td width="6%" class="td_center_title">&nbsp;</td><td width="6%" class="td_center_title">blank</td><td width="6%" class="td_center_title">self</td><td>&nbsp;</td></tr>';
+                $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td width="30%" class="td_left_title"><b>'.$text_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_url_adress.'</b> '.$text_url_adress_description.'</td><td width="6%" class="td_center_title">&nbsp;</td><td width="6%" class="td_center_title">blank</td><td width="6%" class="td_center_title">self</td><td>&nbsp;</td></tr>';
                 $pagecontent .= '<tr>';
                 $pagecontent .= '<td width="6%" class="td_left_title"><input type="hidden" name="categories[cat][position]['.$max_cat_page.']" value="'.$post['categories']['cat']['position'][$max_cat_page].'">';
                 $pagecontent .= '<input '.$post['categories']['cat']['error_html']['new_position'][$max_cat_page].'class="input_text" type="text" name="categories[cat][new_position]['.$max_cat_page.']" value="'.$post['categories']['cat']['new_position'][$max_cat_page].'" size="2" maxlength="2"'.$tooltip_category_help_new_position.'></td>';
@@ -715,16 +715,16 @@ function category($post) {
                 }
                 closedir($fileshandle);
             }
-            $text = '('.$pagescount.' '.$text_info_many_pages.', '.$filecount.' '.$text_info_many_files.')';
+            $text = '('.$pagescount.' '.$text_pages.', '.$filecount.' '.$text_files.')';
         } else {
-            $text = '('.$text_info_url.' target = '.substr($post['categories']['cat']['target'][$pos],2,-1).')';
+            $text = '('.$text_url.' target = '.substr($post['categories']['cat']['target'][$pos],2,-1).')';
         }
 
         $pagecontent .= '<tr><td width="100%" class="td_toggle">';
 
         $pagecontent .= '<table width="100%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
        if(!isset($display_new_cat_name)) {
-            $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_titel_position.'</b></td><td class="td_left_title"><b>'.$text_titel_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_titel_contents.'</b></td><td width="15%" class="td_icons">&nbsp;</td></tr>';
+            $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td class="td_left_title"><b>'.$text_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_contents.'</b></td><td width="15%" class="td_icons">&nbsp;</td></tr>';
             $display_new_cat_name = true;
         }
         $pagecontent .= '<tr><td width="6%" class="td_left_title"><input type="hidden" name="categories[cat][position]['.$pos.']" value="'.$post['categories']['cat']['position'][$pos].'">';
@@ -745,8 +745,8 @@ function category($post) {
 
         if(isset($post['categories']['cat']['url'][$pos])) {
             $pagecontent .= '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
-            $pagecontent .= '<tr><td width="30%" class="td_left_title" valign="bottom" nowrap><b>'.$text_titel_new_name.'</b></td>';
-            $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_titel_url.'</b></td>';
+            $pagecontent .= '<tr><td width="30%" class="td_left_title" valign="bottom" nowrap><b>'.$text_new_name.'</b></td>';
+            $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_url_adress.'</b></td>';
             $pagecontent .= '<td width="30%" class="td_left_title"><input type="hidden" name="categories[cat][url]['.$pos.']" value="'.$post['categories']['cat']['url'][$pos].'">';
 #            $pagecontent .= '<div class="div_noedit">'.$post['categories']['cat']['url'][$pos].'</div>';
             $pagecontent .= '<input class="input_readonly" name="categories[cat][url]['.$pos.']" value="'.$post['categories']['cat']['url'][$pos].'" maxlength="'.$max_strlen.'" readonly>';
@@ -754,13 +754,13 @@ function category($post) {
             $pagecontent .= '</tr><tr>';
 #$specialchars->rebuildSpecialChars($post['categories']['cat']['new_name'][$pos], true, true)
             $pagecontent .= '<td width="30%" class="td_left_title"><input '.$post['categories']['cat']['error_html']['new_name'][$pos].' class="input_text" name="categories[cat][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['new_name'][$pos], true, true).'" maxlength="'.$max_strlen.'"'.$tooltip_category_help_name.'></td>';
-            $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_titel_new_url.'</b></td>';
+            $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_url_new_adress.'</b></td>';
             $pagecontent .= '<td width="30%" class="td_left_title"><input '.$post['categories']['cat']['error_html']['new_url'][$pos].' class="input_text" name="categories[cat][new_url]['.$pos.']" value="'.$post['categories']['cat']['new_url'][$pos].'" maxlength="'.$max_strlen.'"'.$tooltip_help_url.'></td>';
             $pagecontent .= '<td width="6%" class="td_center_title"><b'.$tooltip_help_target.'>Target:</b></td><td width="6%" class="td_center_title"><input type="radio" name="categories[cat][new_target]['.$pos.']" value="-_blank-"'.$post['categories']['cat']['checked_blank'][$pos].$tooltip_help_target_blank.'></td>';
             $pagecontent .= '<td width="6%" class="td_center_title"><input type="radio" name="categories[cat][new_target]['.$pos.']" value="-_self-"'.$post['categories']['cat']['checked_selv'][$pos].$tooltip_help_target_self.'><input type="hidden" name="categories[cat][target]['.$pos.']" value="'.$post['categories']['cat']['target'][$pos].'"></td>';
             $pagecontent .= '<td>&nbsp;</td></tr></table>';
         } else
-            $pagecontent .= '<table width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0"><tr><td colspan="2" class="td_left_title" align="left" valign="bottom" ><b>'.$text_titel_new_name.'</b></td></tr><tr><td width="30%" class="td_left_title"><input '.$post['categories']['cat']['error_html']['new_name'][$pos].'class="input_text" name="categories[cat][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['new_name'][$pos], true, true).'"'.$tooltip_category_help_name.'></td><td>&nbsp;</td></tr></table>';
+            $pagecontent .= '<table width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0"><tr><td colspan="2" class="td_left_title" align="left" valign="bottom" ><b>'.$text_new_name.'</b></td></tr><tr><td width="30%" class="td_left_title"><input '.$post['categories']['cat']['error_html']['new_name'][$pos].'class="input_text" name="categories[cat][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['new_name'][$pos], true, true).'"'.$tooltip_category_help_name.'></td><td>&nbsp;</td></tr></table>';
 
         if(getRequestParam('javascript', true)) {
             $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.$text_category_button_edit.'\');</script>';
@@ -960,7 +960,7 @@ function page($post) {
                 $pagecontent .= categoriesMessages($post);
                 $cat = key($post['action_data']['editsite']);
                 $page = $post['action_data']['editsite'][$cat];
-                $pagecontent .= '<span class="titel">'.getLanguageValue("page_titel_edit").' -&gt; </span>'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen($EXT_PAGE))), true, true);
+                $pagecontent .= '<span class="titel">'.getLanguageValue("page_edit").' -&gt; </span>'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen($EXT_PAGE))), true, true);
                 $pagecontent .= $post['content'];
                 $pagecontent .= '<input type="hidden" name="checkpara" value="no">';
                 return array(getLanguageValue("page_button"), $pagecontent);
@@ -1012,9 +1012,9 @@ function page($post) {
 
 
     # Die getLanguageValue() und createTooltipWZ() erzeugen
-    $array_getLanguageValue = array("info_many_pages","titel_position","titel_name","titel_new_name","titel_url","titel_new_url","titel_new_url_only","page_button_edit","page_titel_move","page_titel_status","page_saveasdraft","page_saveasnormal","page_saveashidden","page_titel_copy","page_button_editieren","page_button_delete");
+    $array_getLanguageValue = array("pages","position","name","new_name","url_adress","url_new_adress","url_adress_description","page_button_edit","page_move","page_status","page_saveasdraft","page_saveasnormal","page_saveashidden","page_copy","page_button_edit","page_button_delete");
 
-    # Variable erzeugen z.B. info_many_pages = $text_info_many_pages
+    # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getLanguageValue as $language) {
         ${"text_".$language} = getLanguageValue($language);
     }
@@ -1023,7 +1023,7 @@ function page($post) {
         "page_help_edit","page_help_position","page_help_new_position","page_help_name","page_help_new_name",
         "page_help_move","page_help_editieren","page_help_delete","page_help_copy");
 
-    # Variable erzeugen z.B. info_many_pages = $text_info_many_pages
+    # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getTooltipValue as $language) {
         if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
             ${"tooltip_".$language} = createTooltipWZ("",$language,",WIDTH,200,CLICKCLOSE,true");
@@ -1054,7 +1054,7 @@ function page($post) {
             }
             closedir($pageshandle);
         }
-        $text = '('.$pagescount.' '.$text_info_many_pages.')'; 
+        $text = '('.$pagescount.' '.$text_pages.')'; 
         $pagecontent .= '<td width="20%" class="td_left_title"><span class="text_info">'.$text.'</span></td>';
         $pagecontent .= '<td width="15%" class="td_icons">&nbsp;';
         if(getRequestParam('javascript', true)) {
@@ -1081,7 +1081,7 @@ function page($post) {
             if(!isset($display_new_cat)) {
                 $pagecontent .= '<tr><td width="100%" class="td_toggle_new">';
                 $pagecontent .= '<table width="100%" class="table_data" border="0" cellspacing="0" cellpadding="0">';
-                $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_titel_position.'</b></td><td width="30%" class="td_left_title"><b>'.$text_titel_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_titel_url.'</b> '.$text_titel_new_url_only.'</td><td width="6%" class="td_center_title">&nbsp;</td><td width="6%" class="td_center_title">blank</td><td width="6%" class="td_center_title">self</td><td>&nbsp;</td></tr>';
+                $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td width="30%" class="td_left_title"><b>'.$text_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_url_adress.'</b> '.$text_url_adress_description.'</td><td width="6%" class="td_center_title">&nbsp;</td><td width="6%" class="td_center_title">blank</td><td width="6%" class="td_center_title">self</td><td>&nbsp;</td></tr>';
                 $pagecontent .= '<tr>';
                 $pagecontent .= '<td width="6%" class="td_left_title"><input type="hidden" name="categories['.$cat.'][position]['.$max_cat_page.']" value="'.$post['categories'][$cat]['position'][$max_cat_page].'">';
                 $pagecontent .= '<input '.$post['categories'][$cat]['error_html']['new_position'][$max_cat_page].'class="input_text" type="text" name="categories['.$cat.'][new_position]['.$max_cat_page.']" value="'.$post['categories'][$cat]['new_position'][$max_cat_page].'" size="2" maxlength="2"'.$tooltip_page_help_new_position.'></td>';
@@ -1120,7 +1120,7 @@ function page($post) {
 
             $pagecontent .= '<table width="100%" class="table_data" border="0" cellspacing="0" cellpadding="0">';
             if(!isset($display_new_cat_name)) {
-                $pagecontent .= '<tr><td width="17%" class="td_left_title"><b>'.$text_page_titel_move.'</b></td><td width="6%" class="td_left_title"><b>'.$text_titel_position.'</b></td><td class="td_left_title"><b>'.$text_titel_name.'</b></td><td width="12%" class="td_left_title"><b>'.$text_page_titel_status.'</b></td><td width="12%" class="td_left_title">&nbsp;</td><td width="15%" class="td_icons">&nbsp;</td></tr>';
+                $pagecontent .= '<tr><td width="17%" class="td_left_title"><b>'.$text_page_move.'</b></td><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td class="td_left_title"><b>'.$text_name.'</b></td><td width="12%" class="td_left_title"><b>'.$text_page_status.'</b></td><td width="12%" class="td_left_title">&nbsp;</td><td width="15%" class="td_icons">&nbsp;</td></tr>';
                 $display_new_cat_name = true;
             }
             $pagecontent .= '<tr><td width="17%" class="td_left_title" nowrap>'.$select_box.'</td>';
@@ -1145,14 +1145,14 @@ function page($post) {
 #'.createTooltipWZ("", "",",WIDTH,200,CLICKCLOSE,true").'
 #'.getLanguageValue("").'
 
-            $pagecontent .= '<td width="12%" class="td_left_title" nowrap><b>'.$text_page_titel_copy.'</b>&nbsp;<input class="input_check" type="checkbox" name="categories['.$cat.'][copy]['.$pos.']" value="yes"'.$post['categories'][$cat]['copy'][$pos].''.$tooltip_page_help_copy.'></td>';
+            $pagecontent .= '<td width="12%" class="td_left_title" nowrap><b>'.$text_page_copy.'</b>&nbsp;<input class="input_check" type="checkbox" name="categories['.$cat.'][copy]['.$pos.']" value="yes"'.$post['categories'][$cat]['copy'][$pos].''.$tooltip_page_help_copy.'></td>';
 
             $pagecontent .= '<td width="15%" class="td_icons" nowrap>';
             if(getRequestParam('javascript', true)) {
                 $pagecontent .= '<span id="toggle_'.substr($cat,0,2).'_'.$pos.'_linkBild"'.$tooltip_page_help_edit.'></span>';
             }
             if(!isset($post['categories'][$cat]['url'][$pos])) {
-                $pagecontent .= '<input type="image" class="input_img_button" name="action_data[editsite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_editieren.'"  src="gfx/icons/'.$icon_size.'/page-edit.png" title="'.$text_page_button_editieren.'"'.$tooltip_page_help_editieren.'>';
+                $pagecontent .= '<input type="image" class="input_img_button" name="action_data[editsite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_edit.'"  src="gfx/icons/'.$icon_size.'/page-edit.png" title="'.$text_page_button_edit.'"'.$tooltip_page_help_editieren.'>';
                 $pagecontent .= '<input type="image" class="input_img_button_last" name="action_data[deletesite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$text_page_button_delete.'"'.$tooltip_page_help_delete.'>';
             } else {
                 $pagecontent .= '<input type="image" class="input_nobefor_img_button_last" name="action_data[deletesite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['target'][$pos].$post['categories'][$cat]['url'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$text_page_button_delete.'"'.$tooltip_page_help_delete.'>';
@@ -1163,8 +1163,8 @@ function page($post) {
             $pagecontent .= '<td width="100%" class="td_togglen_padding_bottom" align="right" '.$post['categories'][$cat]['error_html']['display'][$pos].' id="toggle_'.substr($cat,0,2).'_'.$pos.'">';
 
             if(isset($post['categories'][$cat]['url'][$pos])) {
-                $pagecontent .= '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data"><tr><td width="30%" valign="bottom" nowrap class="td_left_title"><b>'.$text_titel_new_name.'</b></td>';
-                $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_titel_url.'</b></td>';
+                $pagecontent .= '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data"><tr><td width="30%" valign="bottom" nowrap class="td_left_title"><b>'.$text_new_name.'</b></td>';
+                $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_url_adress.'</b></td>';
                 $pagecontent .= '<td width="30%" class="td_left_title"><input type="hidden" name="categories['.$cat.'][url]['.$pos.']" value="'.$post['categories'][$cat]['url'][$pos].'">';
 #                $pagecontent .= '<div class="div_noedit">'.$post['categories'][$cat]['url'][$pos].'</div>';
                 $pagecontent .= '<input class="input_readonly" name="categories['.$cat.'][url]['.$pos.']" value="'.$post['categories'][$cat]['url'][$pos].'" maxlength="'.$max_strlen.'" readonly>';
@@ -1173,13 +1173,13 @@ function page($post) {
                 $pagecontent .= '</tr><tr>';
                 $pagecontent .= '';
                 $pagecontent .= '<td width="30%" class="td_left_title"><input '.$post['categories'][$cat]['error_html']['new_name'][$pos].' class="input_text" name="categories['.$cat.'][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_name'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_name.'></td>';
-                $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_titel_new_url.'</b></td>';
+                $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_url_new_adress.'</b></td>';
                 $pagecontent .= '<td width="30%" class="td_left_title"><input '.$post['categories'][$cat]['error_html']['new_url'][$pos].' class="input_text" name="categories['.$cat.'][new_url]['.$pos.']" value="'.$post['categories'][$cat]['new_url'][$pos].'" maxlength="'.$max_strlen.'"'.$tooltip_help_url.'></td>';
                 $pagecontent .= '<td width="6%" class="td_center_title"'.$tooltip_help_target.'><b>Target:</b></td><td width="6%" class="td_center_title"><input type="radio" name="categories['.$cat.'][new_target]['.$pos.']" value="-_blank-"'.$post['categories'][$cat]['checked_blank'][$pos].''.$tooltip_help_target_blank.'></td>';
                 $pagecontent .= '<td width="6%" class="td_center_title"><input type="radio" name="categories['.$cat.'][new_target]['.$pos.']" value="-_self-"'.$post['categories'][$cat]['checked_selv'][$pos].''.$tooltip_help_target_self.'><input type="hidden" name="categories['.$cat.'][target]['.$pos.']" value="'.$post['categories'][$cat]['target'][$pos].'"></td><td>&nbsp;</td>';
                 $pagecontent .= '</tr></table>';
             } else {
-                $pagecontent .= '<table width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0"><tr><td width="30%" class="td_left_title" nowrap><b>'.$text_titel_new_name.'</b></td><td class="td_left_title">&nbsp;</td></tr>';
+                $pagecontent .= '<table width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0"><tr><td width="30%" class="td_left_title" nowrap><b>'.$text_new_name.'</b></td><td class="td_left_title">&nbsp;</td></tr>';
                 $pagecontent .= '<tr><td width="30%" class="td_left_title" nowrap><input '.$post['categories'][$cat]['error_html']['new_name'][$pos].' class="input_text" name="categories['.$cat.'][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_name'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_name.'></td><td>&nbsp;</td>';
                 $pagecontent .= '</tr></table>';
             }
@@ -1733,7 +1733,7 @@ $tooltip_help_edit = NULL;
         "gallery_titel_all_thumbs_new","gallery_titel_size","gallery_titel_subtitle","gallery_button_cut","gallery_titel_newname",
         "gallery_button_img_delete","gallery_button_gallery_delete");
 
-    # Variable erzeugen z.B. info_many_pages = $text_info_many_pages
+    # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getLanguageValue as $language) {
         ${"text_".$language} = getLanguageValue($language);
     }
@@ -1744,7 +1744,7 @@ $tooltip_help_edit = NULL;
         "gallery_help_del","gallery_help_target","gallery_help_conf","gallery_help_edit","gallery_help_newname");
 
 
-    # Variable erzeugen z.B. info_many_pages = $text_info_many_pages
+    # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getTooltipValue as $language) {
         if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
             ${"tooltip_".$language} = createTooltipWZ("",$language,",WIDTH,200,CLICKCLOSE,true");
@@ -2381,9 +2381,9 @@ function files($post) {
         $maxnumberoffiles = 5;
     }
 
-    $array_getLanguageValue = array("info_many_files","titel_cat","titel_contents","files_titel_datei","files_titel_download","files_titel_upload_date","files_titel_size","files_text_upload","files_button_cut","files_button_delete","files_text_no_files");
+    $array_getLanguageValue = array("files","category","contents","files_titel_datei","files_titel_download","files_titel_upload_date","files_titel_size","files_text_upload","files_button_cut","files_button_delete","files_text_no_files");
 
-    # Variable erzeugen z.B. info_many_pages = $text_info_many_pages
+    # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getLanguageValue as $language) {
         ${"text_".$language} = getLanguageValue($language);
     }
@@ -2391,7 +2391,7 @@ function files($post) {
     $array_getTooltipValue = array("files_help_edit","files_help_delete","files_help_show","files_help_upload",
                             "files_help_downloads","files_help_overwrite");
 
-    # Variable erzeugen z.B. info_many_pages = $text_info_many_pages
+    # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getTooltipValue as $language) {
         if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
             ${"tooltip_".$language} = createTooltipWZ("",$language,",WIDTH,200,CLICKCLOSE,true");
@@ -2425,13 +2425,13 @@ function files($post) {
                 }
                 closedir($fileshandle);
             }
-            $text = '('.$filecount.' '.$text_info_many_files.')';
+            $text = '('.$filecount.' '.$text_files.')';
 
         $pagecontent .= '<tr><td class="td_toggle">';
 
         $pagecontent .= '<table width="100%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
         if(!isset($display_titel)) {# Position:          
-            $pagecontent .= '<tr><td width="30%" class="td_left_title"><b>'.$text_titel_cat.'</b></td><td>&nbsp;</td><td width="30%" class="td_left_title"><b>'.$text_titel_contents.'</b></td><td width="15%" class="td_icons">&nbsp;</td></tr>';
+            $pagecontent .= '<tr><td width="30%" class="td_left_title"><b>'.$text_category.'</b></td><td>&nbsp;</td><td width="30%" class="td_left_title"><b>'.$text_contents.'</b></td><td width="15%" class="td_icons">&nbsp;</td></tr>';
             $display_titel = true;
         }
         $pagecontent .= '<tr><td width="30%" class="td_left_title"><span '.$post['categories']['cat']['error_html']['name'][$pos].'class="text_cat_page">'.$specialchars->rebuildSpecialChars($post['categories']['cat']['name'][$pos], true, true).'</span><input type="hidden" name="categories[cat][position]['.$pos.']" value="'.$post['categories']['cat']['position'][$pos].'"><input type="hidden" name="categories[cat][name]['.$pos.']" value="'.$post['categories']['cat']['name'][$pos].'"></td>';
@@ -2476,7 +2476,7 @@ function files($post) {
                 // Downloads pro Tag berechnen
                 $uploadtime = filemtime("$CONTENT_DIR_REL/$file/dateien/$subfile");
                 $counterstart = $DOWNLOAD_COUNTS->get("_downloadcounterstarttime");
-                // Berechnungsgrundlage für "Downloads pro Tag":
+                // Berechnungsgrundlage fuer "Downloads pro Tag":
                 // Entweder Upload-Zeitpunkt oder Beginn der Statistik - genommen wird der spätere Zeitpunkt
                 if ($uploadtime > $counterstart)
                     $starttime = $uploadtime;
@@ -2858,7 +2858,7 @@ $array_checkbox = array('usecmssyntax','hidecatnamedpages','modrewrite','showhid
         $post['error_messages']['config_error_language_emty'][] = NULL;
         $error_color['cmslanguage'] = ' style="background-color:#FF7029;"';
     } elseif(!in_array($CMS_CONF->get('cmslanguage').".conf",$language_array)) {
-        $post['error_messages']['config_error_language_existed'][] = $CMS_CONF->get('cmslanguage');
+        $post['error_messages']['config_error_languagefile_error'][] = $CMS_CONF->get('cmslanguage');
         $error_color['cmslanguage'] = ' style="background-color:#FF7029;"';
     }
 
@@ -2884,7 +2884,7 @@ $array_checkbox = array('usecmssyntax','hidecatnamedpages','modrewrite','showhid
     $array_getTooltipValue = array("admin_help_language","admin_help_adminmail","admin_help_chmodnewfiles",
         "admin_help_chmodupdate");
 
-    # Variable erzeugen z.B. info_many_pages = $text_info_many_pages
+    # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getTooltipValue as $language) {
         if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
             ${"tooltip_".$language} = createTooltipWZ("",$language,",WIDTH,200,CLICKCLOSE,true");
@@ -3113,7 +3113,7 @@ $array_checkbox = array('usecmssyntax','hidecatnamedpages','modrewrite','showhid
     .'<td width="10%" class="td_contact_title" align="center">'.getLanguageValue("config_titel_contact_show").'</td>'
     .'<td width="10%" class="td_contact_title" align="center">'.getLanguageValue("config_titel_contact_mandatory").'</td></tr>'
     .'<tr><td>'.getLanguageValue("config_input_contact_mail").'</td><td><input type="text" class="input_cms_text" name="titel_mail" value="'.$specialchars->rebuildSpecialChars($config_mail[0],true,true).'"'.$error_color['titel_mail'].' /></td><td align="center">'.buildCheckBox("show_mail", ($config_mail[1] == "true")).'</td><td align="center">'.buildCheckBox("mandatory_mail", ($config_mail[2] == "true")).'</td></tr>'
-    .'<tr><td>'.getLanguageValue("config_input_contact_text").'</td><td><input type="text" class="input_cms_text" name="titel_name" value="'.$specialchars->rebuildSpecialChars($config_name[0],true,true).'"'.$error_color['titel_name'].' /></td><td align="center">'.buildCheckBox("show_name", ($config_name[1] == "true")).'</td><td align="center">'.buildCheckBox("mandatory_name", ($config_name[2] == "true")).'</td></tr>'
+    .'<tr><td>'.getLanguageValue("config_input_contact_text").'</td><td><input type="text" class="input_cms_text" name="name" value="'.$specialchars->rebuildSpecialChars($config_name[0],true,true).'"'.$error_color['name'].' /></td><td align="center">'.buildCheckBox("show_name", ($config_name[1] == "true")).'</td><td align="center">'.buildCheckBox("mandatory_name", ($config_name[2] == "true")).'</td></tr>'
     .'<tr><td>'.getLanguageValue("config_input_contact_text").'</td><td><input type="text" class="input_cms_text" name="titel_website" value="'.$specialchars->rebuildSpecialChars($config_website[0],true,true).'"'.$error_color['titel_website'].' /></td><td align="center">'.buildCheckBox("show_website", ($config_website[1] == "true")).'</td><td align="center">'.buildCheckBox("mandatory_website", ($config_website[2] == "true")).'</td></tr>'
     .'<tr><td>'.getLanguageValue("config_input_contact_textarea").'</td><td><input type="text" class="input_cms_text" name="titel_message" value="'.$specialchars->rebuildSpecialChars($config_message[0],true,true).'"'.$error_color['titel_message'].' /></td><td align="center">'.buildCheckBox("show_message", ($config_message[1] == "true")).'</td><td align="center">'.buildCheckBox("mandatory_message", ($config_message[2] == "true")).'</td></tr>'
     ."</table></td>";
@@ -3218,7 +3218,7 @@ echo "</pre><br>\n";*/
         $post['error_messages']['admin_error_language_emty'][] = NULL;
         $error_color['language'] = ' style="background-color:#FF7029;"';
     } elseif(!in_array("language_".$ADMIN_CONF->get('language').".conf",$language_array)) {
-        $post['error_messages']['admin_error_language_existed'][] = $ADMIN_CONF->get('language');
+        $post['error_messages']['admin_error_languagefile_error'][] = $ADMIN_CONF->get('language');
         $error_color['language'] = ' style="background-color:#FF7029;"';
     }
 
@@ -3404,7 +3404,7 @@ if($LOGINCONF->get("initialsetup") == "true") {
     $array_getTooltipValue = array("admin_help_language","admin_help_adminmail","admin_help_chmodnewfiles",
         "admin_help_chmodupdate");
 
-    # Variable erzeugen z.B. info_many_pages = $text_info_many_pages
+    # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getTooltipValue as $language) {
         if(isset($post['javascript']) and $ADMIN_CONF->get("showTooltips") == "true") {
             ${"tooltip_".$language} = createTooltipWZ("",$language,",WIDTH,200,CLICKCLOSE,true");
@@ -4129,13 +4129,13 @@ function returnFormatToolbar($currentcat) {
     return $content;
 }
 
-// Rückgabe eines Standard-Formatsymbolleisten-Icons
+// Rueckgabe eines Standard-Formatsymbolleisten-Icons
 function returnFormatToolbarIcon($tag) {
     return "<img class=\"js\" alt=\"$tag\" title=\"[$tag| ... ] - ".getLanguageValue("toolbar_desc_".$tag)."\" src=\"gfx/jsToolbar/".$tag.".png\" onClick=\"insert('[".$tag."|', ']', true)\">";
 }
 
 
-// Rückgabe einer Selectbox mit Elementen, die per Klick in die Inhaltsseite übernommen werden k�nnen
+// Rueckgabe einer Selectbox mit Elementen, die per Klick in die Inhaltsseite uebernommen werden k�nnen
 // $type: 1=Kategorien 2=Inhaltsseiten 3=Dateien 4=Galerien
 function returnOverviewSelectbox($type, $currentcat) {
     global $specialchars;
@@ -4265,7 +4265,7 @@ function deleteCategoryFromDownloadStats($catname) {
             unset($downloadsarray[$key]);
         }
     }
-    // bearbeitetes Array wieder zurück in die Download-Statistik schreiben
+    // bearbeitetes Array wieder zurueck in die Download-Statistik schreiben
     $DOWNLOAD_COUNTS->setFromArray($downloadsarray);
 }
 
@@ -4283,7 +4283,7 @@ function renameCategoryInDownloadStats($oldcatname, $newcatname) {
             unset($downloadsarray[$key]);                            // Element mit altem Key aus Array l�schen
         }
     }
-    // bearbeitetes Array wieder zurück in die Download-Statistik schreiben
+    // bearbeitetes Array wieder zurueck in die Download-Statistik schreiben
     $DOWNLOAD_COUNTS->setFromArray($downloadsarray);
 }
 
@@ -4298,7 +4298,7 @@ function setLayoutAndDependentSettings($layoutfolder) {
 
 #wird in Propertis gepr�ft
 #        if (file_exists($settingsfile)) {
-            // Einstellungen aus Layout-Settings laden und in den CMS-Einstellungen überschreiben
+            // Einstellungen aus Layout-Settings laden und in den CMS-Einstellungen ueberschreiben
             $layoutsettings = new Properties($settingsfile);
             if(isset($layoutsettings->properties['error'])) {
                 return $layoutsettings->properties['error'];
@@ -4314,7 +4314,7 @@ function setLayoutAndDependentSettings($layoutfolder) {
 #    $CMS_CONF->set("cmslayout", $layoutfolder);
 }
 
-// Hochgeladene Datei überprüfen und speichern
+// Hochgeladene Datei ueberpruefen und speichern
 function uploadFile($uploadfile, $cat, $forceoverwrite, $gallery = false){
     global $ADMIN_CONF;
     global $specialchars;
@@ -4339,7 +4339,7 @@ function uploadFile($uploadfile, $cat, $forceoverwrite, $gallery = false){
         if (fileHasExtension($uploadfile_name, explode(",", $ADMIN_CONF->get("noupload")))) {
             return array("files_error_wrongext" => $uploadfile_name);
         }
-        // ungültige Zeichen im Dateinamen
+        // ungueltige Zeichen im Dateinamen
         elseif(!preg_match($specialchars->getFileCharsRegex(), $uploadfile_name)) {
             return array("files_error_name" => $uploadfile_name);
         }
@@ -4373,7 +4373,7 @@ return;
     }
 }
 
-// Überprüft den REQUEST-Parameter mit dem übergebenen Index auf Validität.
+// Überprueft den REQUEST-Parameter mit dem uebergebenen Index auf Validität.
 // $type hat folgende Werte:
 // 1: nur Ziffern (wenigstens eine)
 // 2: beliebige Zeichen (wenigstens eins)
@@ -4421,7 +4421,7 @@ function isValidRequestParameter($index, $type) {
     }
 }
 
-// Gibt eine Checkbox mit dem übergebenen Namen zurück. Der Parameter checked bestimmt, ob die Checkbox angehakt ist.
+// Gibt eine Checkbox mit dem uebergebenen Namen zurueck. Der Parameter checked bestimmt, ob die Checkbox angehakt ist.
 function buildCheckBox($name, $checked) {
     $checkbox = '<input type="checkbox" ';
     if ($checked == "true") {
@@ -4431,11 +4431,11 @@ function buildCheckBox($name, $checked) {
     return $checkbox;
 }
 
-// gibt zurück, ob eine Checkbox angehakt ist
+// gibt zurueck, ob eine Checkbox angehakt ist
 function checkBoxIsChecked($checkboxrequest) {
     return (isset($_POST[$checkboxrequest]) && ($_POST[$checkboxrequest] == "on"));
 }
-// gibt zurück, ob eine Checkbox angehakt ist
+// gibt zurueck, ob eine Checkbox angehakt ist
 function checkBoxChecked($checkboxrequest) {
     if(isset($_POST[$checkboxrequest]) and ($_POST[$checkboxrequest] == "on")) {
         return "true";
@@ -4444,7 +4444,7 @@ function checkBoxChecked($checkboxrequest) {
     }
 }
 
-// gibt das img-Tag für ein Action-Icon zurück (abhängig von der entsprechenden Einstellung)
+// gibt das img-Tag fuer ein Action-Icon zurueck (abhängig von der entsprechenden Einstellung)
 function getActionIcon($iconname, $titletext) {
     global $ADMIN_CONF;
     // Gro�e Icons anzeigen?
@@ -4474,7 +4474,7 @@ function getActionIcon($iconname, $titletext) {
     }
 
 // ------------------------------------------------------------------------------
-// Hilfsfunktion: Prüft einen Requestparameter
+// Hilfsfunktion: Prueft einen Requestparameter
 // ------------------------------------------------------------------------------
     function getRequestParam($param, $clean) {
         if (isset($_POST[$param])) {

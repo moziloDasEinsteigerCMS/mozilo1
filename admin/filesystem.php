@@ -68,7 +68,7 @@ function getLanguageValue($confpara,$accesskey = NULL)
     if($accesskey != NULL) {
         $sring = $BASIC_LANGUAGE->get($confpara);
         if(empty($sring)) {
-            return $confpara." ".$BASIC_LANGUAGE->get('language_existed');
+            return $confpara." ".$BASIC_LANGUAGE->get('languagefile_error');
         }
         $position = strpos($sring,$accesskey);
         $accesskey_zeichen = substr($sring,$position,1);
@@ -81,7 +81,7 @@ function getLanguageValue($confpara,$accesskey = NULL)
     } else
         $text = htmlentities($BASIC_LANGUAGE->get($confpara),ENT_COMPAT,'ISO-8859-1');
         if(empty($text)) {
-            return '<b style="color:#ff0000;">'.$confpara."</b> ".$BASIC_LANGUAGE->get('language_existed');
+            return '<b style="color:#ff0000;">'.$confpara."</b> ".$BASIC_LANGUAGE->get('languagefile_error');
         }
         $text = str_replace(array("&lt;","&gt;"),array("<",">"), $text);
         return $text;
@@ -670,7 +670,7 @@ function changeChmod($file,$error = NULL) {
         @chmod();
         $error_new['php_error'] = $file." - ".$last_error['message'];
     } elseif(substr(decoct(fileperms($file)), -3) != decoct(getChmod($dir))) {
-        $error_new['change_chmod'] = $file;
+        $error_new['chmod_error'] = $file;
     }
     return $error_new;
 }
