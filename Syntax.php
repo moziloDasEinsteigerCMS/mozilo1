@@ -19,7 +19,7 @@ class Syntax {
     var $TARGETBLANK_GALLERY;
     var $TARGETBLANK_DOWNLOAD;
     var $anchorcounter;
-    var $headlininfos;
+    var $headlineinfos;
 
     
 // ------------------------------------------------------------------------------    
