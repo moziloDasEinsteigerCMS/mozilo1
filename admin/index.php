@@ -1141,7 +1141,7 @@ function page($post) {
             $pagecontent .= '<input type="hidden" name="categories['.$cat.'][name]['.$pos.']" value="'.$post['categories'][$cat]['name'][$pos].'"><input type="hidden" name="categories['.$cat.'][ext]['.$pos.']" value="'.substr($post['categories'][$cat]['ext'][$pos],-(strlen($EXT_PAGE))).'"></td>';
 
             $pagecontent .= '<td width="12%" class="td_left_title" nowrap><span class="text_info">'.$text.'</span></td>';
-            $pagecontent .= '<td width="12%" class="td_left_title" nowrap><b>'.$text_page_page_copy.'</b>&nbsp;<input class="input_check" type="checkbox" name="categories['.$cat.'][copy]['.$pos.']" value="yes"'.$post['categories'][$cat]['copy'][$pos].''.$tooltip_page_help_copy.'></td>';
+            $pagecontent .= '<td width="12%" class="td_left_title" nowrap><b>'.$text_page_copy.'</b>&nbsp;<input class="input_check" type="checkbox" name="categories['.$cat.'][copy]['.$pos.']" value="yes"'.$post['categories'][$cat]['copy'][$pos].''.$tooltip_page_help_copy.'></td>';
 
             $pagecontent .= '<td width="15%" class="td_icons" nowrap>';
             if(getRequestParam('javascript', true)) {
