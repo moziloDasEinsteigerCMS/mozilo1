@@ -129,6 +129,11 @@ if(!isset($CMS_CONF->properties['readonly'])) {
 }
 
 
+if(!is_file("../conf/version.conf")) {
+    $VERSION_CONF    = new Properties("../conf/version.conf");
+    makeDefaultConf("../conf/version.conf","VERSION_CONF");
+    unset($VERSION_CONF);
+}
 $VERSION_CONF    = new Properties("../conf/version.conf");
 if(!isset($VERSION_CONF->properties['readonly'])) {
     die($VERSION_CONF->properties['error']);
