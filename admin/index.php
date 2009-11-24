@@ -1696,7 +1696,7 @@ $post = editGallery($post);
         $tooltip_gallery_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration&amp;page=30_Kategorien" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
     }
 $tooltip_help_edit = NULL;
-    $pagecontent .= '<span class="titel">'.getLanguageValue("gallery_titel").'</span>';
+    $pagecontent .= '<span class="titel">'.getLanguageValue("gallery_button").'</span>';
     $pagecontent .= $tooltip_gallery_help;
     $pagecontent .= "<p>".getLanguageValue("gallery_text")."</p>";
 
@@ -1705,7 +1705,7 @@ $tooltip_file_help_overwrite = NULL;
 $overwrite = NULL;
 $tooltip_help_edit = NULL;
     $pagecontent .= '<tr><td class="td_toggle">';
-    $pagecontent .= '<input type="submit" name="action_data[gallery]" value="Dateien Hochladen" class="input_submit">';
+    $pagecontent .= '<input type="submit" name="action_data[gallery]" value="'.getLanguageValue("category_button_change").'" class="input_submit">';
     $pagecontent .= '&nbsp;&nbsp;<input class="input_check_copy" type="checkbox" name="overwrite" value="on"'.$tooltip_file_help_overwrite.$overwrite.'>&nbsp;<span'.$tooltip_file_help_overwrite.$overwrite.'>'.getLanguageValue("files_button_overwrite").'</span>';
     $pagecontent .= '</td></tr>';
 
@@ -2371,7 +2371,7 @@ function files($post) {
 
     $pagecontent .= categoriesMessages($post);
 
-    $pagecontent .= '<span class="titel">'.getLanguageValue("files_titel").'</span>';
+    $pagecontent .= '<span class="titel">'.getLanguageValue("files_button").'</span>';
     $pagecontent .= $tooltip_files_help;
     $pagecontent .= "<p>".getLanguageValue("files_text")."</p>";
 
@@ -2381,7 +2381,7 @@ function files($post) {
         $maxnumberoffiles = 5;
     }
 
-    $array_getLanguageValue = array("files","category","contents","files_titel_datei","files_titel_download","files_titel_upload_date","files_titel_size","files_text_upload","files_button_cut","files_button_delete","files_text_no_files");
+    $array_getLanguageValue = array("files","category","contents","file","files_downloads","files_uploaddate","files_size","files_text_upload","files_button_cut","files_button_delete","files_text_no_files");
 
     # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getLanguageValue as $language) {
@@ -2496,7 +2496,7 @@ function files($post) {
 
         $titel_dateien = NULL;
         if(!isset($display_titel_dateien)) {# Position:          
-            $titel_dateien = '<tr><td class="td_left_title"><b>'.$text_files_titel_datei.'</b></td><td width="10%" class="td_left_title" nowrap><b>'.$text_files_titel_size.'</b></td><td width="20%" class="td_left_title" nowrap><b>'.$text_files_titel_upload_date.'</b></td><td width="10%" class="td_center_title" nowrap><b'.$tooltip_files_help_downloads.'>'.$text_files_titel_download.'</b></td><td width="5%" class="td_left_title" nowrap>&nbsp;</td></tr>';
+            $titel_dateien = '<tr><td class="td_left_title"><b>'.$text_file.'</b></td><td width="10%" class="td_left_title" nowrap><b>'.$text_files_size.'</b></td><td width="20%" class="td_left_title" nowrap><b>'.$text_files_uploaddate.'</b></td><td width="10%" class="td_center_title" nowrap><b'.$tooltip_files_help_downloads.'>'.$text_files_downloads.'</b></td><td width="5%" class="td_left_title" nowrap>&nbsp;</td></tr>';
             $display_titel_dateien = true;
         }
 
@@ -4054,6 +4054,7 @@ function returnFormatToolbar($currentcat) {
     .returnFormatToolbarIcon("ueber1")
     .returnFormatToolbarIcon("ueber2")
     .returnFormatToolbarIcon("ueber3")
+    .returnFormatToolbarIcon("absatz")
     .returnFormatToolbarIcon("liste")
     .returnFormatToolbarIcon("numliste")
     ."<img class=\"js\" alt=\"Tabelle\" title=\"[tabelle| ... ] - ".getLanguageValue("toolbar_desc_tabelle")."\" src=\"gfx/jsToolbar/tabelle.png\" onClick=\"insert('[tabelle|\\n<< ', ' |  >>\\n<  |  >\\n]', true)\">"
@@ -4234,7 +4235,7 @@ if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
             break;
             // Galerien
         case 3:
-            $select .="<option class=\"noaction\" value=\"\">".getLanguageValue("button_gallery").":</option>";
+            $select .="<option class=\"noaction\" value=\"\">".getLanguageValue("gallery_button").":</option>";
             break;
     }
     // Elemente der Selectbox
