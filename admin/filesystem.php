@@ -730,81 +730,88 @@ function useChmod($dir = false, $error = NULL) {
 # Parameter:
 # $conf_datei = pfad/datei name
 # $conv_variable = z.B. $USER_SYNTAX = new Properties(); $conv_variable = "USER_SYNTAX"
-# bei $get_only_array == true werden die Parameter gebraucht:
-# makeDefaultConf(arrayname ohne "$", "", false, true)
+# bei $get_only_array == true wird das array zurückgegeben
+# makeDefaultConf(arrayname ohne "$", "", true)
 # Aufbau:
 # $"name der datei ohne .conf" = array(syntax => default wert);
-function makeDefaultConf($conf_datei,$conv_variable,$make_default = false,$get_only_array = false) {
-#dig_
-#txt_
-#che_
+function makeDefaultConf($conf_datei,$conv_variable,$get_only_array = false) {
 
-    $basic = array('adminmail' => '',
-                    'backupmsgintervall' => '30',
-                    'chmodnewfilesatts' => '664',
-                    'language' => 'deDE',
-                    'lastbackup' => time(),
-                    'maximageheight' => '',
-                    'maximagewidth' => '',
-                    'maxnumberofuploadfiles' => '5',
-                    'noupload' => 'php,php3,php4,php5',
-                    'overwriteuploadfiles' => 'false',
-                    'resizeimages' => 'false',
-                    'sendadminmail' => 'false',
-                    'showTooltips' => 'true',
-                    'textareaheight' => '270',
-                    'usebigactionicons' => 'false',
-                    'showexpert' => 'false'); # als letztes damit wennn ausgeschaltet die einstellungen noch gespeichert werden
+    $basic = array(
+                    'text' => array(
+                        'adminmail' => '',
+                        'language' => 'deDE',
+                        'noupload' => 'php,php3,php4,php5'),
+                    'digit' => array(
+                        'backupmsgintervall' => '30',
+                        'chmodnewfilesatts' => '664',
+                        'lastbackup' => time(),
+                        'maximageheight' => '',
+                        'maximagewidth' => '',
+                        'maxnumberofuploadfiles' => '5',
+                        'textareaheight' => '270'),
+                    'checkbox' => array(
+                        'overwriteuploadfiles' => 'false',
+#                        'resizeimages' => 'false',
+                        'sendadminmail' => 'false',
+                        'showTooltips' => 'true',
+                        'usebigactionicons' => 'false',
+                        'showexpert' => 'false'),
+                    # das sind die Expert Parameter von basic
+                    'expert' => array(
+                        'noupload',
+                        'backupmsgintervall',
+                        'lastbackup',
+                        'maxnumberofuploadfiles',
+                        'showTooltips',
+                        'textareaheight',
+                        'usebigactionicons',
+                        'overwriteuploadfiles')
+                    );
 
-    # das sind die Expert Parameter von basic
-    $expert_basic = array('noupload' => '',
-                    'backupmsgintervall' => '',
-                    'lastbackup' => '',
-                    'maxnumberofuploadfiles' => '',
-                    'showTooltips' => '',
-                    'textareaheight' => '',
-                    'usebigactionicons' => '',
-                    'overwriteuploadfiles' => ''
-                        );
 
-    $main = array('cmslanguage' => 'Deutsch',
-                    'cmslayout' => 'moziloCMS%202009',
-                    'cmsversion' => '1.12alpha',
-                    'defaultcat' => '',
-                    'hidecatnamedpages' => 'false',
-                    'menu2' => 'no_menu2',
-                    'modrewrite' => 'false',
-                    'replaceemoticons' => 'true',
-                    'shortenlinks' => '0',
-                    'showhiddenpagesinlastchanged' => 'false',
-                    'showhiddenpagesinsearch' => 'false',
-                    'showhiddenpagesinsitemap' => 'false',
-                    'showsyntaxtooltips' => 'true',
-                    'targetblank_download' => 'true',
-                    'targetblank_gallery' => 'true',
-                    'targetblank_link' => 'true',
-                    'titlebarformat' => '{WEBSITE}',
-                    'titlebarseparator' => ' :: ',
-                    'usesubmenu' => '1',
-                    'websitedescription' => '',
-                    'websitekeywords' => '',
-                    'websitetitle' => 'moziloCMS - Das CMS für Einsteiger',
-                    'usecmssyntax' => 'true'); # als letztes damit wennn ausgeschaltet die einstellungen noch gespeichert werden
+    $main = array(
+                    'text' => array(
+#                        'cmsversion' => '1.12alpha',
+                        'shortenlinks' => '0',
+                        'titlebarseparator' => '%20%3A%3A%20',
+                        'usesubmenu' => '1',
+                        'websitedescription' => '',
+                        'websitekeywords' => '',
+                        'websitetitle' => 'moziloCMS%20-%20Das%20CMS%20f%FCr%20Einsteiger'),
+                    'select' => array(
+                        'cmslanguage' => 'Deutsch',
+                        'cmslayout' => 'moziloCMS%202009',
+                        'defaultcat' => '',
+                        'menu2' => 'no_menu2',
+                        'titlebarformat' => '%7BWEBSITE%7D'),
+                    'checkbox' => array(
+                        'hidecatnamedpages' => 'false',
+                        'modrewrite' => 'false',
+                        'replaceemoticons' => 'true',
+                        'showhiddenpagesinlastchanged' => 'false',
+                        'showhiddenpagesinsearch' => 'false',
+                        'showhiddenpagesinsitemap' => 'false',
+                        'showsyntaxtooltips' => 'true',
+                        'targetblank_download' => 'true',
+                        'targetblank_gallery' => 'true',
+                        'targetblank_link' => 'true',
+                        'usecmssyntax' => 'true'),
+                    'expert' => array(
+                        'hidecatnamedpages',
+                        'modrewrite',
+                        'showhiddenpagesinlastchanged',
+                        'showhiddenpagesinsearch',
+                        'showhiddenpagesinsitemap',
+                        'targetblank_download',
+                        'targetblank_gallery',
+                        'targetblank_link',
+                        'showsyntaxtooltips',
+                        'replaceemoticons',
+                        'shortenlinks',
+                        'usecmssyntax',
+                        'usesubmenu')
+                    );
 
-    # das sind die Expert Parameter von main
-    $expert_main = array('hidecatnamedpages' => '',
-                    'modrewrite' => '',
-                    'showhiddenpagesinlastchanged' => '',
-                    'showhiddenpagesinsearch' => '',
-                    'showhiddenpagesinsitemap' => '',
-                    'targetblank_download' => '',
-                    'targetblank_gallery' => '',
-                    'targetblank_link' => '',
-                    'showsyntaxtooltips' => '',
-                    'replaceemoticons' => '',
-                    'shortenlinks' => '',
-                    'usecmssyntax' => '',
-                    'usesubmenu' => '');
 
     $syntax = array('wikipedia' => '[link={DESCRIPTION}|http://de.wikipedia.org/wiki/{VALUE}]');
 
@@ -822,7 +829,7 @@ function makeDefaultConf($conf_datei,$conv_variable,$make_default = false,$get_o
                         'pw' => '19ad89bc3e3c9d7ef68b89523eff1987');
 
     $downloads = array('_downloadcounterstarttime' => '1254408507');
-
+/*
     # Das sind die Verstägten Parameter Achtung Bitte ergenzen wenn was Fehlt!!!!!!!!!!!!!!!!!!!!!!!!!!!
     $hidden_syntax = array('usebigactionicons' => 'false',
                     'targetblank_download' => 'true',
@@ -832,7 +839,7 @@ function makeDefaultConf($conf_datei,$conv_variable,$make_default = false,$get_o
                     'modrewrite' => 'false',
                     'showhiddenpagesinlastchanged' => 'false',
                     'showhiddenpagesinsearch' => 'false',
-                    'showhiddenpagesinsitemap' => 'false');
+                    'showhiddenpagesinsitemap' => 'false');*/
 
 /*
                     'gallerymaxheight' => '375',
@@ -844,19 +851,29 @@ function makeDefaultConf($conf_datei,$conv_variable,$make_default = false,$get_o
         global $$conv_variable;
         $name = substr(basename($conf_datei),0,-(strlen(".conf")));
         foreach($$name as $syntax => $default) {
-            if($make_default === false) {
-                $$conv_variable->set($syntax, $default);
-            } else {
-                if(!in_array($syntax,$hidden_syntax)) {
+            if(is_array($default) and $syntax != 'expert') {
+                foreach($default as $syntax => $default) {
+#echo "sub = $syntax => $default<br>\n";
                     $$conv_variable->set($syntax, $default);
                 }
+            } else {
+                $$conv_variable->set($syntax, $default);
+#echo "$syntax => $default<br>\n";
             }
+#            if($make_default === false) {
+#                $$conv_variable->set($syntax, $default);
+#            } else {
+#                if(!in_array($syntax,$hidden_syntax)) {
+#                    $$conv_variable->set($syntax, $default);
+#                }
+#            }
         }
     } else {
-        foreach($$conf_datei as $syntax => $tmp) {
-            $return[] = $syntax;
-        }
-        return $return;
+        return $$conf_datei;
+#        foreach($$conf_datei as $syntax => $tmp) {
+#            $return[] = $syntax;
+#        }
+#        return $return;
     }
 }
 
