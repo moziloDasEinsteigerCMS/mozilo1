@@ -193,6 +193,7 @@ class DEMOPLUGIN extends Plugin {
             "description" => "Bitte Wert eingeben",     // Pflicht:  Beschreibung
             "maxlength" => "100",                       // optional: maximale Länge
             "size" => "30",                             // optional: dargestellte Zeichen
+            "regex_error" => "Es dürfen nur 3 kleine Buchstaben eingegeben werden bei Bitte Wert eingeben",// optional: error meldung
             "regex" => "/^[a-z]{3}$/"                   // optional: Erlaubte Werte als regulärer Ausdruck (hier: drei kleine Buchstaben; wird beim Speichern der Einstellungen überprüft)
             );
 
@@ -206,6 +207,7 @@ class DEMOPLUGIN extends Plugin {
             "cols" => "30",                             // Pflicht:  Spaltenanzahl 
             "rows" => "5",                              // Pflicht:  Zeilenanzahl
             "description" => "Bitte Text eingeben",     // Pflicht:  Beschreibung
+            "regex_error" => "Das sind keine Belibigen Zeichen bei Bitte Text eingeben",// optional: error meldung
             "regex" => "/^.*$/"                         // optional: Erlaubte Werte als regulärer Ausdruck (hier: beliebige Zeichen; wird beim Speichern der Einstellungen überprüft)
             );
 
@@ -220,6 +222,7 @@ class DEMOPLUGIN extends Plugin {
             "description" => "Bitte Passwort eingeben", // Pflicht:  Beschreibung
             "maxlength" => "100",                       // optional: maximale Länge
             "size" => "30",                             // optional: dargestellte Zeichen
+            "regex_error" => "mindestens acht Zeichen, bestehend aus Klein- und Großbuchstaben sowie Ziffern bei Bitte Passwort eingeben",// optional: error meldung
             "regex" => "/^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).*$/" // optional: Erlaubte Werte als regulärer Ausdruck (hier: mindestens acht Zeichen, bestehend aus Klein- und Großbuchstaben sowie Ziffern); wird beim Speichern der Einstellungen überprüft
             );
 
