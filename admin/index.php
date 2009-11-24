@@ -1705,17 +1705,17 @@ $tooltip_file_help_overwrite = NULL;
 $overwrite = NULL;
 $tooltip_help_edit = NULL;
     $pagecontent .= '<tr><td class="td_toggle">';
-    $pagecontent .= '<input type="submit" name="action_data[gallery]" value="'.getLanguageValue("category_button_change").'" class="input_submit">';
+    $pagecontent .= '<input type="submit" name="action_data[gallery]" value="'.getLanguageValue("gallery_button_change").'" class="input_submit">';
     $pagecontent .= '&nbsp;&nbsp;<input class="input_check_copy" type="checkbox" name="overwrite" value="on"'.$tooltip_file_help_overwrite.$overwrite.'>&nbsp;<span'.$tooltip_file_help_overwrite.$overwrite.'>'.getLanguageValue("files_button_overwrite").'</span>';
     $pagecontent .= '</td></tr>';
 
     $pagecontent .= '<tr><td width="100%" class="td_toggle_new">';
     # Neue GAllery
     $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
-    $pagecontent .= '<tr><td width="30%" class="td_left_title"><b>'.getLanguageValue("gallery_titel_new").'</b></td>';
+    $pagecontent .= '<tr><td width="30%" class="td_left_title"><b>'.getLanguageValue("gallery_new").'</b></td>';
     $pagecontent .= '<td width="70%" class="td_left_title">&nbsp;</td>';
     $pagecontent .= '</tr><tr>';
-#<b>'.getLanguageValue("gallery_titel_scale").'</b>
+#<b>'.getLanguageValue("gallery_scale").'</b>
     $pagecontent .= '';
     $pagecontent .= '<td width="30%" class="td_left_title"><input class="input_text" name="new_gallery" value="" maxlength="'.$max_strlen.'"></td>';
     $pagecontent .= '<td width="70%" class="td_left_title">&nbsp;</td>';
@@ -1728,9 +1728,9 @@ $tooltip_help_edit = NULL;
 #    $array_getLanguageValue = array("","","","","","",
 #        "","","","","",
 #        "","");
-    $array_getLanguageValue = array("gallery_titel_scale",
-        "gallery_titel_picsperrow","gallery_titel_use_thumbs","gallery_titel_target","gallery_titel_all_picture_scale",
-        "gallery_titel_all_thumbs_new","gallery_titel_size","gallery_titel_subtitle","gallery_button_cut","gallery_titel_newname",
+    $array_getLanguageValue = array("gallery_scale",
+        "gallery_picsperrow","gallery_usethumbs","gallery_target","gallery_scaleimages",
+        "gallery_rebuildthumbs","gallery_size","gallery_subtitle","gallery_button_cut","gallery_newname",
         "gallery_button_img_delete","gallery_button_gallery_delete");
 
     # Variable erzeugen z.B. pages = $text_pages
@@ -1813,14 +1813,14 @@ $tooltip_help_edit = NULL;
         $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data" id="toggle_'.$toggle_pos.'conf"'.$post['gallery']['error_html']['display_setings'][$currentgalerien].'><tr>';
 
 
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_newname.'><b>'.$text_gallery_titel_newname.'</b></td>';
+        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_newname.'><b>'.$text_gallery_newname.'</b></td>';
         $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input class="input_text" name="gallery['.$currentgalerien.'][newname]" value="" maxlength="'.$max_strlen.'"'.$post['gallery']['error_html']['newname'][$currentgalerien].$tooltip_gallery_help_newname.'></td>';
 
 #$post['gallery']['error_html']['new_name'][$gallery]
 
         $pagecontent .= '</tr><tr>';
 
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_scale.'><b>'.$text_gallery_titel_scale.'</b></td>';
+        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_scale.'><b>'.$text_gallery_scale.'</b></td>';
         $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery['.$currentgalerien.'][setings][maxwidth]" value="'.$conf->get("maxwidth").'"'.$post['gallery']['error_html']['maxwidth'][$currentgalerien].$tooltip_gallery_help_input_scale.' />&nbsp;x&nbsp;<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery['.$currentgalerien.'][setings][maxheight]" value="'.$conf->get("maxheight").'"'.$post['gallery']['error_html']['maxheight'][$currentgalerien].$tooltip_gallery_help_input_scale.' />&nbsp;'.getLanguageValue("pixels").'</td>';
 
         $checket = NULL;
@@ -1835,22 +1835,22 @@ $tooltip_help_edit = NULL;
         }
 
         $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_target.'><b>'.$text_gallery_titel_target.'</b></td>';
+        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_target.'><b>'.$text_gallery_target.'</b></td>';
         $pagecontent .= '<td width="20%" class="td_left_title_padding_bottom"><b'.$tooltip_help_target.'>Target:</b>&nbsp;&nbsp;blank&nbsp;<input type="radio" name="gallery['.$currentgalerien.'][setings][target]" value="_blank"'.$tooltip_help_target_blank.$checket_blank.'>&nbsp;oder&nbsp;self&nbsp;<input type="radio" name="gallery['.$currentgalerien.'][setings][target]" value="_self"'.$tooltip_help_target_self.$checket_self.'></td>';
 
         $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_use_thumbs.'><b>'.$text_gallery_titel_use_thumbs.'</b></td>';
+        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_use_thumbs.'><b>'.$text_gallery_usethumbs.'</b></td>';
         $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery['.$currentgalerien.'][setings][usethumbs]" value="true"'.$tooltip_gallery_help_use_thumbs.$checket.'></td>';
         $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_picsperrow.'><b>'.$text_gallery_titel_picsperrow.'</b></td>';
+        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_picsperrow.'><b>'.$text_gallery_picsperrow.'</b></td>';
         $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="2" name="gallery['.$currentgalerien.'][setings][picsperrow]" value="'.$conf->get("picsperrow").'"'.$post['gallery']['error_html']['picsperrow'][$currentgalerien].$tooltip_gallery_help_input_picsperrow.' /></td>';
 
 
         $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_all_picture_scale.'><b>'.$text_gallery_titel_all_picture_scale.'</b></td>';
+        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_all_picture_scale.'><b>'.$text_gallery_scaleimages.'</b></td>';
         $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery['.$currentgalerien.'][scale_max]" value="true"'.$tooltip_gallery_help_all_picture_scale.'></td>';
         $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_all_thumbs_new.'><b>'.$text_gallery_titel_all_thumbs_new.'</b></td>';
+        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_all_thumbs_new.'><b>'.$text_gallery_rebuildthumbs.'</b></td>';
         $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery['.$currentgalerien.'][make_thumbs]" value="true"'.$tooltip_gallery_help_all_thumbs_new.'></td>';
         $pagecontent .= '</tr>';
         $pagecontent .= '</table>';
@@ -1942,9 +1942,9 @@ $pagecontent .= "pos = $pos max_cols = $max_cols_check<br>\n";
             $pagecontent .= '<img src="'.$specialchars->replaceSpecialChars($preview,true).'" alt="'.$specialchars->rebuildSpecialChars($file, true, true).'" style="height:60px;border:none;" />';
 
             $pagecontent .= '</a></td>
-                            <td height="1%" class="td_left_title"'.$tooltip_gallery_help_size.'><b>'.$text_gallery_titel_size.'</b></td></tr>
+                            <td height="1%" class="td_left_title"'.$tooltip_gallery_help_size.'><b>'.$text_gallery_size.'</b></td></tr>
                             <tr><td height="1%" class="td_togglen_padding_bottom">'.$size[0].' x '.$size[1].' Pixel</td></tr>
-                            <tr><td height="1%" class="td_left_title"><b>'.$text_gallery_titel_subtitle.'</b></td></tr>
+                            <tr><td height="1%" class="td_left_title"><b>'.$text_gallery_subtitle.'</b></td></tr>
                             <tr><td height="1%"><input type="text" class="input_text" name="gallery['.$currentgalerien.'][subtitle]['.$file.']" value="'.$specialchars->rebuildSpecialChars($subtitle->get($file), true, true).'"'.$tooltip_gallery_help_subtitle.' /></td></tr>
                             <tr><td style="font-size:1px;">&nbsp;</td></tr>
                             <tr><td height="1%" colspan="2">
