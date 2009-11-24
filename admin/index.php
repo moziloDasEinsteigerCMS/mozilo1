@@ -10,7 +10,7 @@
 
 
 // DEEEEEEEEEEEBUG ;)
-// Ausgabe aller uebergebenen Werte zu Testzwecken
+// Ausgabe aller Ã¼bergebenen Werte zu Testzwecken
 
 /*
  echo "<h2>POST</h2>";
@@ -127,6 +127,7 @@ $CMS_CONF    = new Properties("../conf/main.conf");
 if(!isset($CMS_CONF->properties['readonly'])) {
     die($CMS_CONF->properties['error']);
 }
+
 
 $VERSION_CONF    = new Properties("../conf/version.conf");
 if(!isset($VERSION_CONF->properties['readonly'])) {
@@ -375,6 +376,11 @@ if($action == 'files' or $action == 'gallery' or $action == 'plugins') {
 $html .= '<form name="form" class="form" accept-charset="ISO-8859-1" action="index.php" method="post"'.$enctype.'>';
 
 $html .= '<script type="text/javascript">document.write(\'<input type="hidden" name="javascript" value="ja">\');</script>';
+
+
+if($LOGINCONF->get("initialpw") == "true") {
+    $html .= returnMessage(false, getLanguageValue("initialpw"));
+}
 
 // Warnung, wenn seit dem letzten Login Logins fehlgeschlagen sind
 if ($LOGINCONF->get("falselogincount") > 0) {
@@ -1033,9 +1039,7 @@ function page($post) {
     }
 
     foreach ($post['categories'] as $cat => $tmp) {
-#echo "unset cat = $cat<br>\n";
         unset($display_new_cat,$display_new_cat_name);
-        # $post['makepara'] = "yes" überschreibt die $post['categories'][$cat]['error_html']['display_cat']
         if(isset($post['display'][$cat]['error_html']['display_cat'])) {
             $post['categories'][$cat]['error_html']['display_cat'] = $post['display'][$cat]['error_html']['display_cat'];
         }
@@ -1044,8 +1048,6 @@ function page($post) {
         $pagecontent .= '<table width="100%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
         $pagecontent .= '<tr><td class="td_left_title">';
         $pagecontent .= '<span '.$post['categories'][$cat]['error_html']['cat_name'].'class="text_cat_page">'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'</span><input type="hidden" name="categories['.$cat.']" value="'.$cat.'">';
-#$pagecontent .= '<a name="'.$cat.'">&nbsp;</a>';
-
         $pagescount = 0;
         if($pageshandle = opendir("$CONTENT_DIR_REL/$cat/")) {
             while (($currentpage = readdir($pageshandle))) {
@@ -1067,8 +1069,6 @@ function page($post) {
         if(getRequestParam('javascript', true)) {
 
             $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.substr($cat,0,2).'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.$text_page_button_edit.'\');</script>';
-
-#            $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen("toggle_'.substr($cat,0,2).'","gfx/icons/'.$icon_size.'/edit.png","gfx/icons/'.$icon_size.'/edit-hide.png","'.$text_page_button_edit.'");</script>';
         }
         $pagecontent .= '<table width="98%" cellspacing="0" cellpadding="0" border="0"><tr><td width="100%">';
 
@@ -1095,7 +1095,6 @@ function page($post) {
 
                 $pagecontent .= '</td></tr>';
                 $display_new_cat = true;
-#                continue;
             }
         if($pos == $max_cat_page) continue;
             # Select Box erstellen 
@@ -1142,10 +1141,7 @@ function page($post) {
             $pagecontent .= '<input type="hidden" name="categories['.$cat.'][name]['.$pos.']" value="'.$post['categories'][$cat]['name'][$pos].'"><input type="hidden" name="categories['.$cat.'][ext]['.$pos.']" value="'.substr($post['categories'][$cat]['ext'][$pos],-(strlen($EXT_PAGE))).'"></td>';
 
             $pagecontent .= '<td width="12%" class="td_left_title" nowrap><span class="text_info">'.$text.'</span></td>';
-#'.createTooltipWZ("", "",",WIDTH,200,CLICKCLOSE,true").'
-#'.getLanguageValue("").'
-
-            $pagecontent .= '<td width="12%" class="td_left_title" nowrap><b>'.$text_page_copy.'</b>&nbsp;<input class="input_check" type="checkbox" name="categories['.$cat.'][copy]['.$pos.']" value="yes"'.$post['categories'][$cat]['copy'][$pos].''.$tooltip_page_help_copy.'></td>';
+            $pagecontent .= '<td width="12%" class="td_left_title" nowrap><b>'.$text_page_page_copy.'</b>&nbsp;<input class="input_check" type="checkbox" name="categories['.$cat.'][copy]['.$pos.']" value="yes"'.$post['categories'][$cat]['copy'][$pos].''.$tooltip_page_help_copy.'></td>';
 
             $pagecontent .= '<td width="15%" class="td_icons" nowrap>';
             if(getRequestParam('javascript', true)) {
@@ -1166,7 +1162,6 @@ function page($post) {
                 $pagecontent .= '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data"><tr><td width="30%" valign="bottom" nowrap class="td_left_title"><b>'.$text_new_name.'</b></td>';
                 $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_url_adress.'</b></td>';
                 $pagecontent .= '<td width="30%" class="td_left_title"><input type="hidden" name="categories['.$cat.'][url]['.$pos.']" value="'.$post['categories'][$cat]['url'][$pos].'">';
-#                $pagecontent .= '<div class="div_noedit">'.$post['categories'][$cat]['url'][$pos].'</div>';
                 $pagecontent .= '<input class="input_readonly" name="categories['.$cat.'][url]['.$pos.']" value="'.$post['categories'][$cat]['url'][$pos].'" maxlength="'.$max_strlen.'" readonly>';
 
                 $pagecontent .= '</td><td width="6%" class="td_center_title">&nbsp;</td><td width="6%" valign="bottom" class="td_center_title">blank</td><td width="6%" valign="bottom" class="td_center_title">self</td><td class="td_left_title">&nbsp;</td>';
@@ -1192,9 +1187,7 @@ function page($post) {
         $pagecontent .= '</table>';
         $pagecontent .= '</td></tr></table>';
         $pagecontent .= '</td></tr>';
-    } # foreach cat
-#'.createTooltipWZ("", "",",WIDTH,200,CLICKCLOSE,true").'
-#'.getLanguageValue("").'
+    }
     $pagecontent .= '<tr><td width="100%" class="td_toggle"><input type="submit" name="action_data[copymovesite]" value="'.getLanguageValue("page_button_change").'" class="input_submit"></td></tr>';
     $pagecontent .= '</table>';
     return array(getLanguageValue("page_button"), $pagecontent);
@@ -1205,8 +1198,6 @@ function editSite($post) {
     global $specialchars;
     global $CONTENT_DIR_REL;
     global $EXT_PAGE;
-
-#    $pagecontent = '<span class="titel">'.getLanguageValue("button_site_edit").'</span>';
 
     $cat = key($post['action_data']['editsite']);
     $page = $post['action_data']['editsite'][$cat];
@@ -1715,7 +1706,7 @@ $tooltip_help_edit = NULL;
     $pagecontent .= '<tr><td width="30%" class="td_left_title"><b>'.getLanguageValue("gallery_new").'</b></td>';
     $pagecontent .= '<td width="70%" class="td_left_title">&nbsp;</td>';
     $pagecontent .= '</tr><tr>';
-#<b>'.getLanguageValue("gallery_scale").'</b>
+#<b>'.getLanguageValue("gallery_titel_scale").'</b>
     $pagecontent .= '';
     $pagecontent .= '<td width="30%" class="td_left_title"><input class="input_text" name="new_gallery" value="" maxlength="'.$max_strlen.'"></td>';
     $pagecontent .= '<td width="70%" class="td_left_title">&nbsp;</td>';
@@ -2599,70 +2590,21 @@ function config($post) {
     global $USER_SYNTAX_FILE;
     global $CONTACT_CONF;
     global $ADMIN_CONF;
-/*
-    $expert_array = array(
-                    'hidecatnamedpages',
-                    'modrewrite',
-                    'showhiddenpagesinlastchanged',
-                    'showhiddenpagesinsearch',
-                    'showhiddenpagesinsitemap',
-                    'targetblank_download',
-                    'targetblank_gallery',
-                    'targetblank_link',
-                    'showsyntaxtooltips',
-
-                    'replaceemoticons',
-                    'shortenlinks',
-                    'usecmssyntax',
-                    'usesubmenu'
-                    );*/
 
     $icon_size = "24x24";
-#    $post = NULL;
-    $expert_array = makeDefaultConf("expert_main", "", false, true);
-    $input_array = makeDefaultConf("main", "", false, true);
 
-    # Die Parameter werden gesondert behandelt
-    $unsets = array('cmslanguage','cmslayout','cmsversion','defaultcat');
-/*
-    $input_array = array('websitetitle',
-                    'titlebarseparator',
-                    'websitedescription',
-                    'websitekeywords',
-                    'titlebarformat',
-                    'usesubmenu',
-                    'shortenlinks',
-                    'replaceemoticons',
-                    'usecmssyntax',
-                    'hidecatnamedpages',
-                    'modrewrite',
-                    'showhiddenpagesinlastchanged',
-                    'showhiddenpagesinsearch',
-                    'showhiddenpagesinsitemap',
-                    'targetblank_download',
-                    'targetblank_gallery',
-                    'targetblank_link',
-                    'showsyntaxtooltips',
-                    'modrewrite',
-                    'menu2');*/
+    $main = makeDefaultConf("main", "", true);
 
-
-    foreach($input_array as $pos => $syntax_name) {
-        $error_color[$syntax_name] = NULL;
-        if(in_array($syntax_name,$unsets)) {
-            unset($input_array[$pos]);
+    # error colors für die input felder vorbereiten vom main array,usersyntax und input_mail array
+    foreach($main as $type => $type_array) {
+        if($type == 'expert') continue;
+        foreach($main[$type] as $syntax_name => $dumy) {
+            $error_color[$syntax_name] = NULL;
         }
     }
     $error_color['usersyntax'] = NULL;
-#    $error_color['menu2'] = NULL;
-/*
-    $input_mail = array('name',
-                        'website',
-                        'message',
-                        'mail');*/
-
-    $input_mail = makeDefaultConf("formular", "", false, true);
-    foreach($input_mail as $syntax_name) {
+    $input_mail = makeDefaultConf("formular", "", true);
+    foreach($input_mail as $syntax_name => $dumy) {
         $error_color['titel_'.$syntax_name] = NULL;
     }
 
@@ -2677,135 +2619,89 @@ function config($post) {
         $post['apply'] = $specialchars->rebuildSpecialChars(getRequestParam('apply', true), false, true);
     }
 
-    if(isset($post['apply']) and $post['apply'] == getLanguageValue("config_submit") and isset($post['default'])) {
-        $cmslayout_tmp = $CMS_CONF->get('cmslayout');
-        makeDefaultConf("../conf/main.conf","CMS_CONF",true);
-        makeDefaultConf("../formular/formular.conf","CONTACT_CONF",true);
-        if($cmslayout_tmp != $CMS_CONF->get('cmslayout')) {
-            $CMS_CONF->set('cmslayout', $cmslayout_tmp);
-            $error = setLayoutAndDependentSettings($cmslayout_tmp);
-            if($error !== true) {
-                $post['error_messages']['properties'][] = $error;
-                $error_color['cmslayout'] = ' style="background-color:#FF7029;"';
-            }
-        }
-        $post['apply'] = "false";
-    }
-
-    if(isset($CMS_CONF->properties['error']) or isset($CONTACT_CONF->properties['error'])) {
-        $post['apply'] = "false";
-        if(isset($CMS_CONF->properties['error'])) {
-            $post['error_messages']['properties'][] = $CMS_CONF->properties['error'];
-        }
-        if(isset($CONTACT_CONF->properties['error'])) {
-            $post['error_messages']['properties'][] = $CONTACT_CONF->properties['error'];
-        }
-    }
-
-/*
-'replaceemoticons',
-'shortenlinks',
-'usecmssyntax',
-'usesubmenu',
-in_array('',$expert_array)
-*/
-
-#
-#    if (getRequestParam('apply', true)) {
 
     // Ã„nderungen speichern
-    if (isset($post['apply']) and $post['apply'] == getLanguageValue("config_submit")) {
-        $post['cmslayout'] = $specialchars->replaceSpecialChars($post['cmslayout'],false);
-#echo $_POST['usesubmenu']."<br>\n";
-#        $post['usesubmenu'] = $post['usesubmenu'];
-#echo $_POST['usesubmenu']."<br>\n";
-       if(count($layout_array) > 0) {
+    if(isset($post['apply']) and $post['apply'] == getLanguageValue("config_submit")) {
+
+        # nur wenns auch Layouts gibt
+        if(count($layout_array) > 0) {
             # wens ein neues layout ist setings aus der layoutsettings hollen und schreiben
-            if($CMS_CONF->get('cmslayout') != $post['cmslayout']) {
-                $error = setLayoutAndDependentSettings($post['cmslayout']);
-                if($error !== true) {
-                    $post['error_messages']['properties'][] = $error;
+            if($CMS_CONF->get('cmslayout') != $specialchars->replaceSpecialChars($post['cmslayout'],false)) {
+                $error = setLayoutAndDependentSettings($specialchars->replaceSpecialChars($post['cmslayout'],false));
+                if(is_array($error)) {
+                    $post['error_messages']['properties'][] = $error['error'];
                     $error_color['cmslayout'] = ' style="background-color:#FF7029;"';
+                    # damits nicht gespeichert wird
+                    unset($post['cmslayout'],$post['usesubmenu']);
                 } else {
-#echo $_POST['usesubmenu']."<br>\n";
-                    $post['usesubmenu'] = $CMS_CONF->get('usesubmenu');
+                    $post['usesubmenu'] = $error;
                 }
             }
-            $CMS_CONF->set('cmslayout', $post['cmslayout']);
-        }
-#echo $_POST['usesubmenu']."<br>\n";
-        if(count($cat_array) > 0) {
-            $CMS_CONF->set('defaultcat', $post['defaultcat']);
         }
 
-        if(count($cat_array) > 0) {
-            $CMS_CONF->set('menu2', $post['menu2']);
+        # usecmssyntax wurde eingeschaltet also posts fühlen
+        if(isset($post['usecmssyntax']) and $post['usecmssyntax'] == "true" and $CMS_CONF->get('usecmssyntax') == "false") {
+            $post['replaceemoticons'] = $CMS_CONF->get('replaceemoticons');
+            $post['shortenlinks'] = $CMS_CONF->get('shortenlinks');
+        }
+        # usecmssyntax ist ausgeschaltet also posts fühlen
+        if($CMS_CONF->get('usecmssyntax') == "false") {
+            $post['replaceemoticons'] = $CMS_CONF->get('replaceemoticons');
         }
 
-        if(count($language_array) > 0) {
-            $CMS_CONF->set('cmslanguage', $post['cmslanguage']);
-        }
-
-        $post['titlebarseparator'] = preg_replace('/\s/', "&nbsp;", $post['titlebarseparator']);
-        $post['websitetitle'] = $post['websitetitle'];
-        $post['websitedescription'] = $post['websitedescription'];
-        $post['websitekeywords'] = $post['websitekeywords'];
-
-        $usecmssyntax_from_file = false;
-        foreach($input_array as $syntax_name) {
-            if($ADMIN_CONF->get('showexpert') == "false" and in_array($syntax_name,$expert_array)) {
-                continue;
-            }
-            # usecmssyntax wurde eingeschaltet default werte holen und setzen
-            if(checkBoxChecked('usecmssyntax') == "true" and $CMS_CONF->get('usecmssyntax') == "false") {
-                if($syntax_name == "replaceemoticons" or $syntax_name == "shortenlinks") {
-                    $CMS_CONF->set($syntax_name, $CMS_CONF->get($syntax_name));
-                    $usecmssyntax_from_file = true;
+        foreach($main as $type => $type_array) {
+            if($type == 'expert') continue;
+            foreach($main[$type] as $syntax_name => $dumy) {
+                $error_messages = false;
+                if($ADMIN_CONF->get('showexpert') == "false" and in_array($syntax_name,$main['expert'])) {
                     continue;
                 }
-            # usecmssyntax ist an also werte setzen
-            } elseif(checkBoxChecked('usecmssyntax') == "true") {
-                # ist eine checkbox
-                if($syntax_name == "replaceemoticons") {
-                    $CMS_CONF->set($syntax_name, checkBoxChecked($syntax_name));
-                    continue;
+                if($type == 'text') {
+                    if(isset($post[$syntax_name])) {
+                        $text = $specialchars->replaceSpecialChars($post[$syntax_name],false);
+                    } else continue;
+                    if($error_messages === false and $CMS_CONF->get($syntax_name) != $text) {
+                        $CMS_CONF->set($syntax_name, $text);
+                    }
                 }
-                if($syntax_name == "shortenlinks") {
-                    $CMS_CONF->set($syntax_name, $post[$syntax_name]);
-                    continue;
+                if($type == 'select') {
+                    if(isset($post[$syntax_name])) { # wenn select lehr ist post lehr ja
+                        $select = $specialchars->replaceSpecialChars($post[$syntax_name],false);
+                    } else continue;
+                    if($error_messages === false and $CMS_CONF->get($syntax_name) != $select) {
+                        $CMS_CONF->set($syntax_name, $select);
+                    }
                 }
-            # replaceemoticons und shortenlinks nicht ändern
-            } elseif($syntax_name == "replaceemoticons" or $syntax_name == "shortenlinks") {
-                continue;
-            }
-# das find ich nicht gut!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-$array_checkbox = array('usecmssyntax','hidecatnamedpages','modrewrite','showhiddenpagesinlastchanged','showhiddenpagesinsearch' ,'showhiddenpagesinsitemap','showsyntaxtooltips','targetblank_download','targetblank_gallery','targetblank_link');
-            # ist eine checkbox
-#            if($syntax_name == "usecmssyntax") {
-            if(in_array($syntax_name,$array_checkbox)) {
-                $CMS_CONF->set($syntax_name, checkBoxChecked($syntax_name));
-                continue;
-            }
-
-            $request_para = $post[$syntax_name];
-            if($request_para !== false) {
-                $CMS_CONF->set($syntax_name, $request_para);
-            } else {
-                $post['error_messages']['config_error_request'][] = NULL;
-                $error_color[$syntax_name] = ' style="background-color:#FF7029;"';
+                if($type == 'checkbox') {
+                    $checkbox = "false";
+                    if(isset($post[$syntax_name])) {
+                        $checkbox = $post[$syntax_name];
+                    }
+                    if($error_messages === false and $CMS_CONF->get($syntax_name) != $checkbox) {
+                        $CMS_CONF->set($syntax_name, $checkbox);
+                    }
+                }
+/*
+                if($error_messages !== false) {
+                    $post['error_messages']['config_error_'.$syntax_name]['color'] = "#FF7029";
+                    $post['error_messages']['config_error_'.$syntax_name][] = NULL;
+                    $error_color[$syntax_name] = ' style="background-color:#FF7029;"';
+                }*/
             }
         }
-
-        foreach($input_mail as $syntax_name) {
-            $CONTACT_CONF->set($syntax_name, $post['titel_'.$syntax_name].",".checkBoxChecked('show_'.$syntax_name).",".checkBoxChecked('mandatory_'.$syntax_name));
+        # Mail daten speichern
+        foreach($input_mail as $syntax_name => $dumy) {
+            $mail_titel = $specialchars->replaceSpecialChars($post['titel_'.$syntax_name],false);
+            $CONTACT_CONF->set($syntax_name, $mail_titel.",".checkBoxChecked('show_'.$syntax_name).",".checkBoxChecked('mandatory_'.$syntax_name));
         }
+
 
         #"usersyntax" => "wikipedia = [link={DESCRIPTION}|http://de.wikipedia.org/wiki/{VALUE}]"
         // Speichern der benutzerdefinierten Syntaxelemente -> ERWEITERN UM PRÃœFUNG!
         # nur Speichern wenn auch benutzt wird
-        if($CMS_CONF->get('usecmssyntax') == "true") {
+        if($CMS_CONF->get('usecmssyntax') == "true" and $ADMIN_CONF->get('showexpert') == "true") {
             # usecmssyntax wurde eingeschaltet aus syntax.conf lesen
-            if($CMS_CONF->get('usecmssyntax') == "true" and $usecmssyntax_from_file === true) {
+            if(!isset($post['usersyntax'])) {
                 $usersyntax_array = file($USER_SYNTAX_FILE);
             } else {
                 $usersyntax_array = preg_split("/\r\n|\r|\n/", $post['usersyntax']);
@@ -2817,6 +2713,7 @@ $array_checkbox = array('usecmssyntax','hidecatnamedpages','modrewrite','showhid
                     $usersyntax_text .= $zeile."\n";
                     # in jeder zeile muss " =" enthalten sein sonst Fehler
                     if(!strstr($zeile," =") !== false) {
+                        $post['error_messages']['config_error_usersyntax']['color'] = "#FF7029";
                         $post['error_messages']['config_error_usersyntax'][] = $zeile;
                         $error_color['usersyntax'] = ' style="background-color:#FF7029;"';
                     } else {
@@ -2828,6 +2725,7 @@ $array_checkbox = array('usecmssyntax','hidecatnamedpages','modrewrite','showhid
                                 $count++;
                             }
                             if($count > 1) {
+                                $post['error_messages']['config_error_usersyntax_doubles']['color'] = "#FF7029";
                                 $post['error_messages']['config_error_usersyntax_doubles'][$search_tmp] = $search_tmp;
                                 $error_color['usersyntax'] = ' style="background-color:#FF7029;"';
                             }
@@ -2836,33 +2734,32 @@ $array_checkbox = array('usecmssyntax','hidecatnamedpages','modrewrite','showhid
                 }
             }
             if($handle = @fopen($USER_SYNTAX_FILE, "a+")) {
+                $test = fread($handle,filesize($USER_SYNTAX_FILE));
                 fclose($handle);
-                $handle = @fopen($USER_SYNTAX_FILE, "w");
-                fputs($handle, $usersyntax_text);
-                fclose($handle);
+                # sonst kann es pasieren das filesize im cache gespeichert wird
+                clearstatcache();
+                # nur Speichern wenn sich was geändert hat
+                if($test != $usersyntax_text) {
+                    $handle = @fopen($USER_SYNTAX_FILE, "w");
+                    fputs($handle, $usersyntax_text);
+                    fclose($handle);
+                }
             } else {
                 $post['error_messages']['config_error_usersyntax_write'][] = NULL;
             }
         }
-        if(isset($post['error_messages'])) {
-            foreach($post['error_messages'] as $name => $tmp) {
-                $post['error_messages'][$name]['color'] = "#FF7029";
-            }
-        }
         $post['messages']['config_messages_changes'][] = NULL;
-    }
+    } # setings end
     # Anzeige begin
 
-    $error_color['cmslanguage'] = NULL;
     if(count($language_array) <= 0) {
         $post['error_messages']['config_error_language_emty'][] = NULL;
         $error_color['cmslanguage'] = ' style="background-color:#FF7029;"';
     } elseif(!in_array($CMS_CONF->get('cmslanguage').".conf",$language_array)) {
-        $post['error_messages']['config_error_languagefile_error'][] = $CMS_CONF->get('cmslanguage');
+        $post['error_messages']['config_error_language_existed'][] = $CMS_CONF->get('cmslanguage');
         $error_color['cmslanguage'] = ' style="background-color:#FF7029;"';
     }
 
-    $error_color['defaultcat'] = NULL;
     if(count($cat_array) <= 0) {
         $post['error_messages']['config_error_defaultcat_emty'][] = NULL;
         $error_color['defaultcat'] = ' style="background-color:#FF7029;"';
@@ -2871,7 +2768,6 @@ $array_checkbox = array('usecmssyntax','hidecatnamedpages','modrewrite','showhid
         $error_color['defaultcat'] = ' style="background-color:#FF7029;"';
     }
 
-    $error_color['cmslayout'] = NULL;
     if(count($layout_array) <= 0) {
         $post['error_messages']['config_error_layouts_emty'][] = NULL;
         $error_color['cmslayout'] = ' style="background-color:#FF7029;"';
@@ -2880,11 +2776,11 @@ $array_checkbox = array('usecmssyntax','hidecatnamedpages','modrewrite','showhid
         $error_color['cmslayout'] = ' style="background-color:#FF7029;"';
     }
     $pagecontent .= categoriesMessages($post);
-/*
+/* tooltips noch einbauen!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     $array_getTooltipValue = array("admin_help_language","admin_help_adminmail","admin_help_chmodnewfiles",
         "admin_help_chmodupdate");
 
-    # Variable erzeugen z.B. pages = $text_pages
+    # Variable erzeugen z.B. info_many_pages = $text_info_many_pages
     foreach($array_getTooltipValue as $language) {
         if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
             ${"tooltip_".$language} = createTooltipWZ("",$language,",WIDTH,200,CLICKCLOSE,true");
@@ -2931,7 +2827,7 @@ $array_checkbox = array('usecmssyntax','hidecatnamedpages','modrewrite','showhid
     );
     foreach ($titlebarformats as $titlebarformat) {
         $selected = NULL;
-        if ($titlebarformat == $CMS_CONF->get("titlebarformat")) {
+        if ($titlebarformat == $specialchars->rebuildSpecialChars($CMS_CONF->get("titlebarformat"),true,true)) {
             $selected = "selected ";
         }
         $text = preg_replace('/{WEBSITE}/', $txt_websitetitle, $titlebarformat);
@@ -3142,9 +3038,10 @@ $array_checkbox = array('usecmssyntax','hidecatnamedpages','modrewrite','showhid
     if(!isset($CMS_CONF->properties['error']) or !isset($CONTACT_CONF->properties['error'])) {
         $pagecontent .= '<tr><td class="td_cms_submit" colspan="2">';
         $pagecontent .= '<input type="submit" name="apply" class="input_submit" value="'.getLanguageValue("config_submit").'" />';
+/*
         if($ADMIN_CONF->get('showexpert') == "true") {
             $pagecontent .= '&nbsp;&nbsp;&nbsp;'.getLanguageValue("config_input_default").buildCheckBox("default", "false").'</td></tr>';
-        }
+        }*/
     }
 
     $pagecontent .= "</table>";
@@ -3159,50 +3056,18 @@ function admin($post) {
     global $MAILFUNCTIONS;
     global $specialchars;
     $icon_size = "24x24";
-#    $post = NULL;
-#    global $CONTENT_DIR_REL;
 
-#                    'noupload',
-#                    'backupmsgintervall',
-//                    'lastbackup',
-#                    'maxnumberofuploadfiles',
-#                    'showTooltips',
-#                    'textareaheight',
-//                    'usebigactionicons',
-#                    'overwriteuploadfiles'
 
-    $expert_basic = makeDefaultConf("expert_basic", "", false, true);
-/*
-echo "<pre>";
-print_r($expert_basic);
-echo "</pre><br>\n";*/
+    $basic = makeDefaultConf("basic", "", true);
 
-    $showexpert_off = false;
-    # wenn expert eingeschaltet wird müssen ein par $post gefühlt werden
-    if(checkBoxChecked('showexpert') == "true" and $ADMIN_CONF->get('showexpert') == "false") {
-        foreach($expert_basic as $syntax) {
-            if($syntax == 'lastbackup' or $syntax == 'usebigactionicons') {
-                continue;
-            }
-            $post[$syntax] = $ADMIN_CONF->get($syntax);
+    # error colors für die input felder vorbereiten
+    foreach($basic as $type => $type_array) {
+        if($type == 'expert') continue;
+        foreach($basic[$type] as $syntax_name => $dumy) {
+            $error_color[$syntax_name] = NULL;
         }
-
-    # wenn expert ausgeschaltet wird
-    } elseif(checkBoxChecked('showexpert') == "false" and $ADMIN_CONF->get('showexpert') == "true") {
-        $showexpert_off = true;
     }
 
-
-    $digit_array = array('textareaheight','backupmsgintervall','chmodnewfilesatts','maxnumberofuploadfiles','maximagewidth','maximageheight');
-    foreach($digit_array as $syntax_name) {
-        $error_color[$syntax_name] = NULL;
-    }
-    $checkbox_array = array('showTooltips','overwriteuploadfiles','sendadminmail','resizeimages','showexpert');
-    foreach($checkbox_array as $syntax_name) {
-        $error_color[$syntax_name] = NULL;
-    }
-    $error_color['adminmail'] = NULL;
-    $error_color['noupload'] = NULL;
     $error_color['newname'] = NULL;
     $error_color['newpw'] = NULL;
     $error_color['newpwrepeat'] = NULL;
@@ -3237,12 +3102,20 @@ echo "</pre>";*/
     }
 
     if(isset($post['apply']) and $post['apply'] == getLanguageValue("admin_submit") and isset($post['default'])) {
-        makeDefaultConf("conf/basic.conf","ADMIN_CONF",true);
+        makeDefaultConf("conf/basic.conf","ADMIN_CONF");
         $post['apply'] = "false";
     }
 
+    if(isset($post['default_pw']) and $specialchars->rebuildSpecialChars($post['default_pw'], false, true) == getLanguageValue("admin_submit_default_pw")) {
+        $LOGINCONF->set("initialsetup", "false");
+    }
+
+    if($LOGINCONF->get("initialsetup") == "true") {
+        $post['error_messages']['initialsetup'][] = NULL;
+    }
+
     // Auswertung des Formulars
-    if (isset($post['apply']) and $post['apply'] == getLanguageValue("admin_submit")) {
+    if(isset($post['apply']) and $post['apply'] == getLanguageValue("admin_submit")) {
 
         # auf jeden fall erst mal deDE setzen ist blöd wenn kein language gesetzt ist
         $ADMIN_CONF->set('language', "deDE");
@@ -3250,112 +3123,113 @@ echo "</pre>";*/
             $ADMIN_CONF->set('language', $post['language']);
         }
 
-        foreach($digit_array as $syntax_name) {
-            # wenn expert off
-            if(!isset($post[$syntax_name])) {
-                continue;
-            }
-            $digit = trim($post[$syntax_name]);
-            if($syntax_name == 'textareaheight' and $digit < 50) {
-                $post['error_messages']['adming_error_textareaheight'][] = NULL;
-                $error_color[$syntax_name] = ' style="background-color:#FF7029;"';
-                continue;
-            }
-            if($syntax_name == 'maxnumberofuploadfiles' and $digit < 1) {
-                $post['error_messages']['adming_error_max_uploads'][] = NULL;
-                $error_color[$syntax_name] = ' style="background-color:#FF7029;"';
-                continue;
-            }
-            if($syntax_name == 'chmodnewfilesatts' and !preg_match("/^[0-7]{3}$/", $digit)) {
-                $post['error_messages']['adming_error_chmod'][] = NULL;
-                $error_color[$syntax_name] = ' style="background-color:#FF7029;"';
-                continue;
-            }
-            if($syntax_name == 'backupmsgintervall' and ($digit < 0 or $digit == "")) {
-                $post['error_messages']['adming_error_backupintervall'][] = NULL;
-                $error_color[$syntax_name] = ' style="background-color:#FF7029;"';
-                continue;
-            }
-
-            if((ctype_digit($digit) or $digit == "") and strlen($digit) <= 4) {
-                $ADMIN_CONF->set($syntax_name, $digit);
-            } else {
-                $post['error_messages']['adming_error_nodigit_tolong'][] = $digit;
-                $error_color[$syntax_name] = ' style="background-color:#FF7029;"';
-            }
-        }
-
-        foreach($checkbox_array as $syntax_name) {
-            if($LOGINCONF->get("initialsetup") == "true") {
-                continue;
-            }
-            # wenn expert off
-            if($ADMIN_CONF->get('showexpert') == "false" and in_array($syntax_name,$expert_basic)) {
-                continue;
-            }
-            if($syntax_name == 'sendadminmail' and checkBoxChecked($syntax_name) == "true" and $post['adminmail'] == "") {
-                $post['error_messages']['adming_error_noadminmail'][] = NULL;
-                $error_color['adminmail'] = ' style="background-color:#FF7029;"';
-                $ADMIN_CONF->set($syntax_name, "false");
-                continue;
-            }
-            if($syntax_name == 'resizeimages' and checkBoxChecked($syntax_name) == "true" and  $post['maximagewidth'] == "" and $post['maximageheight'] == "") {
-                $post['error_messages']['adming_error_noresizeimages'][] = NULL;
-                $error_color['maximagewidth'] = ' style="background-color:#FF7029;"';
-                $error_color['maximageheight'] = ' style="background-color:#FF7029;"';
-                $ADMIN_CONF->set($syntax_name, "false");
-                continue;
-            }
-            if($syntax_name == 'chmodupdate' and checkBoxChecked($syntax_name) == "true" and $ADMIN_CONF->get('chmodnewfilesatts') != "") {
-                $error = useChmod();
-                if(!empty($error)) {
-                    $post['error_messages'] = $error;
+        # wenn expert eingeschaltet wird müssen die expert $post gefühlt werden
+        if(checkBoxChecked('showexpert') == "true" and $ADMIN_CONF->get('showexpert') == "false") {
+            foreach($basic['expert'] as $syntax) {
+                if($syntax == 'lastbackup' or $syntax == 'usebigactionicons') {
+                    continue;
                 }
-                continue;
+                $post[$syntax] = $ADMIN_CONF->get($syntax);
             }
-            $ADMIN_CONF->set($syntax_name, checkBoxChecked($syntax_name));
         }
 
-        if(isset($post['adminmail'])) {
-            if(isset($post['adminmail']) and $post['adminmail'] != "") {
-                if(preg_match("/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/", $post['adminmail'])) {
-                    $ADMIN_CONF->set('adminmail', $post['adminmail']);
-                } else {
-                    $post['error_messages']['adming_error_invalid_adminmail'][] = $post['adminmail'];
-                    $error_color['adminmail'] = ' style="background-color:#FF7029;"';
+
+
+        foreach($basic as $type => $type_array) {
+            if($type == 'expert') continue;
+            foreach($basic[$type] as $syntax_name => $dumy) {
+                $error_messages = false;
+                if(checkBoxChecked('showexpert') == "false" and in_array($syntax_name,$basic['expert'])) {
+                    continue;
                 }
-            } else {
-                $ADMIN_CONF->set('adminmail', $post['adminmail']);
+                if($type == 'text') {
+                    if(isset($post[$syntax_name])) {
+                        $text = $post[$syntax_name];
+                    } else continue;
+                    if($syntax_name == 'adminmail' and $text != "" and !preg_match("/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/",$text)) {
+                        $error_messages = $syntax_name;
+                    }
+                    if($error_messages === false and $ADMIN_CONF->get($syntax_name) != $text) {
+                        $ADMIN_CONF->set($syntax_name, $specialchars->replaceSpecialChars($text,false));
+                    }
+        
+                }
+                if($type == 'digit') {
+                    if($syntax_name == 'lastbackup') {
+        # das muss noch!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                        continue;
+                    }
+                    if(isset($post[$syntax_name])) {
+                        $digit = trim($post[$syntax_name]);
+                    } else continue;
+                    # wenn eingabe keine Zahl oder mehr wie 4stelig ist
+                    if($digit != "" and (!ctype_digit($digit) or strlen($digit) > 4)) {
+                        $error_messages = 'nodigit_tolong';
+                    } elseif($syntax_name == 'chmodnewfilesatts' and !empty($digit) and !preg_match("/^[0-7]{3}$/",$digit)) {
+                        $error_messages = $syntax_name;
+                    } elseif($syntax_name == 'textareaheight' and $digit < 50) {
+                        $error_messages = $syntax_name;
+                    } elseif($syntax_name == 'maxnumberofuploadfiles' and $digit < 1) {
+                        $error_messages = $syntax_name;
+                    } elseif($syntax_name == 'backupmsgintervall' and ($digit < 0 or $digit == "")) {
+                        $error_messages = $syntax_name;
+                    }
+        
+                    if($error_messages === false and $ADMIN_CONF->get($syntax_name) != $digit) {
+                        $ADMIN_CONF->set($syntax_name, $digit);
+                    }
+                }
+                if($type == 'checkbox') {
+
+                    $checkbox = "false";
+                    if(isset($post[$syntax_name])) {
+                        $checkbox = $post[$syntax_name];
+                    }
+                    if($syntax_name == 'sendadminmail' and $checkbox == "true" and $post['adminmail'] == "") {
+                        $error_messages = $syntax_name;
+                    }
+        
+                    if($error_messages === false and $ADMIN_CONF->get($syntax_name) != $checkbox) {
+                        $ADMIN_CONF->set($syntax_name, $checkbox);
+                    }
+                }
+                if($error_messages !== false) {
+                    $post['error_messages']['admin_error_'.$syntax_name]['color'] = "#FF7029";
+                    $post['error_messages']['admin_error_'.$syntax_name][] = NULL;
+                    $error_color[$syntax_name] = ' style="background-color:#FF7029;"';
+                }
             }
         }
 
-        if(checkBoxChecked('showexpert') == "true") {
-            if($post['noupload'] != "") {
-                $ADMIN_CONF->set('noupload', $post['noupload']);
-            } else {
-                $post['error_messages']['adming_error_noupload'][] = NULL;
-                $error_color['noupload'] = ' style="background-color:#FF7029;"';
+        if(checkBoxChecked('chmodupdate') == "true" and $ADMIN_CONF->get('chmodnewfilesatts') != "") {
+            $error = useChmod();
+            if(!empty($error)) {
+                $post['error_messages'] = $error;
             }
         }
+
         require_once("Crypt.php");
         $pwcrypt = new Crypt();
-#        if($post['newname'] != $LOGINCONF->get("name") or $post['newpw'] != "" or $pwcrypt->encrypt($post['newpw']) != $LOGINCONF->get("pw")) {
         if($post['newpw'] != "" and $pwcrypt->encrypt($post['newpw']) != $LOGINCONF->get("pw")) {
             if (($post['newname'] == "" ) or ($post['newpw'] == "" ) or ($post['newpwrepeat'] == "" )) {
+                $post['error_messages']['pw_error_missingvalues']['color'] = "#FF7029";
                 $post['error_messages']['pw_error_missingvalues'][] = NULL;
                 $error_color['newname'] = ' style="background-color:#FF7029;"';
                 $error_color['newpw'] = ' style="background-color:#FF7029;"';
                 $error_color['newpwrepeat'] = ' style="background-color:#FF7029;"';
             } elseif(strlen($post['newname']) < 5) {
+                $post['error_messages']['pw_error_tooshortname']['color'] = "#FF7029";
                 $post['error_messages']['pw_error_tooshortname'][] = NULL;
                 $error_color['newname'] = ' style="background-color:#FF7029;"';
             // Neues Paßwort zweimal exakt gleich eingegeben?
             } elseif ($post['newpw'] != $post['newpwrepeat']) {
+                $post['error_messages']['pw_error_newpwmismatch']['color'] = "#FF7029";
                 $post['error_messages']['pw_error_newpwmismatch'][] = NULL;
                 $error_color['newpw'] = ' style="background-color:#FF7029;"';
                 $error_color['newpwrepeat'] = ' style="background-color:#FF7029;"';
             // Neues Paßwort wenigstens sechs Zeichen lang und mindestens aus kleinen und großen Buchstaben sowie Zahlen bestehend?
             } elseif ((strlen($post['newpw']) <= 6) or !preg_match("/[0-9]/", $post['newpw']) or !preg_match("/[a-z]/", $post['newpw']) or !preg_match("/[A-Z]/", $post['newpw'])) {
+                $post['error_messages']['pw_error_newpwerror']['color'] = "#FF7029";
                 $post['error_messages']['pw_error_newpwerror'][] = NULL;
                 $error_color['newpw'] = ' style="background-color:#FF7029;"';
             # Allles gut Speichen
@@ -3363,7 +3237,7 @@ echo "</pre>";*/
                 # initialsetub sachen speichern
                 if($LOGINCONF->get("initialsetup") == "true") {
                     $LOGINCONF->set("initialsetup", "false");
-#                    $LOGINCONF->set("initialpw", "false");
+                    $LOGINCONF->set("initialpw", "false");
                     $ADMIN_CONF->set('lastbackup', time());
                 }
                 $LOGINCONF->set("name", $post['newname']);
@@ -3371,35 +3245,13 @@ echo "</pre>";*/
                 $post['messages']['pw_messages_changes'][] = NULL;
             }
         }
-        # Farben für Fehlermeldungen setzen
-        if(isset($post['error_messages'])) {
-            if($showexpert_off === true) {
-                $ADMIN_CONF->set('showexpert', 'true');
-                $post['error_messages']['adming_error_showexpert'][] = NULL;
-                $error_color['showexpert'] = ' style="background-color:#FF7029;"';
-            }
-            foreach($post['error_messages'] as $name => $tmp) {
-                $post['error_messages'][$name]['color'] = "#FF7029";
-            }
-        }
-        $post['messages']['admin_messages_changes'][] = NULL;
-#applay end
-    }
 
-if($LOGINCONF->get("initialsetup") == "true") {
-#    unset($post);
-    $post['error_messages']['initialsetup'][] = NULL;
-#    $action = "admin";
-}
+        $post['messages']['admin_messages_changes'][] = NULL;
+
+    } #applay end
 
     # Anzeige begin
     $pagecontent .= categoriesMessages($post);
-/*
-    if(isset($_POST['javascript']) and $_POST['javascript'] == "ja") {
-        $javascript = "ja";
-    } else {
-        $javascript = "nein";
-    }*/
 
     $array_getTooltipValue = array("admin_help_language","admin_help_adminmail","admin_help_chmodnewfiles",
         "admin_help_chmodupdate");
@@ -3421,7 +3273,6 @@ if($LOGINCONF->get("initialsetup") == "true") {
 
 
     $pagecontent .= '<span class="titel">'.getLanguageValue("admin_button").'</span>';
-#wenn kein javascript nur link!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     $pagecontent .= $tooltip_admin_help;
     $pagecontent .= "<p>".getLanguageValue("admin_text")."</p>";
 
@@ -3481,7 +3332,12 @@ if($LOGINCONF->get("initialsetup") == "true") {
             $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("admin_text_adminmail").'</td>';
             $pagecontent .= '<td class="td_cms_left">'
             .buildCheckBox("sendadminmail", ($ADMIN_CONF->get("sendadminmail") == "true"))
-            .getLanguageValue("admin_input_adminmail")."<br />";
+            .getLanguageValue("admin_input_adminmail");
+            $pagecontent .= "</td>";
+            $pagecontent .= "</tr>";
+
+            $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("admin_text_adminmail").'</td>';
+            $pagecontent .= '<td class="td_cms_left">';
             $pagecontent .= '<input type="text" class="input_text" name="adminmail" value="'.$ADMIN_CONF->get("adminmail").'"'.$tooltip_admin_help_adminmail.$error_color['adminmail'].' />';
             $pagecontent .= "</td>";
             $pagecontent .= "</tr>";
@@ -3519,16 +3375,14 @@ if($LOGINCONF->get("initialsetup") == "true") {
             .getLanguageValue("admin_input_defaultoverwrite").'</td>';
             $pagecontent .= "</tr>";
         }
-//                    'lastbackup',
-//                    'usebigactionicons',
-# if($ADMIN_CONF->get('showexpert') == "true") {
-
         // BILD-EINSTELLUNGEN
         if (extension_loaded("gd"))
         {
             $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("admin_text_imagesmax");
             $pagecontent .= "</td>";
-            $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("resizeimages", $ADMIN_CONF->get("resizeimages") == "true") . getLanguageValue("admin_input_imagesmax").'<br><input type="text" class="input_cms_zahl" size="4" maxlength="4" name="maximagewidth" value="'.$ADMIN_CONF->get("maximagewidth").'"'.$error_color['maximagewidth'].' />&nbsp;x&nbsp;<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="maximageheight" value="'.$ADMIN_CONF->get("maximageheight").'"'.$error_color['maximageheight'].' />&nbsp;' . getLanguageValue("pixels") . '</td>';
+            $pagecontent .= '<td class="td_cms_left">';
+#            $pagecontent .= buildCheckBox("resizeimages", $ADMIN_CONF->get("resizeimages") == "true") . getLanguageValue("admin_input_imagesmax").'<br>';
+            $pagecontent .= '<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="maximagewidth" value="'.$ADMIN_CONF->get("maximagewidth").'"'.$error_color['maximagewidth'].' />&nbsp;x&nbsp;<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="maximageheight" value="'.$ADMIN_CONF->get("maximageheight").'"'.$error_color['maximageheight'].' />&nbsp;' . getLanguageValue("pixels") . '</td>';
             $pagecontent .= "</tr>";
         }
     }
@@ -3549,9 +3403,13 @@ if($LOGINCONF->get("initialsetup") == "true") {
     // Zeile "ÃœBERNEHMEN"
     if(!isset($ADMIN_CONF->properties['error'])) {
         $pagecontent .= '<tr><td class="td_cms_submit" colspan="2"><input type="submit" name="apply" class="input_submit" value="'.getLanguageValue("admin_submit").'">';
+        if($LOGINCONF->get("initialsetup") == "true") {
+            $pagecontent .= '&nbsp;&nbsp;&nbsp;<input type="submit" name="default_pw" class="input_submit" value="'.getLanguageValue("admin_submit_default_pw").'">';
+        }
+/*
         if($ADMIN_CONF->get('showexpert') == "true") {
             $pagecontent .= '&nbsp;&nbsp;&nbsp;'.getLanguageValue("admin_input_default").buildCheckBox("default", "false");
-        }
+        }*/
         $pagecontent .= '</td></tr>';
     }
     $pagecontent .= "</table>";
@@ -3628,6 +3486,9 @@ $pagecontent .= '<input type="submit" class="input_submit" name="apply" value="S
                     $plugins_info_array = array("plugins_titel_version","plugins_titel_over","plugins_titel_author","plugins_titel_web");
                     $pos = 1;
                     foreach($plugins_info_array as $info) {
+                        if($pos == 4) {
+                            $plugin_info[$pos] = '<a href="'.$plugin_info[$pos].'" target="_blank">'.$plugin_info[$pos].'</a>';
+                        }
                         if(isset($plugin_info[$pos])) {
                             $pagecontent_conf .= '<tr><td width="0%" class="td_togglen_padding_bottom" nowrap><b class="text_grau">'.getLanguageValue($info).'</b></td><td width="90%" class="td_togglen_padding_bottom">'.$plugin_info[$pos].'</td></tr>';
                         }
@@ -3669,6 +3530,11 @@ $pagecontent .= '<input type="submit" class="input_submit" name="apply" value="S
                                         $conf_inhalt = str_replace(array("\r\n","\r","\n"),"<br>",trim($_POST[$currentelement][$name]));
                                     }
                                     if(isset($config[$name]['regex']) and strlen($conf_inhalt) > 0) {
+                                        if(isset($config[$name]['regex_error'])) {
+                                            $regex_error = $config[$name]['regex_error'];
+                                        } else {
+                                            $regex_error = getLanguageValue("plugins_messages_input");
+                                        }
                                         if(preg_match($config[$name]['regex'], $conf_inhalt)) {
                                             # bei Password und verschlüsselung an
                                             if($config[$name]['type'] == "password" and $config[$name]['saveasmd5'] == "true") {
@@ -3678,19 +3544,19 @@ $pagecontent .= '<input type="submit" class="input_submit" name="apply" value="S
                                             if($conf_plugin->get($name) != $conf_inhalt) {
                                                 $conf_plugin->set($name,$conf_inhalt);
                                                 $display_toggle = ' style="display:block;"';
-                                                $messages = returnMessage(true, getLanguageValue("plugins_messages_input"));
+                                                $messages = returnMessage(true, $regex_error);
                                             }
                                         } else {
                                             $error = ' style="background-color:#FF0000;"';
                                             $display_toggle = ' style="display:block;"';
-                                            $messages = returnMessage(false, getLanguageValue("plugins_error_input"));
+                                            $messages = returnMessage(false, $regex_error);
                                         }
                                     } else {
                                         # nur in conf schreiben wenn sich der wert geändert hat und es kein password ist
                                         if($conf_plugin->get($name) != $conf_inhalt and $config[$name]['type'] != "password") {
                                             $conf_plugin->set($name,$conf_inhalt);
                                             $display_toggle = ' style="display:block;"';
-                                            $messages = returnMessage(true, getLanguageValue("plugins_messages_input"));
+                                            $messages = returnMessage(true, $regex_error);
                                         }
                                    }
                                 # checkbox
@@ -4302,16 +4168,18 @@ function setLayoutAndDependentSettings($layoutfolder) {
             // Einstellungen aus Layout-Settings laden und in den CMS-Einstellungen ueberschreiben
             $layoutsettings = new Properties($settingsfile);
             if(isset($layoutsettings->properties['error'])) {
-                return $layoutsettings->properties['error'];
+                return $layoutsettings->properties;
+#                return $layoutsettings->properties['error'];
             } else {
                 if(isset($layoutsettings->properties['usesubmenu']))
+                    return $layoutsettings->properties['usesubmenu'];
                     $CMS_CONF->set("usesubmenu", $layoutsettings->get("usesubmenu"));
-                if(isset($layoutsettings->properties['gallerypicsperrow']))
-                    $CMS_CONF->set("gallerypicsperrow", $layoutsettings->get("gallerypicsperrow"));
+#                if(isset($layoutsettings->properties['gallerypicsperrow']))
+#                    $CMS_CONF->set("gallerypicsperrow", $layoutsettings->get("gallerypicsperrow"));
             }
 #        }
 #    }
-    return true;
+#    return true;
 #    $CMS_CONF->set("cmslayout", $layoutfolder);
 }
 
@@ -4438,7 +4306,7 @@ function checkBoxIsChecked($checkboxrequest) {
 }
 // gibt zurueck, ob eine Checkbox angehakt ist
 function checkBoxChecked($checkboxrequest) {
-    if(isset($_POST[$checkboxrequest]) and ($_POST[$checkboxrequest] == "on")) {
+    if(isset($_POST[$checkboxrequest]) and ($_POST[$checkboxrequest] == "true")) {
         return "true";
     } else {
         return "false";
