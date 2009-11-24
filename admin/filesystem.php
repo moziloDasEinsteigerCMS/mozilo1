@@ -822,13 +822,18 @@ function makeDefaultConf($conf_datei,$conv_variable,$get_only_array = false) {
 
     $logindata = array('falselogincount' => '0',
                         'falselogincounttemp' => '0',
-#                        'initialpw' => 'true',
+                        'initialpw' => 'true',
                         'initialsetup' => 'true',
                         'loginlockstarttime' => '',
                         'name' => 'admin',
                         'pw' => '19ad89bc3e3c9d7ef68b89523eff1987');
 
     $downloads = array('_downloadcounterstarttime' => '1254408507');
+
+    $version = array('cmsversion' => '1.12alpha',
+                        'cmsname' => 'Amalia');
+#                        'cmsversion' => '1.12alpha',
+
 /*
     # Das sind die Verstägten Parameter Achtung Bitte ergenzen wenn was Fehlt!!!!!!!!!!!!!!!!!!!!!!!!!!!
     $hidden_syntax = array('usebigactionicons' => 'false',
