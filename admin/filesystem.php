@@ -549,7 +549,9 @@ function updateReferencesInText($currentPagesContent, $currentPagesCategory, $mo
     $allowed_attributes = array("seite","kategorie","datei","bild","bildlinks","bildrechts","include");
 
     // Für jeden Treffer...
+$debug = false;
     foreach ($matches[0] as $match) {
+if($debug) echo "alle matches = $match -----------<br>\n";
         # ein Hack weil dieses preg_match_all nicht mit ^, [ und ] im attribut umgehen kann
         $match = str_replace(array("&#94;&#091;","&#94;&#093;"),array("^[","^]"),$match);
         // ...Auswertung und Verarbeitung der Informationen
@@ -563,7 +565,6 @@ function updateReferencesInText($currentPagesContent, $currentPagesCategory, $mo
         }
         if(in_array($allowed_test,$allowed_attributes))
         {
-$debug = false;
 if($debug) echo "match = $match -----------<br>\n";
 if($debug) echo "datei = $pos_currentPagesCategory/$movedPage<br>\n";
             # weil oldPage und newPage lehr sind Kategorie rename
