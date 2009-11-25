@@ -53,7 +53,7 @@ echo "</pre>";
     $contactformcalcs   = new Properties("formular/aufgaben.conf");
 
 
-    $WEBSITE_NAME = $mainconfig->get("websitetitle");
+    $WEBSITE_NAME = $specialchars->rebuildSpecialChars($mainconfig->get("websitetitle"),false,false);
     if ($WEBSITE_NAME == "")
         $WEBSITE_NAME = "Titel der Website";
 
@@ -261,7 +261,7 @@ echo "</pre>";
 
     // Platzhalter ersetzen
     $HTML = replacePlaceholders($HTML, $cattitle, $pagetitle);
-    $HTML = preg_replace('/{WEBSITE_TITLE}/', $specialchars->numeric_entities_decode(getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle)), $HTML);
+    $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle), $HTML);
 
     // Meta-Tag "keywords"
     $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $specialchars->numeric_entities_decode($mainconfig->get("websitekeywords")), $HTML);
@@ -1023,10 +1023,10 @@ echo "</pre><br>\n";*/
 // ------------------------------------------------------------------------------
     function getWebsiteTitle($websitetitle, $cattitle, $pagetitle) {
         global $mainconfig;
+        global $specialchars;
 
-        $title = $mainconfig->get("titlebarformat");
-        $sep = $mainconfig->get("titlebarseparator");
-
+        $title = $specialchars->rebuildSpecialChars($mainconfig->get("titlebarformat"),true,true);
+        $sep = $specialchars->rebuildSpecialChars($mainconfig->get("titlebarseparator"),true,true);
         $title = preg_replace('/{WEBSITE}/', $websitetitle, $title);
         if ($cattitle == "") {
             $title = preg_replace('/{CATEGORY}/', "", $title);
