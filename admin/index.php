@@ -2351,10 +2351,6 @@ function files($post) {
         $pagecontent .= returnMessage(true, $post['ask']);
     }
 
-    if(isset($post['error_messages'])) {
-        $pagecontent .= categoriesErrorMessages($post);
-    }
-
     if(getRequestParam('javascript', true)) {
         $pagecontent .= '<script type="text/javascript" src="toggle.js"></script>';
     }
@@ -2497,7 +2493,7 @@ function files($post) {
         }
 
 
-                $pagecontent .= $titel_dateien.'<tr><td class="td_left_title_padding_bottom"><a class="file_link" href="'.$CONTENT_DIR_REL.'/'.$file.'/dateien/'.$subfile.'" target="_blank"'.$tooltip_files_help_show.'>'.$specialchars->rebuildSpecialChars($subfile,true,true).'</a></td>'
+                $pagecontent .= $titel_dateien.'<tr><td class="td_left_title_padding_bottom"><a class="file_link" href="'.$CONTENT_DIR_REL.'/'.$specialchars->replaceSpecialChars($file,true).'/dateien/'.$specialchars->replaceSpecialChars($subfile,true).'" target="_blank"'.$tooltip_files_help_show.'>'.$specialchars->rebuildSpecialChars($subfile,true,true).'</a></td>'
                 .'<td class="td_left_title_padding_bottom" nowrap><span class="text_info">'.convertFileSizeUnit($filesize).'</span></td>'
                 .'<td class="td_left_title_padding_bottom" nowrap><span class="text_info">'.strftime(getLanguageValue("_dateformat"), $uploadtime).'</span></td>'
                 .'<td class="td_center_title_padding_bottom" nowrap><span class="text_info">'.$downloads." ".$downloadsperdaytext.'</span></td>';
