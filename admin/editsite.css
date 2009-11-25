@@ -1,0 +1,93 @@
+
+img.js
+{
+	border: 1px solid #c0c0c0;
+/*	height: 24px;*/
+	padding: 1px;
+	background-color: #FFFFFF;
+	margin:1px 2px 5px 2px;
+}
+
+img.js:hover
+{
+	background-color: #AFC4DE;
+}
+
+div.js
+{
+	border: 1px solid black;
+}
+
+img.jss
+{
+	border: 1px solid #c0c0c0;
+	padding: 1px;
+	background-color: #FFFFFF;
+	margin:1px 2px 5px 1px;
+}
+
+img.jss:hover
+{
+	background-color: #AFC4DE;
+}
+
+div.colordiv {
+	width:70px;
+	border:1px solid #7F9DB9;
+	height: 18px;
+	background-color:#FFFFFF;
+
+	margin-top:-4px;
+}
+input.colorinput {
+	background-color:#FFFFFF;
+	height:17px;
+	font-size:12px;
+	border:0px;
+	margin-top:2px;
+	text-align:right;
+	padding:0px;
+}
+
+input#farbcode {
+	font-size:10px;
+	background-color:transparent;
+}
+
+img.colorimage {
+	float:right;
+	padding:1px;
+	margin:0px;
+}
+option.noaction {
+	font-weight:bold;
+}
+option.hasaction {
+}
+select.overviewselect, select.usersyntaxselectbox {
+    margin-top: -2px;
+    margin-bottom: 0px;
+	font-size:12px;
+	border:1px solid #C0C0C0;
+    height:18px;
+    font-size:0.9em;
+    max-width:150px;
+} 
+select.usersyntaxselectbox {
+    max-width:200px;
+}
+
+.fehler
+{
+	display:block;
+	margin:10px;
+	color:#aa0000;
+	border: 1px solid;
+	padding: 5px;
+	padding-left:30px;
+	font-weight: bolder;
+	background-color:#FFDDDD;
+	background-image:url('gfx/msg_error.png');
+	background-position:5px 5px;
+	background-repeat:no-repeat;
+}
