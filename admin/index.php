@@ -3867,8 +3867,12 @@ function returnMessage($success, $message) {
 function returnSmileyBar() {
     $smileys = new Smileys("../smileys");
     $content = "";
-    foreach($smileys->getSmileysArray() as $icon => $emoticon)
-    $content .= "<img class=\"jss\" title=\":$icon:\" alt=\"$emoticon\" src=\"../smileys/$icon.gif\" onClick=\"insert(' :$icon: ', '', false)\" />";
+    foreach($smileys->getSmileysArray() as $icon => $emoticon) {
+        if($icon == "readonly" or $icon == "error") {
+            continue;
+        }
+        $content .= "<img class=\"jss\" title=\":$icon:\" alt=\"$emoticon\" src=\"../smileys/$icon.gif\" onClick=\"insert(' :$icon: ', '', false)\" />";
+    }
     return $content;
 }
 
