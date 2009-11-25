@@ -1125,11 +1125,10 @@ function page($post) {
 
             $pagecontent .= '<table width="100%" class="table_data" border="0" cellspacing="0" cellpadding="0">';
             if(!isset($display_new_cat_name)) {
-                $pagecontent .= '<tr><td width="17%" class="td_left_title"><b>'.$text_page_move.'</b></td><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td class="td_left_title"><b>'.$text_name.'</b></td><td width="12%" class="td_left_title"><b>'.$text_page_status.'</b></td><td width="12%" class="td_left_title">&nbsp;</td><td width="15%" class="td_icons">&nbsp;</td></tr>';
+                $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td class="td_left_title"><b>'.$text_name.'</b></td><td width="12%" class="td_left_title"><b>'.$text_page_status.'</b></td><td width="17%" class="td_left_title"><b>'.$text_page_move.'</b></td><td width="12%" class="td_left_title">&nbsp;</td><td width="15%" class="td_icons">&nbsp;</td></tr>';
                 $display_new_cat_name = true;
             }
-            $pagecontent .= '<tr><td width="17%" class="td_left_title" nowrap>'.$select_box.'</td>';
-            $pagecontent .= '<td width="6%" class="td_left_title"><input '.$post['categories'][$cat]['error_html']['new_position'][$pos].'class="input_text" type="text" name="categories['.$cat.'][new_position]['.$pos.']" value="'.$post['categories'][$cat]['new_position'][$pos].'" size="2" maxlength="2"'.$tooltip_page_help_position.'><input type="hidden" name="categories['.$cat.'][position]['.$pos.']" value="'.$post['categories'][$cat]['position'][$pos].'"></td>';
+            $pagecontent .= '<tr><td width="6%" class="td_left_title"><input '.$post['categories'][$cat]['error_html']['new_position'][$pos].'class="input_text" type="text" name="categories['.$cat.'][new_position]['.$pos.']" value="'.$post['categories'][$cat]['new_position'][$pos].'" size="2" maxlength="2"'.$tooltip_page_help_position.'><input type="hidden" name="categories['.$cat.'][position]['.$pos.']" value="'.$post['categories'][$cat]['position'][$pos].'"></td>';
             $pagecontent .= '<td class="td_left_title">';
             if($post['categories'][$cat]['ext'][$pos] == $EXT_PAGE) {
                 $text = "(".$text_page_saveasnormal.")";
@@ -1145,8 +1144,8 @@ function page($post) {
             $pagecontent .= '<span '.$post['categories'][$cat]['error_html']['name'][$pos].'class="text_cat_page">'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['name'][$pos],true,true).'</span>';
 
             $pagecontent .= '<input type="hidden" name="categories['.$cat.'][name]['.$pos.']" value="'.$post['categories'][$cat]['name'][$pos].'"><input type="hidden" name="categories['.$cat.'][ext]['.$pos.']" value="'.substr($post['categories'][$cat]['ext'][$pos],-(strlen($EXT_PAGE))).'"></td>';
-
             $pagecontent .= '<td width="12%" class="td_left_title" nowrap><span class="text_info">'.$text.'</span></td>';
+            $pagecontent .= '<td width="17%" class="td_left_title" nowrap>'.$select_box.'</td>';
             $pagecontent .= '<td width="12%" class="td_left_title" nowrap><b>'.$text_page_copy.'</b>&nbsp;<input class="input_check" type="checkbox" name="categories['.$cat.'][copy]['.$pos.']" value="yes"'.$post['categories'][$cat]['copy'][$pos].''.$tooltip_page_help_copy.'></td>';
 
             $pagecontent .= '<td width="15%" class="td_icons" nowrap>';
