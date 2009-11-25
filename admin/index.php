@@ -2360,7 +2360,26 @@ function files($post) {
     } else {
         $tooltip_files_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration&amp;&page=50_Dateien" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
     }
-
+    # Prüfen ob der Ordner dateien existiert wenn nicht anlegen
+    foreach ($post['categories']['cat']['position'] as $pos => $position) {
+        if($pos == $max_cat_page or isset($post['categories']['cat']['url'][$pos])) {
+            continue;
+        }
+        $file = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
+        if(!file_exists($CONTENT_DIR_REL."/".$file."/dateien")) {
+            $post['error_messages']['files_error_dateien'][] = $CONTENT_DIR_REL."/".$file."/dateien";
+            @mkdir ($CONTENT_DIR_REL."/".$file."/dateien");
+            $line_error = __LINE__ - 1;
+            $last_error = @error_get_last();
+            if($last_error['line'] == $line_error) {
+                $post['error_messages']['php_error'][] = $last_error['message'];
+            } elseif(!is_dir($CONTENT_DIR_REL."/".$file."/dateien")) {
+                $post['error_messages']['files_error_mkdir_dateien'][] = $CONTENT_DIR_REL."/".$file."/dateien";
+            } else {
+                useChmod($CONTENT_DIR_REL."/".$file."/dateien");
+            }
+        }
+    }
     $pagecontent .= categoriesMessages($post);
 
     $pagecontent .= '<span class="titel">'.getLanguageValue("files_button").'</span>';
@@ -2407,17 +2426,19 @@ function files($post) {
         if($pos == $max_cat_page or isset($post['categories']['cat']['url'][$pos])) {
             continue;
         }
-            $file = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
-            // Anzahl Dateien auslesen
-            $filecount = 0;
-            if($fileshandle = opendir("$CONTENT_DIR_REL/".$file."/dateien")) {
+        $file = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
+        // Anzahl Dateien auslesen
+        $filecount = 0;
+        if(file_exists($CONTENT_DIR_REL."/".$file."/dateien")) {
+            if($fileshandle = opendir($CONTENT_DIR_REL."/".$file."/dateien")) {
                  while (($filesdir = readdir($fileshandle))) {
                     if(isValidDirOrFile($filesdir))
                         $filecount++;
                 }
                 closedir($fileshandle);
             }
-            $text = '('.$filecount.' '.$text_files.')';
+        }
+        $text = '('.$filecount.' '.$text_files.')';
 
         $pagecontent .= '<tr><td class="td_toggle">';
 
@@ -2439,7 +2460,7 @@ function files($post) {
         $pagecontent .= '<td '.$post['categories']['cat']['error_html']['display'][$pos].'id="toggle_'.$pos.'" align="right" class="td_togglen">';
 
         $file = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
-        if (isValidDirOrFile($file) && ($subhandle = opendir("$CONTENT_DIR_REL/".$file."/dateien"))) {
+        if (isValidDirOrFile($file) && ($subhandle = @opendir("$CONTENT_DIR_REL/".$file."/dateien"))) {
             $hasdata = false;
             $pagecontent .= '<table width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
             $pagecontent .= '<tr><td class="td_left_title_padding_bottom" colspan="1">'.$text_files_text_upload.'</td><td colspan="4" class="td_right_title_padding_bottom"'.$tooltip_files_help_upload.'><input type="file" id="uploadfileinput_'.$pos.'" name="uploadfile" class="uploadfileinput"></td></tr><tr><td colspan="5" class="td_right_title_padding_bottom"><div id="files_list_'.$pos.'" class="text_cat_page"></div>';
@@ -4218,7 +4239,7 @@ function uploadFile($uploadfile, $cat, $forceoverwrite, $gallery = false){
             return array("files_error_name" => $uploadfile_name);
         }
         // Datei vorhanden und "Ãœberschreiben"-Checkbox nicht aktiviert
-        elseif (file_exists($dir_real.'/'.$specialchars->replaceSpecialChars($cat,false).'/'.$die_dateien.$uploadfile_name) && ($forceoverwrite != "on")) {
+        elseif (file_exists($dir_real.'/'.$cat.'/'.$die_dateien.$uploadfile_name) && ($forceoverwrite != "on")) {
             return array("files_error_exists" => $uploadfile_name);
         }
         // alles okay, hochladen!
