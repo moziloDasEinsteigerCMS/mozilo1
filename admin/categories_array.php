@@ -185,15 +185,26 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
         if(isset($post[$cat]['error_html']['display_cat'])) {
             $post[$cat]['error_html']['display_cat'] = 'style="display:block;" ';
         }
-
-#        $post[$cat]['error_html']['check_too_many_categories'] = NULL;
         if(count($_POST['categories'][$cat]['position']) > $max_cat_page + 1) {
             $post['error_messages']['check_too_many_categories'][] = NULL;
-#            $post['error_messages']['check_too_many_categories'][] = $cat;
-#            $post[$cat]['error_html']['check_too_many_categories'] = 'style="background-color:'.$error_color['check_too_many_categories'].';" ';
         }
         foreach ($_POST['categories'][$cat]['position'] as $pos => $tmp) {
-
+            # erstmal die Sonderzeichen umwandeln
+            if(isset($_POST['categories'][$cat]['name'][$pos])) {
+                $_POST['categories'][$cat]['name'][$pos] = $specialchars->replaceSpecialChars($_POST['categories'][$cat]['name'][$pos],false);
+            }
+            if(isset($_POST['categories'][$cat]['new_name'][$pos])) {
+                $_POST['categories'][$cat]['new_name'][$pos] = $specialchars->replaceSpecialChars($_POST['categories'][$cat]['new_name'][$pos],false);
+            }
+            if(isset($_POST['categories'][$cat]['url'][$pos])) {
+                $_POST['categories'][$cat]['url'][$pos] = $specialchars->replaceSpecialChars($_POST['categories'][$cat]['url'][$pos],false);
+            }
+            if(isset($_POST['categories'][$cat]['new_url'][$pos])) {
+                $_POST['categories'][$cat]['new_url'][$pos] = $specialchars->replaceSpecialChars($_POST['categories'][$cat]['new_url'][$pos],false);
+            }
+            if(isset($_POST['categories'][$cat]['new_cat'][$pos])) {
+                $_POST['categories'][$cat]['new_cat'][$pos] = $specialchars->replaceSpecialChars($_POST['categories'][$cat]['new_cat'][$pos],false);
+            }
             $post[$cat]['error_html']['cat_name'] = NULL;
             if(count($_POST['categories'][$cat]['position'][$pos]) > $max_cat_page + 1) {
                 $post['error_messages']['check_too_many_pages']['color'] = $error_color['check_too_many_pages'];
@@ -294,8 +305,8 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
                 $post[$cat]['new_name'][$pos] = NULL;
                 # Cat Page Umbenen bei Page in gleicher Cat
                 if(strlen(trim($_POST['categories'][$cat]['new_name'][$pos])) > "0") {
-                    $post[$cat]['new_name'][$pos] = $specialchars->replaceSpecialChars($_POST['categories'][$cat]['new_name'][$pos],false);
-                    $newname = $post[$cat]['new_name'][$pos];
+                    $post[$cat]['new_name'][$pos] = $_POST['categories'][$cat]['new_name'][$pos];
+                   $newname = $post[$cat]['new_name'][$pos];
                     $name_len = strlen($newname);
                     if(!preg_match($ALLOWED_SPECIALCHARS_REGEX, $newname) or stristr($newname,"%5E")) {
                         $post['error_messages']['check_name']['color'] = $error_color['check_name'];
@@ -340,13 +351,12 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
             $post[$cat]['error_html']['new_url'][$pos] = NULL;
             $post[$cat]['new_url'][$pos] = NULL;
             if(isset($_POST['categories'][$cat]['new_url'][$pos])) {
-                $post[$cat]['new_url'][$pos] = $specialchars->replaceSpecialChars(trim(str_replace(array("\r\n","\n","\r"),'',$_POST['categories'][$cat]['new_url'][$pos])),false);
+                $post[$cat]['new_url'][$pos] = trim(str_replace(array("\r\n","\n","\r"),'',$_POST['categories'][$cat]['new_url'][$pos]));
                 if(strlen($post[$cat]['new_url'][$pos]) > "0") {
                     $url_len = strlen($post[$cat]['new_url'][$pos]);
                     # urls haben immer eine ext.
                     $ext_len = strlen($EXT_LINK);
-                    $newlink = $post[$cat]['new_url'][$pos];
-                    if(!preg_match($ALLOWED_SPECIALCHARS_REGEX, $newlink) or stristr($newlink,"%5E")) {
+                    if(!preg_match($ALLOWED_SPECIALCHARS_REGEX, $post[$cat]['new_url'][$pos]) or stristr($post[$cat]['new_url'][$pos],"%5E")) {
                         $post['error_messages']['check_url']['color'] = $error_color['check_url'];
                         $post['error_messages']['check_url'][] = NULL;
                         $post[$cat]['error_html']['new_url'][$pos] = 'style="background-color:'.$error_color['check_url'].';" ';
