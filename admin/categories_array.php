@@ -188,7 +188,7 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
         if(count($_POST['categories'][$cat]['position']) > $max_cat_page + 1) {
             $post['error_messages']['check_too_many_categories'][] = NULL;
         }
-        foreach ($_POST['categories'][$cat]['position'] as $pos => $tmp) {
+        foreach ($_POST['categories'][$cat]['position'] as $pos => $tmp) {# str_replace('/','%2F',)
             # erstmal die Sonderzeichen umwandeln
             if(isset($_POST['categories'][$cat]['name'][$pos])) {
                 $_POST['categories'][$cat]['name'][$pos] = $specialchars->replaceSpecialChars($_POST['categories'][$cat]['name'][$pos],false);
