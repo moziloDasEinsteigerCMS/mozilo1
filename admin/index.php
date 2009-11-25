@@ -4318,7 +4318,7 @@ function isValidRequestParameter($index, $type) {
 
 // Gibt eine Checkbox mit dem uebergebenen Namen zurueck. Der Parameter checked bestimmt, ob die Checkbox angehakt ist.
 function buildCheckBox($name, $checked) {
-    $checkbox = '<input type="checkbox" ';
+    $checkbox = '<input type="checkbox" value="true" ';
     if ($checked == "true") {
         $checkbox .= 'checked=checked';
     }
