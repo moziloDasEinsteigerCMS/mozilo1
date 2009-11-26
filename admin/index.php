@@ -75,7 +75,6 @@ if($debug == "ja") { #top:850px; relative absolute position:relative;
 require_once("filesystem.php");
 require_once("string.php");
 require_once("../Smileys.php");
-require_once("../SpecialChars.php");
 require_once("../Mail.php");
 require_once("categories_array.php");
 
