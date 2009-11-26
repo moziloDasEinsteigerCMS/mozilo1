@@ -219,7 +219,7 @@ class Properties {
                 if($key == "error" or $key == "readonly") {
                     continue;
                 }
-                $content .= "$key = $value\n";
+                $content .= $key." = ".$value."\n";
             }
             // ...und speichern
             fputs($file, $content);
