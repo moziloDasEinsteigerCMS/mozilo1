@@ -1533,6 +1533,8 @@ echo "</pre><br>\n";*/
     function menuLink($link,$css) {
         global $EXT_LINK;
         global $specialchars;
+        global $syntax;
+        global $language;
 
         if(!empty($css)) {
              $css = ' class="'.$css.'"';
@@ -1548,7 +1550,8 @@ echo "</pre><br>\n";*/
         if(substr($tmp_link[1], 0, 7) != "http://") {
             $tmp_link[1] = "http://".$tmp_link[1];
         }
-        return '<a href="'.substr($tmp_link[1],0,-(strlen($EXT_LINK))).'"'.$css.' target="'.$target.'">'.$specialchars->rebuildSpecialChars(substr($tmp_link[0],3), true, true).'</a> ';
+        $titel = $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_link",$specialchars->rebuildSpecialChars($tmp_link[1], true, true)));
+        return '<a href="'.substr($tmp_link[1],0,-(strlen($EXT_LINK))).'"'.$css.' target="'.$target.'"'.$titel.'>'.$specialchars->rebuildSpecialChars(substr($tmp_link[0],3), true, true).'</a> ';
     }
     
 ?>
