@@ -21,15 +21,15 @@ $CHARSET = 'UTF-8';
 
     $URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("index.php")));
 
+    require_once("SpecialChars.php");
     require_once("Language.php");
     require_once("Properties.php");
-    require_once("SpecialChars.php");
     require_once("Syntax.php");
     require_once("Smileys.php");
     require_once("Mail.php");
     require_once("Plugin.php");
     
-    // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
+    // Initial: Fehlerausgabe unterdrÃ¼cken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 #    @ini_set("display_errors", 0);
 
     $specialchars   = new SpecialChars();
@@ -41,7 +41,7 @@ $CHARSET = 'UTF-8';
     $smileys        = new Smileys("smileys");
     $mailfunctions  = new Mail(false);
 
-    // Dateiendungen für Inhaltsseiten
+    // Dateiendungen fÃ¼r Inhaltsseiten
     $EXT_PAGE       = ".txt";
     $EXT_HIDDEN     = ".hid";
     $EXT_DRAFT      = ".tmp";
@@ -52,12 +52,12 @@ $CHARSET = 'UTF-8';
     $TEMPLATE_FILE  = "layouts/$LAYOUT_DIR/template.html";
     $CSS_FILE       = $URL_BASE."layouts/$LAYOUT_DIR/css/style.css";
     $FAVICON_FILE   = $URL_BASE."layouts/$LAYOUT_DIR/favicon.ico";
-    // Einstellungen für Kontaktformular
+    // Einstellungen fÃ¼r Kontaktformular
     $contactformconfig  = new Properties("formular/formular.conf");
     $contactformcalcs   = new Properties("formular/aufgaben.conf");
 
 
-    $WEBSITE_NAME = $specialchars->rebuildSpecialChars($mainconfig->get("websitetitle"),false,false);
+    $WEBSITE_NAME = $specialchars->rebuildSpecialChars($mainconfig->get("websitetitle"),false,true);
     if ($WEBSITE_NAME == "")
         $WEBSITE_NAME = "Titel der Website";
 
@@ -87,7 +87,7 @@ $CHARSET = 'UTF-8';
     $PLUGIN_DIR             = "plugins";
     $HTML                   = "";
 
-    // Überprüfen: Ist die Startkategorie vorhanden? Wenn nicht, nimm einfach die allererste als Standardkategorie
+    // ÃœberprÃ¼fen: Ist die Startkategorie vorhanden? Wenn nicht, nimm einfach die allererste als Standardkategorie
     if (!file_exists("$CONTENT_DIR_REL/$DEFAULT_CATEGORY")) {
         $contentdir = opendir($CONTENT_DIR_REL);
         while ($cat = readdir($contentdir)) {
@@ -102,16 +102,16 @@ $CHARSET = 'UTF-8';
     // Dateiname der aktuellen Inhaltsseite (wird in getContent() gesetzt)
     $PAGE_FILE = "";
 
-    // Zuerst: Übergebene Parameter überprüfen
+    // Zuerst: Ãœbergebene Parameter Ã¼berprÃ¼fen
     checkParameters();
-    // Dann: HTML-Template einlesen und mit Inhalt füllen
+    // Dann: HTML-Template einlesen und mit Inhalt fÃ¼llen
     readTemplate();
-    // Zum Schluß: Ausgabe des fertigen HTML-Dokuments
+    // Zum SchluÃŸ: Ausgabe des fertigen HTML-Dokuments
     echo $HTML;
 
 
 // ------------------------------------------------------------------------------
-// Parameter auf Korrektheit prüfen
+// Parameter auf Korrektheit prÃ¼fen
 // ------------------------------------------------------------------------------
     function checkParameters() {
         global $CONTENT_DIR_ABS;
@@ -126,9 +126,9 @@ $CHARSET = 'UTF-8';
 
 #echo $CAT_REQUEST."<br>\n";
 #echo $PAGE_REQUEST."<br>\n";
-        // Überprüfung der gegebenen Parameter
+        // ÃœberprÃ¼fung der gegebenen Parameter
         if (
-                // Wenn keine Kategorie übergeben wurde...
+                // Wenn keine Kategorie Ã¼bergeben wurde...
                 ($CAT_REQUEST == "")
                 // ...oder eine nicht existente Kategorie...
                 || (!file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST"))
@@ -151,7 +151,7 @@ $CHARSET = 'UTF-8';
             $PAGE_REQUEST = substr($pagesarray[0], 0, strlen($pagesarray[0]) - 4);
         }
 
-        // Wenn ein Action-Parameter übergeben wurde: keine aktiven Kat./Inhaltts. anzeigen
+        // Wenn ein Action-Parameter Ã¼bergeben wurde: keine aktiven Kat./Inhaltts. anzeigen
         if (($ACTION_REQUEST == "sitemap") || ($ACTION_REQUEST == "search")) {
             $CAT_REQUEST = "";
             $PAGE_REQUEST = "";
@@ -180,12 +180,13 @@ $CHARSET = 'UTF-8';
         global $smileys;
         global $specialchars;
         global $URL_BASE;
+        global $CHARSET;
 
     if (!$file = @fopen($specialchars->rebuildSpecialChars($TEMPLATE_FILE, false, false), "r"))
         die($language->getLanguageValue1("message_template_error_1", $TEMPLATE_FILE));
     $template = fread($file, filesize($specialchars->rebuildSpecialChars($TEMPLATE_FILE, false, false)));
     fclose($file);
-        // Platzhalter des Templates mit Inhalt füllen
+        // Platzhalter des Templates mit Inhalt fÃ¼llen
         $pagecontentarray = array();
        // getSiteMap, getSearchResult und getContent liefern jeweils ein Array:
        // [0] = Inhalt
@@ -207,13 +208,13 @@ $CHARSET = 'UTF-8';
         $cattitle         = $pagecontentarray[1];
         $pagetitle         = $pagecontentarray[2];
     }
-    // Inhalte aus Inhaltsseiten durch Passwort schützen
+    // Inhalte aus Inhaltsseiten durch Passwort schÃ¼tzen
     else { 
-        // zunächst Passwort als gesetzt und nicht eingegeben annehmen
+        // zunÃ¤chst Passwort als gesetzt und nicht eingegeben annehmen
         $passwordok = false;
         if (file_exists("conf/passwords.conf")) {
-            $passwords = new Properties("conf/passwords.conf"); // alle Passwörter laden
-            if ($passwords->keyExists($CAT_REQUEST.'/'.$PAGE_REQUEST)) { // nach Passwort für diese Seite suchen
+            $passwords = new Properties("conf/passwords.conf"); // alle PasswÃ¶rter laden
+            if ($passwords->keyExists($CAT_REQUEST.'/'.$PAGE_REQUEST)) { // nach Passwort fÃ¼r diese Seite suchen
                 $cattitle    = catToName($CAT_REQUEST, true);
                 $pagetitle   = $language->getLanguageValue0("passwordform_title_0");
                 if (!isset($_POST) || ($_POST == array())) // sofern kein Passwort eingegeben, nach einem Fragen
@@ -260,6 +261,7 @@ $CHARSET = 'UTF-8';
     }
 
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
+    $HTML = preg_replace('/{CHARSET}/', $CHARSET, $HTML);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
     $HTML = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR, $HTML);
 
@@ -275,7 +277,7 @@ $CHARSET = 'UTF-8';
     $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
     $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
 
-    // Detailmenü (nicht zeigen, wenn Submenüs aktiviert sind)
+    // DetailmenÃ¼ (nicht zeigen, wenn SubmenÃ¼s aktiviert sind)
     if ($mainconfig->get("usesubmenu") > 0) {
         $HTML = preg_replace('/{DETAILMENU}/', "", $HTML);
     }
@@ -285,16 +287,16 @@ $CHARSET = 'UTF-8';
     // Suchformular
     $HTML = preg_replace('/{SEARCH}/', getSearchForm(), $HTML);
 
-    // Letzte Änderung
+    // Letzte Ã„nderung
     $lastchangeinfo = getLastChangedContentPageAndDate();
-    // - Name der zuletzt geänderten Inhaltsseite
+    // - Name der zuletzt geÃ¤nderten Inhaltsseite
     // - kompletter Link auf diese Inhaltsseite  
-    // - formatiertes Datum der letzten Änderung
+    // - formatiertes Datum der letzten Ã„nderung
     $HTML = preg_replace('/{LASTCHANGEDTEXT}/', $language->getLanguageValue0("message_lastchange_0"), $HTML);
     $HTML = preg_replace('/{LASTCHANGEDPAGE}/', $lastchangeinfo[0], $HTML);
     $HTML = preg_replace('/{LASTCHANGEDPAGELINK}/', $lastchangeinfo[1], $HTML);
     $HTML = preg_replace('/{LASTCHANGEDATE}/', $lastchangeinfo[2], $HTML);
-    // Platzhalter {LASTCHANGE} ist obsolet seit 1.12! Wird nur aus Gründen der Abwärtskompatibilität noch ersetzt 
+    // Platzhalter {LASTCHANGE} ist obsolet seit 1.12! Wird nur aus GrÃ¼nden der AbwÃ¤rtskompatibilitÃ¤t noch ersetzt 
     $HTML = preg_replace('/{LASTCHANGE}/', $language->getLanguageValue0("message_lastchange_0")." ".$lastchangeinfo[1]." (".$lastchangeinfo[2].")", $HTML); 
     
     // Sitemap-Link
@@ -319,7 +321,7 @@ $CHARSET = 'UTF-8';
 // ------------------------------------------------------------------------------
     function getPasswordForm() {
         global $language;
-        // TODO: sollte auch wahlweise über ein Template gehen
+        // TODO: sollte auch wahlweise Ã¼ber ein Template gehen
         return '<form action="index.php?'.$_SERVER['QUERY_STRING'].'" method="post">
         '.$language->getLanguageValue0("passwordform_pagepasswordplease_0").' 
         <input type="password" name="password" />
@@ -328,8 +330,8 @@ $CHARSET = 'UTF-8';
     }
 
 // ------------------------------------------------------------------------------
-// Zu einem Kategorienamen passendes Kategorieverzeichnis suchen und zurückgeben
-// Alle Kühe => 00_Alle-nbsp-K-uuml-he
+// Zu einem Kategorienamen passendes Kategorieverzeichnis suchen und zurÃ¼ckgeben
+// Alle KÃ¼he => 00_Alle-nbsp-K-uuml-he
 // ------------------------------------------------------------------------------
     function nameToCategory($catname) {
         global $CONTENT_DIR_ABS;
@@ -337,20 +339,20 @@ $CHARSET = 'UTF-8';
         $dircontent = getDirContentAsArray("$CONTENT_DIR_ABS", false, false);
         // alle vorhandenen Kategorien durchgehen...
         foreach ($dircontent as $currentelement) {
-            // ...und wenn eine auf den Namen paßt...
+            // ...und wenn eine auf den Namen paÃŸt...
             if (substr($currentelement, 3, strlen($currentelement)-3) == $catname) {
-                // ...den vollen Kategorienamen zurückgeben
+                // ...den vollen Kategorienamen zurÃ¼ckgeben
                 return $currentelement;
             }
         }
-        // Wenn kein Verzeichnis paßt: Leerstring zurückgeben
+        // Wenn kein Verzeichnis paÃŸt: Leerstring zurÃ¼ckgeben
         return "";
     }
 
 
 // ------------------------------------------------------------------------------
-// Zu einer Inhaltsseite passende Datei suchen und zurückgeben
-// Müllers Kuh => 00_M-uuml-llers-nbsp-Kuh.txt
+// Zu einer Inhaltsseite passende Datei suchen und zurÃ¼ckgeben
+// MÃ¼llers Kuh => 00_M-uuml-llers-nbsp-Kuh.txt
 // ------------------------------------------------------------------------------
     function nameToPage($pagename, $currentcat) {
         global $CONTENT_DIR_ABS;
@@ -362,24 +364,24 @@ $CHARSET = 'UTF-8';
         $dircontent = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcat", true, true);
         // alle vorhandenen Inhaltsdateien durchgehen...
         foreach ($dircontent as $currentelement) {
-            // ...und wenn eine auf den Namen paßt...
+            // ...und wenn eine auf den Namen paÃŸt...
             if (
                 (substr($currentelement, 3, strlen($currentelement) - 3 - strlen($EXT_PAGE)) == $pagename)
                 || (substr($currentelement, 3, strlen($currentelement) - 3 - strlen($EXT_HIDDEN)) == $pagename)
                 || (substr($currentelement, 3, strlen($currentelement) - 3 - strlen($EXT_DRAFT)) == $pagename)
                 ) {
-                // ...den vollen Seitennamen zurückgeben
+                // ...den vollen Seitennamen zurÃ¼ckgeben
                 return $currentelement;
             }
         }
-        // Wenn keine Datei paßt: Leerstring zurückgeben
+        // Wenn keine Datei paÃŸt: Leerstring zurÃ¼ckgeben
         return "";
     }
 
 
 // ------------------------------------------------------------------------------
-// Kategorienamen aus komplettem Verzeichnisnamen einer Kategorie zurückgeben
-// 00_Alle-nbsp-K-uuml-he => Alle Kühe
+// Kategorienamen aus komplettem Verzeichnisnamen einer Kategorie zurÃ¼ckgeben
+// 00_Alle-nbsp-K-uuml-he => Alle KÃ¼he
 // ------------------------------------------------------------------------------
     function catToName($cat, $rebuildnbsp) {
         global $specialchars;
@@ -388,8 +390,8 @@ $CHARSET = 'UTF-8';
 
 
 // ------------------------------------------------------------------------------
-// Seitennamen aus komplettem Dateinamen einer Inhaltsseite zurückgeben
-// 00_M-uuml-llers-nbsp-Kuh.txt => Müllers Kuh
+// Seitennamen aus komplettem Dateinamen einer Inhaltsseite zurÃ¼ckgeben
+// 00_M-uuml-llers-nbsp-Kuh.txt => MÃ¼llers Kuh
 // ------------------------------------------------------------------------------
     function pageToName($page, $rebuildnbsp) {
         global $specialchars;
@@ -398,7 +400,7 @@ $CHARSET = 'UTF-8';
 
 
 // ------------------------------------------------------------------------------
-// Inhalt einer Content-Datei einlesen, Rückgabe als String
+// Inhalt einer Content-Datei einlesen, RÃ¼ckgabe als String
 // ------------------------------------------------------------------------------
     function getContent() {
         global $CONTENT_DIR_ABS;
@@ -448,8 +450,8 @@ $CHARSET = 'UTF-8';
 
 
 // ------------------------------------------------------------------------------
-// Auslesen des Content-Verzeichnisses unter Berücksichtigung
-// des auszuschließenden File-Verzeichnisses, Rückgabe als Array
+// Auslesen des Content-Verzeichnisses unter BerÃ¼cksichtigung
+// des auszuschlieÃŸenden File-Verzeichnisses, RÃ¼ckgabe als Array
 // ------------------------------------------------------------------------------
     function getDirContentAsArray($dir, $iscatdir, $showhidden) {
         global $CONTENT_FILES_DIR;
@@ -462,8 +464,8 @@ $CHARSET = 'UTF-8';
         $currentdir = opendir($dir);
         $i=0;
         $files = "";
-        // Einlesen des gesamten Content-Verzeichnisses außer dem
-        // auszuschließenden Verzeichnis und den Elementen . und ..
+        // Einlesen des gesamten Content-Verzeichnisses auÃŸer dem
+        // auszuschlieÃŸenden Verzeichnis und den Elementen . und ..
         while ($file = readdir($currentdir)) {
             if (
                     // wenn Kategorieverzeichnis: Alle Dateien auslesen, die auf $EXT_PAGE oder $EXT_HIDDEN enden...
@@ -483,7 +485,7 @@ $CHARSET = 'UTF-8';
             }
         }
         closedir($currentdir);
-        // Rückgabe des sortierten Arrays
+        // RÃ¼ckgabe des sortierten Arrays
         if ($files <> "")
             sort($files);
         return $files;
@@ -491,7 +493,7 @@ $CHARSET = 'UTF-8';
 
 
 // ------------------------------------------------------------------------------
-// Aufbau des Hauptmenüs, Rückgabe als String
+// Aufbau des HauptmenÃ¼s, RÃ¼ckgabe als String
 // ------------------------------------------------------------------------------
     function getMainMenu() {
         global $CONTENT_DIR_ABS;
@@ -511,9 +513,9 @@ $CHARSET = 'UTF-8';
 echo "<pre>";
 print_r($categoriesarray);
 echo "</pre><br>\n";*/
-        // numerische Accesskeys für angezeigte Menüpunkte
+        // numerische Accesskeys fÃ¼r angezeigte MenÃ¼punkte
         $currentaccesskey = 0;
-        // Jedes Element des Arrays ans Menü anhängen
+        // Jedes Element des Arrays ans MenÃ¼ anhÃ¤ngen
         foreach ($categoriesarray as $currentcategory) {
             # Mod Rewrite
             $url = "index.php?cat=".$currentcategory;
@@ -527,7 +529,7 @@ echo "</pre><br>\n";*/
             elseif (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true, false) == "") {
                 $mainmenu .= "";
             }
-            // Aktuelle Kategorie als aktiven Menüpunkt anzeigen...
+            // Aktuelle Kategorie als aktiven MenÃ¼punkt anzeigen...
             elseif ($currentcategory == $CAT_REQUEST) {
                 $currentaccesskey++;
                 $mainmenu .= "<li class=\"mainmenu\">".
@@ -539,7 +541,7 @@ echo "</pre><br>\n";*/
                 }
                 $mainmenu .= "</li>";
             }
-            // ...alle anderen als normalen Menüpunkt.
+            // ...alle anderen als normalen MenÃ¼punkt.
             else {
                 $currentaccesskey++;
                 $mainmenu .= "<li class=\"mainmenu\">".
@@ -552,13 +554,13 @@ echo "</pre><br>\n";*/
                 $mainmenu .= "</li>";
             }
         }
-        // Rückgabe des Menüs
+        // RÃ¼ckgabe des MenÃ¼s
         return $mainmenu . "</ul>";
     }
 
 
 // ------------------------------------------------------------------------------
-// Aufbau des Detailmenüs, Rückgabe als String
+// Aufbau des DetailmenÃ¼s, RÃ¼ckgabe als String
 // ------------------------------------------------------------------------------
     function getDetailMenu($cat){
         global $ACTION_REQUEST;
@@ -590,30 +592,30 @@ echo "</pre><br>\n";*/
         // Entwurfsansicht
         elseif (($ACTION_REQUEST == "draft") && ($mainconfig->get("usesubmenu") == 0))
             $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?cat=$cat&amp;page=$PAGE_REQUEST&amp;action=draft\" class=\"".$cssprefix."active\">".pageToName($PAGE_REQUEST.$EXT_DRAFT, false)." (".$language->getLanguageValue0("message_draft_0").")</a></li>";
-        // "ganz normales" Detailmenü einer Kategorie
+        // "ganz normales" DetailmenÃ¼ einer Kategorie
         else {
             // Content-Verzeichnis der aktuellen Kategorie einlesen
             $contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$cat", true, false);
 
-            // Kategorie, die nur versteckte Seiten enthält: kein Detailmenü zeigen
+            // Kategorie, die nur versteckte Seiten enthÃ¤lt: kein DetailmenÃ¼ zeigen
             if ($contentarray == "") {
                 return "";
             }
 
-            // alphanumerische Accesskeys (über numerischen ASCII-Code) für angezeigte Menüpunkte
+            // alphanumerische Accesskeys (Ã¼ber numerischen ASCII-Code) fÃ¼r angezeigte MenÃ¼punkte
             $currentaccesskey = 0;
-            // Jedes Element des Arrays ans Menü anhängen
+            // Jedes Element des Arrays ans MenÃ¼ anhÃ¤ngen
             foreach ($contentarray as $currentcontent) {
                 $currentaccesskey++;
-                // Inhaltsseite nicht anzeigen, wenn sie genauso heißt wie die Kategorie
+                // Inhaltsseite nicht anzeigen, wenn sie genauso heiÃŸt wie die Kategorie
                 if ($mainconfig->get("hidecatnamedpages") == "true") {
                     if(substr($currentcontent, 3, strlen($currentcontent) - 7) == substr($CAT_REQUEST, 3, strlen($CAT_REQUEST) - 3) and substr($currentcontent,-(strlen($EXT_LINK))) != $EXT_LINK) {
                         // Wenn es in der Kategorie nur diese eine (dank hidecatnamedpages eh nicht angezeigte) Seite gibt,
-                        // dann gib als Detailmenü gleich einen Leerstring zurück
+                        // dann gib als DetailmenÃ¼ gleich einen Leerstring zurÃ¼ck
                         if (count($contentarray) == 1) {
                             return "";
                         } 
-                        // ...ansonsten auf zur nächsten Inhaltsseite!
+                        // ...ansonsten auf zur nÃ¤chsten Inhaltsseite!
                         else {
                             continue;
                         }
@@ -624,7 +626,7 @@ echo "</pre><br>\n";*/
                 if($mainconfig->get("modrewrite") == "true") {
                     $url = $URL_BASE.$cat."/".substr($currentcontent, 0, strlen($currentcontent) - 4).".html";
                 }
-                // Aktuelle Inhaltsseite als aktiven Menüpunkt anzeigen...
+                // Aktuelle Inhaltsseite als aktiven MenÃ¼punkt anzeigen...
                 if (
                     ($CAT_REQUEST == $cat) // aktive Kategorie
                     && (substr($currentcontent, 0, strlen($currentcontent) - 4) == $PAGE_REQUEST) // aktive Seite
@@ -637,7 +639,7 @@ echo "</pre><br>\n";*/
                                                     pageToName($currentcontent, false).
                                                     "</a></li>";
                 }
-                // ...alle anderen als normalen Menüpunkt.
+                // ...alle anderen als normalen MenÃ¼punkt.
                 else {
                     if(substr($currentcontent,-(strlen($EXT_LINK))) == $EXT_LINK) {
                         $detailmenu .= '<li class="detailmenu">'.menuLink($currentcontent,$cssprefix)."</li>";
@@ -652,13 +654,13 @@ echo "</pre><br>\n";*/
                 }
             }
         }
-        // Rückgabe des Menüs
+        // RÃ¼ckgabe des MenÃ¼s
         return $detailmenu . "</ul>";
     }
 
 
 // ------------------------------------------------------------------------------
-// Rückgabe des Suchfeldes
+// RÃ¼ckgabe des Suchfeldes
 // ------------------------------------------------------------------------------
     function getSearchForm(){
         global $language;
@@ -676,10 +678,10 @@ echo "</pre><br>\n";*/
 
 
 // ------------------------------------------------------------------------------
-// Rückgabe eines Array, bestehend aus:
-// - Name der zuletzt geänderten Inhaltsseite
+// RÃ¼ckgabe eines Array, bestehend aus:
+// - Name der zuletzt geÃ¤nderten Inhaltsseite
 // - kompletter Link auf diese Inhaltsseite  
-// - formatiertes Datum der letzten Änderung
+// - formatiertes Datum der letzten Ã„nderung
 // ------------------------------------------------------------------------------
     function getLastChangedContentPageAndDate(){
         global $CONTENT_DIR_REL;
@@ -713,7 +715,7 @@ echo "</pre><br>\n";*/
 
 
 // ------------------------------------------------------------------------------
-// Einlesen eines Kategorie-Verzeichnisses, Rückgabe der zuletzt geänderten Datei
+// Einlesen eines Kategorie-Verzeichnisses, RÃ¼ckgabe der zuletzt geÃ¤nderten Datei
 // ------------------------------------------------------------------------------
     function getLastChangeOfCat($dir){
         global $EXT_HIDDEN;
@@ -763,7 +765,7 @@ echo "</pre><br>\n";*/
         ."<div class=\"sitemap\">";
         // Kategorien-Verzeichnis einlesen
         $categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false, false);
-        // Jedes Element des Arrays an die Sitemap anhängen
+        // Jedes Element des Arrays an die Sitemap anhÃ¤ngen
         foreach ($categoriesarray as $currentcategory) {
             // Wenn die Kategorie keine Contentseiten hat, zeige sie nicht an
             $contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true, $showhiddenpages);
@@ -772,7 +774,7 @@ echo "</pre><br>\n";*/
 
             $sitemap .= "<h2>".catToName($currentcategory, false)."</h2><ul>";
             // Alle Inhaltsseiten der aktuellen Kategorie auflisten...
-            // Jedes Element des Arrays an die Sitemap anhängen
+            // Jedes Element des Arrays an die Sitemap anhÃ¤ngen
             foreach ($contentarray as $currentcontent) {
                 # ist ein link
                 if(substr($currentcontent,-(strlen($EXT_LINK))) == $EXT_LINK) {
@@ -789,7 +791,7 @@ echo "</pre><br>\n";*/
             $sitemap .= "</ul>";
         }
         $sitemap .= "</div>";
-        // Rückgabe der Sitemap
+        // RÃ¼ckgabe der Sitemap
         return array($sitemap, $language->getLanguageValue0("message_sitemap_0"), $language->getLanguageValue0("message_sitemap_0"));
     }
 
@@ -812,7 +814,7 @@ echo "</pre><br>\n";*/
         $matchesoverall = 0;
         $searchresults = "";
 
-        // Überhaupt erst etwas machen, wenn die Suche nicht leer ist
+        // Ãœberhaupt erst etwas machen, wenn die Suche nicht leer ist
         if (trim($QUERY_REQUEST) != "") {
             // Damit die Links in der Ergbnisliste korrekt sind: Suchanfrage bereinigen
             $queryarray = explode(" ", preg_replace('/"/', "", $QUERY_REQUEST));
@@ -825,7 +827,7 @@ echo "</pre><br>\n";*/
             // Alle Kategorien durchsuchen
             foreach ($categoriesarray as $currentcategory) {
 
-                // Wenn die Kategorie keine Contentseiten hat, direkt zur nächsten springen
+                // Wenn die Kategorie keine Contentseiten hat, direkt zur nÃ¤chsten springen
                 $contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true, $showhiddenpages);
                 if ($contentarray == "") {
                     continue;
@@ -846,7 +848,7 @@ echo "</pre><br>\n";*/
                             continue;
                         // Treffer in der aktuellen Seite?
                         if (pageContainsWord($currentcategory, $currentcontent, $query, true)) {
-                            // wenn noch nicht im Treffer-Array: hinzufügen
+                            // wenn noch nicht im Treffer-Array: hinzufÃ¼gen
                             if (!in_array($currentcontent, $matchingpages))
                                 $matchingpages[$i] = $currentcontent;
                             $i++;
@@ -883,7 +885,7 @@ echo "</pre><br>\n";*/
         // Keine Inhalte gefunden?
         if ($matchesoverall == 0)
             $searchresults .= $language->getLanguageValue0("message_nodatafound_0", trim($QUERY_REQUEST));
-        // Rückgabe des Menüs
+        // RÃ¼ckgabe des MenÃ¼s
         return array($searchresults, $language->getLanguageValue0("message_search_0"), $language->getLanguageValue1("message_searchresult_1", (trim($QUERY_REQUEST))));
     }
 
@@ -908,14 +910,14 @@ echo "</pre><br>\n";*/
             // Zuerst: includierte Seiten herausfinden!
             preg_match_all("/\[include\|([^\[\]]*)\]/Um", $content, $matches);
             $i = 0;
-            // Für jeden Treffer...
+            // FÃ¼r jeden Treffer...
             foreach ($matches[1] as $match) {
                 // ...Auswertung und Verarbeitung der Informationen
                 $valuearray = explode(":", $matches[1][$i]);
                 // Inhaltsseite in aktueller Kategorie
                 if (count($valuearray) == 1) {
                     $includedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($matches[1][$i],ENT_COMPAT,$CHARSET),false), $cat);
-                    // verhindern, daß in der includierten Seite includierte Seiten auch noch durchsucht werden
+                    // verhindern, daÃŸ in der includierten Seite includierte Seiten auch noch durchsucht werden
                     if ($firstrecursion) {
                         // includierte Seite durchsuchen!
                         if (pageContainsWord($cat, $includedpage, $query,false)) {
@@ -927,7 +929,7 @@ echo "</pre><br>\n";*/
                 else {
                     $includedpagescat = nameToCategory($specialchars->replaceSpecialChars(html_entity_decode($valuearray[0],ENT_COMPAT,$CHARSET),false));
                     $includedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($valuearray[1],ENT_COMPAT,$CHARSET),false), $includedpagescat);
-                    // verhindern, daß in der includierten Seite includierte Seiten auch noch durchsucht werden
+                    // verhindern, daÃŸ in der includierten Seite includierte Seiten auch noch durchsucht werden
                     if ($firstrecursion) {
                         // includierte Seite durchsuchen!
                         if (pageContainsWord($includedpagescat, $includedpage, $query, false)) {
@@ -940,9 +942,9 @@ echo "</pre><br>\n";*/
 
             // ...und alle Syntax-Tags entfernen. Gesucht werden soll nur im reinen Text
             $content = preg_replace("/\[[^\[\]]+\|([^\[\]]*)\]/U", "$1", $content);
-            // Auch Emoticons in Doppelpunkten (z.B. ":lach:") sollen nicht berücksichtigt werden
+            // Auch Emoticons in Doppelpunkten (z.B. ":lach:") sollen nicht berÃ¼cksichtigt werden
             $content = preg_replace("/:[^\s]+:/U", "", $content);
-            // Zum Schluß noch die horizontalen Linien ("[----]") von der Suche ausschließen
+            // Zum SchluÃŸ noch die horizontalen Linien ("[----]") von der Suche ausschlieÃŸen
             $content = preg_replace("/\[----\]/U", "", $content);
         }
         if ($query == "")
@@ -951,7 +953,7 @@ echo "</pre><br>\n";*/
         if (
             // ...der aktuelle Suchbegriff im Seitennamen...
             (substr_count(strtolower(pageToName($page, false)), strtolower($query)) > 0)
-            // ...oder im eigentlichen Seiteninhalt vorkommt (überprüft werden nur Seiten, die nicht leer sind), ...
+            // ...oder im eigentlichen Seiteninhalt vorkommt (Ã¼berprÃ¼ft werden nur Seiten, die nicht leer sind), ...
             || ((filesize($filepath) > 0) && (substr_count(strtolower($content), strtolower(html_entity_decode($query,ENT_COMPAT,$CHARSET))) > 0))
             ) {
             // ...dann setze das Treffer-Flag
@@ -963,19 +965,19 @@ echo "</pre><br>\n";*/
             echo "<b> -> TREFFER!</b>";
         echo "<br>";
 */        
-        // Ergebnis zurückgeben
+        // Ergebnis zurÃ¼ckgeben
         return $ismatch;
     }
 
 // ------------------------------------------------------------------------------
 // E-Mail-Adressen verschleiern
 // ------------------------------------------------------------------------------
-// Dank für spam-me-not.php an Rolf Offermanns!
+// Dank fÃ¼r spam-me-not.php an Rolf Offermanns!
 // Spam-me-not in JavaScript: http://www.zapyon.de
     function obfuscateAdress($originalString, $mode) {
         // $mode == 1            dezimales ASCII
         // $mode == 2            hexadezimales ASCII
-        // $mode == 3            zufällig gemischt
+        // $mode == 3            zufÃ¤llig gemischt
         $encodedString = "";
         $nowCodeString = "";
         $randomNumber = -1;
@@ -1026,7 +1028,7 @@ echo "</pre><br>\n";*/
 
 
 // ------------------------------------------------------------------------------
-// Rückgabe des Website-Titels
+// RÃ¼ckgabe des Website-Titels
 // ------------------------------------------------------------------------------
     function getWebsiteTitle($websitetitle, $cattitle, $pagetitle) {
         global $mainconfig;
@@ -1060,7 +1062,7 @@ echo "</pre><br>\n";*/
 
 
 // ------------------------------------------------------------------------------
-// Platzhalter im übergebenen String ersetzen
+// Platzhalter im Ã¼bergebenen String ersetzen
 // ------------------------------------------------------------------------------
     function replacePlaceholders($content, $cattitle, $pagetitle) {
         global $mainconfig;
@@ -1079,14 +1081,14 @@ echo "</pre><br>\n";*/
         if ($CAT_REQUEST != "") {
             // "unbehandelter" Name der aktuellen Kategorie ("10_M%FCllers%20Kuh")
             $content = preg_replace('/{CATEGORY}/', $CAT_REQUEST, $content);
-            // "sauberer" Name der aktuellen Kategorie ("Müllers Kuh")
+            // "sauberer" Name der aktuellen Kategorie ("MÃ¼llers Kuh")
             $content = preg_replace('/{CATEGORY_NAME}/', catToName($CAT_REQUEST, true), $content);
         }
         // Suche, Sitemap
         else {
             // "unbehandelter" Name der aktuellen Kategorie ("10_M%FCllers%20Kuh")
             $content = preg_replace('/{CATEGORY}/', $cattitle, $content);
-            // "sauberer" Name der aktuellen Kategorie ("Müllers Kuh")
+            // "sauberer" Name der aktuellen Kategorie ("MÃ¼llers Kuh")
             $content = preg_replace('/{CATEGORY_NAME}/', $cattitle, $content);
         }
 
@@ -1095,7 +1097,7 @@ echo "</pre><br>\n";*/
             $content = preg_replace('/{PAGE}/', $PAGE_REQUEST, $content);
             // Dateiname der aktuellen Inhaltsseite ("10_M%FCllers%20Kuh.txt")
             $content = preg_replace('/{PAGE_FILE}/', $PAGE_FILE, $content);
-            // "sauberer" Name der aktuellen Inhaltsseite ("Müllers Kuh")
+            // "sauberer" Name der aktuellen Inhaltsseite ("MÃ¼llers Kuh")
             $content = preg_replace('/{PAGE_NAME}/', pageToName($PAGE_FILE, true), $content);
             
             $neighbourPages = getNeighbourPages($PAGE_REQUEST);
@@ -1103,13 +1105,13 @@ echo "</pre><br>\n";*/
             $content = preg_replace('/{PREVIOUS_PAGE}/', substr($neighbourPages[0], 0, strlen($neighbourPages[0]) - 4), $content);
             // Dateiname der vorigen Inhaltsseite ("00_Der%20M%FCller.txt")
             $content = preg_replace('/{PREVIOUS_PAGE_FILE}/', $neighbourPages[0], $content);
-            // "sauberer" Name der vorigen Inhaltsseite ("Der Müller")
+            // "sauberer" Name der vorigen Inhaltsseite ("Der MÃ¼ller")
             $content = preg_replace('/{PREVIOUS_PAGE_NAME}/', pageToName($neighbourPages[0], true), $content);
-            // "unbehandelter" Name der nächsten Inhaltsseite ("20_M%FCllers%20M%FChle")
+            // "unbehandelter" Name der nÃ¤chsten Inhaltsseite ("20_M%FCllers%20M%FChle")
             $content = preg_replace('/{NEXT_PAGE}/', substr($neighbourPages[1], 0, strlen($neighbourPages[1]) - 4), $content);
-            // Dateiname der nächsten Inhaltsseite ("20_M%FCllers%20M%FChle.txt")
+            // Dateiname der nÃ¤chsten Inhaltsseite ("20_M%FCllers%20M%FChle.txt")
             $content = preg_replace('/{NEXT_PAGE_FILE}/', $neighbourPages[1], $content);
-            // "sauberer" Name der nächsten Inhaltsseite ("Müllers Mühle")
+            // "sauberer" Name der nÃ¤chsten Inhaltsseite ("MÃ¼llers MÃ¼hle")
             $content = preg_replace('/{NEXT_PAGE_NAME}/', pageToName($neighbourPages[1], true), $content);
         }
         // Suche, Sitemap
@@ -1118,10 +1120,10 @@ echo "</pre><br>\n";*/
             $content = preg_replace('/{PAGE}/', $pagetitle, $content);
             // Dateiname der aktuellen Inhaltsseite ("10_M-uuml-llers-nbsp-Kuh.txt")
             $content = preg_replace('/{PAGE_FILE}/', $pagetitle, $content);
-            // "sauberer" Name der aktuellen Inhaltsseite ("Müllers Kuh")
+            // "sauberer" Name der aktuellen Inhaltsseite ("MÃ¼llers Kuh")
             $content = preg_replace('/{PAGE_NAME}/', $pagetitle, $content);
         }
-        // ...und zurückgeben
+        // ...und zurÃ¼ckgeben
         return $content;
     }
     
@@ -1149,7 +1151,7 @@ echo "</pre><br>\n";*/
     }
 
 // ------------------------------------------------------------------------------
-// Gibt das Kontaktformular zurück
+// Gibt das Kontaktformular zurÃ¼ck
 // ------------------------------------------------------------------------------
     function buildContactForm() {
         global $adminconfig;
@@ -1162,7 +1164,7 @@ echo "</pre><br>\n";*/
         global $PAGE_REQUEST;
         global $CHARSET;
         
-        // Ist Mailversand überhaupt aktiviert? Wenn nicht: Das Kontaktformular gar nicht anzeigen!
+        // Ist Mailversand Ã¼berhaupt aktiviert? Wenn nicht: Das Kontaktformular gar nicht anzeigen!
         if ($adminconfig->get("sendadminmail") != "true") {
             return "<span class=\"deadlink\"".getTitleAttribute($language->getLanguageValue0("tooltip_no_mail_error_0")).">{CONTACT}</span>";
         }
@@ -1244,7 +1246,7 @@ echo "</pre><br>\n";*/
                     $mailcontent .= "\r\n".$language->getLanguageValue0("contactform_message_0").":\r\n".$message."\r\n";
                 }
                 $mailsubject = $language->getLanguageValue1("contactform_mailsubject_1", html_entity_decode($WEBSITE_NAME,ENT_COMPAT,$CHARSET));
-                // Wenn Mail-Adresse gesetzt ist: Als Absender für die Mail nutzen
+                // Wenn Mail-Adresse gesetzt ist: Als Absender fÃ¼r die Mail nutzen
                 if ($mail <> "") {
                     $mailfunctions->sendMailToAdminWithFrom($mailsubject, $mailcontent, $mail);
                 }
@@ -1351,7 +1353,7 @@ echo "</pre><br>\n";*/
     }
 
 // ------------------------------------------------------------------------------
-// Hilfsfunktion: Prüft einen Requestparameter
+// Hilfsfunktion: PrÃ¼ft einen Requestparameter
 // ------------------------------------------------------------------------------
     function getRequestParam($param, $clean) {
         global $URL_BASE;
@@ -1411,7 +1413,7 @@ echo "</pre><br>\n";*/
 
 
 // ------------------------------------------------------------------------------
-// Rückgabe der Dateinamen der vorigen und nächsten Seite
+// RÃ¼ckgabe der Dateinamen der vorigen und nÃ¤chsten Seite
 // ------------------------------------------------------------------------------
     function getNeighbourPages($page) {
         global $CONTENT_DIR_ABS;
@@ -1422,14 +1424,14 @@ echo "</pre><br>\n";*/
         $neighbourPages = array("", "");
         // aktuelle Kategorie einlesen
         $pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true, $mainconfig->get("showhiddenpagesincmsvariables") == "true");
-        // Schleife über alle Seiten
+        // Schleife Ã¼ber alle Seiten
         for ($i = 0; $i < count($pagesarray); $i++) {
             if ($page == substr($pagesarray[$i], 0, strlen($pagesarray[$i]) - 4)) {
                 // vorige Seite (nur setzen, wenn aktuelle nicht die erste ist)
                 if ($i > 0) {
                     $neighbourPages[0] = $pagesarray[$i-1];
                 }
-                // nächste Seite (nur setzen, wenn aktuelle nicht die letzte ist)
+                // nÃ¤chste Seite (nur setzen, wenn aktuelle nicht die letzte ist)
                 if($i < count($pagesarray)-1) {
                     $neighbourPages[1] = $pagesarray[$i+1];
                 }
@@ -1443,7 +1445,7 @@ echo "</pre><br>\n";*/
 
 
 // ------------------------------------------------------------------------------
-// Hilfsfunktion: Zufällige Spamschutz-Rechenaufgabe und deren Ergebnis zurückgeben
+// Hilfsfunktion: ZufÃ¤llige Spamschutz-Rechenaufgabe und deren Ergebnis zurÃ¼ckgeben
 // ------------------------------------------------------------------------------
     function getRandomCalculationData() {
         global $contactformcalcs;
@@ -1502,7 +1504,7 @@ echo "</pre><br>\n";*/
 
         // Alle Variablen aus dem Inhalt heraussuchen
         preg_match_all("/\{(.+)\}/Um", $content, $matches);
-        // Für jeden Treffer...
+        // FÃ¼r jeden Treffer...
         $i = 0;
         foreach ($matches[0] as $match) {
             // ...erstmal schauen, ob ein Wert dabeisteht, z.B. {VARIABLE|wert}
@@ -1517,12 +1519,12 @@ echo "</pre><br>\n";*/
                 $currentvalue = "";
             }
             
-            // ...überprüfen, ob es eine zugehörige Plugin-PHP-Datei gibt
+            // ...Ã¼berprÃ¼fen, ob es eine zugehÃ¶rige Plugin-PHP-Datei gibt
             if (in_array($currentvariable, $availableplugins)) {
                 $replacement = "";
                 // Plugin-Code includieren
                 require_once(getcwd()."/$PLUGIN_DIR/".$currentvariable."/index.php");
-                // Enthält der Code eine Klasse mit dem Namen des Plugins?
+                // EnthÃ¤lt der Code eine Klasse mit dem Namen des Plugins?
                 if (class_exists($currentvariable)) {
                     // Objekt instanziieren und Inhalt holen!
                     $currentpluginobject = new $currentvariable();
