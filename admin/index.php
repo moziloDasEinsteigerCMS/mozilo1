@@ -4363,7 +4363,7 @@ function getActionIcon($iconname, $titletext) {
     function cleanInput($input) {
         global $CHARSET;
         if (function_exists("mb_convert_encoding")) {
-            $input = @mb_convert_encoding($input, $CHARSET);
+            $input = @mb_convert_encoding($input,$CHARSET,@mb_detect_encoding($input,"UTF-8,ISO-8859-1,ISO-8859-15",true));
         }
 #        return htmlentities($input, ENT_QUOTES, 'ISO8859-1');
 #        return rawurlencode(stripslashes($input));
