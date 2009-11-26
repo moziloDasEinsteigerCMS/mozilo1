@@ -15,6 +15,10 @@ echo "<pre style=\"position:fixed;background-color:#000;color:#0f0;padding:5px;f
 print_r($_REQUEST);
 echo "</pre>";
 */
+
+#$CHARSET = 'ISO-8859-1';
+$CHARSET = 'UTF-8';
+
     $URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("index.php")));
 
     require_once("Language.php");
@@ -569,6 +573,7 @@ echo "</pre><br>\n";*/
         global $syntax;
         global $URL_BASE;
         global $EXT_LINK;
+        global $CHARSET;
 
         if ($mainconfig->get("usesubmenu") > 0)
             $cssprefix = "submenu";
@@ -581,7 +586,7 @@ echo "</pre><br>\n";*/
             $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=sitemap\" class=\"".$cssprefix."active\">".$language->getLanguageValue0("message_sitemap_0")."</a></li>";
         // Suchergebnis
         elseif (($ACTION_REQUEST == "search") && ($mainconfig->get("usesubmenu") == 0))
-            $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=search&amp;query=".$specialchars->replaceSpecialChars($QUERY_REQUEST, true)."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", html_entity_decode($QUERY_REQUEST,ENT_COMPAT,'ISO-8859-1'))."</a></li>";
+            $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=search&amp;query=".$specialchars->replaceSpecialChars($QUERY_REQUEST, true)."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", html_entity_decode($QUERY_REQUEST,ENT_COMPAT,$CHARSET))."</a></li>";
         // Entwurfsansicht
         elseif (($ACTION_REQUEST == "draft") && ($mainconfig->get("usesubmenu") == 0))
             $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?cat=$cat&amp;page=$PAGE_REQUEST&amp;action=draft\" class=\"".$cssprefix."active\">".pageToName($PAGE_REQUEST.$EXT_DRAFT, false)." (".$language->getLanguageValue0("message_draft_0").")</a></li>";
@@ -659,8 +664,9 @@ echo "</pre><br>\n";*/
         global $language;
         global $mainconfig;
         global $specialchars;
+        global $CHARSET;
 
-        $form = "<form accept-charset=\"ISO-8859-1\" method=\"get\" action=\"index.php.html\" class=\"searchform\"><fieldset id=\"searchfieldset\">"
+        $form = "<form accept-charset=\"$CHARSET\" method=\"get\" action=\"index.php.html\" class=\"searchform\"><fieldset id=\"searchfieldset\">"
         ."<input type=\"hidden\" name=\"action\" value=\"search\" />"
         ."<input type=\"text\" name=\"query\" value=\"\" class=\"searchtextfield\" accesskey=\"s\" />"
         ."<input type=\"image\" name=\"action\" value=\"search\" src=\"layouts/".$specialchars->replaceSpecialChars($mainconfig->get("cmslayout"), true)."/grafiken/searchicon.gif\" alt=\"".$language->getLanguageValue0("message_search_0")."\" class=\"searchbutton\"".getTitleAttribute($language->getLanguageValue0("message_search_0"))." />"
@@ -888,6 +894,7 @@ echo "</pre><br>\n";*/
     function pageContainsWord($cat, $page, $query, $firstrecursion) {
         global $CONTENT_DIR_REL;
         global $specialchars;
+        global $CHARSET;
         
         $filepath = $CONTENT_DIR_REL."/".$cat."/".$page;
         $ismatch = false;
@@ -907,7 +914,7 @@ echo "</pre><br>\n";*/
                 $valuearray = explode(":", $matches[1][$i]);
                 // Inhaltsseite in aktueller Kategorie
                 if (count($valuearray) == 1) {
-                    $includedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($matches[1][$i],ENT_COMPAT,'ISO-8859-1'),false), $cat);
+                    $includedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($matches[1][$i],ENT_COMPAT,$CHARSET),false), $cat);
                     // verhindern, daß in der includierten Seite includierte Seiten auch noch durchsucht werden
                     if ($firstrecursion) {
                         // includierte Seite durchsuchen!
@@ -918,8 +925,8 @@ echo "</pre><br>\n";*/
                 }
                 // Inhaltsseite in anderer Kategorie
                 else {
-                    $includedpagescat = nameToCategory($specialchars->replaceSpecialChars(html_entity_decode($valuearray[0],ENT_COMPAT,'ISO-8859-1'),false));
-                    $includedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($valuearray[1],ENT_COMPAT,'ISO-8859-1'),false), $includedpagescat);
+                    $includedpagescat = nameToCategory($specialchars->replaceSpecialChars(html_entity_decode($valuearray[0],ENT_COMPAT,$CHARSET),false));
+                    $includedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($valuearray[1],ENT_COMPAT,$CHARSET),false), $includedpagescat);
                     // verhindern, daß in der includierten Seite includierte Seiten auch noch durchsucht werden
                     if ($firstrecursion) {
                         // includierte Seite durchsuchen!
@@ -945,7 +952,7 @@ echo "</pre><br>\n";*/
             // ...der aktuelle Suchbegriff im Seitennamen...
             (substr_count(strtolower(pageToName($page, false)), strtolower($query)) > 0)
             // ...oder im eigentlichen Seiteninhalt vorkommt (überprüft werden nur Seiten, die nicht leer sind), ...
-            || ((filesize($filepath) > 0) && (substr_count(strtolower($content), strtolower(html_entity_decode($query,ENT_COMPAT,'ISO-8859-1'))) > 0))
+            || ((filesize($filepath) > 0) && (substr_count(strtolower($content), strtolower(html_entity_decode($query,ENT_COMPAT,$CHARSET))) > 0))
             ) {
             // ...dann setze das Treffer-Flag
             $ismatch = true;
@@ -1153,6 +1160,7 @@ echo "</pre><br>\n";*/
         global $WEBSITE_NAME;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
+        global $CHARSET;
         
         // Ist Mailversand überhaupt aktiviert? Wenn nicht: Das Kontaktformular gar nicht anzeigen!
         if ($adminconfig->get("sendadminmail") != "true") {
@@ -1235,7 +1243,7 @@ echo "</pre><br>\n";*/
                 if ($config_message[1] == "true") {
                     $mailcontent .= "\r\n".$language->getLanguageValue0("contactform_message_0").":\r\n".$message."\r\n";
                 }
-                $mailsubject = $language->getLanguageValue1("contactform_mailsubject_1", html_entity_decode($WEBSITE_NAME,ENT_COMPAT,'ISO-8859-1'));
+                $mailsubject = $language->getLanguageValue1("contactform_mailsubject_1", html_entity_decode($WEBSITE_NAME,ENT_COMPAT,$CHARSET));
                 // Wenn Mail-Adresse gesetzt ist: Als Absender für die Mail nutzen
                 if ($mail <> "") {
                     $mailfunctions->sendMailToAdminWithFrom($mailsubject, $mailcontent, $mail);
@@ -1262,7 +1270,7 @@ echo "</pre><br>\n";*/
         // aktuelle Zeit merken
         $_SESSION['contactform_loadtime'] = time();
 
-        $form .= "<form accept-charset=\"ISO-8859-1\" method=\"post\" action=\"index.php\" name=\"contact_form\" id=\"contact_form\">"
+        $form .= "<form accept-charset=\"$CHARSET\" method=\"post\" action=\"index.php\" name=\"contact_form\" id=\"contact_form\">"
         ."<input type=\"hidden\" name=\"cat\" value=\"".$CAT_REQUEST."\" />"
         ."<input type=\"hidden\" name=\"page\" value=\"".$PAGE_REQUEST."\" />"
         ."<table id=\"contact_table\" summary=\"contact form table\">";
@@ -1335,8 +1343,9 @@ echo "</pre><br>\n";*/
 // Hilfsfunktion: Sichert einen Input-Wert
 // ------------------------------------------------------------------------------
     function cleanInput($input) {
+        global $CHARSET;
         if (function_exists("mb_convert_encoding")) {
-            $input = @mb_convert_encoding($input, "ISO-8859-1");
+            $input = @mb_convert_encoding($input, $CHARSET);
         }
         return stripslashes($input);    
     }

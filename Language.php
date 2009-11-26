@@ -49,7 +49,8 @@ class Language {
 // Sprachelement ohne Zusatz aus Sprachdatei holen
 // ------------------------------------------------------------------------------
 	function getLanguageValue0($phrase) {
-		return htmlentities($this->LANG_CONF->get($phrase),ENT_COMPAT,'ISO-8859-1');
+        global $CHARSET;
+		return htmlentities($this->LANG_CONF->get($phrase),ENT_COMPAT,$CHARSET);
 	}
 
 
@@ -57,7 +58,8 @@ class Language {
 // Sprachelement mit einem zusätzlichen Parameter aus Sprachdatei holen
 // ------------------------------------------------------------------------------
 	function getLanguageValue1($phrase, $param1) {
-		$text = htmlentities($this->LANG_CONF->get($phrase),ENT_COMPAT,'ISO-8859-1');
+        global $CHARSET;
+		$text = htmlentities($this->LANG_CONF->get($phrase),ENT_COMPAT,$CHARSET);
 		$text = preg_replace("/{PARAM1}/", $param1, $text);
 		return $text;
 	}
@@ -67,7 +69,8 @@ class Language {
 // Sprachelement mit zwei zusätzlichen Parametern aus Sprachdatei holen
 // ------------------------------------------------------------------------------
 	function getLanguageValue2($phrase, $param1, $param2) {
-		$text = htmlentities($this->LANG_CONF->get($phrase),ENT_COMPAT,'ISO-8859-1');
+        global $CHARSET;
+		$text = htmlentities($this->LANG_CONF->get($phrase),ENT_COMPAT,$CHARSET);
 		$text = preg_replace("/{PARAM1}/", $param1, $text);
 		$text = preg_replace("/{PARAM2}/", $param2, $text);
 		return $text;

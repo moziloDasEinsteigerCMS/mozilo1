@@ -20,7 +20,8 @@ class SpecialChars {
 // Erlaubte Sonderzeichen als RegEx zurückgeben
 // ------------------------------------------------------------------------------
     function getSpecialCharsRegex() {
-        $regex = "/^[a-zA-Z0-9_\%\-\s\?\!\@\.€".addslashes(html_entity_decode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)),ENT_COMPAT,'ISO-8859-1'))."]+$/";
+        global $CHARSET;
+        $regex = "/^[a-zA-Z0-9_\%\-\s\?\!\@\.€".addslashes(html_entity_decode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)),ENT_COMPAT,$CHARSET))."]+$/";
         $regex = preg_replace("/&#39;/", "\'", $regex);
         return $regex;
     }
@@ -29,6 +30,7 @@ class SpecialChars {
 // Erlaubte Sonderzeichen userlesbar als String zurückgeben
 // ------------------------------------------------------------------------------
     function getSpecialCharsString($sep, $charsperline) {
+        global $CHARSET;
         $specialcharsstring = "";
         $specialcharshtml = "";
         for ($i=65; $i<=90;$i++)
@@ -37,9 +39,9 @@ class SpecialChars {
             $specialcharsstring .= chr($i);
         for ($i=48; $i<=57;$i++)
             $specialcharsstring .= chr($i);
-        $specialcharsstring .= html_entity_decode("_- ?!€@.".stripslashes(preg_replace("/&#39;/", "\'", implode(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)))),ENT_COMPAT,'ISO-8859-1');
+        $specialcharsstring .= html_entity_decode("_- ?!€@.".stripslashes(preg_replace("/&#39;/", "\'", implode(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)))),ENT_COMPAT,$CHARSET);
         for ($i=0; $i<=strlen($specialcharsstring); $i+=$charsperline) {
-            $specialcharshtml .= htmlentities(substr($specialcharsstring, $i, $charsperline),ENT_COMPAT,'ISO-8859-1')."<br />";
+            $specialcharshtml .= htmlentities(substr($specialcharsstring, $i, $charsperline),ENT_COMPAT,$CHARSET)."<br />";
         }
         return $specialcharshtml;
     }
@@ -67,9 +69,10 @@ class SpecialChars {
 // Umlaute in Inhaltsseiten/Kategorien für Anzeige 
 // ------------------------------------------------------------------------------
     function rebuildSpecialChars($text, $rebuildnbsp, $html) {
+        global $CHARSET;
         $text = rawurldecode($text);
         if($html) {
-            $text = htmlentities($text,ENT_COMPAT,'ISO-8859-1');
+            $text = htmlentities($text,ENT_COMPAT,$CHARSET);
             $text = str_replace('&amp;#','&#',$text);
         }
         // Leerzeichen
@@ -93,6 +96,7 @@ class SpecialChars {
 // Für Datei-Uploads erlaubte Sonderzeichen userlesbar als String zurückgeben
 // ------------------------------------------------------------------------------
     function getFileCharsString($sep, $charsperline) {
+        global $CHARSET;
         $filecharsstring = "";
         $filecharshtml = "";
         for ($i=65; $i<=90;$i++)
@@ -103,7 +107,7 @@ class SpecialChars {
             $filecharsstring .= chr($i);
         $filecharsstring .= "_-.";
         for ($i=0; $i<=strlen($filecharsstring); $i+=$charsperline) {
-            $filecharshtml .= htmlentities(substr($filecharsstring, $i, $charsperline),ENT_COMPAT,'ISO-8859-1')."<br />";
+            $filecharshtml .= htmlentities(substr($filecharsstring, $i, $charsperline),ENT_COMPAT,$CHARSET)."<br />";
         }
         return $filecharshtml;
     }

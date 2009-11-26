@@ -63,6 +63,7 @@ function setLastBackup()
 function getLanguageValue($confpara,$accesskey = NULL)
 {
     global $BASIC_LANGUAGE;
+    global $CHARSET;
     # das ist ein geschwindigkeits killer
 #    $BASIC_LANGUAGE     = new Properties("conf/language_".getLanguage().".conf");
     if($accesskey != NULL) {
@@ -74,12 +75,12 @@ function getLanguageValue($confpara,$accesskey = NULL)
         $accesskey_zeichen = substr($sring,$position,1);
         $accesskey_html =  '<u>'.$accesskey_zeichen.'</u>';
         $accesskey_html_tities =  '&lt;u&gt;'.$accesskey_zeichen.'&lt;/u&gt;';
-        $sring = htmlentities(substr_replace($sring,$accesskey_html,$position,1),ENT_COMPAT,'ISO-8859-1');
+        $sring = htmlentities(substr_replace($sring,$accesskey_html,$position,1),ENT_COMPAT,$CHARSET);
         $sring = str_replace($accesskey_html_tities,$accesskey_html,$sring);
 #echo "$sring = sring<br>\n";
         return $sring;
     } else
-        $text = htmlentities($BASIC_LANGUAGE->get($confpara),ENT_COMPAT,'ISO-8859-1');
+        $text = htmlentities($BASIC_LANGUAGE->get($confpara),ENT_COMPAT,$CHARSET);
         if(empty($text)) {
             return '<b style="color:#ff0000;">'.$confpara."</b> ".$BASIC_LANGUAGE->get('languagefile_error');
         }
@@ -522,6 +523,7 @@ function updateReferencesInAllContentPages($oldCategory, $oldPage, $newCategory,
 function updateReferencesInText($currentPagesContent, $currentPagesCategory, $movedPage, $oldCategory, $oldPage, $newCategory, $newPage) {
     global $specialchars;
     global $CONTENT_DIR_REL;
+    global $CHARSET;
 
     $pos_currentPagesCategory     = $specialchars->rebuildSpecialChars($currentPagesCategory,false,false);
     $pos_oldCategory        = $specialchars->rebuildSpecialChars($oldCategory,false,false);
@@ -535,10 +537,10 @@ function updateReferencesInText($currentPagesContent, $currentPagesCategory, $mo
     # ein Hack weil in Inhaltsete ein ^ vor [ und ] ist im Dateinamen aber nicht
     $hack_eckigeklamern = str_replace(array("[","]"),array("&#94;[","&#94;]"),array($pos_oldCategory,$pos_oldPage,$pos_newCategory,$pos_newPage));
 
-    $oldCategory    = html_entity_decode(substr($hack_eckigeklamern[0],3),ENT_COMPAT,'ISO-8859-1');
-    $oldPage    = html_entity_decode(substr($hack_eckigeklamern[1],3,-4),ENT_COMPAT,'ISO-8859-1');
-    $newCategory     = html_entity_decode(substr($hack_eckigeklamern[2],3),ENT_COMPAT,'ISO-8859-1');
-    $newPage     = html_entity_decode(substr($hack_eckigeklamern[3],3,-4),ENT_COMPAT,'ISO-8859-1');
+    $oldCategory    = html_entity_decode(substr($hack_eckigeklamern[0],3),ENT_COMPAT,$CHARSET);
+    $oldPage    = html_entity_decode(substr($hack_eckigeklamern[1],3,-4),ENT_COMPAT,$CHARSET);
+    $newCategory     = html_entity_decode(substr($hack_eckigeklamern[2],3),ENT_COMPAT,$CHARSET);
+    $newPage     = html_entity_decode(substr($hack_eckigeklamern[3],3,-4),ENT_COMPAT,$CHARSET);
 
     # ein Hack weil dieses preg_match_all nicht mit ^, [ und ] im attribut umgehen kann
     $currentPagesContentmatches = str_replace(array("^[","^]"),array("&#94;&#091;","&#94;&#093;"),$currentPagesContent);

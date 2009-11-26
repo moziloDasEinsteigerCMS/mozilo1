@@ -78,6 +78,7 @@ class Syntax {
         global $CAT_REQUEST;
         global $specialchars;
         global $URL_BASE;
+        global $CHARSET;
         
         if ($firstrecursion) {
             $content = $this->prepareContent($content);
@@ -163,7 +164,7 @@ class Syntax {
                 if(substr($attribute,0,10) == "kategorie=") {
                     $link_text = substr($attribute, 10, strlen($attribute)-10);
                 }
-                $requestedcat = nameToCategory($specialchars->replaceSpecialChars(html_entity_decode($value,ENT_COMPAT,'ISO-8859-1'),false));
+                $requestedcat = nameToCategory($specialchars->replaceSpecialChars(html_entity_decode($value,ENT_COMPAT,$CHARSET),false));
 $url = "index.php?cat=$requestedcat";
 if($this->CMS_CONF->get("modrewrite") == "true") {
     $url = $URL_BASE.$requestedcat.".html";
@@ -179,7 +180,7 @@ if($this->CMS_CONF->get("modrewrite") == "true") {
             // Link auf Inhaltsseite in aktueller oder anderer Kategorie (überprüfen, ob Inhaltsseite existiert)
             // Link auf Inhaltsseite in aktueller oder anderer Kategorie mit beliebigem Text
             elseif ($attribute == "seite" or substr($attribute,0,6) == "seite=") {
-                $seite = html_entity_decode($value,ENT_COMPAT,'ISO-8859-1');
+                $seite = html_entity_decode($value,ENT_COMPAT,$CHARSET);
                 $valuearray = explode(":", $seite);
                 $link_text = "";
                 if(substr($attribute,0,6) == "seite=") {
@@ -258,7 +259,7 @@ if($this->CMS_CONF->get("modrewrite") == "true") {
             // Datei aus dem Dateiverzeichnis (überprüfen, ob Datei existiert)
             // Datei aus dem Dateiverzeichnis mit beliebigem Text
             elseif ($attribute == "datei" or substr($attribute,0,6) == "datei=") {
-                $datei = html_entity_decode($value,ENT_COMPAT,'ISO-8859-1');
+                $datei = html_entity_decode($value,ENT_COMPAT,$CHARSET);
                 $valuearray = explode(":", $datei);
                 $link_text = "";
                 if(substr($attribute,0,6) == "datei=") {
@@ -301,7 +302,7 @@ if($this->CMS_CONF->get("modrewrite") == "true") {
 
             // Galerie
             elseif (($attribute == "galerie") || (substr($attribute,0,8) == "galerie=")) {
-                $cleanedvalue = $specialchars->replaceSpecialChars(html_entity_decode($value, ENT_COMPAT, 'ISO-8859-1'),false);
+                $cleanedvalue = $specialchars->replaceSpecialChars(html_entity_decode($value, ENT_COMPAT, $CHARSET),false);
                 $link_text = "";
                 if(substr($attribute,0,8) == "galerie=") {
                     $link_text = substr($attribute, 8, strlen($attribute)-8);
@@ -322,7 +323,7 @@ if($this->CMS_CONF->get("modrewrite") == "true") {
                     // Galerie einbetten
                     if ($this->CMS_CONF->get("embeddedgallery") == "true") {
                         require_once("gallery.php");
-                        $gal_request = html_entity_decode($value,ENT_COMPAT,'ISO-8859-1');
+                        $gal_request = html_entity_decode($value,ENT_COMPAT,$CHARSET);
                         if (isset($_GET["gal"]) and $_GET["gal"]==$gal_request) {
                             $gallery->parseGalleryParameters($gal_request,$_GET["index"]);
                         }
@@ -376,7 +377,7 @@ if($this->CMS_CONF->get("modrewrite") == "true") {
                 $imgsrc = "";
                 $error = false;
 
-                $value = html_entity_decode($value,ENT_COMPAT,'ISO-8859-1');
+                $value = html_entity_decode($value,ENT_COMPAT,$CHARSET);
                 // Bei externen Bildern: $value NICHT nach ":" aufsplitten!
                 if (preg_match($this->LINK_REGEX, $value)) {
                     $valuearray = $specialchars->replaceSpecialChars($value,false);
@@ -548,7 +549,7 @@ if($this->CMS_CONF->get("modrewrite") == "true") {
             // HTML
             elseif ($attribute == "html"){
                 $nobrvalue = preg_replace('/(\r\n|\r|\n)/m', '{newline_in_html_tag}', $value);
-                $content = str_replace ("$match", html_entity_decode($nobrvalue,ENT_COMPAT,'ISO-8859-1'), $content);
+                $content = str_replace ("$match", html_entity_decode($nobrvalue,ENT_COMPAT,$CHARSET), $content);
             }
 
 /* 
@@ -611,7 +612,7 @@ verwendet werden sollte!
                 $valuearray = explode(":", $value);
                 // Inhaltsseite in aktueller Kategorie
                 if (count($valuearray) == 1) {
-                    $requestedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($value,ENT_COMPAT,'ISO-8859-1'),false), $cat);
+                    $requestedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($value,ENT_COMPAT,$CHARSET),false), $cat);
                     if ((!$requestedpage=="") && (file_exists("./$CONTENT_DIR_REL/$cat/$requestedpage"))) {
                         // Seite darf sich nicht selbst includen!
                         if (substr($requestedpage, 0, strlen($requestedpage)-strlen($EXT_PAGE)) == $PAGE_REQUEST) {
@@ -639,9 +640,9 @@ verwendet werden sollte!
                 }
                 // Inhaltsseite in anderer Kategorie
                 else {
-                    $requestedcat = nameToCategory($specialchars->replaceSpecialChars(html_entity_decode($valuearray[0],ENT_COMPAT,'ISO-8859-1'),false));
+                    $requestedcat = nameToCategory($specialchars->replaceSpecialChars(html_entity_decode($valuearray[0],ENT_COMPAT,$CHARSET),false));
                     if ((!$requestedcat=="") && (file_exists("./$CONTENT_DIR_REL/$requestedcat"))) {
-                        $requestedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($valuearray[1],ENT_COMPAT,'ISO-8859-1'),false), $requestedcat);
+                        $requestedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($valuearray[1],ENT_COMPAT,$CHARSET),false), $requestedcat);
                         if ((!$requestedpage=="") && (file_exists("./$CONTENT_DIR_REL/$requestedcat/$requestedpage")))
                             // Seite darf sich nicht selbst includen!
                             if (($requestedcat == $cat) && (substr($requestedpage, 0, strlen($requestedpage)-strlen($EXT_PAGE)) == $PAGE_REQUEST)) {
@@ -826,9 +827,10 @@ verwendet werden sollte!
 // ------------------------------------------------------------------------------
     function prepareContent($content) {
         global $specialchars;
+        global $CHARSET;
         
         // Inhaltsformatierungen
-        $content = htmlentities($content,ENT_COMPAT,'ISO-8859-1');
+        $content = htmlentities($content,ENT_COMPAT,$CHARSET);
         $content = preg_replace("/&amp;#036;/Umsi", "&#036;", $content);
         $content = preg_replace("/&amp;#092;/Umsi", "&#092;", $content);
         $content = preg_replace("/\^(.)/Umsie", "'&#'.ord('\\1').';'", $content);

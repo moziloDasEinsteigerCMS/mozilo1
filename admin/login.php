@@ -8,6 +8,8 @@
 *
 */
 
+#$CHARSET = 'ISO-8859-1';
+$CHARSET = 'UTF-8';
 
 require_once("Crypt.php");
 require_once("../Mail.php");
@@ -140,7 +142,7 @@ function login_formular($enabled) {
     else
         $form .= "<div id=\"loginform_maindiv_disabled\">";
     if ($enabled)
-        $form .= "<form accept-charset=\"ISO-8859-1\" name=\"loginform\" action=\"".htmlentities($_SERVER['PHP_SELF'],ENT_COMPAT,'ISO-8859-1')."\" method=\"POST\">";
+        $form .= "<form accept-charset=\"$CHARSET\" name=\"loginform\" action=\"".htmlentities($_SERVER['PHP_SELF'],ENT_COMPAT,$CHARSET)."\" method=\"POST\">";
   $form .= "<table id=\"table_loginform\" width=\"100%\" cellspacing=\"10\" border=\"0\" cellpadding=\"0\">"
       ."<tr>"
       ."<td width=\"5%\" rowspan=\"2\" align=\"center\" valign=\"middle\">"

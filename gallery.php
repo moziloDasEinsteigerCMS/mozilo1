@@ -326,6 +326,7 @@ class Gallery {
 // Beschreibung zum aktuellen Bild anzeigen
 // ------------------------------------------------------------------------------
     function getCurrentDescription($picname) {
+        global $CHARSET;
     
         // Keine Bilder im Galerieverzeichnis?
         if (count($this->picarray) == 0)
@@ -334,7 +335,7 @@ class Gallery {
         $alldescriptions = new Properties($this->dir_gallery."texte.conf");
         $description = $alldescriptions->get($picname);
         if(strlen($description) > 0) {
-            return htmlentities($description,ENT_COMPAT,'ISO-8859-1');
+            return htmlentities($description,ENT_COMPAT,$CHARSET);
         } else {
             return "&nbsp;";
         }

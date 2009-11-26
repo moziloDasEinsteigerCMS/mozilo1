@@ -71,6 +71,8 @@ if($debug == "ja") { #top:850px; relative absolute position:relative;
     ob_end_clean();
 }
 
+#$CHARSET = 'ISO-8859-1';
+$CHARSET = 'UTF-8';
 
 require_once("filesystem.php");
 require_once("string.php");
@@ -305,7 +307,7 @@ $pagecontent = $functionreturn[1];
 $html = '<!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN">'."\n";
 $html .= "<html>\n";
 $html .= "<head>";
-$html .= '<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">';
+$html .= '<meta http-equiv="Content-Type" content="text/html;charset='.$CHARSET.'">';
 $html .= '<script type="text/javascript" src="buttons.js"></script>';
 $html .= '<script type="text/javascript" src="multifileupload.js"></script>';
 $html .= "<title>$ADMIN_TITLE - $pagetitle</title>";
@@ -332,7 +334,7 @@ $html .= '<table width="90%" cellspacing="0" border="0" cellpadding="0" id="tabl
 $html .= '<tr><td width="100%" id="td_title">';
 $html .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" id="table_titel">';
 $html .= '<tr><td id="td_table_titel_text">'.$ADMIN_TITLE.' - '.$pagetitle.'</td>';
-$html .= '<td width="24" height="24" id="td_table_titel_logout"><form class="form" accept-charset="ISO-8859-1" action="login.php" method="post"><input id="design_logout" class="input_button" type="image" name="logout" value="'.getLanguageValue("button_home_logout").'&nbsp;"  src="gfx/icons/'.$icon_size.'/logout.png" title="'.getLanguageValue("button_home_logout").'"'.$tooltip_button_home_logout.'></form></td></tr>';
+$html .= '<td width="24" height="24" id="td_table_titel_logout"><form class="form" accept-charset="'.$CHARSET.'" action="login.php" method="post"><input id="design_logout" class="input_button" type="image" name="logout" value="'.getLanguageValue("button_home_logout").'&nbsp;"  src="gfx/icons/'.$icon_size.'/logout.png" title="'.getLanguageValue("button_home_logout").'"'.$tooltip_button_home_logout.'></form></td></tr>';
 $html .= '</table>';
 
 $html .= "</td></tr>";
@@ -355,7 +357,7 @@ foreach($array_tabs as $position => $language) {
     # IE button bug deshalb name=action_1 ...
     if($action == $language) $activ = "_activ"; else $activ = NULL;
     $html .= '<td width="2%" class="td_button'.$activ.'" nowrap>';
-    $html .= '<form class="form" accept-charset="ISO-8859-1" action="index.php" method="post">';
+    $html .= '<form class="form" accept-charset="'.$CHARSET.'" action="index.php" method="post">';
     $html .= '<script type="text/javascript">document.write(\'<input type="hidden" name="javascript" value="ja">\');</script>';
     $html .= '<button class="button_tab'.$activ.'" type="submit" name="action_'.$position.'" value="'.getLanguageValue($language."_button").'" title="'.getLanguageValue($language."_button").'"'.$tooltip.' accesskey="s">';
     $html .= '<table width="50%" class="button_tab_inhalt'.$activ.'" cellspacing="0" cellpadding="0" border="0"><tr><td width="2%" class="button_tab_icon"><img src="gfx/icons/'.$icon_size.'/'.$language.'.png" alt="" width="24" height="24" hspace="0" vspace="0" border="0"></td><td width="98%" class="button_tab_text">'.getLanguageValue($language."_button").'</td></tr></table>';
@@ -377,7 +379,7 @@ $enctype = NULL;
 if($action == 'files' or $action == 'gallery' or $action == 'plugins') {
     $enctype = ' enctype="multipart/form-data"';
 }
-$html .= '<form name="form" class="form" accept-charset="ISO-8859-1" action="index.php" method="post"'.$enctype.'>';
+$html .= '<form name="form" class="form" accept-charset="'.$CHARSET.'" action="index.php" method="post"'.$enctype.'>';
 
 $html .= '<script type="text/javascript">document.write(\'<input type="hidden" name="javascript" value="ja">\');</script>';
 
@@ -449,7 +451,7 @@ $html .= "</body></html>";
 
 
 // Ausgabe als ISO 8859-1 deklarieren
-header('content-type: text/html; charset=iso-8859-1');
+header('content-type: text/html; charset='.$CHARSET.'');
 /* Ausgabe der kompletten Seite */
 echo $html;
 /*
@@ -4359,8 +4361,9 @@ function getActionIcon($iconname, $titletext) {
 // Hilfsfunktion: Sichert einen Input-Wert
 // ------------------------------------------------------------------------------
     function cleanInput($input) {
+        global $CHARSET;
         if (function_exists("mb_convert_encoding")) {
-            $input = @mb_convert_encoding($input, "ISO-8859-1");
+            $input = @mb_convert_encoding($input, $CHARSET);
         }
 #        return htmlentities($input, ENT_QUOTES, 'ISO8859-1');
 #        return rawurlencode(stripslashes($input));
