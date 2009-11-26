@@ -10,10 +10,10 @@
 
 
 
-require_once("../Properties.php");
 require_once("../SpecialChars.php");
 
 $specialchars = new SpecialChars();
+require_once("../Properties.php");
 /* Variablen */
 
 /**--------------------------------------------------------------------------------
