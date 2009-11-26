@@ -28,11 +28,11 @@ echo "</pre>";
     // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 #    @ini_set("display_errors", 0);
 
+    $specialchars   = new SpecialChars();
     $language       = new Language();
     $mainconfig     = new Properties("conf/main.conf");
     $versionconfig  = new Properties("conf/version.conf");
     $adminconfig    = new Properties("admin/conf/basic.conf");
-    $specialchars   = new SpecialChars();
     $syntax         = new Syntax();
     $smileys        = new Smileys("smileys");
     $mailfunctions  = new Mail(false);
