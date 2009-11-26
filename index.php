@@ -48,10 +48,11 @@ $CHARSET = 'UTF-8';
     $EXT_LINK       = ".lnk";
 
     // Config-Parameter auslesen
-    $LAYOUT_DIR     = $specialchars->replaceSpecialChars($mainconfig->get("cmslayout"),true);
-    $TEMPLATE_FILE  = "layouts/$LAYOUT_DIR/template.html";
-    $CSS_FILE       = $URL_BASE."layouts/$LAYOUT_DIR/css/style.css";
-    $FAVICON_FILE   = $URL_BASE."layouts/$LAYOUT_DIR/favicon.ico";
+    $LAYOUT_DIR     = "layouts/".$specialchars->replaceSpecialChars($mainconfig->get("cmslayout"),true);
+    $TEMPLATE_FILE  = $LAYOUT_DIR."/template.html";
+    $LAYOUT_DIR     = $URL_BASE.$LAYOUT_DIR;
+    $CSS_FILE       = $LAYOUT_DIR."/css/style.css";
+    $FAVICON_FILE   = $LAYOUT_DIR."/favicon.ico";
     // Einstellungen für Kontaktformular
     $contactformconfig  = new Properties("formular/formular.conf");
     $contactformcalcs   = new Properties("formular/aufgaben.conf");
@@ -667,11 +668,12 @@ echo "</pre><br>\n";*/
         global $mainconfig;
         global $specialchars;
         global $CHARSET;
+        global $LAYOUT_DIR;
 
         $form = "<form accept-charset=\"$CHARSET\" method=\"get\" action=\"index.php.html\" class=\"searchform\"><fieldset id=\"searchfieldset\">"
         ."<input type=\"hidden\" name=\"action\" value=\"search\" />"
         ."<input type=\"text\" name=\"query\" value=\"\" class=\"searchtextfield\" accesskey=\"s\" />"
-        ."<input type=\"image\" name=\"action\" value=\"search\" src=\"layouts/".$specialchars->replaceSpecialChars($mainconfig->get("cmslayout"), true)."/grafiken/searchicon.gif\" alt=\"".$language->getLanguageValue0("message_search_0")."\" class=\"searchbutton\"".getTitleAttribute($language->getLanguageValue0("message_search_0"))." />"
+        ."<input type=\"image\" name=\"action\" value=\"search\" src=\"".$LAYOUT_DIR."/grafiken/searchicon.gif\" alt=\"".$language->getLanguageValue0("message_search_0")."\" class=\"searchbutton\"".getTitleAttribute($language->getLanguageValue0("message_search_0"))." />"
         ."</fieldset></form>";
         return $form;
     }
@@ -1164,10 +1166,14 @@ echo "</pre><br>\n";*/
         global $PAGE_REQUEST;
         global $CHARSET;
         
-        // Ist Mailversand überhaupt aktiviert? Wenn nicht: Das Kontaktformular gar nicht anzeigen!
-        if ($adminconfig->get("sendadminmail") != "true") {
+        // existiert eine Mailadresse? Wenn nicht: Das Kontaktformular gar nicht anzeigen!
+        if (strlen($adminconfig->get("adminmail")) < 1) {
             return "<span class=\"deadlink\"".getTitleAttribute($language->getLanguageValue0("tooltip_no_mail_error_0")).">{CONTACT}</span>";
         }
+/*
+        if ($adminconfig->get("sendadminmail") != "true") {
+            return "<span class=\"deadlink\"".getTitleAttribute($language->getLanguageValue0("tooltip_no_mail_error_0")).">{CONTACT}</span>";
+        }*/
         
         // Sollen die Spamschutz-Aufgaben verwendet werden?
         $usespamprotection = $mainconfig->get("contactformusespamprotection") == "true";
