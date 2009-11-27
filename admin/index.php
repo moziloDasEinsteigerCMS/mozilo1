@@ -3101,7 +3101,7 @@ function admin($post) {
 #    $pagecontent = "<h2>".getLanguageValue("button_config_displayadmin")."</h2>";
 
     $error_color['language'] = NULL;
-    $language_array = getFiles('conf',true);
+    $language_array = getFiles('sprachen',true);
     if(count($language_array) <= 0) {
         $post['error_messages']['admin_error_language_emty'][] = NULL;
         $error_color['language'] = ' style="background-color:#FF7029;"';
@@ -3327,7 +3327,7 @@ echo "</pre>";*/
     foreach($language_array as $element) {
         if(substr($element,0,9) == "language_") {
             $selected = NULL;
-            $tmp_array = file("conf/".$element);
+            $tmp_array = file("sprachen/".$element);
             $currentlanguage = NULL;
             foreach($tmp_array as $line) {
                 if (preg_match("/^#/",$line) || preg_match("/^\s*$/",$line)) {
