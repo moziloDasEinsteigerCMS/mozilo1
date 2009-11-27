@@ -98,7 +98,7 @@ $ADMIN_CONF    = new Properties("conf/basic.conf");
 if(!isset($ADMIN_CONF->properties['readonly'])) {
     die($ADMIN_CONF->properties['error']);
 }
-$BASIC_LANGUAGE = new Properties("conf/language_".$ADMIN_CONF->get("language").".conf");
+$BASIC_LANGUAGE = new Properties("sprachen/language_".$ADMIN_CONF->get("language").".conf");
 if(!isset($BASIC_LANGUAGE->properties['readonly'])) {
     die($BASIC_LANGUAGE->properties['error']);
 }
