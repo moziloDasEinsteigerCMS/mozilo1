@@ -2538,9 +2538,8 @@ function config($post) {
         foreach($input_mail as $syntax_name => $dumy) {
             if($syntax_name == "contactformwaittime") {
                 # wenn eingabe keine Zahl oder mehr wie 4stelig ist
-                if($post[$syntax_name] != "" and (!ctype_digit($post[$syntax_name]) or strlen($post[$syntax_name]) > 4)) {
+                if(!ctype_digit($post[$syntax_name]) or strlen($post[$syntax_name]) > 4) {
                     $post['error_messages']['config_error_nodigit_tolong']['color'] = "#FF7029";
-                    $post['error_messages']['config_error_nodigit_tolong'][] = $post[$syntax_name];
                     $error_color['contactformwaittime'] = ' style="background-color:#FF7029;"';
                 } else {
                     $CONTACT_CONF->set($syntax_name, $post[$syntax_name]);
@@ -2558,11 +2557,8 @@ function config($post) {
                 continue;
             }
             if($syntax_name == "formularmail" and $post[$syntax_name] != "") {
-#                        'contactformusespamprotection' => 'true',
-#                        'contactformwaittime' => '15',
                  if(!preg_match("/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/",$post[$syntax_name])) {
                     $post['error_messages']['config_error_formularmail']['color'] = "#FF7029";
-                    $post['error_messages']['config_error_formularmail'][] = $post[$syntax_name];
                     $error_color['formularmail'] = ' style="background-color:#FF7029;"';
                     $error_messages = $syntax_name;
                 } else {
