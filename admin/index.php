@@ -2452,7 +2452,10 @@ function config($post) {
     }
     $error_color['usersyntax'] = NULL;
     $input_mail = makeDefaultConf("formular");
+    $error_color['formularmail'] = NULL;
+    $error_color['contactformwaittime'] = NULL;
     foreach($input_mail as $syntax_name => $dumy) {
+        if($syntax_name == 'formularmail') continue;
         $error_color['titel_'.$syntax_name] = NULL;
     }
 
@@ -2533,6 +2536,40 @@ function config($post) {
         }
         # Mail daten speichern
         foreach($input_mail as $syntax_name => $dumy) {
+            if($syntax_name == "contactformwaittime") {
+                # wenn eingabe keine Zahl oder mehr wie 4stelig ist
+                if($post[$syntax_name] != "" and (!ctype_digit($post[$syntax_name]) or strlen($post[$syntax_name]) > 4)) {
+                    $post['error_messages']['config_error_nodigit_tolong']['color'] = "#FF7029";
+                    $post['error_messages']['config_error_nodigit_tolong'][] = $post[$syntax_name];
+                    $error_color['contactformwaittime'] = ' style="background-color:#FF7029;"';
+                } else {
+                    $CONTACT_CONF->set($syntax_name, $post[$syntax_name]);
+                }
+                continue;
+            }
+            if($syntax_name == "contactformusespamprotection") {
+                $checkbox = "false";
+                if(isset($post[$syntax_name])) {
+                    $checkbox = $post[$syntax_name];
+                }
+                if($CONTACT_CONF->get($syntax_name) != $checkbox) {
+                    $CONTACT_CONF->set($syntax_name, $checkbox);
+                }
+                continue;
+            }
+            if($syntax_name == "formularmail" and $post[$syntax_name] != "") {
+#                        'contactformusespamprotection' => 'true',
+#                        'contactformwaittime' => '15',
+                 if(!preg_match("/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/",$post[$syntax_name])) {
+                    $post['error_messages']['config_error_formularmail']['color'] = "#FF7029";
+                    $post['error_messages']['config_error_formularmail'][] = $post[$syntax_name];
+                    $error_color['formularmail'] = ' style="background-color:#FF7029;"';
+                    $error_messages = $syntax_name;
+                } else {
+                    $CONTACT_CONF->set($syntax_name,$post[$syntax_name]);
+                }
+                continue;
+            }
             $mail_titel = $specialchars->replaceSpecialChars($post['titel_'.$syntax_name],false);
             $CONTACT_CONF->set($syntax_name, $mail_titel.",".checkBoxChecked('show_'.$syntax_name).",".checkBoxChecked('mandatory_'.$syntax_name));
         }
@@ -2711,13 +2748,13 @@ function config($post) {
     natcasesort($layout_array);
     foreach ($layout_array as $file) {
         $selected = NULL;
-            if ($file == $CMS_CONF->get("cmslayout")) {
-                $selected = " selected";
-            }
-            $pagecontent .= "<option".$selected." value=\"".$file."\">";
-            // Übersetzer aus der aktuellen Sprachdatei holen
-            $pagecontent .= $specialchars->rebuildSpecialChars($file, true, true);
-            $pagecontent .= "</option>";
+        if ($file == $CMS_CONF->get("cmslayout")) {
+            $selected = " selected";
+        }
+        $pagecontent .= "<option".$selected." value=\"".$file."\">";
+        // Übersetzer aus der aktuellen Sprachdatei holen
+        $pagecontent .= $specialchars->rebuildSpecialChars($file, true, true);
+        $pagecontent .= "</option>";
     }
     $pagecontent .= "</select></td></tr>";
     // Zeile "STANDARD-KATEGORIE"
@@ -2830,10 +2867,18 @@ function config($post) {
         }
     }
 
-            // KONTAKTFORMULAR-EINSTELLUNGEN
+            // KONTAKTFORMULAR-EINSTELLUNGEN formularmail
     $pagecontent .= "<tr>";
     $pagecontent .= '<td class="td_cms_titel" colspan="2">'.getLanguageValue("config_titel_contact").'</td>';
     $pagecontent .= "</tr>";
+    $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_formularmail")."</td>";
+    $pagecontent .= '<td class="td_cms_left">
+    <input type="text" class="input_cms_text" name="formularmail" value="'.$specialchars->rebuildSpecialChars($CONTACT_CONF->get("formularmail"),true,true).'"'.$error_color['formularmail'].' /></td></tr>';
+    $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_contactformwaittime")."</td>";
+    $pagecontent .= '<td class="td_cms_left">
+    <input type="text" class="input_cms_text" name="contactformwaittime" value="'.$specialchars->rebuildSpecialChars($CONTACT_CONF->get("contactformwaittime"),true,true).'"'.$error_color['contactformwaittime'].' /></td></tr>';
+    $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_contactformusespamprotection")."</td>";
+    $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("contactformusespamprotection", ($CONTACT_CONF->get("contactformusespamprotection") == "true")).'</td></tr>';
     // Zeile "ANGEZEIGTE FELDER / PFLICHTFELDER"
     $config_name = explode(",", ($CONTACT_CONF->get("name")));
     $config_mail = explode(",", ($CONTACT_CONF->get("mail")));
@@ -2860,7 +2905,9 @@ function config($post) {
         $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("showhiddenpagesinlastchanged", ($CMS_CONF->get("showhiddenpagesinlastchanged") == "true")).getLanguageValue("config_input_lastchanged").'<br>'.buildCheckBox("showhiddenpagesinsearch", ($CMS_CONF->get("showhiddenpagesinsearch") == "true")).getLanguageValue("config_input_search").'<br>'.buildCheckBox("showhiddenpagesinsitemap", ($CMS_CONF->get("showhiddenpagesinsitemap") == "true")).getLanguageValue("config_input_sitemap").'</td></tr>';
         // Zeile "Links �ffnen self blank"
         $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_target").'</td>';
-        $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("targetblank_download", ($CMS_CONF->get("targetblank_download") == "true")).getLanguageValue("config_input_download").'<br>'.buildCheckBox("targetblank_gallery", ($CMS_CONF->get("targetblank_gallery") == "true")).getLanguageValue("config_input_gallery").'<br>'.buildCheckBox("targetblank_link", ($CMS_CONF->get("targetblank_link") == "true")).getLanguageValue("config_input_link").'</td></tr>';
+        $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("targetblank_download", ($CMS_CONF->get("targetblank_download") == "true")).getLanguageValue("config_input_download")
+#.'<br>'.buildCheckBox("targetblank_gallery", ($CMS_CONF->get("targetblank_gallery") == "true")).getLanguageValue("config_input_gallery")
+.'<br>'.buildCheckBox("targetblank_link", ($CMS_CONF->get("targetblank_link") == "true")).getLanguageValue("config_input_link").'</td></tr>';
         // Zeile "wenn page == cat"
         $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_catnamedpages").'</td>';
         $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("hidecatnamedpages", ($CMS_CONF->get("hidecatnamedpages") == "true")).getLanguageValue("config_input_catnamedpages").'</td></tr>';
