@@ -333,7 +333,7 @@ class Syntax {
                         }
                         $url = "index.php?cat=$CAT_REQUEST&amp;page=$PAGE_REQUEST&amp;";
                         if($CMS_CONF->get("modrewrite") == "true") {
-                            $url = $URL_BASE.$CAT_REQUEST."/".$PAGE_REQUEST.".html&amp;";
+                            $url = $URL_BASE.$CAT_REQUEST."/".$PAGE_REQUEST.".html?";
                         }
                         $gallery->setLinkPrefix($url); 
                         $gallerycontent = $pagecontent = preg_replace('/(\r\n|\r|\n)/', '{newline_in_include_tag}', $gallery->renderGallery());
