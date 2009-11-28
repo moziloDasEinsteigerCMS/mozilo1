@@ -88,17 +88,11 @@ if(!is_dir("../conf")) {
     die("Fatal Error conf Verzeichnis existiert nicht");
 }
 
-
-if(!is_file("conf/basic.conf")) {
-    $ADMIN_CONF    = new Properties("conf/basic.conf");
-    makeDefaultConf("conf/basic.conf","ADMIN_CONF");
-    unset($ADMIN_CONF);
-}
-$ADMIN_CONF    = new Properties("conf/basic.conf");
+$ADMIN_CONF    = new Properties("conf/basic.conf",true);
 if(!isset($ADMIN_CONF->properties['readonly'])) {
     die($ADMIN_CONF->properties['error']);
 }
-$BASIC_LANGUAGE = new Properties("sprachen/language_".$ADMIN_CONF->get("language").".conf");
+$BASIC_LANGUAGE = new Properties("sprachen/language_".$ADMIN_CONF->get("language").".conf",true);
 if(!isset($BASIC_LANGUAGE->properties['readonly'])) {
     die($BASIC_LANGUAGE->properties['error']);
 }
@@ -119,42 +113,22 @@ if(!is_dir("../galerien")) {
     die(getLanguageValue("error_dir")." galerien/");
 }
 
-if(!is_file("../conf/main.conf")) {
-    $CMS_CONF    = new Properties("../conf/main.conf");
-    makeDefaultConf("../conf/main.conf","CMS_CONF");
-    unset($CMS_CONF);
-}
-$CMS_CONF    = new Properties("../conf/main.conf");
+$CMS_CONF    = new Properties("../conf/main.conf",true);
 if(!isset($CMS_CONF->properties['readonly'])) {
     die($CMS_CONF->properties['error']);
 }
 
-
-if(!is_file("../conf/version.conf")) {
-    $VERSION_CONF    = new Properties("../conf/version.conf");
-    makeDefaultConf("../conf/version.conf","VERSION_CONF");
-    unset($VERSION_CONF);
-}
-$VERSION_CONF    = new Properties("../conf/version.conf");
+$VERSION_CONF    = new Properties("../conf/version.conf",true);
 if(!isset($VERSION_CONF->properties['readonly'])) {
     die($VERSION_CONF->properties['error']);
 }
 
-if(!is_file("../conf/downloads.conf")) {
-    $DOWNLOAD_COUNTS    = new Properties("../conf/downloads.conf");
-    makeDefaultConf("../conf/downloads.conf","DOWNLOAD_COUNTS");
-    unset($DOWNLOAD_COUNTS);
-}
-$DOWNLOAD_COUNTS = new Properties("../conf/downloads.conf");
+$DOWNLOAD_COUNTS = new Properties("../conf/downloads.conf",true);
 if(!isset($DOWNLOAD_COUNTS->properties['readonly'])) {
     die($DOWNLOAD_COUNTS->properties['error']);
 }
-if(!is_file("conf/logindata.conf")) {
-    $LOGINCONF    = new Properties("conf/logindata.conf");
-    makeDefaultConf("conf/logindata.conf","LOGINCONF");
-    unset($LOGINCONF);
-}
-$LOGINCONF = new Properties("conf/logindata.conf");
+
+$LOGINCONF = new Properties("conf/logindata.conf",true);
 # die muss schreiben geöfnet werden können
 if(isset($LOGINCONF->properties['error'])) {
     die($LOGINCONF->properties['error']);
@@ -166,26 +140,17 @@ if (!isset($_SESSION['login_okay']) or !$_SESSION['login_okay']) {
 }
 
 
-$MAILFUNCTIONS = new Mail(true);
+$MAILFUNCTIONS = new Mail();
 
 $USER_SYNTAX_FILE = "../conf/syntax.conf";
-if(!is_file($USER_SYNTAX_FILE)) {
-    $USER_SYNTAX    = new Properties($USER_SYNTAX_FILE);
-    makeDefaultConf($USER_SYNTAX_FILE,"USER_SYNTAX");
-    unset($USER_SYNTAX);
-}
-$USER_SYNTAX = new Properties($USER_SYNTAX_FILE);
+$USER_SYNTAX = new Properties($USER_SYNTAX_FILE,true);
 if($CMS_CONF->properties['usecmssyntax'] == "true" and !isset($USER_SYNTAX->properties['readonly'])) {
     die($USER_SYNTAX->properties['error']);
 } else {
 #    unset($USER_SYNTAX->properties['readonly']);
 }
-if(!is_file("../formular/formular.conf")) {
-    $CONTACT_CONF    = new Properties("../formular/formular.conf");
-    makeDefaultConf("../formular/formular","CONTACT_CONF");
-    unset($CONTACT_CONF);
-}
-$CONTACT_CONF = new Properties("../formular/formular.conf");
+
+$CONTACT_CONF = new Properties("../formular/formular.conf",true);
 if(!isset($CONTACT_CONF->properties['readonly'])) {
     die($CONTACT_CONF->properties['error']);
 }
@@ -1773,7 +1738,7 @@ $tooltip_help_edit = NULL;
             $post['gallery']['error_html']['picsperrow'][$currentgalerien] = NULL;
         }
 
-        $conf = new Properties("$GALLERIES_DIR_REL/".$currentgalerien."/gallery.conf");
+        $conf = new Properties("$GALLERIES_DIR_REL/".$currentgalerien."/gallery.conf",true);
         $pagecontent .= '<tr><td width="100%" class="td_toggle">';
         $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
 
@@ -1887,7 +1852,7 @@ galleryusethumbs = false*/
 
         # inhalt gallery
         $pagecontent .= '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
-        $subtitle = new Properties("$GALLERIES_DIR_REL/".$currentgalerien."/texte.conf");
+        $subtitle = new Properties("$GALLERIES_DIR_REL/".$currentgalerien."/texte.conf",true);
         $counter = 0;
         // alle Bilder der Galerie ins array
         $gallerypics = getFiles($GALLERIES_DIR_REL.'/'.$currentgalerien,"");
@@ -2026,7 +1991,7 @@ echo "</pre><br>\n";*/
             } else {
                 if(extension_loaded("gd")) {
                     require_once("../Image.php");
-                    $gallery_setings = new Properties($GALLERIES_DIR_REL."/".$gallery[1]."/gallery.conf");
+                    $gallery_setings = new Properties($GALLERIES_DIR_REL."/".$gallery[1]."/gallery.conf",true);
 #                    $tn = new Thumbnail();
 #                    $tn->createThumb($specialchars->replaceSpecialChars($_FILES[$array_name]['name'],false), $GALLERIES_DIR_REL."/".$gallery[1]."/", $GALLERIES_DIR_REL."/".$gallery[1]."/$PREVIEW_DIR_NAME/");
 
@@ -2161,7 +2126,7 @@ function editGallery($post) {
 
         # Subtitel setzen
         if(isset($post['gallery'][$gallery]['subtitle'])) {
-            $gallery_subtitel = new Properties($GALLERIES_DIR_REL."/".$gallery."/texte.conf");
+            $gallery_subtitel = new Properties($GALLERIES_DIR_REL."/".$gallery."/texte.conf",true);
             foreach($post['gallery'][$gallery]['subtitle'] as $img => $subtitel) {
                 if($gallery_subtitel->get($img) != $subtitel) {
                     $gallery_subtitel->set($img, $subtitel);
@@ -2177,7 +2142,7 @@ function editGallery($post) {
         }
 
         # Gallery Setings setzen
-        $gallery_setings = new Properties($GALLERIES_DIR_REL."/".$gallery."/gallery.conf");
+        $gallery_setings = new Properties($GALLERIES_DIR_REL."/".$gallery."/gallery.conf",true);
         if(!isset($post['gallery'][$gallery]['setings']['usethumbs'])) {
             $post['gallery'][$gallery]['setings']['usethumbs'] = NULL;
         }
@@ -2283,7 +2248,7 @@ function deleteGalleryImg($post) {
 #                       $post['messages']['gallery_message_deleted'][] = $gallery."/vorschau/ <b>></b> ".$del_file;
                     }
                 }
-                $subtitle = new Properties("$GALLERIES_DIR_REL/".$gallery."/texte.conf");
+                $subtitle = new Properties("$GALLERIES_DIR_REL/".$gallery."/texte.conf",true);
                 $subtitle->delete($del_file);
                 $post['messages']['gallery_message_deleted_img'][] = $gallery." <b>></b> ".$del_file;
             }
@@ -2616,7 +2581,7 @@ function config($post) {
 
     $icon_size = "24x24";
 
-    $main = makeDefaultConf("main", "", true);
+    $main = makeDefaultConf("main");
 
     # error colors für die input felder vorbereiten vom main array,usersyntax und input_mail array
     foreach($main as $type => $type_array) {
@@ -2626,7 +2591,7 @@ function config($post) {
         }
     }
     $error_color['usersyntax'] = NULL;
-    $input_mail = makeDefaultConf("formular", "", true);
+    $input_mail = makeDefaultConf("formular");
     foreach($input_mail as $syntax_name => $dumy) {
         $error_color['titel_'.$syntax_name] = NULL;
     }
@@ -2883,7 +2848,7 @@ function config($post) {
         }
         $pagecontent .= "<option".$selected." value=\"".substr($file,0,strlen($file)-strlen(".conf"))."\">";
         // Ãœbersetzer aus der aktuellen Sprachdatei holen
-        $languagefile = new Properties("../sprachen/$file");
+        $languagefile = new Properties("../sprachen/$file",true);
         $pagecontent .= substr($file,0,strlen($file)-strlen(".conf"))." (".getLanguageValue("config_input_translator")." ".$languagefile->get("_translator_0").")";
         $pagecontent .= "</option>";
     }
@@ -3081,7 +3046,7 @@ function admin($post) {
     $icon_size = "24x24";
 
 
-    $basic = makeDefaultConf("basic", "", true);
+    $basic = makeDefaultConf("basic");
 
     # error colors für die input felder vorbereiten
     foreach($basic as $type => $type_array) {
@@ -3125,7 +3090,7 @@ echo "</pre>";*/
     }
 
     if(isset($post['apply']) and $post['apply'] == getLanguageValue("admin_submit") and isset($post['default'])) {
-        makeDefaultConf("conf/basic.conf","ADMIN_CONF");
+#        makeDefaultConf("conf/basic.conf");
         $post['apply'] = "false";
     }
 
@@ -3527,7 +3492,7 @@ $pagecontent .= '<input type="submit" class="input_submit" name="apply" value="S
                             $error = NULL;
                             # plugin.conf in class einlessen wen vorhanden und schreibbar ist
                             if(file_exists("../$PLUGIN_DIR/".$currentelement."/plugin.conf")) {
-                                $conf_plugin = new Properties("../$PLUGIN_DIR/".$currentelement."/plugin.conf");
+                                $conf_plugin = new Properties("../$PLUGIN_DIR/".$currentelement."/plugin.conf",true);
                                 if(isset($conf_plugin->properties['error'])) {
                                     unset($conf_plugin);
                                     $messages = returnMessage(false, getLanguageValue("properties_write").'&nbsp;&nbsp;<span style="font-weight:normal;">plugin.conf</span>');
@@ -4224,7 +4189,7 @@ function uploadFile($uploadfile, $cat, $forceoverwrite, $gallery = false){
     if($gallery !== false) {
         $dir_real = $GALLERIES_DIR_REL;
         $die_dateien = NULL;
-        $gallery_conf = new Properties("$GALLERIES_DIR_REL/".$cat."/gallery.conf");
+        $gallery_conf = new Properties("$GALLERIES_DIR_REL/".$cat."/gallery.conf",true);
         $MAX_IMG_WIDTH = $gallery_conf->get("maxwidth");
         $MAX_IMG_HEIGHT = $gallery_conf->get("maxheight");
 

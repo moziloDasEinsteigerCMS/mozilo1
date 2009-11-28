@@ -551,7 +551,7 @@ function updateReferencesInText($currentPagesContent, $currentPagesCategory, $mo
     $allowed_attributes = array("seite","kategorie","datei","bild","bildlinks","bildrechts","include");
 
     // FÃ¼r jeden Treffer...
-$debug = false;
+$debug = true;
     foreach ($matches[0] as $match) {
 if($debug) echo "alle matches = $match -----------<br>\n";
         # ein Hack weil dieses preg_match_all nicht mit ^, [ und ] im attribut umgehen kann
@@ -729,16 +729,8 @@ function useChmod($dir = false, $error = NULL) {
     }
 }
 
-# wenn conf Datei nicht existiert Anlegen und Default werte schreiben
-# Parameter:
-# $conf_datei = pfad/datei name
-# $conv_variable = z.B. $USER_SYNTAX = new Properties(); $conv_variable = "USER_SYNTAX"
-# bei $get_only_array == true wird das array zurückgegeben
-# makeDefaultConf(arrayname ohne "$", "", true)
-# Aufbau:
-# $"name der datei ohne .conf" = array(syntax => default wert);
-function makeDefaultConf($conf_datei,$conv_variable,$get_only_array = false) {
-
+# $conf_datei = voller pfad und conf Dateiname oder nur Array Name
+function makeDefaultConf($conf_datei) {
     $basic = array(
                     'text' => array(
                         'adminmail' => '',
@@ -770,7 +762,6 @@ function makeDefaultConf($conf_datei,$conv_variable,$get_only_array = false) {
                         'usebigactionicons',
                         'overwriteuploadfiles')
                     );
-
 
     $main = array(
                     'text' => array(
@@ -815,7 +806,6 @@ function makeDefaultConf($conf_datei,$conv_variable,$get_only_array = false) {
                         'usesubmenu')
                     );
 
-
     $syntax = array('wikipedia' => '[link={DESCRIPTION}|http://de.wikipedia.org/wiki/{VALUE}]');
 
     $formular = array('mail' => 'Mail,true,true',
@@ -835,53 +825,12 @@ function makeDefaultConf($conf_datei,$conv_variable,$get_only_array = false) {
 
     $version = array('cmsversion' => '1.12alpha',
                         'cmsname' => 'Amalia');
-#                        'cmsversion' => '1.12alpha',
 
-/*
-    # Das sind die Verstägten Parameter Achtung Bitte ergenzen wenn was Fehlt!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    $hidden_syntax = array('usebigactionicons' => 'false',
-                    'targetblank_download' => 'true',
-                    'targetblank_gallery' => 'true',
-                    'targetblank_link' => 'true',
-                    'hidecatnamedpages' => 'false',
-                    'modrewrite' => 'false',
-                    'showhiddenpagesinlastchanged' => 'false',
-                    'showhiddenpagesinsearch' => 'false',
-                    'showhiddenpagesinsitemap' => 'false');*/
-
-/*
-                    'gallerymaxheight' => '375',
-                    'gallerymaxwidth' => '400',
-                    'gallerypicsperrow' => '5',
-                    'galleryusethumbs' => 'false',*/
-
-    if($get_only_array === false) {
-        global $$conv_variable;
+    if(strpos($conf_datei,".conf") > 0) {
         $name = substr(basename($conf_datei),0,-(strlen(".conf")));
-        foreach($$name as $syntax => $default) {
-            if(is_array($default) and $syntax != 'expert') {
-                foreach($default as $syntax => $default) {
-#echo "sub = $syntax => $default<br>\n";
-                    $$conv_variable->set($syntax, $default);
-                }
-            } else {
-                $$conv_variable->set($syntax, $default);
-#echo "$syntax => $default<br>\n";
-            }
-#            if($make_default === false) {
-#                $$conv_variable->set($syntax, $default);
-#            } else {
-#                if(!in_array($syntax,$hidden_syntax)) {
-#                    $$conv_variable->set($syntax, $default);
-#                }
-#            }
-        }
+        return $$name;
     } else {
         return $$conf_datei;
-#        foreach($$conf_datei as $syntax => $tmp) {
-#            $return[] = $syntax;
-#        }
-#        return $return;
     }
 }
 
