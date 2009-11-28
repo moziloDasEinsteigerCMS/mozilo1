@@ -28,6 +28,7 @@ class Gallery {
     function Gallery() {
         global $LAYOUT_DIR;
         global $URL_BASE;
+        global $CMS_CONF;
 
         $this->language       = new Language();
         $this->mainconf       = new Properties("conf/main.conf");
