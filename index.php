@@ -30,7 +30,6 @@ $CHARSET = 'UTF-8';
     $specialchars   = new SpecialChars();
     $CMS_CONF     = new Properties("conf/main.conf");
     $VERSION_CONF  = new Properties("conf/version.conf");
-    $ADMIN_CONF    = new Properties("admin/conf/basic.conf");
     require_once("Language.php");
     $language       = new Language();
     require_once("Syntax.php");
@@ -1157,7 +1156,6 @@ echo "</pre><br>\n";*/
 // Gibt das Kontaktformular zurück
 // ------------------------------------------------------------------------------
     function buildContactForm() {
-#        global $ADMIN_CONF;
         global $contactformconfig;
         global $language;
         global $mailfunctions;
@@ -1171,10 +1169,6 @@ echo "</pre><br>\n";*/
         if (strlen($contactformconfig->get("formularmail")) < 1) {
             return "<span class=\"deadlink\"".getTitleAttribute($language->getLanguageValue0("tooltip_no_mail_error_0")).">{CONTACT}</span>";
         }
-/*
-        if ($ADMIN_CONF->get("sendadminmail") != "true") {
-            return "<span class=\"deadlink\"".getTitleAttribute($language->getLanguageValue0("tooltip_no_mail_error_0")).">{CONTACT}</span>";
-        }*/
         
         // Sollen die Spamschutz-Aufgaben verwendet werden?
         $usespamprotection = $contactformconfig->get("contactformusespamprotection") == "true";
