@@ -19,22 +19,16 @@ class Mail {
     
     // Sendet eine Mail an die konfigurierte Admin-Adresse (Absender ist der CMS-Titel)
     function sendMailToAdmin($subject, $content) {
-        #global $CMS_CONF;
         global $ADMIN_CONF;
-        //$from = "\"".$this->CMSCONF->get("websitetitle")."\"";
         $from = $ADMIN_CONF->get("adminmail");
-        $this->sendMailToAdminWithFrom($subject, $content, $from);
+        $this->sendMail($subject, $content, $from, $from);
     }
-    
+
     // Sendet eine Mail an die konfigurierte Admin-Adresse (mit definierter Absender-Adresse) 
-    function sendMailToAdminWithFrom($subject, $content, $from) {
+    function sendMail($subject, $content, $from, $to) {
         global $CHARSET;
-        #global $CMS_CONF;
-        global $ADMIN_CONF;
-        $to = $ADMIN_CONF->get("adminmail");
         @mail(html_entity_decode($to,ENT_COMPAT,$CHARSET), html_entity_decode($subject), html_entity_decode($content), $this->getHeader(html_entity_decode($to), html_entity_decode($from)));
     }
-    
 
     // Baut den Mail-Header zusammen
     function getHeader($from, $replyto) {
