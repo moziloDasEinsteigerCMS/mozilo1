@@ -797,7 +797,7 @@ function makeDefaultConf($conf_datei) {
                         'showhiddenpagesinsearch',
                         'showhiddenpagesinsitemap',
                         'targetblank_download',
-                        'targetblank_gallery',
+#                        'targetblank_gallery',
                         'targetblank_link',
                         'showsyntaxtooltips',
                         'replaceemoticons',
@@ -808,7 +808,10 @@ function makeDefaultConf($conf_datei) {
 
     $syntax = array('wikipedia' => '[link={DESCRIPTION}|http://de.wikipedia.org/wiki/{VALUE}]');
 
-    $formular = array('mail' => 'Mail,true,true',
+    $formular = array('formularmail' => '',
+                        'contactformusespamprotection' => 'true',
+                        'contactformwaittime' => '15',
+                        'mail' => 'Mail,true,true',
                         'message' => 'Nachricht,true,true',
                         'name' => 'Name,true,true',
                         'website' => 'Website,true,true');
@@ -826,9 +829,30 @@ function makeDefaultConf($conf_datei) {
     $version = array('cmsversion' => '1.12alpha',
                         'cmsname' => 'Amalia');
 
+    $gallery = array('maxheight' => '',
+                        'maxthumbheight' => '100',
+                        'maxthumbwidth' => '100',
+                        'maxwidth' => '',
+                        'picsperrow' => '4',
+                        'target' => '_blank',
+                        'usethumbs' => 'true');
+
+
     if(strpos($conf_datei,".conf") > 0) {
         $name = substr(basename($conf_datei),0,-(strlen(".conf")));
-        return $$name;
+        # beim erzeugen dürfen sub arrays nicht mit rein
+        foreach($$name as $key => $value) {
+            if($key == "expert") continue;
+            if(is_array($value)) {
+                foreach($value as $key => $value) {
+                    $return_array[$key] = $value;
+                }
+            } else {
+                $return_array = $$name;
+                break;
+            }
+        }
+        return $return_array;
     } else {
         return $$conf_datei;
     }
