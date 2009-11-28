@@ -9,23 +9,6 @@
  */
 
 
-// DEEEEEEEEEEEBUG ;)
-// Ausgabe aller Ã¼bergebenen Werte zu Testzwecken
-
-/*
- echo "<h2>POST</h2>";
- foreach ($_POST as $a => $b)
- echo $a." -> ".$b."<br />";
- echo "<h2>GET</h2>";
- foreach ($_GET as $a => $b)
- echo $a." -> ".$b."<br />";
- echo "<h2>REQUEST</h2>";
- foreach ($_REQUEST as $a => $b)
- echo $a." -> ".$b."<br />";
- */
-/**/
-
-#$time_start = microtime(true);
 
 $ADMIN_TITLE = "moziloAdmin";
 
@@ -87,6 +70,10 @@ if(!is_dir("conf")) {
 if(!is_dir("../conf")) {
     die("Fatal Error conf Verzeichnis existiert nicht");
 }
+/*
+properties['readonly'] = nur lesen
+properties['error'] = kann nicht lesen oder schreiben, Sperdatei anlegen oder Sperdatei kann nicht gelöscht werden
+*/
 
 $ADMIN_CONF    = new Properties("conf/basic.conf",true);
 if(!isset($ADMIN_CONF->properties['readonly'])) {
@@ -146,22 +133,12 @@ $USER_SYNTAX_FILE = "../conf/syntax.conf";
 $USER_SYNTAX = new Properties($USER_SYNTAX_FILE,true);
 if($CMS_CONF->properties['usecmssyntax'] == "true" and !isset($USER_SYNTAX->properties['readonly'])) {
     die($USER_SYNTAX->properties['error']);
-} else {
-#    unset($USER_SYNTAX->properties['readonly']);
 }
 
 $CONTACT_CONF = new Properties("../formular/formular.conf",true);
 if(!isset($CONTACT_CONF->properties['readonly'])) {
     die($CONTACT_CONF->properties['error']);
 }
-/*
-properties['readonly'] = nur lesen
-properties['error'] = kann nicht lesen oder schreiben, Sperdatei anlegen oder Sperdatei kann nicht gelöscht werden
-*/
-/*
-echo "<pre>";
-print_r($CONTACT_CONF->properties);
-echo "</pre>";*/
 
 
 // AbwÃ¤rtskompatibilitÃ¤t: Downloadcounter initalisieren
@@ -252,7 +229,6 @@ if(getRequestParam("lastbackup_yes", true)) {
     $post['makepara'] = "yes";
     if($specialchars->rebuildSpecialChars(getRequestParam("lastbackup_yes", true), false, true) == getLanguageValue("yes")) {
         if(!isset($ADMIN_CONF->properties['error'])) {
-#echo "lastbackup_yes<br>\n";
             $ADMIN_CONF->set("lastbackup",time());
         } else {
             $error_backup = returnMessage(false, $ADMIN_CONF->properties['error']);
@@ -260,7 +236,6 @@ if(getRequestParam("lastbackup_yes", true)) {
     }
 }
 
-#echo "action = ".$action."<br>\n";
 # Function aufrufen
 $functionreturn = array();
 $functionreturn = $action($post);
@@ -276,7 +251,6 @@ $html .= '<meta http-equiv="Content-Type" content="text/html;charset='.$CHARSET.
 $html .= '<script type="text/javascript" src="buttons.js"></script>';
 $html .= '<script type="text/javascript" src="multifileupload.js"></script>';
 $html .= "<title>$ADMIN_TITLE - $pagetitle</title>";
-#$html .= "<link rel=\"stylesheet\" href=\"adminstyle.css\" type=\"text/css\">";
 $html .= '<link type="text/css" rel="stylesheet" href="adminstyle_neu.css">';
 $html .= '<link type="text/css" rel="stylesheet" href="editsite.css">';
 $html .= '<link type="text/css" rel="stylesheet" media="screen" href="js_color_picker_v2/js_color_picker_v2.css">';
@@ -310,12 +284,9 @@ $html .= '<tr>';
 
 # Menue Tabs erzeugen
 foreach($array_tabs as $position => $language) {
-#    ${"lang_".$language} = getLanguageValue($language."_button");
     if($ADMIN_CONF->get("showTooltips") == "true") {
-#        ${"tooltip_".$language} = createTooltipWZ($language."_button",$language."_text",",WIDTH,400");
         $tooltip = createTooltipWZ($language."_button",$language."_text",",WIDTH,400");
     } else {
-#        ${"tooltip_".$language} = NULL;
         $tooltip = NULL;
     }
 
@@ -337,9 +308,7 @@ $html .= '</tr></table>';
 
 $html .= "</td></tr>";
 $html .= '<tr><td width="100%" height="450" valign="top" id="td_content">';
-#$html .= '<div class="div_content">';
 
-#$html .= '<img src="gfx/clear_sch.gif" alt=" " width="1" height="60" hspace="0" vspace="0" border="0">';
 $enctype = NULL;
 if($action == 'files' or $action == 'gallery' or $action == 'plugins') {
     $enctype = ' enctype="multipart/form-data"';
@@ -367,7 +336,6 @@ $html .= $error_backup;
 $intervallsetting = $ADMIN_CONF->get("backupmsgintervall");
 if (($intervallsetting != "") && preg_match("/^[0-9]+$/", $intervallsetting) && ($intervallsetting > 0)) {
     $intervallinseconds = 60 * 60 * 24 * $intervallsetting;
-#    $lastbackup = getLastBackup();
     $lastbackup = $ADMIN_CONF->get("lastbackup");
     // initial: nur setzen 
     if ($lastbackup == "") {
@@ -376,7 +344,6 @@ if (($intervallsetting != "") && preg_match("/^[0-9]+$/", $intervallsetting) && 
         } else {
             $html .= returnMessage(false, $ADMIN_CONF->properties['error']);
         }
-#        setLastBackup();
     }
     // wenn schon gesetzt: pruefen und ggfs. warnen
     else {
@@ -390,7 +357,6 @@ $html .= $pagecontent;
 
 $html .= '</form>';
 
-#$html .= '</div>';
 $html .= "</td></tr>";
 
 if($debug == "ja") {
@@ -408,9 +374,6 @@ if(isset($post)) print_r($post);
 if($debug == "ja") $html .= "<tr><td>".$debug_txt."</td></tr>";
 
 $html .= '<tr><td width="100%"><img src="gfx/clear.gif" alt=" " width="930" height="1" hspace="0" vspace="0" align="left" border="0"></td></tr></table>';
-
-#$html .= '</form>';
-#$html .= "</td></tr></table>";
 $html .= "</body></html>";
 
 
@@ -419,16 +382,11 @@ $html .= "</body></html>";
 header('content-type: text/html; charset='.$CHARSET.'');
 /* Ausgabe der kompletten Seite */
 echo $html;
-/*
-$time_end = microtime(true);
-$time = $time_end - $time_start;
-echo "$time Sekunden\n";*/
 
 /*     ------------------------------
  ZusÃ¤tzliche Funktionen
  ------------------------------ */
 
-#function sysInfo() {
 function home($post) {
     global $CMS_CONF;
     global $VERSION_CONF;
@@ -436,22 +394,12 @@ function home($post) {
     global $MAILFUNCTIONS;
     
     $pagecontent = NULL;
-#    $post = NULL;
 
     if(isset($_GET['link']) and $_GET['link'] == 1) {
         $post['error_messages']['home_error_mod_rewrite'][] = NULL;
     } elseif(isset($_GET['link']) and $_GET['link'] == 2) {
         $post['messages']['home_messages_mod_rewrite'][] = NULL;
-    }# elseif(!isset($_POST['test'])) {
-#        header("location:rewrite2.htm");
-#    }
-
-/*echo ini_get('safe_mode')." = save<br>\n";
-
-echo "<pre>";
-print_r(ini_get_all());
-echo "</pre>";*/
-
+    }
     $safemode = getLanguageValue("no");
     if(ini_get('safe_mode')) {
         $post['error_messages']['home_error_safe_mode'][] = NULL;
@@ -492,15 +440,9 @@ echo "</pre>";*/
     $pagecontent .= getLanguageValue("home_text_welcome");
     $pagecontent .= "</p>";
 
-#getRequestParam('', true)
-
-
-#$path = str_replace('admin','',dirname(__FILE__));
-$path = dirname(dirname(__FILE__))."/";
+    $path = dirname(dirname(__FILE__))."/";
 #    $cmssize = convertFileSizeUnit(dirsize(getcwd()."/.."));
     $cmssize = convertFileSizeUnit(dirsize($path));
-
-#    $pagecontent = '<span class="titel">'.getLanguageValue("home_button").'</span>'
     $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">'
     // CMS-INFOS
     ."<tr>"
@@ -559,8 +501,6 @@ $path = dirname(dirname(__FILE__))."/";
 
 
     ."</table>";
-#    return array(getLanguageValue("home_button"), $pagecontent);
-#    return $pagecontent;
     return array(getLanguageValue("home_button"), $pagecontent);
 }
 
@@ -601,11 +541,8 @@ function category($post) {
     }
 
     if(getRequestParam('javascript', true)) {
-#        $javascript = "ja";
         $pagecontent .= '<script type="text/javascript" src="toggle.js"></script>';
-    }# else {
-#        $javascript = "nein";
-#    }
+    }
 
     if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
         $tooltip_category_help = '<img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"'.createTooltipWZ("","category_help",",WIDTH,400,CLICKCLOSE,true").'>';
@@ -718,19 +655,14 @@ function category($post) {
         $pagecontent .= '</td></tr></table></td></tr>';
         $pagecontent .= '<tr>';
         $pagecontent .= '<td width="100%" '.$post['categories']['cat']['error_html']['display'][$pos].'id="toggle_'.$pos.'" align="right" class="td_togglen_padding_bottom">';
-#        $pagecontent .= '<td style="display:block;" id="toggle_'.$pos.'" class="td_togglen_padding_bottom">';
-
         if(isset($post['categories']['cat']['url'][$pos])) {
             $pagecontent .= '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
             $pagecontent .= '<tr><td width="30%" class="td_left_title" valign="bottom" nowrap><b>'.$text_new_name.'</b></td>';
             $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_url_adress.'</b></td>';
             $pagecontent .= '<td width="30%" class="td_left_title">';
-#            $pagecontent .= '<input type="hidden" name="categories[cat][url]['.$pos.']" value="'.$post['categories']['cat']['url'][$pos].'">';
-#            $pagecontent .= '<div class="div_noedit">'.$post['categories']['cat']['url'][$pos].'</div>';
             $pagecontent .= '<input type="text" class="input_readonly" name="categories[cat][url]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['url'][$pos], true, true).'" maxlength="'.$max_strlen.'" readonly>';
             $pagecontent .= '</td><td>&nbsp;</td><td width="6%" valign="bottom" class="td_center_title">blank</td><td width="6%" align="center" valign="bottom" class="td_center_title">self</td><td>&nbsp;</td>';
             $pagecontent .= '</tr><tr>';
-#$specialchars->rebuildSpecialChars($post['categories']['cat']['new_name'][$pos], true, true)
             $pagecontent .= '<td width="30%" class="td_left_title"><input type="text" '.$post['categories']['cat']['error_html']['new_name'][$pos].' class="input_text" name="categories[cat][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['new_name'][$pos], true, true).'" maxlength="'.$max_strlen.'"'.$tooltip_category_help_name.'></td>';
             $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_url_new_adress.'</b></td>';
             $pagecontent .= '<td width="30%" class="td_left_title"><input type="text" '.$post['categories']['cat']['error_html']['new_url'][$pos].' class="input_text" name="categories[cat][new_url]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['new_url'][$pos], true, true).'" maxlength="'.$max_strlen.'"'.$tooltip_help_url.'></td>';
@@ -864,10 +796,6 @@ function editCategory($post) {
             $post['makepara'] = "yes"; # kein makePostCatPageReturnVariable()
         }
     }
-/*    $post['makepara'] = "yes";
-    if(isset($post['error_messages'])) {
-        $post['makepara'] = "no"; # kein makePostCatPageReturnVariable()
-    }*/
     return $post;
 }
 
@@ -928,10 +856,6 @@ function page($post) {
 
 
     if(isset($post['action_data']) and !isset($post['error_messages'])) {
-#    if(isset($post['action_data']) and !isset($post['error_messages'])) {
-/*        if(key($post['action_data']) == "newsite") {
-            $post = newSite($post);
-        }*/
         if(key($post['action_data']) == "editsite") {
             $post = editSite($post);
             if($post['editsite'] == 'yes') {
@@ -970,11 +894,8 @@ function page($post) {
     $pagecontent .= categoriesMessages($post);
 
     if(getRequestParam('javascript', true)) {
-#        $javascript = "ja";
         $pagecontent .= '<script type="text/javascript" src="toggle.js"></script>';
-    }# else {
-#        $javascript = "nein";
-#    }
+    }
     $pagecontent .= '<span class="titel">'.getLanguageValue("page_button").'</span>';
     if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
         $tooltip_page_help = '<img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"'.createTooltipWZ("","page_help",",WIDTH,400,CLICKCLOSE,true").'>';
@@ -983,7 +904,6 @@ function page($post) {
     }
     $pagecontent .= $tooltip_page_help;
     $pagecontent .= "<p>".getLanguageValue("page_text")."</p>";
-#    $pagecontent .= "<h3>".getLanguageValue("choice_text")."</h3>";
 
     $pagecontent .= '<table width="100%" class="table_toggle" cellspacing="0" cellpadding="0">';# border="0"
     $pagecontent .= '<tr><td width="100%" class="td_toggle"><input type="submit" name="action_data[copymovesite]" value="'.getLanguageValue("page_button_change").'" class="input_submit"></td></tr>';
@@ -1174,17 +1094,6 @@ function editSite($post) {
     $page = $post['action_data']['editsite'][$cat];
 
     $input_merker = NULL;
-/*    if(isset($_POST['editsite_merker']) and count($_POST['editsite_merker']) > 0) {
-        $post['ask'] = getLanguageValue("page_edit_text");
-        foreach($_POST['editsite_merker'] as $cat_merk => $page_merk) {
-            if($cat_merk == $cat) {
-                continue;
-            }
-            $input_merker .= '<input type="hidden" name="editsite_merker['.$cat_merk.']" value="'.$_POST['editsite_merker'][$cat_merk].'">';
-            $post['ask'] .= '<br>'.$cat_merk.'/'.$_POST['editsite_merker'][$cat_merk].'&nbsp;&nbsp;<input type="image" class="input_img_button" name="action_data[editsite]['.$cat_merk.']['.$_POST['editsite_merker'][$cat_merk].']" value="Bearbeiten"  src="gfx/icons/24x24/page-edit.png" title="Bearbeiten" onmouseover="Tip('."'Hier k&ouml;nnen Sie die die Inhaltsseiten bearbeiten. Dazu werden nachfolgend die Inhaltsseiten aller Kategorien aufgelistet.".',WIDTH,200,CLICKCLOSE,true)" onmouseout="UnTip()"><input type="hidden" name="editsite_merker['.$cat_merk.']" value="'.$_POST['editsite_merker'][$cat_merk].'">';
-        }
-    }
-*/
     $post['editsite'] = 'yes';
     $content = "editsite";
     if(isset($_POST['save']) or isset($_POST['savetemp'])) {
@@ -1233,16 +1142,6 @@ function copymoveSite($post) {
     global $EXT_LINK;
     global $EXT_PAGE;
     $max_cat_page = 100;
-
-//     $input_merker = NULL;
-// 
-//     if(isset($_POST['editsite_merker']) and count($_POST['editsite_merker']) > 0) {
-//         $post['ask'] = getLanguageValue("page_edit_text");
-//         foreach($_POST['editsite_merker'] as $cat_merk => $page_merk) {
-//             $post['ask'] .= '<input type="hidden" name="editsite_merker['.$cat_merk.']" value="'.$_POST['editsite_merker'][$cat_merk].'">';
-//             $post['ask'] .= '<br>'.$cat_merk.'/'.$_POST['editsite_merker'][$cat_merk].'&nbsp;&nbsp;<input type="image" class="input_img_button" name="action_data[editsite]['.$cat_merk.']['.$_POST['editsite_merker'][$cat_merk].']" value="Bearbeiten"  src="gfx/icons/24x24/page-edit.png" title="Bearbeiten" onmouseover="Tip('."'Hier k&ouml;nnen Sie die die Inhaltsseiten bearbeiten. Dazu werden nachfolgend die Inhaltsseiten aller Kategorien aufgelistet.".',WIDTH,200,CLICKCLOSE,true)" onmouseout="UnTip()"><input type="hidden" name="editsite_merker['.$cat_merk.']" value="'.$_POST['editsite_merker'][$cat_merk].'">';
-//         }
-//     }
 
     # wenn Verschoben wird unset die Position der Inhaltseite aus anderer Kategorie
     # damit bei position_move() die Positionen frei sind
@@ -1386,33 +1285,8 @@ function copymoveSite($post) {
             }
         }
     }
-/*
-# ausgabe testen
-    foreach($post['categories'] as $cat => $tmp) {
-    if(isset($new_page[$cat]))
-         $post['messages']['new_page'][] = $cat."/".$new_page[$cat];
-    if(isset($rename_orgname[$cat])) {
-        foreach($rename_orgname[$cat] as $key => $tmp) {
-#            echo $move_orgname[$key]." -> ".$move_newname[$key]."<br>\n";
-         $post['messages']['rename_success'][] = $rename_orgname[$cat][$key]." -> ".$rename_newname[$cat][$key];
-        }
-    }
-    if(isset($move_orgname[$cat])) {
-        foreach($move_orgname[$cat] as $key => $tmp) {
-#            echo $move_orgname[$key]." -> ".$move_newname[$key]."<br>\n";
-         $post['messages']['copymove_success'][] = $move_orgname[$cat][$key]." -> ".$move_newname[$cat][$key];
-         $post['messages']['copymove_success'][] = "driname() = ".dirname($move_orgname[$cat][$key]);
-        }
-    }
-    }
-    $post['makepara'] = "yes"; # makePostCatPageReturnVariable()
-    $post['makepara'] = "no"; # makePostCatPageReturnVariable()
-    return $post;
-*/
     # Rename
     if(isset($rename_newname)) {
-/*$debug_test[$cat] = $rename_newname;
-global $debug_test;*/
         foreach($rename_newname as $cat => $tmp) {
             foreach($rename_newname[$cat] as $z => $tmp) {
                 @rename($CONTENT_DIR_REL."/".$cat."/".$rename_orgname[$cat][$z],$CONTENT_DIR_REL."/".$cat."/".$rename_newname[$cat][$z]);
@@ -1441,7 +1315,6 @@ global $debug_test;*/
                     $post['makepara'] = "yes"; # makePostCatPageReturnVariable()
                     # nur wenn name != neu_name also die Position wird nicht berücksichtigt
                     if(substr($rename_orgname[$cat][$z],3) != substr($rename_newname[$cat][$z],3)) {
-#                        updateReferencesInAllContentPages($cat, $rename_orgname[$cat][$z], "", $rename_newname[$cat][$z]);
                         $error_message['updateReferences'] = updateReferencesInAllContentPages($cat, $rename_orgname[$cat][$z], "", $rename_newname[$cat][$z]);
                         if(is_array($error_message['updateReferences'])) {
                             $post['makepara'] = "yes";
@@ -1456,19 +1329,11 @@ global $debug_test;*/
             }
         }
     }
-/*
-echo "<pre>";
-echo "<br>\n rename_newname --------------------<br>\n";
-print_r($rename_newname);
-echo "<br>\n post['display'] --------------------<br>\n";
-print_r($post['display']);
-echo "</pre><br>\n";*/
     # Copy Move
     if(isset($move_newname)) {
         foreach($move_newname as $cat => $tmp) {
             foreach($move_newname[$cat] as $z => $tmp) {
                 # Einfach mal Kopieren
-#echo "copy $CONTENT_DIR_REL/$source -> $CONTENT_DIR_REL/$desti<br>\n";
                 @copy($CONTENT_DIR_REL."/".$move_orgname[$cat][$z],$CONTENT_DIR_REL."/".$move_newname[$cat][$z]);
                 $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
                 $last_error = @error_get_last();
@@ -1492,7 +1357,6 @@ echo "</pre><br>\n";*/
                         $error = true;
                     } else {
                         # Weil Verschoben
-#                        updateReferencesInAllContentPages(dirname($move_orgname[$cat][$z]), basname($move_orgname[$cat][$z]), $cat, basname($move_newname[$cat][$z]));
                         $error_message['updateReferences'] = updateReferencesInAllContentPages(dirname($move_orgname[$cat][$z]), basename($move_orgname[$cat][$z]), $cat, basename($move_newname[$cat][$z]));
                         if(is_array($error_message['updateReferences'])) {
                             $post['makepara'] = "yes";
@@ -1537,12 +1401,8 @@ echo "</pre><br>\n";*/
                 }
             } else {
                 if(empty($post['categories'][$cat]['new_url'][$max_cat_page])) {
-/*                    if(!isset($post['ask'])) {
-                        $post['ask'] = getLanguageValue("page_edit_text");
-                    }*/
                     # Editieren der Neuen Inhaltseite und hier Fertig weiter gehts nach dem Speichern mit editSite()
                     $post['messages']['page_message_new'][] = $cat."/".$new_page[$cat];
-#                    $post['ask'] .= '<br>'.$cat.'/'.$new_page[$cat].'&nbsp;&nbsp;<input type="image" class="input_img_button" name="action_data[editsite]['.$cat.']['.$new_page[$cat].']" value="Bearbeiten"  src="gfx/icons/24x24/page-edit.png" title="Bearbeiten" onmouseover="Tip('."'Hier k&ouml;nnen Sie die die Inhaltsseiten bearbeiten. Dazu werden nachfolgend die Inhaltsseiten aller Kategorien aufgelistet.".',WIDTH,200,CLICKCLOSE,true)" onmouseout="UnTip()"><input type="hidden" name="editsite_merker['.$cat.']" value="'.$new_page[$cat].'">';
                     $post['editsite'] = 'no';
                 } else {
                     $post['messages']['message_link'][] = $cat."/".$new_page[$cat];
@@ -2669,12 +2529,6 @@ function config($post) {
                         $CMS_CONF->set($syntax_name, $checkbox);
                     }
                 }
-/*
-                if($error_messages !== false) {
-                    $post['error_messages']['config_error_'.$syntax_name]['color'] = "#FF7029";
-                    $post['error_messages']['config_error_'.$syntax_name][] = NULL;
-                    $error_color[$syntax_name] = ' style="background-color:#FF7029;"';
-                }*/
             }
         }
         # Mail daten speichern
@@ -2683,8 +2537,6 @@ function config($post) {
             $CONTACT_CONF->set($syntax_name, $mail_titel.",".checkBoxChecked('show_'.$syntax_name).",".checkBoxChecked('mandatory_'.$syntax_name));
         }
 
-
-        #"usersyntax" => "wikipedia = [link={DESCRIPTION}|http://de.wikipedia.org/wiki/{VALUE}]"
         // Speichern der benutzerdefinierten Syntaxelemente -> ERWEITERN UM PRÃœFUNG!
         # nur Speichern wenn auch benutzt wird
         if($CMS_CONF->get('usecmssyntax') == "true" and $ADMIN_CONF->get('showexpert') == "true") {
@@ -2963,11 +2815,9 @@ function config($post) {
 
         // Zeile "BENUTZERDEFINIERTE SYNTAX-ELEMENTE"
         $usersyntaxdefs = "";
-#        if (file_exists($USER_SYNTAX_FILE)) {
-            $handle = @fopen($USER_SYNTAX_FILE, "r");
-            $usersyntaxdefs = @fread($handle, @filesize($USER_SYNTAX_FILE));
-            @fclose($handle);
-#        }
+        $handle = @fopen($USER_SYNTAX_FILE, "r");
+        $usersyntaxdefs = @fread($handle, @filesize($USER_SYNTAX_FILE));
+        @fclose($handle);
         $pagecontent .= "<tr><td class=\"td_cms_colspan2\" colspan=\"2\">".getLanguageValue("config_text_usersyntax")."</td>";
         $pagecontent .= "<tr><td class=\"td_cms_left\" colspan=\"2\"><textarea class=\"textarea_cms\" cols=\"116\" rows=\"6\" name=\"usersyntax\" ".$error_color['usersyntax'].">".$specialchars->rebuildSpecialChars($usersyntaxdefs,false,true)."</textarea></td></tr>";
         // Zeile "ERSETZE EMOTICONS"
@@ -3063,7 +2913,6 @@ function admin($post) {
     $changesmade = false;
 
     $pagecontent = '<input type="hidden" name="action_activ" value="'.getLanguageValue("admin_button").'">';
-#    $pagecontent = "<h2>".getLanguageValue("button_config_displayadmin")."</h2>";
 
     $error_color['language'] = NULL;
     $language_array = getFiles('sprachen',true);
@@ -3074,11 +2923,6 @@ function admin($post) {
         $post['error_messages']['admin_error_languagefile_error'][] = $ADMIN_CONF->get('language');
         $error_color['language'] = ' style="background-color:#FF7029;"';
     }
-
-/*
-echo "<pre>";
-print_r($language_array);
-echo "</pre>";*/
 
     if(isset($ADMIN_CONF->properties['error'])) {
         $post['apply'] = "false";
@@ -3430,7 +3274,7 @@ function plugins($post) {
     $pagecontent .= '<span class="titel">'.getLanguageValue("plugins_titel").'</span>';
     $pagecontent .= $tooltip_plugins_help;
     $pagecontent .= "<p>".getLanguageValue("plugins_text")."</p>";
-$pagecontent .= '<input type="submit" class="input_submit" name="apply" value="Speichern Test"/>';
+    $pagecontent .= '<input type="submit" class="input_submit" name="apply" value="Speichern Test"/>';
     $pagecontent .= '<table width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
 
     $dircontent = getDirs("../$PLUGIN_DIR", true);
@@ -3439,12 +3283,6 @@ $pagecontent .= '<input type="submit" class="input_submit" name="apply" value="S
         if (file_exists("../$PLUGIN_DIR/".$currentelement."/index.php")) {
             require_once("../$PLUGIN_DIR/".$currentelement."/index.php");
             $plugin = new $currentelement();
-
-#echo "<pre>";
-#print_r($plugin->conf('begruessung_1'));
-#echo "</pre>";
-#echo $plugin->conf->properties('begruessung_1');#get()
-#echo $plugin->getproperties('begruessung_1');#get()
             // Enthält der Code eine Klasse mit dem Namen des Plugins?
             if (class_exists($currentelement)) {
                 $plugin_info = $plugin->getInfo();
@@ -3500,13 +3338,6 @@ $pagecontent .= '<input type="submit" class="input_submit" name="apply" value="S
                                     break;
                                 }
                             }
-    if (getRequestParam('newname', true)) {
-        $newname = getRequestParam('newname', true);
-    } else {
-        $newname = "";
-    }
-#replaceSpecialChars($text,$nochmal_erlauben)
-#rebuildSpecialChars($text, $rebuildnbsp, $html)
                             # Änderungen schreiben isset($_POST['apply'])
                             if(getRequestParam('apply', true)) {
                                 if(isset($_POST[$currentelement][$name])) {
@@ -3639,7 +3470,6 @@ $pagecontent .= '<input type="submit" class="input_submit" name="apply" value="S
                                     $display_toggle = ' style="display:block;"';
                                     $messages .= returnMessage(false, getLanguageValue("plugins_error_type_file"));
                                     $input = '<span style="background-color:#FF0000;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';
-#                                    $input = '<input type="text" name="'.$currentelement.'['.$name.']"'.$value.$maxlength.$size.' class="plugin_input"'.$error.'>';
                                 } else {
                                     $input = '<input name="'.$currentelement.'['.$name.']"'.$type.$value.$maxlength.$size.' class="plugin_input"'.$error.'>';
                                 }
@@ -3686,7 +3516,6 @@ function showEditPageForm($cat, $page, $newsite)    {
     $content = "";
     $action = 'editsite';
 
-#    $file = $specialchars->replaceSpecialChars("$CONTENT_DIR_REL/".$cat."/".$page,false);
     $file = $CONTENT_DIR_REL."/".$cat."/".$page;
 
     # Vorhandene Inhaltseite öffnen
@@ -3694,15 +3523,10 @@ function showEditPageForm($cat, $page, $newsite)    {
         // Inhaltsseite: Inhalt ins Textfeld holen
         $handle=fopen($file, "r");
         if (filesize($file) > 0) {
-#            $pagecontent = htmlentities(fread($handle, filesize($file)),ENT_COMPAT,'ISO-8859-1');
             $pagecontent = $specialchars->rebuildSpecialChars(fread($handle, filesize($file)),true,true);
         } else
             $pagecontent = "";
         fclose($handle);
-#    } elseif($newsite == 'newsite') {
-        // Inhaltsseite noch nicht vorhanden: Titel als Üerschrift ins Textfeld einfügen
-        # und ein Hack um das ^ vor [ und ] zusetzen damit attribut umgehen kann
-#        $pagecontent = "[ueber1|".str_replace(array("[","]"),array("^[","^]"),$specialchars->rebuildSpecialChars(substr($page, 3,strlen($page)-7), false, false))."]";
     } else {
         $pagecontent = $newsite;
     }
@@ -3719,13 +3543,6 @@ function showEditPageForm($cat, $page, $newsite)    {
     }
     $content .= '<textarea cols="96" rows="24" style="height:'.$height.';" name="pagecontent">'.$pagecontent.'</textarea><br />';
     $content .= '<input type="hidden" name="action_data['.$action.']['.$cat.']['.$page.']" value="'.$action.'" />';
-#    $content .= "<input type="hidden" name="action_editsite" value="$newsite" />";
-
-#$pagecontent .= '<input type="image" class="'.$class_delete_button.'" name="action_data[deletesite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['target'][$pos].$post['categories'][$cat]['url'][$pos].$EXT_LINK.']" value="'.getLanguageValue("button_delete").'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.getLanguageValue("button_delete").'"'.createTooltipWZ("category_delete_text", "",",WIDTH,200,CLICKCLOSE,true").'>';
-
-
-
-#    $content .= "<input type="hidden" name="cat" value="$cat" />";
     $content .= '<input type="submit" name="cancel" value="'.getLanguageValue("button_cancel").'" accesskey="a" /> ';
     // Zwischenspeichern-Button nicht beim Neuanlegen einer Inhaltsseite anzeigen
     if($newsite != 'newsite')
@@ -4042,7 +3859,7 @@ if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
             // alle Kategorien durchgehen
             $categories = getDirContentAsArray($CONTENT_DIR_REL, false);
             foreach ($categories as $catdir) {
-if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
+                if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
                 if (isValidDirOrFile($catdir)) {
                     $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
                     array_push($elements, array($cleancatname, ":".$cleancatname));
@@ -4150,29 +3967,17 @@ function renameCategoryInDownloadStats($oldcatname, $newcatname) {
 function setLayoutAndDependentSettings($layoutfolder) {
     global $CMS_CONF;
 
-    // nur, wenn sich das Layout Ã¤ndert
-#wird vor aufruf der finction geprüft
-#    if ($layoutfolder != $CMS_CONF->get("cmslayout")) {
-        $settingsfile = "../layouts/$layoutfolder/layoutsettings.conf";
+    $settingsfile = "../layouts/$layoutfolder/layoutsettings.conf";
 
-#wird in Propertis geprüft
-#        if (file_exists($settingsfile)) {
-            // Einstellungen aus Layout-Settings laden und in den CMS-Einstellungen ueberschreiben
-            $layoutsettings = new Properties($settingsfile);
-            if(isset($layoutsettings->properties['error'])) {
-                return $layoutsettings->properties;
-#                return $layoutsettings->properties['error'];
-            } else {
-                if(isset($layoutsettings->properties['usesubmenu']))
-                    return $layoutsettings->properties['usesubmenu'];
-                    $CMS_CONF->set("usesubmenu", $layoutsettings->get("usesubmenu"));
-#                if(isset($layoutsettings->properties['gallerypicsperrow']))
-#                    $CMS_CONF->set("gallerypicsperrow", $layoutsettings->get("gallerypicsperrow"));
-            }
-#        }
-#    }
-#    return true;
-#    $CMS_CONF->set("cmslayout", $layoutfolder);
+    // Einstellungen aus Layout-Settings laden und in den CMS-Einstellungen ueberschreiben
+    $layoutsettings = new Properties($settingsfile);
+    if(isset($layoutsettings->properties['error'])) {
+        return $layoutsettings->properties;
+    } else {
+        if(isset($layoutsettings->properties['usesubmenu']))
+            return $layoutsettings->properties['usesubmenu'];
+            $CMS_CONF->set("usesubmenu", $layoutsettings->get("usesubmenu"));
+    }
 }
 
 // Hochgeladene Datei ueberpruefen und speichern
@@ -4227,60 +4032,11 @@ function uploadFile($uploadfile, $cat, $forceoverwrite, $gallery = false){
                     }
                 }
             }
-
-#            return returnMessage(true, $specialchars->rebuildSpecialChars($uploadfile_name,true,true).": ".getLanguageValue("data_upload_success"));
-return;
+        return;
         }
     }
 }
 
-// Ãœberprueft den REQUEST-Parameter mit dem uebergebenen Index auf ValiditÃ¤t.
-// $type hat folgende Werte:
-// 1: nur Ziffern (wenigstens eine)
-// 2: beliebige Zeichen (wenigstens eins)
-// 3: Mail-Adresse
-// 4: Paßwort
-// 5: Benutzername
-// 6: beliebige Zeichen (darf leer sein)
-function isValidRequestParameter($index, $type) {
-    if (!isset($_POST[$index])) {
-        return false;
-    }
-
-    $value = $_POST[$index];
-    switch ($type) {
-
-        case 1:
-            return preg_match("/^[0-9]+$/", $value);
-            break;
-
-        case 2:
-            return ($value <> "");
-            break;
-
-        case 3:
-            return preg_match("/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/", $value);
-            break;
-                
-        case 4:
-            return (
-            (strlen($value) >= 6)
-            && preg_match("/[0-9]/", $value)
-            && preg_match("/[a-z]/", $value)
-            && preg_match("/[A-Z]/", $value)
-            );
-
-        case 5:
-            return (strlen($value) >= 5);
-
-        case 6:
-            return true;
-
-                
-        default:
-            return false;
-    }
-}
 
 // Gibt eine Checkbox mit dem uebergebenen Namen zurueck. Der Parameter checked bestimmt, ob die Checkbox angehakt ist.
 function buildCheckBox($name, $checked) {
@@ -4293,33 +4049,12 @@ function buildCheckBox($name, $checked) {
 }
 
 // gibt zurueck, ob eine Checkbox angehakt ist
-function checkBoxIsChecked($checkboxrequest) {
-    return (isset($_POST[$checkboxrequest]) && ($_POST[$checkboxrequest] == "on"));
-}
-// gibt zurueck, ob eine Checkbox angehakt ist
 function checkBoxChecked($checkboxrequest) {
     if(isset($_POST[$checkboxrequest]) and ($_POST[$checkboxrequest] == "true")) {
         return "true";
     } else {
         return "false";
     }
-}
-
-// gibt das img-Tag fuer ein Action-Icon zurueck (abhÃ¤ngig von der entsprechenden Einstellung)
-function getActionIcon($iconname, $titletext) {
-    global $ADMIN_CONF;
-    // Große Icons anzeigen?
-    if ($ADMIN_CONF->get("usebigactionicons") == "true") {
-        return "<img src=\"gfx/actionsbig/".$iconname.".png\" alt=\"".$titletext."\" title=\"".$titletext."\" />";
-#        return '<input type="button" name="name" value="valu" alt="'.$titletext.'" src="'.$iconname.'">';
-
-    }
-    // sonst normale Icons anzeigen
-    else {
-        return "<img src=\"gfx/actions/".$iconname.".png\" alt=\"".$titletext."\" title=\"".$titletext."\" />";
-#        return '<input type="button" name="action" value="'.$titletext.'" alt="'.$titletext.'" src="gfx/actions/'.$iconname.'">';
-    }
-    
 }
 
 // ------------------------------------------------------------------------------
@@ -4330,8 +4065,6 @@ function getActionIcon($iconname, $titletext) {
         if (function_exists("mb_convert_encoding")) {
             $input = @mb_convert_encoding($input,$CHARSET,@mb_detect_encoding($input,"UTF-8,ISO-8859-1,ISO-8859-15",true));
         }
-#        return htmlentities($input, ENT_QUOTES, 'ISO8859-1');
-#        return rawurlencode(stripslashes($input));
         return stripslashes($input);
     }
 
@@ -4345,10 +4078,8 @@ function getActionIcon($iconname, $titletext) {
                 die();
             }
             if ($clean) {
- #               return cleanInput(rawurldecode($_POST[$param]));
                 return cleanInput($_POST[$param]);
             } else {
-#                return rawurldecode($_POST[$param]);
                 return $_POST[$param];
             }
         }
