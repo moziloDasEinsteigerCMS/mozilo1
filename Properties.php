@@ -75,12 +75,30 @@ class Properties {
      *
      * @param string $file The file name to load the properties from
      */
-    function Properties($file = null) {
+    function Properties($file = null, $is_admin = false) {
         global $BASIC_LANGUAGE;
         if(isset($BASIC_LANGUAGE->properties['_translator'])) {
             $error_input = $BASIC_LANGUAGE->properties['properties_noinput'];
         } else {
             $error_input = "Keine Datei angegeben!";
+        }
+
+        if(!is_file($file)) {
+        if($is_admin)) {
+                if($handle = @fopen($file, "w")) {
+                    $default = makeDefaultConf($file);#,"LOGINCONF"
+                    $content = NULL;
+                    foreach ($default as $key => $value) {
+                        $content .= $key." = ".$value."\n";
+                    }
+                    fputs($handle, $content);
+                    fclose($handle);
+                } else {
+                    die("Properties: Kann die $file Datei nicht Anlegen!");
+                }
+            } else {
+                die("Properties: Darf die $file Datei nicht Anlegen rufen sie denn moziloCMS Admin auf!");
+            }
         }
 
         if ($file == "")
