@@ -29,7 +29,7 @@ if(!isset($logindataconf->properties['readonly'])) {
 
 $basicconf = new Properties("conf/basic.conf");
 $pwcrypt = new Crypt();
-$mailfunctions = new Mail(true);
+$mailfunctions = new Mail();
 $BASIC_LANGUAGE = new Properties("conf/language_".$basicconf->get("language").".conf");
 
 // MAXIMALE ANZAHL FALSCHER LOGINS
