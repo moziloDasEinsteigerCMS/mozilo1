@@ -1157,7 +1157,7 @@ echo "</pre><br>\n";*/
 // Gibt das Kontaktformular zurück
 // ------------------------------------------------------------------------------
     function buildContactForm() {
-        global $ADMIN_CONF;
+#        global $ADMIN_CONF;
         global $contactformconfig;
         global $language;
         global $mailfunctions;
@@ -1168,7 +1168,7 @@ echo "</pre><br>\n";*/
         global $CHARSET;
         
         // existiert eine Mailadresse? Wenn nicht: Das Kontaktformular gar nicht anzeigen!
-        if (strlen($ADMIN_CONF->get("adminmail")) < 1) {
+        if (strlen($contactformconfig->get("formularmail")) < 1) {
             return "<span class=\"deadlink\"".getTitleAttribute($language->getLanguageValue0("tooltip_no_mail_error_0")).">{CONTACT}</span>";
         }
 /*
@@ -1177,7 +1177,7 @@ echo "</pre><br>\n";*/
         }*/
         
         // Sollen die Spamschutz-Aufgaben verwendet werden?
-        $usespamprotection = $CMS_CONF->get("contactformusespamprotection") == "true";
+        $usespamprotection = $contactformconfig->get("contactformusespamprotection") == "true";
 
         $config_name = explode(",", ($contactformconfig->get("name")));
         $config_mail = explode(",", ($contactformconfig->get("mail")));
@@ -1205,7 +1205,7 @@ echo "</pre><br>\n";*/
         if (getRequestParam('submit', false) <> "") { 
 
             // Bot-Schutz: Wurde das Formular innerhalb von x Sekunden abgeschickt?
-            $sendtime = $CMS_CONF->get("contactformwaittime");
+            $sendtime = $contactformconfig->get("contactformwaittime");
             if (($sendtime == "") || !preg_match("/^[\d+]+$/", $sendtime)) {
                 $sendtime = 15;
             }
@@ -1253,14 +1253,12 @@ echo "</pre><br>\n";*/
                     $mailcontent .= "\r\n".$language->getLanguageValue0("contactform_message_0").":\r\n".$message."\r\n";
                 }
                 $mailsubject = $language->getLanguageValue1("contactform_mailsubject_1", html_entity_decode($WEBSITE_NAME,ENT_COMPAT,$CHARSET));
-                // Wenn Mail-Adresse gesetzt ist: Als Absender für die Mail nutzen
+                // Wenn Mail-Adresse gesetzt ist: erh�lt der Absender eine copy
                 if ($mail <> "") {
-                    $mailfunctions->sendMailToAdminWithFrom($mailsubject, $mailcontent, $mail);
+                    $mailfunctions->sendMail($mailsubject, $mailcontent, $contactformconfig->get("formularmail"), $mail);
                 }
-                // ansonsten Mail ohne festgelegten Absender losschicken
-                else {
-                    $mailfunctions->sendMailToAdmin($mailsubject, $mailcontent);
-                }
+                // Mail Senden an eingestelte emailadresse
+                $mailfunctions->sendMail($mailsubject, $mailcontent, $contactformconfig->get("formularmail"), $contactformconfig->get("formularmail"));
                 $form .= "<span id=\"contact_successmessage\">".$language->getLanguageValue0("contactform_confirmation_0")."</span>";
                 
                 // Felder leeren
@@ -1278,8 +1276,11 @@ echo "</pre><br>\n";*/
         
         // aktuelle Zeit merken
         $_SESSION['contactform_loadtime'] = time();
-
-        $form .= "<form accept-charset=\"$CHARSET\" method=\"post\" action=\"index.php\" name=\"contact_form\" id=\"contact_form\">"
+        $action_para = "index.php";
+        if($CMS_CONF->get("modrewrite") == "true") {
+            $action_para = $PAGE_REQUEST.".html";
+        }
+        $form .= "<form accept-charset=\"$CHARSET\" method=\"post\" action=\"$action_para\" name=\"contact_form\" id=\"contact_form\">"
         ."<input type=\"hidden\" name=\"cat\" value=\"".$CAT_REQUEST."\" />"
         ."<input type=\"hidden\" name=\"page\" value=\"".$PAGE_REQUEST."\" />"
         ."<table id=\"contact_table\" summary=\"contact form table\">";
