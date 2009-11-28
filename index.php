@@ -22,24 +22,25 @@ $CHARSET = 'UTF-8';
     $URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("index.php")));
 
     require_once("SpecialChars.php");
-    require_once("Language.php");
     require_once("Properties.php");
-    require_once("Syntax.php");
-    require_once("Smileys.php");
-    require_once("Mail.php");
-    require_once("Plugin.php");
     
     // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 #    @ini_set("display_errors", 0);
 
     $specialchars   = new SpecialChars();
+    $CMS_CONF     = new Properties("conf/main.conf");
+    $VERSION_CONF  = new Properties("conf/version.conf");
+    $ADMIN_CONF    = new Properties("admin/conf/basic.conf");
+    require_once("Language.php");
     $language       = new Language();
-    $mainconfig     = new Properties("conf/main.conf");
-    $versionconfig  = new Properties("conf/version.conf");
-    $adminconfig    = new Properties("admin/conf/basic.conf");
+    require_once("Syntax.php");
+    require_once("Smileys.php");
+    require_once("Mail.php");
     $syntax         = new Syntax();
     $smileys        = new Smileys("smileys");
-    $mailfunctions  = new Mail(false);
+    $mailfunctions  = new Mail();
+
+    require_once("Plugin.php");
 
     // Dateiendungen für Inhaltsseiten
     $EXT_PAGE       = ".txt";
@@ -48,7 +49,7 @@ $CHARSET = 'UTF-8';
     $EXT_LINK       = ".lnk";
 
     // Config-Parameter auslesen
-    $LAYOUT_DIR     = "layouts/".$specialchars->replaceSpecialChars($mainconfig->get("cmslayout"),true);
+    $LAYOUT_DIR     = "layouts/".$specialchars->replaceSpecialChars($CMS_CONF->get("cmslayout"),true);
     $TEMPLATE_FILE  = $LAYOUT_DIR."/template.html";
     $LAYOUT_DIR     = $URL_BASE.$LAYOUT_DIR;
     $CSS_FILE       = $LAYOUT_DIR."/css/style.css";
@@ -58,20 +59,20 @@ $CHARSET = 'UTF-8';
     $contactformcalcs   = new Properties("formular/aufgaben.conf");
 
 
-    $WEBSITE_NAME = $specialchars->rebuildSpecialChars($mainconfig->get("websitetitle"),false,true);
+    $WEBSITE_NAME = $specialchars->rebuildSpecialChars($CMS_CONF->get("websitetitle"),false,true);
     if ($WEBSITE_NAME == "")
         $WEBSITE_NAME = "Titel der Website";
 
-    $DEFAULT_CATEGORY = $mainconfig->get("defaultcat");
+    $DEFAULT_CATEGORY = $CMS_CONF->get("defaultcat");
     if ($DEFAULT_CATEGORY == "")
         $DEFAULT_CATEGORY = "10_Willkommen";
 
-    $DEFAULT_PAGE = $mainconfig->get("defaultpage");
+    $DEFAULT_PAGE = $CMS_CONF->get("defaultpage");
     if ($DEFAULT_PAGE == "")
         $DEFAULT_PAGE = "10_Willkommen";
 
     $USE_CMS_SYNTAX = true;
-    if ($mainconfig->get("usecmssyntax") == "false")
+    if ($CMS_CONF->get("usecmssyntax") == "false")
         $USE_CMS_SYNTAX = false;
         
     // Request-Parameter einlesen und dabei absichern
@@ -123,7 +124,7 @@ $CHARSET = 'UTF-8';
         global $EXT_DRAFT;
         global $EXT_HIDDEN;
         global $EXT_PAGE;
-        global $mainconfig;
+        global $CMS_CONF;
 
 #echo $CAT_REQUEST."<br>\n";
 #echo $PAGE_REQUEST."<br>\n";
@@ -141,7 +142,7 @@ $CHARSET = 'UTF-8';
 
 
         // Kategorie-Verzeichnis einlesen
-        $pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true, $mainconfig->get("showhiddenpagesasdefaultpage") == "true");
+        $pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true, $CMS_CONF->get("showhiddenpagesasdefaultpage") == "true");
 
         // Wenn Contentseite nicht explizit angefordert wurde oder nicht vorhanden ist...
         if (
@@ -177,7 +178,7 @@ $CHARSET = 'UTF-8';
         global $PAGE_REQUEST;
         global $language;
         global $syntax;
-        global $mainconfig;
+        global $CMS_CONF;
         global $smileys;
         global $specialchars;
         global $URL_BASE;
@@ -252,7 +253,7 @@ $CHARSET = 'UTF-8';
         }
     }  
     // Smileys ersetzen
-    if ($mainconfig->get("replaceemoticons") == "true") {
+    if ($CMS_CONF->get("replaceemoticons") == "true") {
         $pagecontent = $smileys->replaceEmoticons($pagecontent);
     }
 
@@ -271,15 +272,15 @@ $CHARSET = 'UTF-8';
     $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle), $HTML);
 
     // Meta-Tag "keywords"
-    $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $specialchars->numeric_entities_decode($mainconfig->get("websitekeywords")), $HTML);
+    $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $specialchars->numeric_entities_decode($CMS_CONF->get("websitekeywords")), $HTML);
     // Meta-Tag "description"
-    $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $specialchars->numeric_entities_decode($mainconfig->get("websitedescription")), $HTML);
+    $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $specialchars->numeric_entities_decode($CMS_CONF->get("websitedescription")), $HTML);
 
     $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
     $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
 
     // Detailmenü (nicht zeigen, wenn Submenüs aktiviert sind)
-    if ($mainconfig->get("usesubmenu") > 0) {
+    if ($CMS_CONF->get("usesubmenu") > 0) {
         $HTML = preg_replace('/{DETAILMENU}/', "", $HTML);
     }
     else {
@@ -501,7 +502,7 @@ $CHARSET = 'UTF-8';
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $specialchars;
-        global $mainconfig;
+        global $CMS_CONF;
         global $language;
         global $syntax;
         global $URL_BASE;
@@ -520,7 +521,7 @@ echo "</pre><br>\n";*/
         foreach ($categoriesarray as $currentcategory) {
             # Mod Rewrite
             $url = "index.php?cat=".$currentcategory;
-            if($mainconfig->get("modrewrite") == "true") {
+            if($CMS_CONF->get("modrewrite") == "true") {
                 $url = $URL_BASE.$currentcategory.".html";
             }
             if(substr($currentcategory,-(strlen($EXT_LINK))) == $EXT_LINK) {
@@ -537,7 +538,7 @@ echo "</pre><br>\n";*/
                     "<a href=\"".$url."\" class=\"menuactive\" accesskey=\"$currentaccesskey\"".
                     $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_category_1", catToName($currentcategory, false))).
                     ">".catToName($currentcategory, false)."</a>";
-                if ($mainconfig->get("usesubmenu") > 0) {
+                if ($CMS_CONF->get("usesubmenu") > 0) {
                     $mainmenu .= getDetailMenu($currentcategory);
                 }
                 $mainmenu .= "</li>";
@@ -549,7 +550,7 @@ echo "</pre><br>\n";*/
                     "<a href=\"".$url."\" class=\"menu\" accesskey=\"$currentaccesskey\"".
                      $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_category_1", catToName($currentcategory, false))).
                      ">".catToName($currentcategory, false)."</a>";
-                if ($mainconfig->get("usesubmenu") == 2) {
+                if ($CMS_CONF->get("usesubmenu") == 2) {
                     $mainmenu .= getDetailMenu($currentcategory);
                 }
                 $mainmenu .= "</li>";
@@ -572,26 +573,26 @@ echo "</pre><br>\n";*/
         global $EXT_DRAFT;
         global $language;
         global $specialchars;
-        global $mainconfig;
+        global $CMS_CONF;
         global $syntax;
         global $URL_BASE;
         global $EXT_LINK;
         global $CHARSET;
 
-        if ($mainconfig->get("usesubmenu") > 0)
+        if ($CMS_CONF->get("usesubmenu") > 0)
             $cssprefix = "submenu";
         else
             $cssprefix = "detailmenu";
 
         $detailmenu = "<ul class=\"detailmenu\">";
         // Sitemap
-        if (($ACTION_REQUEST == "sitemap") && ($mainconfig->get("usesubmenu") == 0))
+        if (($ACTION_REQUEST == "sitemap") && ($CMS_CONF->get("usesubmenu") == 0))
             $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=sitemap\" class=\"".$cssprefix."active\">".$language->getLanguageValue0("message_sitemap_0")."</a></li>";
         // Suchergebnis
-        elseif (($ACTION_REQUEST == "search") && ($mainconfig->get("usesubmenu") == 0))
+        elseif (($ACTION_REQUEST == "search") && ($CMS_CONF->get("usesubmenu") == 0))
             $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=search&amp;query=".$specialchars->replaceSpecialChars($QUERY_REQUEST, true)."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", html_entity_decode($QUERY_REQUEST,ENT_COMPAT,$CHARSET))."</a></li>";
         // Entwurfsansicht
-        elseif (($ACTION_REQUEST == "draft") && ($mainconfig->get("usesubmenu") == 0))
+        elseif (($ACTION_REQUEST == "draft") && ($CMS_CONF->get("usesubmenu") == 0))
             $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?cat=$cat&amp;page=$PAGE_REQUEST&amp;action=draft\" class=\"".$cssprefix."active\">".pageToName($PAGE_REQUEST.$EXT_DRAFT, false)." (".$language->getLanguageValue0("message_draft_0").")</a></li>";
         // "ganz normales" Detailmenü einer Kategorie
         else {
@@ -609,7 +610,7 @@ echo "</pre><br>\n";*/
             foreach ($contentarray as $currentcontent) {
                 $currentaccesskey++;
                 // Inhaltsseite nicht anzeigen, wenn sie genauso heißt wie die Kategorie
-                if ($mainconfig->get("hidecatnamedpages") == "true") {
+                if ($CMS_CONF->get("hidecatnamedpages") == "true") {
                     if(substr($currentcontent, 3, strlen($currentcontent) - 7) == substr($CAT_REQUEST, 3, strlen($CAT_REQUEST) - 3) and substr($currentcontent,-(strlen($EXT_LINK))) != $EXT_LINK) {
                         // Wenn es in der Kategorie nur diese eine (dank hidecatnamedpages eh nicht angezeigte) Seite gibt,
                         // dann gib als Detailmenü gleich einen Leerstring zurück
@@ -624,7 +625,7 @@ echo "</pre><br>\n";*/
                 }
                 # Mod Rewrite
                 $url = "index.php?cat=".$cat."&amp;page=".substr($currentcontent, 0, strlen($currentcontent) - 4);
-                if($mainconfig->get("modrewrite") == "true") {
+                if($CMS_CONF->get("modrewrite") == "true") {
                     $url = $URL_BASE.$cat."/".substr($currentcontent, 0, strlen($currentcontent) - 4).".html";
                 }
                 // Aktuelle Inhaltsseite als aktiven Menüpunkt anzeigen...
@@ -665,7 +666,7 @@ echo "</pre><br>\n";*/
 // ------------------------------------------------------------------------------
     function getSearchForm(){
         global $language;
-        global $mainconfig;
+        global $CMS_CONF;
         global $specialchars;
         global $CHARSET;
         global $LAYOUT_DIR;
@@ -704,7 +705,7 @@ echo "</pre><br>\n";*/
         }
         closedir($currentdir);
 /*                        $url = "index.php?cat=$currentcategory&amp;page=".substr($matchingpage, 0, strlen($matchingpage) - 4);
-                        if($mainconfig->get("modrewrite") == "true") {
+                        if($CMS_CONF->get("modrewrite") == "true") {
                             $url = $URL_BASE.$currentcategory."/".substr($matchingpage, 0, strlen($matchingpage) - 4).".html";
                         }*/
         
@@ -722,9 +723,9 @@ echo "</pre><br>\n";*/
     function getLastChangeOfCat($dir){
         global $EXT_HIDDEN;
         global $EXT_PAGE;
-        global $mainconfig;
+        global $CMS_CONF;
 
-        $showhiddenpages = ($mainconfig->get("showhiddenpagesinlastchanged") == "true");
+        $showhiddenpages = ($CMS_CONF->get("showhiddenpagesinlastchanged") == "true");
         
         $latestchanged = array("file" => "filename", "time" => 0);
         $currentdir = opendir($dir);
@@ -757,11 +758,11 @@ echo "</pre><br>\n";*/
         global $CONTENT_DIR_ABS;
         global $language;
         global $specialchars;
-        global $mainconfig;
+        global $CMS_CONF;
         global $EXT_LINK;
         global $URL_BASE;
         
-        $showhiddenpages = ($mainconfig->get("showhiddenpagesinsitemap") == "true");
+        $showhiddenpages = ($CMS_CONF->get("showhiddenpagesinsitemap") == "true");
         
         $sitemap = "<h1>".$language->getLanguageValue0("message_sitemap_0")."</h1>"
         ."<div class=\"sitemap\">";
@@ -783,7 +784,7 @@ echo "</pre><br>\n";*/
                     continue;
                 }
                 $url = "index.php?cat=$currentcategory&amp;page=".substr($currentcontent, 0, strlen($currentcontent) - 4);
-                if($mainconfig->get("modrewrite") == "true") {
+                if($CMS_CONF->get("modrewrite") == "true") {
                     $url = $URL_BASE.$currentcategory."/".substr($currentcontent, 0, strlen($currentcontent) - 4).".html";
                 }
                 $sitemap .= "<li><a href=\"$url\"".getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", pageToName($currentcontent, false), catToName($currentcategory, false))).">".
@@ -808,11 +809,11 @@ echo "</pre><br>\n";*/
         global $QUERY_REQUEST;
         global $language;
         global $specialchars;
-        global $mainconfig;
+        global $CMS_CONF;
         global $URL_BASE;
         global $EXT_LINK;
 
-        $showhiddenpages = ($mainconfig->get("showhiddenpagesinsearch") == "true");
+        $showhiddenpages = ($CMS_CONF->get("showhiddenpagesinsearch") == "true");
         $matchesoverall = 0;
         $searchresults = "";
 
@@ -865,7 +866,7 @@ echo "</pre><br>\n";*/
                     $searchresults .= "<h2>$categoryname</h2><ul>";
                     foreach ($matchingpages as $matchingpage) {
                         $url = "index.php?cat=$currentcategory&amp;page=".substr($matchingpage, 0, strlen($matchingpage) - 4);
-                        if($mainconfig->get("modrewrite") == "true") {
+                        if($CMS_CONF->get("modrewrite") == "true") {
                             $url = $URL_BASE.$currentcategory."/".substr($matchingpage, 0, strlen($matchingpage) - 4).".html";
                         }
                         $pagename = pageToName($matchingpage, false);
@@ -1033,11 +1034,11 @@ echo "</pre><br>\n";*/
 // Rückgabe des Website-Titels
 // ------------------------------------------------------------------------------
     function getWebsiteTitle($websitetitle, $cattitle, $pagetitle) {
-        global $mainconfig;
+        global $CMS_CONF;
         global $specialchars;
 
-        $title = $specialchars->rebuildSpecialChars($mainconfig->get("titlebarformat"),true,true);
-        $sep = $specialchars->rebuildSpecialChars($mainconfig->get("titlebarseparator"),true,true);
+        $title = $specialchars->rebuildSpecialChars($CMS_CONF->get("titlebarformat"),true,true);
+        $sep = $specialchars->rebuildSpecialChars($CMS_CONF->get("titlebarseparator"),true,true);
         $title = preg_replace('/{WEBSITE}/', $websitetitle, $title);
         if ($cattitle == "") {
             $title = preg_replace('/{CATEGORY}/', "", $title);
@@ -1056,10 +1057,10 @@ echo "</pre><br>\n";*/
 // Anzeige der Informationen zum System
 // ------------------------------------------------------------------------------
     function getCmsInfo() {
-        global $mainconfig;
+        global $CMS_CONF;
         global $language;
-        global $versionconfig;
-        return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" id=\"cmsinfolink\"".getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", "http://cms.mozilo.de")).">moziloCMS ".$versionconfig->get("cmsversion")."</a>";
+        global $VERSION_CONF;
+        return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" id=\"cmsinfolink\"".getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", "http://cms.mozilo.de")).">moziloCMS ".$VERSION_CONF->get("cmsversion")."</a>";
     }
 
 
@@ -1067,7 +1068,7 @@ echo "</pre><br>\n";*/
 // Platzhalter im übergebenen String ersetzen
 // ------------------------------------------------------------------------------
     function replacePlaceholders($content, $cattitle, $pagetitle) {
-        global $mainconfig;
+        global $CMS_CONF;
         global $specialchars;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
@@ -1076,7 +1077,7 @@ echo "</pre><br>\n";*/
         global $LAYOUT_DIR;
 
         // Titel der Website
-        $content = preg_replace('/{WEBSITE_NAME}/', $specialchars->numeric_entities_decode($mainconfig->get("websitetitle")), $content);
+        $content = preg_replace('/{WEBSITE_NAME}/', $specialchars->numeric_entities_decode($CMS_CONF->get("websitetitle")), $content);
         // Layout-Verzeichnis
         $content = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR, $content);
 
@@ -1156,27 +1157,27 @@ echo "</pre><br>\n";*/
 // Gibt das Kontaktformular zurück
 // ------------------------------------------------------------------------------
     function buildContactForm() {
-        global $adminconfig;
+        global $ADMIN_CONF;
         global $contactformconfig;
         global $language;
         global $mailfunctions;
-        global $mainconfig;
+        global $CMS_CONF;
         global $WEBSITE_NAME;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $CHARSET;
         
         // existiert eine Mailadresse? Wenn nicht: Das Kontaktformular gar nicht anzeigen!
-        if (strlen($adminconfig->get("adminmail")) < 1) {
+        if (strlen($ADMIN_CONF->get("adminmail")) < 1) {
             return "<span class=\"deadlink\"".getTitleAttribute($language->getLanguageValue0("tooltip_no_mail_error_0")).">{CONTACT}</span>";
         }
 /*
-        if ($adminconfig->get("sendadminmail") != "true") {
+        if ($ADMIN_CONF->get("sendadminmail") != "true") {
             return "<span class=\"deadlink\"".getTitleAttribute($language->getLanguageValue0("tooltip_no_mail_error_0")).">{CONTACT}</span>";
         }*/
         
         // Sollen die Spamschutz-Aufgaben verwendet werden?
-        $usespamprotection = $mainconfig->get("contactformusespamprotection") == "true";
+        $usespamprotection = $CMS_CONF->get("contactformusespamprotection") == "true";
 
         $config_name = explode(",", ($contactformconfig->get("name")));
         $config_mail = explode(",", ($contactformconfig->get("mail")));
@@ -1204,7 +1205,7 @@ echo "</pre><br>\n";*/
         if (getRequestParam('submit', false) <> "") { 
 
             // Bot-Schutz: Wurde das Formular innerhalb von x Sekunden abgeschickt?
-            $sendtime = $mainconfig->get("contactformwaittime");
+            $sendtime = $CMS_CONF->get("contactformwaittime");
             if (($sendtime == "") || !preg_match("/^[\d+]+$/", $sendtime)) {
                 $sendtime = 15;
             }
@@ -1363,9 +1364,9 @@ echo "</pre><br>\n";*/
 // ------------------------------------------------------------------------------
     function getRequestParam($param, $clean) {
         global $URL_BASE;
-        global $mainconfig;
+        global $CMS_CONF;
 
-        if(($mainconfig->get("modrewrite") == "true") and ($param == "cat" or $param == "page")) {
+        if(($CMS_CONF->get("modrewrite") == "true") and ($param == "cat" or $param == "page")) {
             $request = NULL;
             if($param == "cat") {
                 $url_get = str_replace($URL_BASE,"",$_SERVER['REQUEST_URI']);
@@ -1410,8 +1411,8 @@ echo "</pre><br>\n";*/
 // Hilfsfunktion: "title"-Attribut zusammenbauen (oder nicht, wenn nicht konfiguriert)
 // ------------------------------------------------------------------------------
     function getTitleAttribute($value) {
-        global $mainconfig;
-        if ($mainconfig->get("showsyntaxtooltips") == "true") {
+        global $CMS_CONF;
+        if ($CMS_CONF->get("showsyntaxtooltips") == "true") {
             return " title=\"".$value."\"";
         }
         return "";
@@ -1424,12 +1425,12 @@ echo "</pre><br>\n";*/
     function getNeighbourPages($page) {
         global $CONTENT_DIR_ABS;
         global $CAT_REQUEST;
-        global $mainconfig;
+        global $CMS_CONF;
         
         // leer initialisieren
         $neighbourPages = array("", "");
         // aktuelle Kategorie einlesen
-        $pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true, $mainconfig->get("showhiddenpagesincmsvariables") == "true");
+        $pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true, $CMS_CONF->get("showhiddenpagesincmsvariables") == "true");
         // Schleife über alle Seiten
         for ($i = 0; $i < count($pagesarray); $i++) {
             if ($page == substr($pagesarray[$i], 0, strlen($pagesarray[$i]) - 4)) {
