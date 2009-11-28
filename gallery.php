@@ -26,6 +26,8 @@ class Gallery {
     // Konstruktor
     // ------------------------------------------------------------------------------
     function Gallery() {
+        global $LAYOUT_DIR;
+        global $URL_BASE;
 
         $this->language       = new Language();
         $this->mainconf       = new Properties("conf/main.conf");
@@ -56,8 +58,11 @@ class Gallery {
 
         $this->layout_dir         = $this->mainconf->get("cmslayout");
         $this->template_file      = "layouts/".$this->layout_dir."/gallerytemplate.html";
-        $this->css_file           = "layouts/".$this->layout_dir."/css/style.css";
-        $this->favicon_file       = "layouts/".$this->layout_dir."/favicon.ico";
+        if($CMS_CONF->get("modrewrite") == "false") {
+            $URL_BASE = NULL;
+        }
+        $this->css_file           = $URL_BASE."layouts/".$this->layout_dir."/css/style.css";
+        $this->favicon_file       = $URL_BASE."layouts/".$this->layout_dir."/favicon.ico";
 
         $this->linkprefix = "gallery.php?";
         
@@ -74,8 +79,14 @@ class Gallery {
     }
     
     function parseGalleryParameters($gallery,$index) {
+        global $URL_BASE;
+        global $CMS_CONF;
         // Übergebene Parameter überprüfen
         $this->gal_request        = $this->specialchars->replacespecialchars($gallery,false);
+        $this->dir_gallery_src    = "./galerien/".$this->gal_request."/";
+        if($CMS_CONF->get("modrewrite") == "true") {
+            $this->dir_gallery_src    = $URL_BASE."/galerien/".$this->gal_request."/";
+        }
         $this->dir_gallery        = "./galerien/".$this->gal_request."/";
         $this->dir_thumbs         = $this->dir_gallery."vorschau/";
         if (($this->gal_request == "") || (!file_exists($this->dir_gallery))) {
@@ -270,7 +281,7 @@ class Gallery {
             if (($i > 0) && ($i % $picsperrow == 0))
                 $thumbs .= "</tr><tr>";
             $thumbs .= "<td class=\"gallerytd\" style=\"width:".floor(100 / $picsperrow)."%;\">"
-            ."<a href=\"".$this->specialchars->replaceSpecialChars($this->dir_gallery.$this->picarray[$i],true)."\" target=\"_blank\" title=\"".$this->language->getLanguageValue1("tooltip_gallery_fullscreen_1", $this->specialchars->rebuildSpecialChars($this->picarray[$i],true,true))."\">"
+            ."<a href=\"".$this->specialchars->replaceSpecialChars($this->dir_gallery_src.$this->picarray[$i],true)."\" target=\"_blank\" title=\"".$this->language->getLanguageValue1("tooltip_gallery_fullscreen_1", $this->specialchars->rebuildSpecialChars($this->picarray[$i],true,true))."\">"
             ."<img src=\"".$this->specialchars->replaceSpecialChars($this->dir_thumbs.$this->thumbarray[$i],true)."\" alt=\"".$this->specialchars->rebuildSpecialChars($this->thumbarray[$i],true,true)."\" class=\"thumbnail\" />"
             ."</a><br />"
             .$description
@@ -295,7 +306,7 @@ class Gallery {
         if (count($this->picarray) == 0)
             return "&nbsp;";
         // Link zur Vollbildansicht öffnen
-        $currentpic = "<a href=\"".$this->specialchars->replaceSpecialChars($this->dir_gallery.$this->picarray[$this->index-1],true)."\" target=\"_blank\" title=\"".$this->language->getLanguageValue1("tooltip_gallery_fullscreen_1", $this->specialchars->rebuildSpecialChars($this->picarray[$this->index-1],true,true))."\">";
+        $currentpic = "<a href=\"".$this->specialchars->replaceSpecialChars($this->dir_gallery_src.$this->picarray[$this->index-1],true)."\" target=\"_blank\" title=\"".$this->language->getLanguageValue1("tooltip_gallery_fullscreen_1", $this->specialchars->rebuildSpecialChars($this->picarray[$this->index-1],true,true))."\">";
         // Bilder für die Anzeige skalieren
         if (extension_loaded('gd')) {
             $size = getimagesize($this->dir_gallery.$this->picarray[$this->index-1]);
@@ -311,10 +322,10 @@ class Gallery {
                 $h=$this->max_img_height;
                 $w=round(($this->max_img_height*$size[0])/$size[1]);
             }
-            $currentpic .= "<img src=\"".$this->specialchars->replaceSpecialChars($this->dir_gallery.$this->picarray[$this->index-1],true)."\" alt=\"".$this->language->getLanguageValue1("alttext_galleryimage_1", $this->specialchars->rebuildSpecialChars($this->picarray[$this->index-1],true,true))."\"  style=\"width:".$w."px;height:".$h."px;\" />";
+            $currentpic .= "<img src=\"".$this->specialchars->replaceSpecialChars($this->dir_gallery_src.$this->picarray[$this->index-1],true)."\" alt=\"".$this->language->getLanguageValue1("alttext_galleryimage_1", $this->specialchars->rebuildSpecialChars($this->picarray[$this->index-1],true,true))."\"  style=\"width:".$w."px;height:".$h."px;\" />";
         }
         else
-            $currentpic .= "<img src=\"".$this->specialchars->replaceSpecialChars($this->dir_gallery.$this->picarray[$this->index-1],true)."\" alt=\"".$this->language->getLanguageValue1("alttext_galleryimage_1", $this->specialchars->rebuildSpecialChars($this->picarray[$this->index-1],true,true))."\"  style=\"max-width:".$this->max_img_width."px;max-height:".$this->max_img_height."px;\" />";
+            $currentpic .= "<img src=\"".$this->specialchars->replaceSpecialChars($this->dir_gallery_src.$this->picarray[$this->index-1],true)."\" alt=\"".$this->language->getLanguageValue1("alttext_galleryimage_1", $this->specialchars->rebuildSpecialChars($this->picarray[$this->index-1],true,true))."\"  style=\"max-width:".$this->max_img_width."px;max-height:".$this->max_img_height."px;\" />";
             // Link zur Vollbildansicht schließen
             $currentpic .= "</a>";
         // Rückgabe des Bildes
