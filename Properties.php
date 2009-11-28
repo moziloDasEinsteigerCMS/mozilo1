@@ -84,7 +84,7 @@ class Properties {
         }
 
         if(!is_file($file)) {
-        if($is_admin)) {
+        if($is_admin) {
                 if($handle = @fopen($file, "w")) {
                     $default = makeDefaultConf($file);#,"LOGINCONF"
                     $content = NULL;
