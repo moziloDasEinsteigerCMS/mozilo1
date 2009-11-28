@@ -83,10 +83,10 @@ class Properties {
             $error_input = "Keine Datei angegeben!";
         }
 
-        if(!is_file($file)) {
-        if($is_admin) {
+        if(!is_file($file) and !strstr($file,"sprachen")) {
+            if($is_admin) {
                 if($handle = @fopen($file, "w")) {
-                    $default = makeDefaultConf($file);#,"LOGINCONF"
+                    $default = makeDefaultConf($file);
                     $content = NULL;
                     foreach ($default as $key => $value) {
                         $content .= $key." = ".$value."\n";
