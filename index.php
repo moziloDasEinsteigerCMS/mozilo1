@@ -66,12 +66,17 @@ $CHARSET = 'UTF-8';
         $WEBSITE_NAME = "Titel der Website";
 
     $DEFAULT_CATEGORY = $CMS_CONF->get("defaultcat");
-    if ($DEFAULT_CATEGORY == "")
-        $DEFAULT_CATEGORY = "10_Willkommen";
-
-    $DEFAULT_PAGE = $CMS_CONF->get("defaultpage");
-    if ($DEFAULT_PAGE == "")
-        $DEFAULT_PAGE = "10_Willkommen";
+    // Überprüfen: Ist die Startkategorie vorhanden? Wenn nicht, nimm einfach die allererste als Standardkategorie
+    if (!file_exists("$CONTENT_DIR_REL/$DEFAULT_CATEGORY")) {
+        $contentdir = opendir($CONTENT_DIR_REL);
+        while ($cat = readdir($contentdir)) {
+            if (isValidDirOrFile($cat)) {
+                $DEFAULT_CATEGORY = $cat;
+                break;
+            }
+        }
+        closedir($contentdir);
+    }
 
     $USE_CMS_SYNTAX = true;
     if ($CMS_CONF->get("usecmssyntax") == "false")
@@ -91,17 +96,6 @@ $CHARSET = 'UTF-8';
     $PLUGIN_DIR             = "plugins";
     $HTML                   = "";
 
-    // Überprüfen: Ist die Startkategorie vorhanden? Wenn nicht, nimm einfach die allererste als Standardkategorie
-    if (!file_exists("$CONTENT_DIR_REL/$DEFAULT_CATEGORY")) {
-        $contentdir = opendir($CONTENT_DIR_REL);
-        while ($cat = readdir($contentdir)) {
-            if (isValidDirOrFile($cat)) {
-                $DEFAULT_CATEGORY = $cat;
-                break;
-            }
-        }
-        closedir($contentdir);
-    }
 
     // Dateiname der aktuellen Inhaltsseite (wird in getContent() gesetzt)
     $PAGE_FILE = "";
