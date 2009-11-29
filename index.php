@@ -1452,14 +1452,10 @@ echo "</pre><br>\n";*/
     function getRandomCalculationData() {
         global $contactformcalcs;
         $confarray = $contactformcalcs->toArray();
+        unset($confarray['readonly']);
+        $tmp = array_keys($confarray);
         $randnum = rand(0, count($confarray)-1);
-        $i = 0;
-        foreach ($confarray as $calculation => $result) {
-            if ($randnum == $i) {
-                return array($calculation, $result);
-            }
-            $i++;
-        }
+        return array($tmp[$randnum],$confarray[$tmp[$randnum]]);
     }
 
 // ------------------------------------------------------------------------------
