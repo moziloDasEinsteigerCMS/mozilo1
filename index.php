@@ -19,7 +19,10 @@ echo "</pre>";
 #$CHARSET = 'ISO-8859-1';
 $CHARSET = 'UTF-8';
 
-    $URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("index.php")));
+    $URL_BASE = NULL;
+    if($CMS_CONF->get("modrewrite") == "true") {
+        $URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("index.php")));
+    }
 
     require_once("SpecialChars.php");
     require_once("Properties.php");
