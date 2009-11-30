@@ -9,8 +9,10 @@
  */
 
 
-
 $ADMIN_TITLE = "moziloAdmin";
+
+#$CHARSET = 'ISO-8859-1';
+$CHARSET = 'UTF-8';
 
 session_start();
  
@@ -18,8 +20,9 @@ $debug = "ja"; # ja oder nein
  // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 if($debug != "ja")
     @ini_set("display_errors", 0);
+
  // ISO 8859-1 erzwingen - experimentell!
- // @ini_set("default_charset", "ISO-8859-1");
+ // @ini_set("default_charset", $CHARSET);
 
  // Session Fixation durch Vergabe einer neuen Session-ID beim ersten Login verhindern
  if (!isset($_SESSION['PHPSESSID'])) {
@@ -53,9 +56,6 @@ if($debug == "ja") { #top:850px; relative absolute position:relative;
     $debug_txt = ob_get_contents();
     ob_end_clean();
 }
-
-#$CHARSET = 'ISO-8859-1';
-$CHARSET = 'UTF-8';
 
 require_once("filesystem.php");
 require_once("string.php");
