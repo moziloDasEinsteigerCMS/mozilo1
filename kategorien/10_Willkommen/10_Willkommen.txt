@@ -1,9 +1,9 @@
 [ueber1|Willkommen]
-...in Ihrem moziloCMS! Passen Sie alles an Ihre Bed¸rfnisse und Ziele an: Loggen Sie sich daf¸r in die moziloCMS-Konfigurationsoberfl‰che [html|<a href="./admin/" target="_blank">moziloAdmin</a>] ein. Der initiale Benutzer heiﬂt "admin" und hat das Paﬂwort "install" - bitte vergessen Sie nicht, als erstes diese Zugangsdaten zu ‰ndern!
+...in Ihrem moziloCMS! Passen Sie alles an Ihre Bed√ºrfnisse und Ziele an: Loggen Sie sich daf√ºr in die moziloCMS-Konfigurationsoberfl√§che [html|<a href="./admin/" target="_blank">moziloAdmin</a>] ein. Der initiale Benutzer hei√üt "admin" und hat das Pa√üwort "install" - bitte vergessen Sie nicht, als erstes diese Zugangsdaten zu √§ndern!
 
-Wie alles hier im moziloCMS funktioniert, ist auf [link|http://cms.mozilo.de] beschrieben; f¸r Fragen und Anregungen steht Ihnen das [link=mozilo-Supportforum|http://forum.mozilo.de/] zur Verf¸gung.
+Wie alles hier im moziloCMS funktioniert, ist auf [link|http://cms.mozilo.de] beschrieben; f√ºr Fragen und Anregungen steht Ihnen das [link=mozilo-Supportforum|http://forum.mozilo.de/] zur Verf√ºgung.
 
-[fett|Viel Spaﬂ mit moziloCMS!]
+[fett|Viel Spa√ü mit moziloCMS!]
 Ihr [link=mozilo-Team|http://www.mozilo.de]
 
 [----]
