@@ -16,14 +16,6 @@ print_r($_REQUEST);
 echo "</pre>";
 */
 
-#$CHARSET = 'ISO-8859-1';
-$CHARSET = 'UTF-8';
-
-    $URL_BASE = NULL;
-    if($CMS_CONF->get("modrewrite") == "true") {
-        $URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("index.php")));
-    }
-
     require_once("SpecialChars.php");
     require_once("Properties.php");
     
@@ -43,6 +35,15 @@ $CHARSET = 'UTF-8';
     $mailfunctions  = new Mail();
 
     require_once("Plugin.php");
+
+
+#$CHARSET = 'ISO-8859-1';
+$CHARSET = 'UTF-8';
+
+    $URL_BASE = NULL;
+    if($CMS_CONF->get("modrewrite") == "true") {
+        $URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("index.php")));
+    }
 
     // Dateiendungen für Inhaltsseiten
     $EXT_PAGE       = ".txt";
@@ -65,19 +66,6 @@ $CHARSET = 'UTF-8';
     if ($WEBSITE_NAME == "")
         $WEBSITE_NAME = "Titel der Website";
 
-    $DEFAULT_CATEGORY = $CMS_CONF->get("defaultcat");
-    // Überprüfen: Ist die Startkategorie vorhanden? Wenn nicht, nimm einfach die allererste als Standardkategorie
-    if (!file_exists("$CONTENT_DIR_REL/$DEFAULT_CATEGORY")) {
-        $contentdir = opendir($CONTENT_DIR_REL);
-        while ($cat = readdir($contentdir)) {
-            if (isValidDirOrFile($cat)) {
-                $DEFAULT_CATEGORY = $cat;
-                break;
-            }
-        }
-        closedir($contentdir);
-    }
-
     $USE_CMS_SYNTAX = true;
     if ($CMS_CONF->get("usecmssyntax") == "false")
         $USE_CMS_SYNTAX = false;
@@ -96,6 +84,18 @@ $CHARSET = 'UTF-8';
     $PLUGIN_DIR             = "plugins";
     $HTML                   = "";
 
+    $DEFAULT_CATEGORY = $CMS_CONF->get("defaultcat");
+    // Überprüfen: Ist die Startkategorie vorhanden? Wenn nicht, nimm einfach die allererste als Standardkategorie
+    if (!file_exists("$CONTENT_DIR_REL/$DEFAULT_CATEGORY")) {
+        $contentdir = opendir($CONTENT_DIR_REL);
+        while ($cat = readdir($contentdir)) {
+            if (isValidDirOrFile($cat)) {
+                $DEFAULT_CATEGORY = $cat;
+                break;
+            }
+        }
+        closedir($contentdir);
+    }
 
     // Dateiname der aktuellen Inhaltsseite (wird in getContent() gesetzt)
     $PAGE_FILE = "";
@@ -1548,16 +1548,16 @@ echo "</pre><br>\n";*/
         $target = "_blank";
         if(strstr($link,"-_blank-")) {
             $tmp_link = explode("-_blank-",$link);
+            if(substr($tmp_link[1], 0, 13) != "http%3A%2F%2F") {
+                $tmp_link[1] = "http%3A%2F%2F".$tmp_link[1];
+            }
         }
         if(strstr($link,"-_self-")) {
             $tmp_link = explode("-_self-",$link);
             $target = "_self";
         }
-        if(substr($tmp_link[1], 0, 7) != "http://") {
-            $tmp_link[1] = "http://".$tmp_link[1];
-        }
         $titel = $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_link",$specialchars->rebuildSpecialChars($tmp_link[1], true, true)));
-        return '<a href="'.substr($tmp_link[1],0,-(strlen($EXT_LINK))).'"'.$css.' target="'.$target.'"'.$titel.'>'.$specialchars->rebuildSpecialChars(substr($tmp_link[0],3), true, true).'</a> ';
+        return '<a href="'.$specialchars->rebuildSpecialChars(substr($tmp_link[1],0,-(strlen($EXT_LINK))), true, true).'"'.$css.' target="'.$target.'"'.$titel.'>'.$specialchars->rebuildSpecialChars(substr($tmp_link[0],3), true, true).'</a> ';
     }
     
 ?>
