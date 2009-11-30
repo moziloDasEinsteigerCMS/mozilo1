@@ -837,6 +837,17 @@ function makeDefaultConf($conf_datei) {
                         'target' => '_blank',
                         'usethumbs' => 'true');
 
+    $aufgaben = array('3 + 7' => '10',
+                        '5 - 3' => '2',
+                        '1 plus 1' => '2',
+                        '17 minus 7' => '10',
+                        '4 * 2' => '8',
+                        '3x3' => '9',
+                        '2 durch 2' => '1',
+                        'Elvis Presleys Vorname' => 'Elvis',
+                        'Angela Merkels Nachname' => 'Merkel',
+                        'Bronze, Silber, ...?' => 'Gold');
+
 
     if(strpos($conf_datei,".conf") > 0) {
         $name = substr(basename($conf_datei),0,-(strlen(".conf")));
