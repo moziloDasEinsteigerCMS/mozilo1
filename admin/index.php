@@ -155,6 +155,7 @@ if(!is_file("../conf/passwords.conf")) {
     }
     unset($PASSWORDS_CONF);
 }
+
 // Abwärtskompatibilität: Downloadcounter initalisieren
 if ($DOWNLOAD_COUNTS->get("_downloadcounterstarttime") == "" and !isset($DOWNLOAD_COUNTS->properties['error']))
     $DOWNLOAD_COUNTS->set("_downloadcounterstarttime", time());

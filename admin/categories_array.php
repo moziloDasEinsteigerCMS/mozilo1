@@ -352,12 +352,13 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
             $post[$cat]['error_html']['new_url'][$pos] = NULL;
             $post[$cat]['new_url'][$pos] = NULL;
             if(isset($_POST['categories'][$cat]['new_url'][$pos])) {
+/*
                 if(strpos("tmp".strtolower($_POST['categories'][$cat]['new_url'][$pos]),'http%3a//') > 0) {
                     $_POST['categories'][$cat]['new_url'][$pos] = substr($_POST['categories'][$cat]['new_url'][$pos],9);
                     $post['error_messages']['check_no_http']['color'] = $error_color['check_no_http'];
                     $post['error_messages']['check_no_http'][] = $cat;
                     $post[$cat]['error_html']['new_url'][$pos] = 'style="background-color:'.$error_color['check_no_http'].';" ';
-                }
+                }*/
                 $post[$cat]['new_url'][$pos] = trim(str_replace(array("\r\n","\n","\r"),'',$_POST['categories'][$cat]['new_url'][$pos]));
                 if(strlen($post[$cat]['new_url'][$pos]) > "0") {
                     $url_len = strlen($post[$cat]['new_url'][$pos]);
