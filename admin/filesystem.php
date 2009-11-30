@@ -848,6 +848,8 @@ function makeDefaultConf($conf_datei) {
                         'Angela Merkels Nachname' => 'Merkel',
                         'Bronze, Silber, ...?' => 'Gold');
 
+    $passwords = array('# Kategorie/Inhaltsseite' => 'password');
+
 
     if(strpos($conf_datei,".conf") > 0) {
         $name = substr(basename($conf_datei),0,-(strlen(".conf")));

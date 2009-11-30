@@ -147,6 +147,14 @@ if(!is_file("../formular/aufgaben.conf")) {
     }
     unset($AUFGABEN_CONF);
 }
+
+if(!is_file("../conf/passwords.conf")) {
+    $PASSWORDS_CONF = new Properties("../conf/passwords.conf",true);
+    if(!isset($PASSWORDS_CONF->properties['readonly'])) {
+        die($PASSWORDS_CONF->properties['error']);
+    }
+    unset($PASSWORDS_CONF);
+}
 // Abwärtskompatibilität: Downloadcounter initalisieren
 if ($DOWNLOAD_COUNTS->get("_downloadcounterstarttime") == "" and !isset($DOWNLOAD_COUNTS->properties['error']))
     $DOWNLOAD_COUNTS->set("_downloadcounterstarttime", time());
