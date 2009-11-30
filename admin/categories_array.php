@@ -198,10 +198,10 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
                 $_POST['categories'][$cat]['new_name'][$pos] = $specialchars->replaceSpecialChars($_POST['categories'][$cat]['new_name'][$pos],false);
             }
             if(isset($_POST['categories'][$cat]['url'][$pos])) {
-                $_POST['categories'][$cat]['url'][$pos] = $specialchars->replaceSpecialChars($_POST['categories'][$cat]['url'][$pos],false);
+                $_POST['categories'][$cat]['url'][$pos] = str_replace('/','%2F',$specialchars->replaceSpecialChars($_POST['categories'][$cat]['url'][$pos],false));
             }
             if(isset($_POST['categories'][$cat]['new_url'][$pos])) {
-                $_POST['categories'][$cat]['new_url'][$pos] = $specialchars->replaceSpecialChars($_POST['categories'][$cat]['new_url'][$pos],false);
+                $_POST['categories'][$cat]['new_url'][$pos] = str_replace('/','%2F',$specialchars->replaceSpecialChars($_POST['categories'][$cat]['new_url'][$pos],false));
             }
             if(isset($_POST['categories'][$cat]['new_cat'][$pos])) {
                 $_POST['categories'][$cat]['new_cat'][$pos] = $specialchars->replaceSpecialChars($_POST['categories'][$cat]['new_cat'][$pos],false);
