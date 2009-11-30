@@ -746,7 +746,6 @@ function makeDefaultConf($conf_datei) {
                         'textareaheight' => '270'),
                     'checkbox' => array(
                         'overwriteuploadfiles' => 'false',
-#                        'resizeimages' => 'false',
                         'sendadminmail' => 'false',
                         'showTooltips' => 'true',
                         'usebigactionicons' => 'false',
@@ -765,7 +764,6 @@ function makeDefaultConf($conf_datei) {
 
     $main = array(
                     'text' => array(
-#                        'cmsversion' => '1.12alpha',
                         'shortenlinks' => '0',
                         'titlebarseparator' => '%20%3A%3A%20',
                         'usesubmenu' => '1',
@@ -790,6 +788,7 @@ function makeDefaultConf($conf_datei) {
                         'targetblank_gallery' => 'true',
                         'targetblank_link' => 'true',
                         'usecmssyntax' => 'true'),
+                    # das sind die Expert Parameter von main
                     'expert' => array(
                         'hidecatnamedpages',
                         'modrewrite',
@@ -797,7 +796,6 @@ function makeDefaultConf($conf_datei) {
                         'showhiddenpagesinsearch',
                         'showhiddenpagesinsitemap',
                         'targetblank_download',
-#                        'targetblank_gallery',
                         'targetblank_link',
                         'showsyntaxtooltips',
                         'replaceemoticons',
@@ -824,7 +822,7 @@ function makeDefaultConf($conf_datei) {
                         'name' => 'admin',
                         'pw' => '19ad89bc3e3c9d7ef68b89523eff1987');
 
-    $downloads = array('_downloadcounterstarttime' => '1254408507');
+    $downloads = array('_downloadcounterstarttime' => time());
 
     $version = array('cmsversion' => '1.12alpha',
                         'cmsname' => 'Amalia');
