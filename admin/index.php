@@ -30,16 +30,11 @@ if($debug != "ja")
  $_SESSION['PHPSESSID'] = true;
  }
 
-# das nach POST!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-$phpsessid_tmp = $_REQUEST['PHPSESSID'];
-#unset($_REQUEST);
-#$_REQUEST['PHPSESSID'] = $phpsessid_tmp;
-if($debug == "ja") { #top:850px; relative absolute position:relative;
+if($debug == "ja") {
     ob_start();
 #echo getcwd()." = getcwd<br>\n";
 #echo $_SERVER['REQUEST_URI']." = REQUEST_URI<br>\n";
 #echo __FILE__." = file<br>\n";
-#    echo "<div style=\"overflow:auto;width:920px;height:400px;margin:0;margin-top:20px;padding:0;\"><pre style=\"background-color:#000;color:#0f0;padding:5px;margin:0;font-family:monospace;border:2px solid #777;\">";
     echo "SESSION -------------------\n";
     print_r($_SESSION);
     echo "POST -------------------\n";
@@ -167,9 +162,6 @@ $GALLERIES_DIR_NAME    = "galerien";
 $GALLERIES_DIR_REL    = "../".$GALLERIES_DIR_NAME;
 $PREVIEW_DIR_NAME        = "vorschau";
 
-// RegEx fuer erlaubte Zeichen in Inhaltsseiten, Kategorien, Dateien und Galerien
-# $specialchars wurde schonn in filesystem.php erstelt!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#$specialchars = new SpecialChars();
 $ALLOWED_SPECIALCHARS_REGEX = $specialchars->getSpecialCharsRegex();
 
 // Dateiendungen fuer Inhaltsseiten 
