@@ -34,25 +34,6 @@ class Gallery {
         $this->mainconf       = new Properties("conf/main.conf");
         $this->versionconf    = new Properties("conf/version.conf");
         $this->specialchars   = new SpecialChars();
-        
-        $this->embedded = $this->mainconf->get("embeddedgallery") == "true";
-
-        // Vorschaubilder nach Benutzereinstellung und wenn GDlib installiert
-        if (!extension_loaded("gd"))
-            $this->mainconf->set("galleryusethumbs", "false");
-        if ($this->mainconf->get("galleryusethumbs") == "true")
-            $this->usethumbs = true;
-        else
-            $this->usethumbs = false;
-
-        $this->max_img_width             = $this->mainconf->get("gallerymaxwidth");
-        if ($this->max_img_width == "")
-            $this->max_img_width = 500;
-
-        $this->max_img_height         = $this->mainconf->get("gallerymaxheight");
-        if ($this->max_img_height == "")
-            $this->max_img_height = 350;
-
         $this->website_title            = $this->mainconf->get("websitetitle");
         if ($this->website_title == "")
             $this->website_title = "Titel der Website";
@@ -66,7 +47,7 @@ class Gallery {
         $this->favicon_file       = $URL_BASE."layouts/".$this->layout_dir."/favicon.ico";
 
         $this->linkprefix = "gallery.php?";
-        
+/*        
         if (!$this->embedded) {
             if (!isset($_GET['index'])) {
                 $_GET['index'] = "1";
@@ -76,20 +57,51 @@ class Gallery {
         }
         else if (basename($_SERVER['PHP_SELF']) == "gallery.php") {
             die($this->language->getLanguageValue0("message_galleryembed_error_0"));
+        }*/
+        if (basename($_SERVER['PHP_SELF']) == "gallery.php") {
+            if (!isset($_GET['index'])) {
+                $_GET['index'] = "1";
+            }
+            $this->parseGalleryParameters($_GET['gal'],$_GET['index']);
+            echo $this->renderGallery();
         }
     }
     
     function parseGalleryParameters($gallery,$index) {
         global $URL_BASE;
         global $CMS_CONF;
+
+        $this->gallery_conf       = new Properties("galerien/".$this->specialchars->replacespecialchars($gallery,false)."/gallery.conf");
+
+        $this->embedded = $this->gallery_conf->get("target");
+
+        // Vorschaubilder nach Benutzereinstellung und wenn GDlib installiert
+#        if (!extension_loaded("gd"))
+#            $this->mainconf->set("galleryusethumbs", "false");
+        if ($this->gallery_conf->get("usethumbs") == "true")
+            $this->usethumbs = true;
+        else
+            $this->usethumbs = false;
+
+        $this->max_img_width             = $this->gallery_conf->get("maxwidth");
+        if ($this->max_img_width == "")
+            $this->max_img_width = 500;
+
+        $this->max_img_height         = $this->gallery_conf->get("maxheight");
+        if ($this->max_img_height == "")
+            $this->max_img_height = 350;
+
+
         // Übergebene Parameter überprüfen
         $this->gal_request        = $this->specialchars->replacespecialchars($gallery,false);
-        $this->dir_gallery_src    = "./galerien/".$this->gal_request."/";
-        if($CMS_CONF->get("modrewrite") == "true") {
-            $this->dir_gallery_src    = $URL_BASE."/galerien/".$this->gal_request."/";
-        }
         $this->dir_gallery        = "./galerien/".$this->gal_request."/";
         $this->dir_thumbs         = $this->dir_gallery."vorschau/";
+        $this->dir_thumbs_src     = $this->dir_gallery."vorschau/";
+        $this->dir_gallery_src    = "./galerien/".$this->gal_request."/";
+        if($CMS_CONF->get("modrewrite") == "true") {
+            $this->dir_gallery_src    = $URL_BASE."galerien/".$this->gal_request."/";
+            $this->dir_thumbs_src     = $this->dir_gallery_src."vorschau/";
+        }
         if (($this->gal_request == "") || (!file_exists($this->dir_gallery))) {
             die($this->language->getlanguagevalue1("message_gallerydir_error_1", $this->gal_request));
         }
@@ -161,8 +173,7 @@ class Gallery {
         }
         $template = fread($file, filesize($this->template_file));
         fclose($file);
-        
-        if ($this->embedded) {
+        if ($this->embedded == "_self") {
             $template = $this->extractEmbeddedTemplate($template);
             if ($template == false) {
                 return false;
@@ -267,7 +278,7 @@ class Gallery {
 // ------------------------------------------------------------------------------
     function getThumbnails() {
         // Aus Config auslesen: Wieviele Bilder pro Tabellenzeile?
-        $picsperrow = $this->mainconf->get("gallerypicsperrow");
+        $picsperrow = $this->gallery_conf->get("picsperrow");
         if (($picsperrow == "") || ($picsperrow == 0))
             $picsperrow = 4;
 
@@ -283,7 +294,7 @@ class Gallery {
                 $thumbs .= "</tr><tr>";
             $thumbs .= "<td class=\"gallerytd\" style=\"width:".floor(100 / $picsperrow)."%;\">"
             ."<a href=\"".$this->specialchars->replaceSpecialChars($this->dir_gallery_src.$this->picarray[$i],true)."\" target=\"_blank\" title=\"".$this->language->getLanguageValue1("tooltip_gallery_fullscreen_1", $this->specialchars->rebuildSpecialChars($this->picarray[$i],true,true))."\">"
-            ."<img src=\"".$this->specialchars->replaceSpecialChars($this->dir_thumbs.$this->thumbarray[$i],true)."\" alt=\"".$this->specialchars->rebuildSpecialChars($this->thumbarray[$i],true,true)."\" class=\"thumbnail\" />"
+            ."<img src=\"".$this->specialchars->replaceSpecialChars($this->dir_thumbs_src.$this->thumbarray[$i],true)."\" alt=\"".$this->specialchars->rebuildSpecialChars($this->thumbarray[$i],true,true)."\" class=\"thumbnail\" />"
             ."</a><br />"
             .$description
             ."</td>";
@@ -396,7 +407,7 @@ function checkThumbs() {
     
     // Vorschauverzeichnis prüfen
     if (!file_exists($this->dir_thumbs))
-        die($language->getLanguageValue1("tooltip_link_category_error_1", $this->dir_thumbs));
+        die($this->language->getLanguageValue1("tooltip_link_category_error_1", $this->dir_thumbs));
     // alle Bilder überprüfen: Vorschau dazu vorhanden?
     foreach($this->picarray as $pic) {
         // Vorschaubild anlegen, wenn nicht vorhanden
