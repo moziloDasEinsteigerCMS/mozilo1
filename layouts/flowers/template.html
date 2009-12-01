@@ -11,13 +11,13 @@
 
 <head>
 <title>{WEBSITE_TITLE}</title>
-  <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" />
+  <meta http-equiv="Content-Type" content="text/html;charset={CHARSET}" />
   <meta http-equiv="Content-Script-Type" content="text/javascript" />
   <meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="keywords" content="{WEBSITE_KEYWORDS}" />
 	<meta name="description" content="{WEBSITE_DESCRIPTION}" />
-  <link rel="SHORTCUT ICON" href="layouts/{LAYOUT_DIR}/favicon.ico" />
-  <style type="text/css"> @import "layouts/{LAYOUT_DIR}/css/style.css"; </style>
+  <link rel="SHORTCUT ICON" href="{FAVICON_FILE}" />
+  <style type="text/css"> @import "{CSS_FILE}"; </style>
 
 <!--[if IE]>
 <style type="text/css">
