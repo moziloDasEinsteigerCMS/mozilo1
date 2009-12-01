@@ -46,13 +46,13 @@ class Syntax {
         else {
             $this->TARGETBLANK_LINK = "";
         }
-        // Galerie-Links in neuem Fenster öffnen?
+/*        // Galerie-Links in neuem Fenster öffnen?
         if ($CMS_CONF->get("targetblank_gallery") == "true") {
             $this->TARGETBLANK_GALLERY = " target=\"_blank\"";
         }
         else {
             $this->TARGETBLANK_GALLERY = "";
-        }
+        }*/
         // Download-Links in neuem Fenster öffnen?
         if ($CMS_CONF->get("targetblank_download") == "true") {
             $this->TARGETBLANK_DOWNLOAD = " target=\"_blank\"";
@@ -321,8 +321,9 @@ class Syntax {
                         }
                     }
                     closedir($handle);
+                    $GALLERY_CONF = new Properties("./".$GALLERIES_DIR."/".$cleanedvalue."/gallery.conf");
                     // Galerie einbetten
-                    if ($CMS_CONF->get("embeddedgallery") == "true") {
+                    if ($GALLERY_CONF->get("target") == "_self") {
                         require_once("gallery.php");
                         $gal_request = html_entity_decode($value,ENT_COMPAT,$CHARSET);
                         if (isset($_GET["gal"]) and $_GET["gal"]==$gal_request) {
@@ -346,7 +347,7 @@ class Syntax {
                         }
                     }
                     else {
-                        $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">$link_text</a>", $content);
+                        $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE."gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"".$GALLERY_CONF->get("target")."\">$link_text</a>", $content);
                     }
                 }
                 // Galerie nicht vorhanden
