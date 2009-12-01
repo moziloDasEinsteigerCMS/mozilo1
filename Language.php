@@ -38,6 +38,11 @@ class Language {
 // ------------------------------------------------------------------------------
     function Language() {
         global $CMS_CONF;
+        # das ist ein hack für die gallery.php
+        if(!isset($CMS_CONF->properties['cmslanguage'])) {
+            $CMS_CONF     = new Properties("conf/main.conf");
+        }
+
         $currentlanguage = $CMS_CONF->get("cmslanguage");
         if (($currentlanguage == "") || (!file_exists("sprachen/$currentlanguage.conf")))
             $currentlanguage = "Deutsch";
