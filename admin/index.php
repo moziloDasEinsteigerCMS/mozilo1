@@ -1859,9 +1859,6 @@ echo "</pre><br>\n";*/
                 if(extension_loaded("gd")) {
                     require_once("../Image.php");
                     $gallery_setings = new Properties($GALLERIES_DIR_REL."/".$gallery[1]."/gallery.conf",true);
-#                    $tn = new Thumbnail();
-#                    $tn->createThumb($specialchars->replaceSpecialChars($_FILES[$array_name]['name'],false), $GALLERIES_DIR_REL."/".$gallery[1]."/", $GALLERIES_DIR_REL."/".$gallery[1]."/$PREVIEW_DIR_NAME/");
-
                     scaleImage($specialchars->replaceSpecialChars($_FILES[$array_name]['name'],false), $GALLERIES_DIR_REL."/".$gallery[1]."/", $GALLERIES_DIR_REL."/".$gallery[1]."/$PREVIEW_DIR_NAME/", $gallery_setings->get('maxthumbwidth'), $gallery_setings->get('maxthumbheight'));
                     // chmod, wenn so eingestellt
 #                    if ($ADMIN_CONF->get("chmodnewfiles") == "true")
