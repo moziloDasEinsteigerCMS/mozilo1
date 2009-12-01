@@ -60,32 +60,17 @@ function setLastBackup()
  @author: Oliver Lorenz
  Liest aus dem Language-File eine Bistimmte Variable    aus.
  --------------------------------------------------------------------------------*/
-function getLanguageValue($confpara,$accesskey = NULL)
+function getLanguageValue($confpara)#,$accesskey = NULL
 {
     global $BASIC_LANGUAGE;
     global $CHARSET;
-    # das ist ein geschwindigkeits killer
-#    $BASIC_LANGUAGE     = new Properties("conf/language_".getLanguage().".conf");
-    if($accesskey != NULL) {
-        $sring = $BASIC_LANGUAGE->get($confpara);
-        if(empty($sring)) {
-            return $confpara." ".$BASIC_LANGUAGE->get('languagefile_error');
-        }
-        $position = strpos($sring,$accesskey);
-        $accesskey_zeichen = substr($sring,$position,1);
-        $accesskey_html =  '<u>'.$accesskey_zeichen.'</u>';
-        $accesskey_html_tities =  '&lt;u&gt;'.$accesskey_zeichen.'&lt;/u&gt;';
-        $sring = htmlentities(substr_replace($sring,$accesskey_html,$position,1),ENT_COMPAT,$CHARSET);
-        $sring = str_replace($accesskey_html_tities,$accesskey_html,$sring);
-#echo "$sring = sring<br>\n";
-        return $sring;
-    } else
-        $text = htmlentities($BASIC_LANGUAGE->get($confpara),ENT_COMPAT,$CHARSET);
-        if(empty($text)) {
-            return '<b style="color:#ff0000;">'.$confpara."</b> ".$BASIC_LANGUAGE->get('languagefile_error');
-        }
-        $text = str_replace(array("&lt;","&gt;"),array("<",">"), $text);
-        return $text;
+
+    $text = htmlentities($BASIC_LANGUAGE->get($confpara),ENT_COMPAT,$CHARSET);
+    if(empty($text)) {
+        return '<b style="color:#ff0000;">'.$confpara."</b> ".$BASIC_LANGUAGE->get('languagefile_error');
+    }
+    $text = str_replace(array("&lt;","&gt;"),array("<",">"), $text);
+    return $text;
 }
 
 /**--------------------------------------------------------------------------------
