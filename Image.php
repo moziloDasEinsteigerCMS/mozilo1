@@ -48,13 +48,6 @@ class Thumbnail {
         if($maxHeight === false or empty($maxHeight)) {
             $maxHeight = 120; // Maximal höhe des Bildes
         }
-/*
-if(is_file($dir_origin.$pic)) {
-echo $maxWidth." x ".$maxHeight."<br>\n";
-echo "file ja<br>\n";
-return;
-}*/
-
 
         // --------------------------------------------------------------------
         // Bildgröße und MIME Type holen
@@ -69,7 +62,6 @@ return;
         // --------------------------------------------------------------------
 
         // Der Bildname darf folgende Zeichen nicht enthalten / : .. < >
-#        if ( strpos(dirname($image), ':') || preg_match('/(\.\.|<|>)/', $image) )
          if ( strpos($pic, ':') || preg_match('/(\.\.|<|>)/', $pic) )
          {
              die("Error: Bilddatei ". $dir_origin . $pic ."enthält nicht gültige Zeichen!");
@@ -87,24 +79,19 @@ return;
         // und dann die Breite und Höhe für das Vorschaubild ermitteln,
         // aber nur, wenn das Originalbild größer als das Zielbild ist
         // --------------------------------------------------------------------
-#        if ($height <= $maxHeight && $width <= $maxWidth) {
-#          $tnHeight = $height;
-#          $tnWidth  = $width;
-#        } else {
-            $xRatio        = $maxWidth / $width;
-            $yRatio        = $maxHeight / $height;
+        $xRatio        = $maxWidth / $width;
+        $yRatio        = $maxHeight / $height;
 
-            if ($xRatio * $height < $maxHeight)
-            { // Bildmaße auf Basis der Breite
-                $tnHeight    = ceil($xRatio * $height);
-                $tnWidth    = $maxWidth;
-            }
-            else // Bildmaße auf Basis der Höhe
-            {
-                $tnWidth    = ceil($yRatio * $width);
-                 $tnHeight    = $maxHeight;
-            }
-#        }
+        if ($xRatio * $height < $maxHeight)
+        { // Bildmaße auf Basis der Breite
+            $tnHeight    = ceil($xRatio * $height);
+            $tnWidth    = $maxWidth;
+        }
+        else // Bildmaße auf Basis der Höhe
+        {
+            $tnWidth    = ceil($yRatio * $width);
+             $tnHeight    = $maxHeight;
+        }
         # Bild grösse = Neue grösse also nicht zu tun
         if($tnWidth == $width and $tnHeight == $height) {
             return;
