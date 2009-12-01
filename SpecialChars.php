@@ -17,40 +17,20 @@ class SpecialChars {
     }
 
 // ------------------------------------------------------------------------------    
-// Erlaubte Sonderzeichen als RegEx zurückgeben
+// Erlaubte Sonderzeichen als RegEx zurÃ¼ckgeben
 // ------------------------------------------------------------------------------
     function getSpecialCharsRegex() {
         global $CHARSET;
-        $regex = "/^[a-zA-Z0-9_\%\-\s\?\!\@\.€".addslashes(html_entity_decode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)),ENT_COMPAT,$CHARSET))."]+$/";
+        $regex = "/^[a-zA-Z0-9_\%\-\s\?\!\@\.â‚¬".addslashes(html_entity_decode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)),ENT_COMPAT,$CHARSET))."]+$/";
         $regex = preg_replace("/&#39;/", "\'", $regex);
         return $regex;
     }
-    
+
 // ------------------------------------------------------------------------------    
-// Erlaubte Sonderzeichen userlesbar als String zurückgeben
-// ------------------------------------------------------------------------------
-    function getSpecialCharsString($sep, $charsperline) {
-        global $CHARSET;
-        $specialcharsstring = "";
-        $specialcharshtml = "";
-        for ($i=65; $i<=90;$i++)
-            $specialcharsstring .= chr($i);
-        for ($i=97; $i<=122;$i++)
-            $specialcharsstring .= chr($i);
-        for ($i=48; $i<=57;$i++)
-            $specialcharsstring .= chr($i);
-        $specialcharsstring .= html_entity_decode("_- ?!€@.".stripslashes(preg_replace("/&#39;/", "\'", implode(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)))),ENT_COMPAT,$CHARSET);
-        for ($i=0; $i<=strlen($specialcharsstring); $i+=$charsperline) {
-            $specialcharshtml .= htmlentities(substr($specialcharsstring, $i, $charsperline),ENT_COMPAT,$CHARSET)."<br />";
-        }
-        return $specialcharshtml;
-    }
-    
-// ------------------------------------------------------------------------------    
-// Inhaltsseiten/Kategorien für Speicherung umlaut- und sonderzeichenbereinigen 
+// Inhaltsseiten/Kategorien fÃ¼r Speicherung umlaut- und sonderzeichenbereinigen 
 // ------------------------------------------------------------------------------
     function replaceSpecialChars($text,$nochmal_erlauben) {
-        # $nochmal_erlauben = für Tags mit src z.B. img dann muss das % auch gewndelt werden
+        # $nochmal_erlauben = fÃ¼r Tags mit src z.B. img dann muss das % auch gewndelt werden
         $text = str_replace('/','ssslashhh',$text);
         if(preg_match('#\%([0-9a-f]{2})#ie',$text) < 1)
             $text = rawurlencode(stripslashes($text));
@@ -60,9 +40,8 @@ class SpecialChars {
         return $text;
     }
 
-
 // ------------------------------------------------------------------------------    
-// Umlaute in Inhaltsseiten/Kategorien für Anzeige 
+// Umlaute in Inhaltsseiten/Kategorien fÃ¼r Anzeige 
 // ------------------------------------------------------------------------------
     function rebuildSpecialChars($text, $rebuildnbsp, $html) {
         global $CHARSET;
@@ -81,15 +60,15 @@ class SpecialChars {
 
 
 // ------------------------------------------------------------------------------    
-// Für Datei-Uploads erlaubte Sonderzeichen als RegEx zurückgeben
+// FÃ¼r Datei-Uploads erlaubte Sonderzeichen als RegEx zurÃ¼ckgeben
 // ------------------------------------------------------------------------------
     function getFileCharsRegex() {
         $regex = "/^[a-zA-Z0-9_\%\-\.]+$/";
         return $regex;
     }
-    
+
 // ------------------------------------------------------------------------------    
-// Für Datei-Uploads erlaubte Sonderzeichen userlesbar als String zurückgeben
+// FÃ¼r Datei-Uploads erlaubte Sonderzeichen userlesbar als String zurÃ¼ckgeben
 // ------------------------------------------------------------------------------
     function getFileCharsString($sep, $charsperline) {
         global $CHARSET;
@@ -108,11 +87,8 @@ class SpecialChars {
         return $filecharshtml;
     }
 
-    
-
-
 // ------------------------------------------------------------------------------
-// Hilfsfunktion: Wandelt numerische Entities im übergebenen Text in Zeichen
+// Hilfsfunktion: Wandelt numerische Entities im Ã¼bergebenen Text in Zeichen
 // ------------------------------------------------------------------------------
     function numeric_entities_decode($text) {
         return str_replace('&amp;#', '&#', $text);
