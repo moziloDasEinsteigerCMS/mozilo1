@@ -507,11 +507,6 @@ $CHARSET = 'UTF-8';
         $mainmenu = "<ul class=\"mainmenu\">";
         // Kategorien-Verzeichnis einlesen
         $categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false, false);
-/*
-echo "<pre>";
-print_r($categoriesarray);
-echo "</pre><br>\n";*/
-        // numerische Accesskeys für angezeigte Menüpunkte
         // Jedes Element des Arrays ans Menü anhängen
         foreach ($categoriesarray as $currentcategory) {
             # Mod Rewrite
@@ -597,7 +592,6 @@ echo "</pre><br>\n";*/
                 return "";
             }
 
-            // alphanumerische Accesskeys (über numerischen ASCII-Code) für angezeigte Menüpunkte
             // Jedes Element des Arrays ans Menü anhängen
             foreach ($contentarray as $currentcontent) {
                 // Inhaltsseite nicht anzeigen, wenn sie genauso heißt wie die Kategorie
@@ -1239,7 +1233,7 @@ echo "</pre><br>\n";*/
                     $mailcontent .= "\r\n".$language->getLanguageValue0("contactform_message_0").":\r\n".$message."\r\n";
                 }
                 $mailsubject = $language->getLanguageValue1("contactform_mailsubject_1", html_entity_decode($WEBSITE_NAME,ENT_COMPAT,$CHARSET));
-                // Wenn Mail-Adresse gesetzt ist: erh�lt der Absender eine copy
+                // Wenn Mail-Adresse gesetzt ist: erhält der Absender eine copy
                 if ($mail <> "") {
                     $mailfunctions->sendMail($mailsubject, $mailcontent, $contactformconfig->get("formularmail"), $mail);
                 }
