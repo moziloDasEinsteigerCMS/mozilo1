@@ -18,49 +18,9 @@ require_once("../Properties.php");
 
 /**--------------------------------------------------------------------------------
  @author: Oliver Lorenz
- Gibt zurueck welche Sprache aktuell verwendet wird.
- --------------------------------------------------------------------------------*/
-/*
-function getLanguage()
-{
-    global $ADMIN_CONF;
-    return $ADMIN_CONF->get("language");
-#    $BASIC_CONFIG         = new Properties("conf/basic.conf");
-#    return $BASIC_CONFIG->get("language");
-}*/
-
-
-/**--------------------------------------------------------------------------------
- @author: Oliver Lorenz
- Gibt zurueck wann der letzte Backup gemacht wurde...
- --------------------------------------------------------------------------------*/
-/*
-function getLastBackup()
-{
-    global $ADMIN_CONF;
-    return $ADMIN_CONF->get("lastbackup");
-#    $BASIC_CONFIG         = new Properties("conf/basic.conf");
-#    return $BASIC_CONFIG->get("lastbackup");
-}*/
-
-/**--------------------------------------------------------------------------------
- @author: Oliver Lorenz
- Schreibt die aktuelle Uhrzeit in lastbackup
- --------------------------------------------------------------------------------*/
-/*
-function setLastBackup()
-{
-    global $ADMIN_CONF;
-    return $ADMIN_CONF->set("lastbackup",time());
-#    $BASIC_CONFIG         = new Properties("conf/basic.conf");
-#    return $BASIC_CONFIG->set("lastbackup",time());
-}*/
-
-/**--------------------------------------------------------------------------------
- @author: Oliver Lorenz
  Liest aus dem Language-File eine Bistimmte Variable    aus.
  --------------------------------------------------------------------------------*/
-function getLanguageValue($confpara)#,$accesskey = NULL
+function getLanguageValue($confpara)
 {
     global $BASIC_LANGUAGE;
     global $CHARSET;
@@ -72,103 +32,6 @@ function getLanguageValue($confpara)#,$accesskey = NULL
     $text = str_replace(array("&lt;","&gt;"),array("<",">"), $text);
     return $text;
 }
-
-/**--------------------------------------------------------------------------------
- @author: Oliver Lorenz
-
- Fragt die Konfiguration ab, ob die Tooltips    angezeigt werden sollen oder nicht.
- --------------------------------------------------------------------------------*/
-/*
-function showTooltips()
-{
-    global $ADMIN_CONF;
-#    $BASIC_CONFIG         = new Properties("conf/basic.conf");
-    return $ADMIN_CONF->get("showTooltips");
-}*/
-
-/**--------------------------------------------------------------------------------
- @author: Oliver Lorenz
- Gibt eine Dropdown-Liste mit den allen mÃ¶glichen und belegten Positionen zurueck 
- --------------------------------------------------------------------------------*/
-/*function show_dirs($maindir, $selecteddir)
-{
-    $content = "<select name=\"position\" size=1>";
-    global $specialchars;
-    $vergeben = getDirs($maindir);
-
-    for($pos = 0; $pos < 100; $pos++ )
-    {
-        if(!in_array($pos,$vergeben))
-        {
-            $content .= "<option>";
-            $content .= sprintf("%02d",$pos);
-            $content .= "</option>";
-        }
-        else
-        {
-            $selected = "";
-            if (sprintf("%02d",$pos)."_".specialNrDir($maindir, sprintf("%02d",$pos)) == $selecteddir)
-            $selected = " selected=\"selected\"";
-            $content .= "<option style=\"color:lightgrey;\"$selected>";
-            $content .= sprintf("%02d",$pos)." ".$specialchars->rebuildSpecialChars(specialNrDir($maindir, sprintf("%02d",$pos)), true, true);
-            $content .= "</option>";
-        }
-      
-    }
-    $content .= "</select>";
-     
-    return $content;
-}*/
-
-/**--------------------------------------------------------------------------------
- @author: Oliver Lorenz
- Gibt eine Dropdown-Liste mit den allen mÃ¶glichen und belegten Positionen zurueck 
- --------------------------------------------------------------------------------*/
-/*function show_files($dir, $currentfile, $includedrafts)
-{
-    global $specialchars;
-    global $EXT_PAGE;
-    global $EXT_HIDDEN;
-    global $EXT_DRAFT;
-
-    $content = "<select name=\"position\" class=\"select1\" size=1>";
-    if ($includedrafts) {
-        $vergeben = getFiles($dir, "");
-    }
-    else {
-        $vergeben = getFiles($dir, ".tmp");
-    }
-    sort($vergeben);
-    
-    for($pos = 0; $pos < 100; $pos++ ) {
-        // Position ist frei: Nummer anzeigen
-        if(!in_array($pos,$vergeben)) {
-            $content .= "<option>";
-            $content .= sprintf("%02d",$pos);
-            $content .= "</option>";
-        }
-        // Position ist belegt: Seintennamen anzeigen
-        else {
-            if (
-                (specialNrFile($dir, sprintf("%02d",$pos)) == $currentfile.$EXT_PAGE) 
-                || (specialNrFile($dir, sprintf("%02d",$pos)) == $currentfile.$EXT_HIDDEN) 
-                || (specialNrFile($dir, sprintf("%02d",$pos)) == $currentfile.$EXT_DRAFT)
-                ) {
-                $selected = "selected=\"selected\" ";
-            }
-            else {
-                $selected = " ";
-            }
-            $content .= "<option ".$selected."style=\"color:lightgrey;\">";
-            $fullname = $specialchars->rebuildSpecialChars(specialNrFile($dir, sprintf("%02d",$pos)), true, true);
-            $content .= sprintf("%02d",$pos)." ".substr($fullname, 0, strlen($fullname)-strlen(".txt"));
-            $content .= "</option>";
-        }
-    }
-    $content .= "</select>";
-
-    return $content;
-}*/
 
 /**--------------------------------------------------------------------------------
  @author: Oliver Lorenz
@@ -249,27 +112,7 @@ function specialNrDir($dir, $nr)
 
 /*--------------------------------------------------------------------------------
  @author: Oliver Lorenz
- Sucht nach einer Datei, die mit einer Bestimmten Nummern-Praefix beginnt
- --------------------------------------------------------------------------------*/
-/*
-function specialNrFile($dir, $nr) {
-    $dir = stripslashes($dir);
-    if(is_dir($dir)) {
-        $handle = opendir($dir);
-        while($file = readdir($handle)) {
-            if(isValidDirOrFile($file) and !is_dir("$dir/$file")) {
-                if(substr($file,0,2)==$nr) {
-                    closedir($handle);
-                    return substr($file,3);
-                }
-            }
-        }
-    }
-}
-*/
-/*--------------------------------------------------------------------------------
- @author: Oliver Lorenz
- Legt die Ordnerstuktur für eine neue Kategorie an
+ Legt die Ordnerstuktur fï¿½r eine neue Kategorie an
  --------------------------------------------------------------------------------*/
 function createCategory($new_cat) {
     global $specialchars;
@@ -305,45 +148,7 @@ function createCategory($new_cat) {
         useChmod("../kategorien/".$new_cat."/dateien");
     }
 }
-/*
-function getFreeDirs($dir)
-{
-    $dirarray = array();
-    global $specialchars;
-    $vergeben = getDirs($dir);
 
-    for($pos = 0; $pos < 100; $pos++ )
-    {
-        if(!in_array($pos,$vergeben))
-        {
-            array_push($dirarray, sprintf("%02d",$pos));
-        }
-    }
-    return $dirarray;
-}
-*/
-/*
-function getCatsAsSelect($selectedcat) {
-    global $specialchars;
-    $dirs = array();
-    $handle = opendir('../kategorien');
-    while (($file = readdir($handle))) {
-        if (isValidDirOrFile($file))
-        array_push($dirs, $file);
-    }
-    closedir($handle);
-    sort($dirs);
-    $select = "<select name=\"cat\">";
-    foreach ($dirs as $file) {
-        if (($selectedcat <> "") && ($file == $selectedcat))
-        $select .= "<option selected=\"selected\" value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true, true)."</option>";
-        else
-        $select .= "<option value=\"".$file."\">".$specialchars->rebuildSpecialChars(substr($file, 3, strlen($file)-3), true, true)."</option>";
-    }
-    $select .= "</select>";
-    return $select;
-}
-*/
 function getGalleriesAsSelect($selectedgallery) {
     global $specialchars;
     $dirs = array();
@@ -386,7 +191,6 @@ function getDirContentAsArray($dir, $hiddeposition = true) {
         closedir($handle);
     }
     natcasesort($dircontent);
-#    ksort($dircontent);
     return $dircontent;
 }
 
@@ -436,20 +240,6 @@ function isValidDirOrFile($file) {
         return false;
     }
     return true;
-/*
-    return (!in_array($file, array(
-            ".", // aktuelles Verzeichnis 
-            "..", // Parent-Verzeichnis
-            "Thumbs.db", // Windows-spezifisch
-            ".DS_Store", // Mac-spezifisch
-            "__MACOSX", // Mac-spezifisch
-            ".svn",    // SVN
-            ".cache", // Eclipse
-            "settings", // Eclipse
-            "index.php",
-            ".htaccess",
-            ".directory" // Dolphin kde4
-            )));*/
 }
 
 
@@ -635,11 +425,6 @@ function getChmod($dir = false) {
     }
     # Der server Vergibt die Rechte
     return false;
-/*    if($dir === true) {
-        return octdec("777");
-    } else {
-        return octdec("666");
-    }*/
 }
 
 function changeChmod($file,$error = NULL) {
@@ -836,7 +621,7 @@ function makeDefaultConf($conf_datei) {
 
     if(strpos($conf_datei,".conf") > 0) {
         $name = substr(basename($conf_datei),0,-(strlen(".conf")));
-        # beim erzeugen dürfen sub arrays nicht mit rein
+        # beim erzeugen dï¿½rfen sub arrays nicht mit rein
         foreach($$name as $key => $value) {
             if($key == "expert") continue;
             if(is_array($value)) {
