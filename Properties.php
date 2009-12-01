@@ -62,9 +62,6 @@
 properties['readonly'] = nur lesen
 properties['error'] = kann nicht lesen oder schreiben oder Sperdatei anlegen
 */
-
-
-
 class Properties {
 
     var $file = "";
@@ -103,7 +100,6 @@ class Properties {
 
         if ($file == "")
             return $this->properties['error'] = $error_input;
-#            die("Properties: Keine Datei angegeben!");
         $this->file = $file;
         $this->loadProperties();
     }
@@ -176,36 +172,18 @@ class Properties {
         }
         // Vorm Schreiben erst auf eine mögliche Sperre überprüfen (Schutz vor konkurrierenden Schreibzugriffen)
         $islocked = true;
-        // 20 Mal versuchen
-#        for ($i=0; $i<20; $i++) {
-            // für die aktuelle Properties-Datei existiert eine Sperrdatei, sie ist also bereits geöffnet!
-            if (file_exists($this->file.".lck")) {
-                return $this->properties['error'] = $error_lock_existed.$this->file.".lck";
-                // nächster Versuch nach einer Sekunde
-#                sleep(1);
-#                continue;
-            }
-            // keine Sperrdatei vorhanden, also darf geschrieben werden
-            else {
-                $islocked = false;
-#                break;
-            }
-#            if($i == 19) {
-#                return $this->properties['error'] = "Properties.php: Es Existiert ein ".$this->file.".lck Sperrdatei kann die Setings nicht Schreiben.";
-
-#            }
-#        }
-        
-        // Existiert die Sperrdatei auch weiterhin?
-#        if ($islocked) {
-            // einfach nix machen
-#        }
-#        else {
+        // für die aktuelle Properties-Datei existiert eine Sperrdatei, sie ist also bereits geöffnet!
+        if (file_exists($this->file.".lck")) {
+            return $this->properties['error'] = $error_lock_existed.$this->file.".lck";
+        }
+        // keine Sperrdatei vorhanden, also darf geschrieben werden
+        else {
+            $islocked = false;
+        }
         if($islocked === false) {
             // neue Sperrdatei anlegen
             if (!@touch($this->file.".lck")) {
                 return $this->properties['error'] = $error_lock_touch.$this->file.".lck";
-#                die("Properties.php: Kann ".$this->file.".lck nicht schreiben - bitte vergebene Dateirechte prüfen.");
             }
             // Datei schreibend öffnen
             if (!@fopen($this->file, "a+")) {
@@ -219,15 +197,6 @@ class Properties {
             } else {
                 $file = @fopen($this->file, "w");
             }
-/*            if (!$file = @fopen($this->file, "w")) {
-                // Löschen der Sperrdatei und Abbruch, wenn das Öffnen nicht klappt
-                @unlink($this->file.".lck");
-                if (file_exists($this->file.".lck")) {
-                    return $this->properties['error'] = $error_lock_del.$this->file.".lck";
-                }
-                return $this->properties['error'] = $error_write.$this->file;
-#                die("Properties.php: Kann ".$this->file." nicht schreiben - bitte Existenz der Datei und vergebene Dateirechte prüfen.");
-            }*/
             $content = "";
             // alphabetisch sortieren
             if (!$this->properties == null)
