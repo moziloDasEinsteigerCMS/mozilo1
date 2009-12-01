@@ -1,0 +1,983 @@
+body
+{
+    color:#000000;
+    font-family: Arial, Verdana, sans-serif;
+    font-size:14px;
+    margin:0;
+    padding:0;
+}
+.form
+{
+    margin:0;
+    padding:0;
+    border:none;
+}
+table
+{
+    font-size:14px;
+    /*width: 100%;
+    border-collapse:separate;*/
+}
+
+
+
+input, select
+{
+    font-size:14px;
+}
+
+.titel /* Titel */
+{
+    font-size:16px;
+    font-weight:bolder;
+    margin-top:10px;
+    margin-bottom:5px;
+    text-decoration:none;
+}
+/* Titel 
+h2 
+{
+    font-size:16px;
+    font-weight:bolder;
+    margin-top:10px;
+    margin-bottom:5px;
+    text-decoration:none;
+}*/
+h3 /* Titel erklärung*/
+{
+    /*font-size: 12px;*/
+    margin-top:10px;
+    margin-bottom:5px;
+    text-decoration:none;
+}
+p /* Text miteilung*/
+{
+    /*font-size:12px;*/
+    padding: 10px;
+    text-align: justify;
+}
+/*
+.font_small
+{
+    font-size:11px;
+}*/
+
+/*.access_key
+{
+    text-decoration:underline;
+}*/
+#table_admin
+{
+/*    width: 930px;
+    position:absolute; 
+    left:10px;
+    top:10px;*/
+    padding:0px;
+    margin:0px;
+    /**/margin-left:10px;
+    margin-top:10px;
+    margin-right:10%;
+    background:#F8F8F8;
+    border:none;
+}
+
+/*
+.div_content
+{
+    width:100%;
+    height:450px;
+}
+*/
+
+/*
+#table_admin td
+{
+    border:1px solid #ff0000;
+}*/
+
+#td_title
+{
+    background: #C9D7EB;
+    text-align:left;
+    vertical-align:middle;
+    border:none;
+}
+#table_titel
+{
+    /*width:100%;*/
+}
+
+#td_table_titel_text
+{
+    padding-left:10px;
+    /*line-height:24px;*/
+    color: #5E8AB4;
+    font-weight: bold;
+    text-align:left;
+    background:#C9D7EB;
+    vertical-align:middle;
+    border:none;
+}
+
+#td_table_titel_logout
+{
+    text-align:right;
+    background:#C9D7EB;
+    vertical-align:middle;
+    border:none;
+}
+
+#design_logout
+{
+    color:#ff0000;
+    font-weight:bold;
+    background-color:#C9D7EB;
+    border:none;
+}
+
+#table_buttons /*tabelle um button*/
+{
+    padding:0;
+    margin:0;
+    vertical-align:bottom;
+}
+
+.td_button /*zelle um button*/
+{
+    padding:0;
+    margin:0;
+    border:none;
+    border-bottom: 1px solid #C0C0C0;
+    vertical-align:bottom;
+}
+
+.td_button_activ /*zelle um button*/
+{
+    padding:0;
+    margin:0;
+    border:none;
+    vertical-align:bottom;
+}
+.rest_td_tabs
+{
+    margin:0px;
+    padding:0px;
+    border-bottom: 1px solid #C0C0C0;
+    vertical-align:bottom;
+}
+
+.button_tab /*der button*/
+{
+    padding:0;
+    margin:0;
+    background:none;
+    border: 1px solid #C0C0C0;
+    border-bottom:none;
+    border-bottom:1px solid #C9D7EB; /*kleiner hack für ie das unter button keine strich*/
+    background-color:#C9D7EB;
+    text-align:left;
+    overflow:visible;
+}
+
+* html .button_tab {  /* nur fuer Internet Explorer */
+  width:100%;     /* Version 5.x */
+  w\idth:100%;    /* Version 6 */
+}
+
+.button_tab_activ /*der button*/
+{
+    padding:0;
+    margin:0;
+    background:none;
+    border: 1px solid #C0C0C0;
+    border-bottom:none;
+    text-align:left;
+    background-color:transparent;
+    /*background-color:#ffffff;*/
+    background-color:#F8F8F8;
+    overflow:visible;
+}
+
+* html .button_tab_activ {  /* nur fuer Internet Explorer */
+  width:100%;     /* Version 5.x */
+  w\idth:100%;    /* Version 6 */
+}
+
+.button_tab_inhalt /*tabelle im button*/
+{
+    padding:0;
+    margin-left:2px;
+    margin-right:2px;
+    margin-top:2px;
+    margin-bottom:0px;
+    vertical-align:bottom;
+}
+
+.button_tab_inhalt_activ /*tabelle im button*/
+{
+    padding:0;
+    margin-left:2px;
+    margin-right:2px;
+    margin-top:2px;
+    margin-bottom:5px;
+}
+
+.button_tab_icon /*zelle in tabelle im button*/
+{
+    margin:0;
+    padding:0;
+    vertical-align:bottom;
+}
+
+.button_tab_text /*zelle in tabelle im button*/
+{
+    margin:0;
+    padding:0;
+    padding-right:5px;
+    padding-left:3px;
+    color: #000000;
+    font-size:11px;
+    font-weight:bold;
+    text-align:left;
+    vertical-align:bottom;
+}
+/*.button_tab_text .access_key
+{
+    font-size:11px;
+}
+*/
+
+
+#td_tabs
+{
+    padding:0;
+    padding-top:10px;
+    margin:0;
+    border:none;
+    /*background: #F8F8F8;
+    background: #ffffff;*/
+}
+
+#td_content
+{
+    padding-left:10px;
+    padding-right:10px;
+    padding-top:10px;
+    border-left:1px solid #C0C0C0;
+    border-right:1px solid #C0C0C0;
+    border-bottom:1px solid #C0C0C0;
+    background-color: transparent;
+}
+
+.message_erfolg
+{
+    display:block;
+    margin:10px;
+    color:#00aa00;
+    border:1px solid #00aa00;
+    padding:8px;
+    padding-left:35px;
+    font-weight:bolder;
+    /*font-size:12px;*/
+    background-color:#DDFFDD;
+    background-image:url(gfx/icons/24x24/information.png);
+    background-position:5px 5px;
+    background-repeat:no-repeat;
+}
+
+.message_fehler
+{
+    display:block;
+    margin:10px;
+    color:#aa0000;
+    border:1px solid #aa0000;
+    padding:8px;
+    padding-left:35px;
+    font-weight:bolder;
+    /*font-size:12px;*/
+    background-color:#FFDDDD;
+    background-image:url(gfx/icons/24x24/error.png);
+    background-position:5px 5px;
+    background-repeat:no-repeat;
+    /*width:70%;*/
+}
+
+/*  Das "span" nicht löschen !!!
+    ist wichtig für toggle der tabelen zellen beim firefox3.5 andere nicht getestet stimt sonst die breite nicht
+    keine anung warum ist aber so
+
+span {
+}*/
+
+.table_toggle
+{
+    /*text-align:left;
+    vertical-align:middle;*/
+    margin:0;
+    padding:0;
+}
+
+/** html .table_togglew {*/  /* nur fuer Internet Explorer */
+ /* table-layout:fixed; */    /* Version 5.x */
+ /* t\able-layout:fixed; */   /* Version 6 */
+/*}*/
+
+.table_data
+{
+    /*text-align:left;
+    vertical-align:middle;*/
+    margin:0;
+    padding:0;
+    border-collapse:collapse;
+}
+
+.td_toggle
+{
+    padding-top:10px;
+    padding-bottom:10px;
+    border-top:1px solid #C0C0C0;
+}
+.td_toggle_new
+{
+    background:#fff0f0;
+    padding-left:10px;
+    padding-top:10px;
+    padding-bottom:10px;
+    border-top:1px solid #C0C0C0;
+}
+.td_toggle_padding
+{
+    padding-left:10px;
+    padding-top:10px;
+    padding-bottom:10px;
+    border-top:1px solid #C0C0C0;
+}
+
+.td_togglen
+{
+    /*padding-left:20px;*/
+}
+
+.td_togglen_padding_bottom
+{
+    /*margin:0;
+    padding:0;*/
+    padding-bottom:10px;
+    /*padding-left:30px;*/
+}
+
+.td_icons
+{
+    text-align:right;
+}
+
+.td_title
+{
+    color:#686868;
+    font-size:11px;
+}
+
+.td_left_title
+{
+    color:#686868;
+    font-size:11px;
+    text-align:left;
+    padding-right:10px;
+}
+
+.td_right_title
+{
+    color:#686868;
+    font-size:11px;
+    text-align:right;
+    padding-right:10px;
+}
+
+.td_center_title
+{
+    color:#686868;
+    font-size:11px;
+    text-align:center;
+}
+
+.td_left_title_padding_bottom
+{
+    color:#686868;
+    font-size:11px;
+    text-align:left;
+    padding-right:10px;
+    padding-bottom:10px;
+}
+
+.td_right_title_padding_bottom
+{
+    color:#686868;
+    font-size:11px;
+    text-align:right;
+    padding-right:10px;
+    padding-bottom:10px;
+}
+
+.td_center_title_padding_bottom
+{
+    color:#686868;
+    font-size:11px;
+    text-align:center;
+    padding-bottom:10px;
+}
+/*
+.td_cms_left_padding_left
+{
+    text-align:left;
+    padding-left:30px;
+    padding-top:10px;
+    padding-bottom:10px;
+}*/
+
+.td_cms_left
+{
+    text-align:left;
+    padding-left:30px;
+    /*padding-left:10px;*/
+    padding-top:10px;
+    padding-bottom:10px;
+    vertical-align:top;
+}
+
+.td_cms_right
+{
+    text-align:right;
+    padding-right:10px;
+    /*padding-left:10px;*/
+    padding-top:10px;
+    padding-bottom:10px;
+    vertical-align:top;
+}
+
+.td_cms_colspan2
+{
+    text-align:left;
+    padding-left:30px;
+    padding-right:30px;
+    padding-top:10px;
+    padding-bottom:10px;
+    vertical-align:top;
+}
+
+.td_cms_titel
+{
+    padding-top:10px;
+    padding-bottom:10px;
+    /*padding:10px 0px;*/
+    /*font-size:14px;*/
+    font-weight:bolder;
+    text-align:left;
+    border-bottom:1px solid #C0C0C0;
+}
+
+.td_cms_submit
+{
+    padding-top:10px;
+    padding-bottom:10px;
+    /*padding:10px 0px;*/
+    /*font-size:14px;*/
+    font-weight:bolder;
+    text-align:left;
+    border-top:1px solid #C0C0C0;
+}
+
+.table_gallery_img
+{
+    margin:0;
+    padding:0;
+    /*margin-bottom:20px;*/
+    border-collapse:collapse;
+}
+
+.td_gallery_img
+{
+    padding:5px;
+    /*padding:10px 0px;*/
+    /*font-size:14px;*/
+    border:1px solid #C0C0C0;
+}
+
+.table_contact
+{
+    /*text-align:left;
+    vertical-align:middle;*/
+    border-collapse:collapse;
+    margin:0;
+    padding:0;
+}
+
+.table_contact td {
+    border-bottom:1px solid #C0C0C0;
+    padding-top:3px;
+    padding-bottom:3px;
+}
+
+.td_contact_title
+ {
+    color:#686868;
+    font-size:11px;
+    font-weight:bolder;
+}
+/*zum Testen*/
+/*
+td
+{
+    border:1px solid #ff0000;
+}
+*/
+.input_readonly
+{
+    vertical-align:middle;
+    margin:0px;
+    padding:0px;
+    color:#000000;
+    font-size:14px;
+    height:18px;/*  fontsize + 4px*/
+    /*border:0;*/
+    border:1px solid #C0C0C0;
+    width:100%;
+    background:#F8F8F8;
+}
+
+.input_text
+{
+    vertical-align:middle;
+    margin:0px;
+    padding:0px;
+    color:#000000;
+    font-size:14px;
+    height:18px;/*  fontsize + 4px*/
+    border:1px solid #C0C0C0;
+    width:100%;
+}
+
+.input_mail
+{
+    vertical-align:middle;
+    margin:0px;
+    padding:0px;
+    color:#000000;
+    font-size:14px;
+    height:18px;/*  fontsize + 4px*/
+    border:1px solid #C0C0C0;
+    width:70%;
+}
+
+.input_select
+{
+    vertical-align:middle;
+    margin:0px;
+    padding:0px;
+    color:#000000;
+    font-size:14px;
+    height:18px;/*  fontsize + 4px*/
+    border:1px solid #C0C0C0;
+    width:120px;
+}
+
+.plugin_input
+{
+    vertical-align:middle;
+    margin:0px;
+    padding:0px;
+    color:#000000;
+    font-size:14px;
+    height:18px;/*  fontsize + 4px*/
+    border:1px solid #C0C0C0;
+}
+
+.plugin_textarea
+{
+    /*vertical-align:middle;*/
+    font-size:14px;
+    margin:0px;
+    padding:0px;
+    border:1px solid #C0C0C0;
+}
+
+.plugin_select
+{
+    /*vertical-align:middle;*/
+    font-size:14px;
+    margin:0px;
+    padding:0px;
+    border:1px solid #C0C0C0;
+}
+
+.text_cat_page
+{
+    color:#000000;
+    font-size:14px;
+    font-weight:bold;
+}
+
+.text_info
+{
+    color:#000000;
+    font-size:11px;
+}
+
+.text_grau
+{
+    color:#686868;
+}
+
+
+.input_nobefor_img_button_last
+{
+    vertical-align:middle;
+    font-weight:bold;
+    padding:0px;
+    margin:0px;
+    margin-left:34px;
+    border:none;
+}
+.input_img_button_last
+{
+    vertical-align:middle;
+    font-weight:bold;
+    margin:0px;
+    padding:0px;
+    border:none;
+}
+.input_img_button
+{
+    margin:0px;
+    padding:0px;
+    vertical-align:middle;
+    font-weight:bold;
+    margin-right:10px;
+    border:none;
+}
+.input_img_button:hover
+{
+    color:#ff0000;
+}
+
+.input_position
+{
+    vertical-align:middle;
+    margin:0px;
+    padding:0px;
+    height:18px;/*  fontsize + 4px*/
+    border:1px solid #C0C0C0;
+    width:100%;
+}
+
+.input_check
+{
+    vertical-align:middle;
+    padding:0px;
+}
+/*
+.input_noedit
+{
+    color:#686868;
+    vertical-align:middle;
+    margin:0px;
+    padding:0px;
+    height:18px;
+    border:1px solid #C0C0C0;
+    font-weight:bold;
+    width:100%;
+    background:#f8f8f8;
+    overflow:scroll;
+}*/
+/*
+.div_noedit
+{
+    color:#686868;
+    vertical-align:middle;
+    margin:0px;
+    padding:0px;
+    border:1px solid #C0C0C0;
+    font-size:14px;
+    font-weight:bold;
+    width:250px;
+    background:#f8f8f8;
+    overflow:auto;
+}
+
+* html .div_noedit
+{
+    overflow-x:scroll;
+    overflow-y:visible;
+}*/
+
+.input_submit
+{
+    vertical-align:middle;
+    margin:0px;
+    padding:0px;
+    height:18px;
+    background:#F8F8F8;
+    border: 1px solid #C0C0C0;
+}
+
+
+.file_link
+{
+    font-weight:bold;
+    color:#000000;
+    font-size:14px;
+/*    text-decoration:none;*/
+}
+
+.file_link:hover
+{
+    color:#ff0000;
+}
+
+
+
+.table_cms
+{
+/*    margin:0;*/
+    padding:0;
+    text-align:left;
+    vertical-align:middle;
+    /*margin-left:3%;*/
+    /*width:100%;*/
+    /*border:1px solid #ff0000;*/
+}
+
+
+
+.td_cms_2_1
+{
+/*    padding-left:20px;
+    padding-top:10px;
+    padding-bottom:10px;*/
+    /*border:none;
+    border:1px solid #00ff00;*/
+    /*width: 3%;*/
+    /*border-top:1px solid #C0C0C0;*/
+}
+
+.td_cms_2_2
+{
+    /*padding-left:20px;*/
+    padding-top:10px;
+    padding-bottom:10px;
+    /*border:none;
+    border:1px solid #00ff00;*/
+    /*width: 62%;*/
+    border-bottom:1px solid #C0C0C0;
+    vertical-align:top;
+}
+.td_cms_2_3
+{
+    vertical-align:top;
+    padding-left:20px;
+    padding-top:10px;
+    padding-bottom:10px;
+    /*border:none;
+    border:1px solid #00ff00;*/
+    text-align:left;
+    /*width: 35%;*/
+    border-bottom:1px solid #C0C0C0;
+}
+.table_cms tr
+{
+    /*margin:0;
+    padding:10px 0;*/
+    /*border-left:2px solid #0000ff;
+    border-right:2px solid #0000ff;*/
+    /*border-top:1px solid #C0C0C0;*/
+    /*background:#f0f0f0;*/
+    /*border-top:1px solid #C0C0C0;*/
+}
+/*
+.td_cms_titel
+{
+    padding-top:20px;
+    padding-bottom:10px;
+    font-weight:bolder;
+    text-align:left;
+    border-bottom:1px solid #C0C0C0;
+}*/
+
+.table_cms td
+{
+    /*margin:0;
+    padding:10px 0;*/
+    /*border-left:2px solid #0000ff;
+    border-right:2px solid #0000ff;*/
+    /*border-top:1px solid #C0C0C0;*/
+    /*background:#f0f0f0;*/
+    /*border:1px solid #0000ff;*/
+}
+.input_cms_text
+{
+    vertical-align:middle;
+    margin:0px;
+    padding:0px;
+    height:18px;/*  fontsize + 4px*/
+    border:1px solid #C0C0C0;
+    width:260px;
+}
+
+.input_cms_select
+{
+    vertical-align:middle;
+    margin:0px;
+    padding:0px;
+    height:18px;/*  fontsize + 4px*/
+    border:1px solid #C0C0C0;
+    width:260px;
+}
+
+.input_cms_zahl
+{
+    vertical-align:middle;
+    margin:0px;
+    padding:0px;
+    height:18px;/*  fontsize + 4px*/
+    border:1px solid #C0C0C0;
+    width:50px;
+}
+
+.textarea_cms
+{
+    /*vertical-align:middle;*/
+    margin:0px;
+    padding:0px;
+    height:120px;
+    border:1px solid #C0C0C0;
+    width:96%;
+}
+/**/
+.input_nobefor_img_button
+{
+    vertical-align:middle;
+    font-weight:bold;
+    padding:0px;
+    margin:0px;
+    margin-left:34px;
+    margin-right:10px;
+    border:none;
+}
+
+.uploadfileinput
+{
+    vertical-align:middle;
+}
+
+.deleteuploadfilebutton
+{
+    vertical-align:middle;
+    margin:0px;
+    margin-left:10px;
+    padding:0px;
+    height:18px;/*  fontsize + 4px*/
+    border:1px solid #C0C0C0;
+}
+
+.deleteuploadfilediv
+{
+    vertical-align:middle;
+    margin:0px;
+    /**/margin-bottom:10px;
+    padding:0px;
+}
+
+.login_submit
+{
+    border: 1px solid #5E8AB4;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    background-color:#ffffff;
+    
+}
+.login_input
+{
+    border: 1px solid #C0C0C0;
+    width:100%;
+}
+/*
+div td {
+    border: 1px solid #ff0000;
+}*/
+#table_loginform
+{
+    /*margin:10px;
+    width:280px;*/
+}
+div#loginform_maindiv
+{
+    height: 120px;
+    width: 320px;
+    margin-top: -60px;
+    margin-left: -160px;
+    padding: 0;
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    border: 1px solid #C0C0C0;
+    /*padding: 10px;*/
+    background-color: white;
+}
+div#loginform_maindiv_disabled
+{
+    height: 120px;
+    width: 320px;
+    margin-top: -60px;
+    margin-left: -160px;
+    padding: 0;
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    border: 1px solid #C0C0C0;
+    /*padding: 10px;*/
+    background-color: #e0e0e0;
+    color:#777777;
+}
+div#loginform_maindiv_disabled .login_input, div#loginform_maindiv_disabled .login_submit {
+    background-color: #e0e0e0;
+    border: 1px solid #C0C0C0;
+    color: #777777;
+}
+div#loginform_shadowdiv
+{
+    height: 120px;
+    width: 320px;
+    margin-top: -55px;
+    margin-left: -155px;
+    padding: 0;
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    background-color: #DCDCDC;
+    /*padding: 10px;*/
+}
+
+div.message_fehler
+{
+    top: 100px;
+    border: 1px solid red;
+    width: 350px;
+    margin-left: -175px;
+    padding: 10px;
+    padding-left:35px;
+    left: 50%;
+    position: absolute;
+    background-color: #FFECEC;
+    text-align: center;
+}
+/*
+div#loginform_logo
+{
+    height: 416px;
+    width: 667px;
+    padding: 0;
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    background-color: #DCDCDC;
+    padding: 10px;
+}*/
