@@ -391,8 +391,8 @@ function getPicsAsArray($dir, $filetypes) {
 // ------------------------------------------------------------------------------
 function checkThumbs() {
     // Thumbnail-Funktionalität
-    require_once("Thumbnail.php");
-    $thumbnailfunction = new Thumbnail();
+    require_once("Image.php");
+#    $thumbnailfunction = new Thumbnail();
     
     // Vorschauverzeichnis prüfen
     if (!file_exists($this->dir_thumbs))
@@ -401,8 +401,9 @@ function checkThumbs() {
     foreach($this->picarray as $pic) {
         // Vorschaubild anlegen, wenn nicht vorhanden
         if (!file_exists($this->dir_thumbs.$pic))
-            $thumbnailfunction->createThumb($pic, $this->dir_gallery, $this->dir_thumbs);
-    }
+            scaleImage($pic, $this->dir_gallery, $this->dir_thumbs);
+#            $thumbnailfunction->createThumb($pic, $this->dir_gallery, $this->dir_thumbs);
+   }
 }
 
 
