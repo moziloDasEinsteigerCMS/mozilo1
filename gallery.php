@@ -7,6 +7,7 @@
 * $Author$
 *
 */
+$CHARSET = 'UTF-8';
 
 require_once("Language.php");
 require_once("Properties.php");
@@ -167,6 +168,7 @@ class Gallery {
 // ------------------------------------------------------------------------------
     function readTemplate() {
        
+$CHARSET = 'UTF-8';
         // Template-Datei auslesen
         if (!$file = @fopen($this->template_file, "r")) {
             die($this->language->getLanguageValue1("message_template_error_1", $this->template_file));
@@ -179,9 +181,9 @@ class Gallery {
                 return false;
             }
         }
-
         // Platzhalter des Templates mit Inhalt füllen
         $this->html = preg_replace('/{CSS_FILE}/', $this->specialchars->replaceSpecialChars($this->css_file, true), $template);
+        $this->html = preg_replace('/{CHARSET}/', $CHARSET, $this->html);
         $this->html = preg_replace('/{FAVICON_FILE}/', $this->specialchars->replaceSpecialChars($this->favicon_file, true), $this->html);
         $this->html = preg_replace('/{LAYOUT_DIR}/', $this->specialchars->replaceSpecialChars($this->layout_dir, true), $this->html);
         $this->html = preg_replace('/{CMSINFO}/', $this->getCmsInfo(), $this->html);
@@ -423,17 +425,20 @@ function checkThumbs() {
 // ------------------------------------------------------------------------------
     function getWebsiteTitle($websitetitle, $cattitle, $pagetitle) {
 
-        $title = $this->mainconf->get("titlebarformat");
-        $sep = $this->mainconf->get("titlebarseparator");
+        $websitetitle = $this->specialchars->rebuildSpecialChars($websitetitle,false,true);
+        $cattitle = $this->specialchars->rebuildSpecialChars($cattitle,false,true);
+        $pagetitle = $this->specialchars->rebuildSpecialChars($pagetitle,false,true);
+        $title = $this->specialchars->rebuildSpecialChars($this->mainconf->get("titlebarformat"),false,true);
+        $sep = $this->specialchars->rebuildSpecialChars($this->mainconf->get("titlebarseparator"),false,true);
         
-    $title = preg_replace('/{WEBSITE}/', $websitetitle, $title);
+        $title = preg_replace('/{WEBSITE}/', $websitetitle, $title);
         if ($cattitle == "")
             $title = preg_replace('/{CATEGORY}/', "", $title);
         else
             $title = preg_replace('/{CATEGORY}/', $cattitle, $title);
-    $title = preg_replace('/{PAGE}/', $pagetitle, $title);
-    $title = preg_replace('/{SEP}/', $sep, $title);
-    return $title;
+        $title = preg_replace('/{PAGE}/', $pagetitle, $title);
+        $title = preg_replace('/{SEP}/', $sep, $title);
+        return $title;
     }
 
 
