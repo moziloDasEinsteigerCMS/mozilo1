@@ -302,7 +302,7 @@ foreach($array_tabs as $position => $language) {
     $html .= '<td width="2%" class="td_button'.$activ.'" nowrap>';
     $html .= '<form class="form" accept-charset="'.$CHARSET.'" action="index.php" method="post">';
     $html .= '<script type="text/javascript">document.write(\'<input type="hidden" name="javascript" value="ja">\');</script>';
-    $html .= '<button class="button_tab'.$activ.'" type="submit" name="action_'.$position.'" value="'.getLanguageValue($language."_button").'" title="'.getLanguageValue($language."_button").'"'.$tooltip.' accesskey="s">';
+    $html .= '<button class="button_tab'.$activ.'" type="submit" name="action_'.$position.'" value="'.getLanguageValue($language."_button").'" title="'.getLanguageValue($language."_button").'"'.$tooltip.'>';
     $html .= '<table width="50%" class="button_tab_inhalt'.$activ.'" cellspacing="0" cellpadding="0" border="0"><tr><td width="2%" class="button_tab_icon"><img src="gfx/icons/'.$icon_size.'/'.$language.'.png" alt="" width="24" height="24" hspace="0" vspace="0" border="0"></td><td width="98%" class="button_tab_text">'.getLanguageValue($language."_button").'</td></tr></table>';
     $html .= '</button>';
     $html .= '</form>';
