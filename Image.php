@@ -43,10 +43,10 @@ class Thumbnail {
         // Variablen
         // --------------------------------------------------------------------
         if($maxWidth === false or empty($maxWidth)) {
-            $maxWidth  = 120; // Maximal Breite des Bildes
+            $maxWidth  = 134; // Maximal Breite des Bildes
         }
         if($maxHeight === false or empty($maxHeight)) {
-            $maxHeight = 120; // Maximal höhe des Bildes
+            $maxHeight = 100; // Maximal höhe des Bildes
         }
 
         // --------------------------------------------------------------------
