@@ -79,7 +79,7 @@ elseif  (isset($_POST['login'])) {
     $falselogincount = ($logindataconf->get("falselogincount"))+1;
     $logindataconf->set("falselogincount", $falselogincount); // Gesamtzähler
     $HTML .= "<head>"
-        ."<link rel=\"stylesheet\" href=\"adminstyle_neu.css\" type=\"text/css\" />"
+        ."<link rel=\"stylesheet\" href=\"adminstyle.css\" type=\"text/css\" />"
         ."<title>".getLanguageValue("incorrect_login")."</title>"
         ."</head>"
         ."<body onLoad=\"document.loginform.username.focus();document.loginform.username.select()\" >"
@@ -113,7 +113,7 @@ elseif  (isset($_POST['login'])) {
 // Formular noch nicht abgeschickt? Dann wurde die Seite zum ersten Mal aufgerufen.
 else {
     $HTML .= "<head>"
-        ."<link rel=\"stylesheet\" href=\"adminstyle_neu.css\" type=\"text/css\">"
+        ."<link rel=\"stylesheet\" href=\"adminstyle.css\" type=\"text/css\">"
         ."<title>".getLanguageValue("loginplease")."</title>"
         ."</head>"
         ."<body onLoad=\"document.loginform.username.focus();document.loginform.username.select()\">";

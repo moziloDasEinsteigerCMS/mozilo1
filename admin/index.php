@@ -17,7 +17,7 @@ $CHARSET = 'UTF-8';
 session_start();
  
 $debug = "ja"; # ja oder nein
- // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
+ // Initial: Fehlerausgabe unterdrï¿½cken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 if($debug != "ja")
     @ini_set("display_errors", 0);
 
@@ -67,7 +67,7 @@ if(!is_dir("../conf")) {
 }
 /*
 properties['readonly'] = nur lesen
-properties['error'] = kann nicht lesen oder schreiben, Sperdatei anlegen oder Sperdatei kann nicht gelöscht werden
+properties['error'] = kann nicht lesen oder schreiben, Sperdatei anlegen oder Sperdatei kann nicht gelï¿½scht werden
 */
 
 $ADMIN_CONF    = new Properties("conf/basic.conf",true);
@@ -111,7 +111,7 @@ if(!isset($DOWNLOAD_COUNTS->properties['readonly'])) {
 }
 
 $LOGINCONF = new Properties("conf/logindata.conf",true);
-# die muss schreiben geöfnet werden können
+# die muss schreiben geï¿½fnet werden kï¿½nnen
 if(isset($LOGINCONF->properties['error'])) {
     die($LOGINCONF->properties['error']);
 }
@@ -190,7 +190,7 @@ foreach($array_tabs as $pos => $tab) {
 
 # action_data parameter die mit cat page zu tun haben
 if(isset($_POST['action_data'])) {
-    # ist das Array für Kategorien oder Inhaltseiten nicht erzeugen
+    # ist das Array fï¿½r Kategorien oder Inhaltseiten nicht erzeugen
     $post['makepara'] = "no";
     if(isset($_POST['checkpara']) and $_POST['checkpara'] == "yes") {
         $post['categories'] = checkPostCatPageReturnVariable("$CONTENT_DIR_REL/");
@@ -230,7 +230,7 @@ if($LOGINCONF->get("initialsetup") == "true") {
     $action = "admin";
 }
 
-# Backup erinerung bestätigen
+# Backup erinerung bestï¿½tigen
 $error_backup = NULL;
 if(getRequestParam("lastbackup_yes", true)) {
     $post['makepara'] = "yes";
@@ -258,7 +258,7 @@ $html .= '<meta http-equiv="Content-Type" content="text/html;charset='.$CHARSET.
 $html .= '<script type="text/javascript" src="buttons.js"></script>';
 $html .= '<script type="text/javascript" src="multifileupload.js"></script>';
 $html .= "<title>$ADMIN_TITLE - $pagetitle</title>";
-$html .= '<link type="text/css" rel="stylesheet" href="adminstyle_neu.css">';
+$html .= '<link type="text/css" rel="stylesheet" href="adminstyle.css">';
 $html .= '<link type="text/css" rel="stylesheet" href="editsite.css">';
 $html .= '<link type="text/css" rel="stylesheet" media="screen" href="js_color_picker_v2/js_color_picker_v2.css">';
 $html .= '<script type="text/javascript" src="js_color_picker_v2/color_functions.js"></script>';
@@ -356,7 +356,7 @@ if (($intervallsetting != "") && preg_match("/^[0-9]+$/", $intervallsetting) && 
     else {
         $nextbackup = $lastbackup + $intervallinseconds;
         if($nextbackup <= time())    {
-            $html .= returnMessage(false, getLanguageValue("admin_messages_backup").'<br>Bitte bestätigen <input type="submit" name="lastbackup_yes" value="'.getLanguageValue("yes").'">');
+            $html .= returnMessage(false, getLanguageValue("admin_messages_backup").'<br>Bitte bestï¿½tigen <input type="submit" name="lastbackup_yes" value="'.getLanguageValue("yes").'">');
         }
     }
 }
@@ -460,7 +460,7 @@ function home($post) {
     .'<td width="50%" class="td_cms_left">'.getLanguageValue("cmsversion_text")."</td>"
     .'<td width="50%" class="td_cms_left">'.$VERSION_CONF->get("cmsversion").' ("'.$VERSION_CONF->get("cmsname").'")</td>'
     ."</tr>"
-    // Zeile "Gesamtgröße des CMS"
+    // Zeile "Gesamtgrï¿½ï¿½e des CMS"
     ."<tr>"
     .'<td width="50%" class="td_cms_left">'.getLanguageValue("cmssize_text")."</td>"
     .'<td width="50%" class="td_cms_left">'.$cmssize."</td>"
@@ -755,9 +755,9 @@ function editCategory($post) {
                 $post['displays']['cat']['error_html']['display'][$pos] = 'style="display:block;" ';
             } else {
                 if(!isset($post['categories']['cat']['url'][$pos])) {
-                    // Referenzen auf die umbenannte Kategorie in der Download-Statistik Ändern
+                    // Referenzen auf die umbenannte Kategorie in der Download-Statistik ï¿½ndern
                     renameCategoryInDownloadStats($orgname[$pos],$newname[$pos]);
-                    // Referenzen auf die umbenannte Kategorie in allen Inhaltsseiten Ändern
+                    // Referenzen auf die umbenannte Kategorie in allen Inhaltsseiten ï¿½ndern
                     $error['updateReferences'] = updateReferencesInAllContentPages($orgname[$pos],"",$newname[$pos],"");
                     if(is_array($error['updateReferences'])) {
                         $post['makepara'] = "yes";
@@ -812,19 +812,19 @@ function deleteCategory($post) {
     global $CMS_CONF;
 
     $icon_size = '24x24';
-    # Nachfragen wirklich Löschen
+    # Nachfragen wirklich Lï¿½schen
     if(!isset($_POST['confirm'])) {
         $del_cat = key($post['action_data']['deletecategory']);
         $post['ask'] = getLanguageValue("category_ask_delete").'<br><span style="font-weight:normal;">-&gt;&nbsp;&nbsp;'.messagesOutLen($specialchars->rebuildSpecialChars($del_cat, true, true)).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletecategory]" value="'.$post['action_data']['deletecategory'].'"><input type="hidden" name="del_cat" value="'.$del_cat.'">';
         $post['makepara'] = "yes";
         return $post;
     }
-    # Kategorie Löschen    
+    # Kategorie Lï¿½schen    
     if(isset($_POST['confirm']) and $_POST['confirm'] == "true" and isset($_POST['del_cat']) and !empty($_POST['del_cat'])) {
         $del_cat = "$CONTENT_DIR_REL/".$_POST['del_cat'];
         $post['error_messages'] = deleteDir($del_cat);
         if(!file_exists($_POST['del_cat'])) {
-            // Alle Dateien der gelöschten Kategorie aus Downloadstatistik entfernen
+            // Alle Dateien der gelï¿½schten Kategorie aus Downloadstatistik entfernen
             deleteCategoryFromDownloadStats($_POST['del_cat']);
             $post['messages']['category_message_delete'][] = $_POST['del_cat'];
             $post['makepara'] = "yes";
@@ -1115,7 +1115,7 @@ function editSite($post) {
             } elseif(!is_file("$CONTENT_DIR_REL/$cat/$new_page")) {
                 $post['error_messages']['page_message_rename'][] = $page." <b>></b> ".$new_page;
             } else {
-                # ext hat sich geändert
+                # ext hat sich geï¿½ndert
                 $page = $new_page;
             }
         }
@@ -1167,7 +1167,7 @@ function copymoveSite($post) {
             continue;
         }
 
-        # rename bauen wenn die position sich nicht geändert hat aber was anderes
+        # rename bauen wenn die position sich nicht geï¿½ndert hat aber was anderes
         foreach($post['categories'][$cat]['position'] as $pos => $tmp) {
             # Neue Inhaltseite nicht hier
             if($pos == $max_cat_page) {
@@ -1236,10 +1236,10 @@ function copymoveSite($post) {
         # jetzt alle position_move sachen machen (Neue Inhaltseite, copy_move und Positions wechsel)
         $array_return = position_move($post['categories'][$cat]['position'],$post['categories'][$cat]['new_position'],$new_move_cat_page);
 
-        # hier die Inhatseiten aus anderer Kategorie fürs copy unlink bauen
+        # hier die Inhatseiten aus anderer Kategorie fï¿½rs copy unlink bauen
         if(isset($move_copy_newname)) {
             foreach($move_copy_newname as $z => $tmp) {
-                # wenn die Position von position_move() geändert wurde
+                # wenn die Position von position_move() geï¿½ndert wurde
                 $new_position = $move_copy_newname[$z]['position'];
                 if(isset($array_return['move_cat_page_newposition'][$move_copy_newname[$z]['position']])) {
                     $new_position = $array_return['move_cat_page_newposition'][$move_copy_newname[$z]['position']];
@@ -1320,7 +1320,7 @@ function copymoveSite($post) {
                     $post['messages']['page_message_rename'][] = $cat."/".$rename_orgname[$cat][$z]." <b>></b> ".$cat."/".$rename_newname[$cat][$z];
                     $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" '; # letzte cat ausklappen
                     $post['makepara'] = "yes"; # makePostCatPageReturnVariable()
-                    # nur wenn name != neu_name also die Position wird nicht berücksichtigt
+                    # nur wenn name != neu_name also die Position wird nicht berï¿½cksichtigt
                     if(substr($rename_orgname[$cat][$z],3) != substr($rename_newname[$cat][$z],3)) {
                         $error_message['updateReferences'] = updateReferencesInAllContentPages($cat, $rename_orgname[$cat][$z], "", $rename_newname[$cat][$z]);
                         if(is_array($error_message['updateReferences'])) {
@@ -1433,14 +1433,14 @@ function deleteSite($post) {
     $icon_size = '24x24';
     $cat = key($post['action_data']['deletesite']);
     $del_page = $cat."/".$post['action_data']['deletesite'][$cat];
-    # Nachfragen wirklich Löschen
+    # Nachfragen wirklich Lï¿½schen
     if(!isset($_POST['confirm'])) {
         $post['ask'] = getLanguageValue("page_ask_delete").':<br><span style="font-weight:normal;">->&nbsp;&nbsp;'.$specialchars->rebuildSpecialChars($post['action_data']['deletesite'][$cat],true,true).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletesite]['.$cat.']" value="'.$post['action_data']['deletesite'][$cat].'">';
         $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
         $post['makepara'] = "yes";
         return $post;
     }
-    # Kategorie Löschen    
+    # Kategorie Lï¿½schen    
     if(isset($_POST['confirm'])) {
         if($_POST['confirm'] == "true") {
             @unlink("$CONTENT_DIR_REL/".$del_page);
@@ -1614,7 +1614,7 @@ $tooltip_help_edit = NULL;
         if(getRequestParam('javascript', true)) {
             $pagecontent .= '<span id="toggle_'.$toggle_pos.'_linkBild"'.$tooltip_gallery_help_edit.'></span>';
         }
-        $pagecontent .= '<input type="image" class="input_img_button_last" name="action_data[deletegallery]['.$currentgalerien.']" value="'.$text_gallery_button_gallery_delete.'" src="gfx/icons/'.$icon_size.'/delete.png" title="löschen"'.$tooltip_gallery_help_del.'></td></tr></table>';
+        $pagecontent .= '<input type="image" class="input_img_button_last" name="action_data[deletegallery]['.$currentgalerien.']" value="'.$text_gallery_button_gallery_delete.'" src="gfx/icons/'.$icon_size.'/delete.png" title="lï¿½schen"'.$tooltip_gallery_help_del.'></td></tr></table>';
         $pagecontent .= '</td></tr>';
 
 
@@ -1739,7 +1739,7 @@ galleryusethumbs = false*/
         $pagecontent .= "<tr>";
         $new_tr = false;
         foreach ($gallerypics as $pos => $file) {
-            # auspleich weil pos mit 0 anfängt
+            # auspleich weil pos mit 0 anfï¿½ngt
             $pos = $pos + 1;
 #            $counter++;
             $lastsavedanchor = "";#$lastsavedanchor = " id=\"lastsavedimage\"";
@@ -1780,7 +1780,7 @@ $pagecontent .= "pos = $pos max_cols = $max_cols_check<br>\n";
                             <table width="100%" cellspacing="0" border="0" cellpadding="0">
                             <tr><td width="99%">
                             <input type="text" class="input_readonly" name="gallery['.$currentgalerien.'][image][]" value="'.$specialchars->rebuildSpecialChars($file, true, true).'" maxlength="'.$max_strlen.'" readonly'.$tooltip_gallery_help_name.'></td>
-                            <td width="1%" nowrap>&nbsp;&nbsp;<input type="image" class="input_img_button_last" name="action_data[deletegalleryimg]['.$currentgalerien.']['.$file.']" value="'.$text_gallery_button_img_delete.'" src="gfx/icons/'.$icon_size.'/delete.png" title="löschen"'.$tooltip_gallery_help_del.'>
+                            <td width="1%" nowrap>&nbsp;&nbsp;<input type="image" class="input_img_button_last" name="action_data[deletegalleryimg]['.$currentgalerien.']['.$file.']" value="'.$text_gallery_button_img_delete.'" src="gfx/icons/'.$icon_size.'/delete.png" title="lï¿½schen"'.$tooltip_gallery_help_del.'>
                             </td></tr></table>
                             </td></tr>
                             </table>';
@@ -1924,7 +1924,7 @@ function newGallery($post) {
                             } elseif(!is_file($GALLERIES_DIR_REL."/".$galleryname."/gallery.conf")) {
                                 $post['error_messages']['gallery_error_datei_conf'][] = $galleryname."/gallery.conf";
                             } else {
-                                # das kann nur in der gallery.conf geändert werden deshalb hier rein
+                                # das kann nur in der gallery.conf geï¿½ndert werden deshalb hier rein
                                 fwrite($handle,"maxthumbheight = 120\nmaxthumbwidth = 120\n");
                                 fclose($handle);
                                 $error = changeChmod($GALLERIES_DIR_REL."/".$galleryname);
@@ -2136,13 +2136,13 @@ function deleteGallery($post) {
     global $PREVIEW_DIR_NAME;
 
     $icon_size = '24x24';
-    # Nachfragen wirklich Löschen
+    # Nachfragen wirklich Lï¿½schen
     if(!isset($_POST['confirm'])) {
         $del_gallery = key($post['action_data']['deletegallery']);
         $post['ask'] = getLanguageValue("gallery_ask_delete").'<br><span style="font-weight:normal;">-&gt;&nbsp;&nbsp;'.messagesOutLen($specialchars->rebuildSpecialChars($del_gallery, true, true)).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletegallery]" value="'.$post['action_data']['deletegallery'].'"><input type="hidden" name="del_gallery" value="'.$del_gallery.'">';
 #        return $post;
     }
-    # Gallery Löschen    
+    # Gallery Lï¿½schen    
     if(isset($_POST['confirm']) and $_POST['confirm'] == "true" and isset($_POST['del_gallery']) and !empty($_POST['del_gallery'])) {
         $del_gallery = $GALLERIES_DIR_REL."/".$_POST['del_gallery'];
         $post['error_messages'] = deleteDir($del_gallery);
@@ -2193,7 +2193,7 @@ function files($post) {
     } else {
         $tooltip_files_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration&amp;&page=50_Dateien" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
     }
-    # Prüfen ob der Ordner dateien existiert wenn nicht anlegen
+    # Prï¿½fen ob der Ordner dateien existiert wenn nicht anlegen
     foreach ($post['categories']['cat']['position'] as $pos => $position) {
         if($pos == $max_cat_page or isset($post['categories']['cat']['url'][$pos])) {
             continue;
@@ -2219,7 +2219,7 @@ function files($post) {
     $pagecontent .= $tooltip_files_help;
     $pagecontent .= "<p>".getLanguageValue("files_text")."</p>";
 
-# im admin prüfen wenn conf nicht von hand ????????????????????????????????????????????
+# im admin prï¿½fen wenn conf nicht von hand ????????????????????????????????????????????
     $maxnumberoffiles = $ADMIN_CONF->get("maxnumberofuploadfiles");
     if (!is_numeric($maxnumberoffiles) || ($maxnumberoffiles < 1)) {
         $maxnumberoffiles = 5;
@@ -2337,7 +2337,7 @@ function files($post) {
 #                    $downloadsperdaytext = "(".$downloadsperday." ".getLanguageValue("data_downloadsperday").")";
 #                else
                     $downloadsperdaytext = "";
-                // Dateigröße
+                // Dateigrï¿½ï¿½e
                 $filesize = filesize("$CONTENT_DIR_REL/$file/dateien/$subfile");
 
         $titel_dateien = NULL;
@@ -2450,7 +2450,7 @@ function config($post) {
 
     $main = makeDefaultConf("main");
 
-    # error colors für die input felder vorbereiten vom main array,usersyntax und input_mail array
+    # error colors fï¿½r die input felder vorbereiten vom main array,usersyntax und input_mail array
     foreach($main as $type => $type_array) {
         if($type == 'expert') continue;
         foreach($main[$type] as $syntax_name => $dumy) {
@@ -2497,12 +2497,12 @@ function config($post) {
             }
         }
 
-        # usecmssyntax wurde eingeschaltet also posts fühlen
+        # usecmssyntax wurde eingeschaltet also posts fï¿½hlen
         if(isset($post['usecmssyntax']) and $post['usecmssyntax'] == "true" and $CMS_CONF->get('usecmssyntax') == "false") {
             $post['replaceemoticons'] = $CMS_CONF->get('replaceemoticons');
             $post['shortenlinks'] = $CMS_CONF->get('shortenlinks');
         }
-        # usecmssyntax ist ausgeschaltet also posts fühlen
+        # usecmssyntax ist ausgeschaltet also posts fï¿½hlen
         if($CMS_CONF->get('usecmssyntax') == "false") {
             $post['replaceemoticons'] = $CMS_CONF->get('replaceemoticons');
         }
@@ -2599,7 +2599,7 @@ function config($post) {
                     } else {
                         $count = 0;
                         $search_tmp = substr($zeile,0,strpos($zeile," =") + strlen(" = "));
-                        # Dopelte einträge suchen
+                        # Dopelte eintrï¿½ge suchen
                         foreach($usersyntax_array as $zeile) {
                             if(strstr($zeile," =") !== false and strpos($zeile,$search_tmp) !== false) {
                                 $count++;
@@ -2618,7 +2618,7 @@ function config($post) {
                 fclose($handle);
                 # sonst kann es pasieren das filesize im cache gespeichert wird
                 clearstatcache();
-                # nur Speichern wenn sich was geändert hat
+                # nur Speichern wenn sich was geï¿½ndert hat
                 if($test != $usersyntax_text) {
                     $handle = @fopen($USER_SYNTAX_FILE, "w");
                     fputs($handle, $usersyntax_text);
@@ -2906,7 +2906,7 @@ function config($post) {
         // Zeile "showhiddenpagesin"
         $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_showhiddenpages").'</td>';
         $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("showhiddenpagesinlastchanged", ($CMS_CONF->get("showhiddenpagesinlastchanged") == "true")).getLanguageValue("config_input_lastchanged").'<br>'.buildCheckBox("showhiddenpagesinsearch", ($CMS_CONF->get("showhiddenpagesinsearch") == "true")).getLanguageValue("config_input_search").'<br>'.buildCheckBox("showhiddenpagesinsitemap", ($CMS_CONF->get("showhiddenpagesinsitemap") == "true")).getLanguageValue("config_input_sitemap").'</td></tr>';
-        // Zeile "Links öffnen self blank"
+        // Zeile "Links ï¿½ffnen self blank"
         $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_target").'</td>';
         $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("targetblank_download", ($CMS_CONF->get("targetblank_download") == "true")).getLanguageValue("config_input_download")
 #.'<br>'.buildCheckBox("targetblank_gallery", ($CMS_CONF->get("targetblank_gallery") == "true")).getLanguageValue("config_input_gallery")
@@ -2948,7 +2948,7 @@ function admin($post) {
 
     $basic = makeDefaultConf("basic");
 
-    # error colors für die input felder vorbereiten
+    # error colors fï¿½r die input felder vorbereiten
     foreach($basic as $type => $type_array) {
         if($type == 'expert') continue;
         foreach($basic[$type] as $syntax_name => $dumy) {
@@ -2999,13 +2999,13 @@ function admin($post) {
     // Auswertung des Formulars
     if(isset($post['apply']) and $post['apply'] == getLanguageValue("admin_submit")) {
 
-        # auf jeden fall erst mal deDE setzen ist blöd wenn kein language gesetzt ist
+        # auf jeden fall erst mal deDE setzen ist blï¿½d wenn kein language gesetzt ist
         $ADMIN_CONF->set('language', "deDE");
         if(count($language_array) > 0) {
             $ADMIN_CONF->set('language', $post['language']);
         }
 
-        # wenn expert eingeschaltet wird müssen die expert $post gefühlt werden
+        # wenn expert eingeschaltet wird mï¿½ssen die expert $post gefï¿½hlt werden
         if(checkBoxChecked('showexpert') == "true" and $ADMIN_CONF->get('showexpert') == "false") {
             foreach($basic['expert'] as $syntax) {
                 if($syntax == 'lastbackup' or $syntax == 'usebigactionicons') {
@@ -3103,13 +3103,13 @@ function admin($post) {
                 $post['error_messages']['pw_error_tooshortname']['color'] = "#FF7029";
                 $post['error_messages']['pw_error_tooshortname'][] = NULL;
                 $error_color['newname'] = ' style="background-color:#FF7029;"';
-            // Neues Paßwort zweimal exakt gleich eingegeben?
+            // Neues Paï¿½wort zweimal exakt gleich eingegeben?
             } elseif ($post['newpw'] != $post['newpwrepeat']) {
                 $post['error_messages']['pw_error_newpwmismatch']['color'] = "#FF7029";
                 $post['error_messages']['pw_error_newpwmismatch'][] = NULL;
                 $error_color['newpw'] = ' style="background-color:#FF7029;"';
                 $error_color['newpwrepeat'] = ' style="background-color:#FF7029;"';
-            // Neues Paßwort wenigstens sechs Zeichen lang und mindestens aus kleinen und großen Buchstaben sowie Zahlen bestehend?
+            // Neues Paï¿½wort wenigstens sechs Zeichen lang und mindestens aus kleinen und groï¿½en Buchstaben sowie Zahlen bestehend?
             } elseif ((strlen($post['newpw']) <= 6) or !preg_match("/[0-9]/", $post['newpw']) or !preg_match("/[a-z]/", $post['newpw']) or !preg_match("/[A-Z]/", $post['newpw'])) {
                 $post['error_messages']['pw_error_newpwerror']['color'] = "#FF7029";
                 $post['error_messages']['pw_error_newpwerror'][] = NULL;
@@ -3333,7 +3333,7 @@ function plugins($post) {
         if (file_exists("../$PLUGIN_DIR/".$currentelement."/index.php")) {
             require_once("../$PLUGIN_DIR/".$currentelement."/index.php");
             $plugin = new $currentelement();
-            // Enthält der Code eine Klasse mit dem Namen des Plugins?
+            // Enthï¿½lt der Code eine Klasse mit dem Namen des Plugins?
             if (class_exists($currentelement)) {
                 $plugin_info = $plugin->getInfo();
                 $pagecontent .= '<tr><td width="100%" class="td_toggle">';
@@ -3388,7 +3388,7 @@ function plugins($post) {
                                     break;
                                 }
                             }
-                            # Änderungen schreiben isset($_POST['apply'])
+                            # ï¿½nderungen schreiben isset($_POST['apply'])
                             if(getRequestParam('apply', true)) {
                                 if(isset($_POST[$currentelement][$name])) {
                                     # ist array bei radio und select multi
@@ -3405,11 +3405,11 @@ function plugins($post) {
                                             $regex_error = getLanguageValue("plugins_messages_input");
                                         }
                                         if(preg_match($config[$name]['regex'], $conf_inhalt)) {
-                                            # bei Password und verschlüsselung an
+                                            # bei Password und verschlï¿½sselung an
                                             if($config[$name]['type'] == "password" and $config[$name]['saveasmd5'] == "true") {
                                                 $conf_inhalt = md5($conf_inhalt);
                                             }
-                                            # nur in conf schreiben wenn sich der wert geändert hat
+                                            # nur in conf schreiben wenn sich der wert geï¿½ndert hat
                                             if($conf_plugin->get($name) != $conf_inhalt) {
                                                 $conf_plugin->set($name,$conf_inhalt);
                                                 $display_toggle = ' style="display:block;"';
@@ -3421,7 +3421,7 @@ function plugins($post) {
                                             $messages = returnMessage(false, $regex_error);
                                         }
                                     } else {
-                                        # nur in conf schreiben wenn sich der wert geändert hat und es kein password ist
+                                        # nur in conf schreiben wenn sich der wert geï¿½ndert hat und es kein password ist
                                         if($conf_plugin->get($name) != $conf_inhalt and $config[$name]['type'] != "password") {
                                             $conf_plugin->set($name,$conf_inhalt);
                                             $display_toggle = ' style="display:block;"';
@@ -3568,7 +3568,7 @@ function showEditPageForm($cat, $page, $newsite)    {
 
     $file = $CONTENT_DIR_REL."/".$cat."/".$page;
 
-    # Vorhandene Inhaltseite öffnen
+    # Vorhandene Inhaltseite ï¿½ffnen
     if ($newsite == 'editsite') {
         // Inhaltsseite: Inhalt ins Textfeld holen
         $handle=fopen($file, "r");
@@ -3649,10 +3649,10 @@ function saveContentToPage($content, $page) {
     return;
 }
 
-// Lösche ein Verzeichnis rekursiv
+// Lï¿½sche ein Verzeichnis rekursiv
 function deleteDir($path) {
 
-    // Existenz prüfen
+    // Existenz prï¿½fen
     if (!file_exists($path)) {
         $error['check_is_file'][] = basename($path);
         return $error;
@@ -3665,7 +3665,7 @@ function deleteDir($path) {
         // Verzeichnis: Rekursiver Funktionsaufruf
         if (is_dir($path."/".$currentelement)) {
             $success = deleteDir($path."/".$currentelement);
-        // Datei: löschen
+        // Datei: lï¿½schen
         } else {
             $success = @unlink($path."/".$currentelement);
             $line_error = __LINE__ - 1;
@@ -3681,7 +3681,7 @@ function deleteDir($path) {
         }
     }
     closedir($handle);
-    // Verzeichnis löschen
+    // Verzeichnis lï¿½schen
     $success = @rmdir($path);
     $line_error = __LINE__ - 1;
     $last_error = @error_get_last();
@@ -3695,7 +3695,7 @@ function deleteDir($path) {
     } else return;
 }
 
-// Überprüfe, ob die gegebene Datei eine der übergebenen Endungen hat
+// ï¿½berprï¿½fe, ob die gegebene Datei eine der ï¿½bergebenen Endungen hat
 function fileHasExtension($filename, $extensions) {
     foreach ($extensions as $ext) {
         if (strtolower(substr($filename, strlen($filename)-(strlen($ext)+1), strlen($ext)+1)) == ".".strtolower($ext))
@@ -3704,7 +3704,7 @@ function fileHasExtension($filename, $extensions) {
     return false;
 }
 
-// Gib Erfolgs- oder Fehlermeldung zurück
+// Gib Erfolgs- oder Fehlermeldung zurï¿½ck
 function returnMessage($success, $message) {
     if ($success === true) {
         return '<span class="message_erfolg">'.$message.'</span>';
@@ -3861,7 +3861,7 @@ function returnFormatToolbarIcon($tag) {
 }
 
 
-// Rueckgabe einer Selectbox mit Elementen, die per Klick in die Inhaltsseite uebernommen werden können
+// Rueckgabe einer Selectbox mit Elementen, die per Klick in die Inhaltsseite uebernommen werden kï¿½nnen
 // $type: 1=Kategorien 2=Inhaltsseiten 3=Dateien 4=Galerien
 function returnOverviewSelectbox($type, $currentcat) {
     global $specialchars;
@@ -3979,13 +3979,13 @@ if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
 }
 
 
-// alle Dateien einer Kategorie aus der Download-Statistik löschen
+// alle Dateien einer Kategorie aus der Download-Statistik lï¿½schen
 function deleteCategoryFromDownloadStats($catname) {
     global $DOWNLOAD_COUNTS;
     // Download-Statistik als Array holen
     $downloadsarray = $DOWNLOAD_COUNTS->toArray();
     foreach($downloadsarray as $key => $value) {
-        // Keys mit zu löschendem Kategorienamen: aus dem Array nehmen
+        // Keys mit zu lï¿½schendem Kategorienamen: aus dem Array nehmen
         $data = explode(":", $key);
         if ($data[0] == $catname) {
             unset($downloadsarray[$key]);
@@ -4006,7 +4006,7 @@ function renameCategoryInDownloadStats($oldcatname, $newcatname) {
         $keyparts = explode(":", $key);
         if ($keyparts[0] == $oldcatname) {
             $downloadsarray[$newcatname.":".$keyparts[1]] = $value; // Element mit neuem Key ans Array hÃ¤ngen
-            unset($downloadsarray[$key]);                            // Element mit altem Key aus Array löschen
+            unset($downloadsarray[$key]);                            // Element mit altem Key aus Array lï¿½schen
         }
     }
     // bearbeitetes Array wieder zurueck in die Download-Statistik schreiben
@@ -4123,7 +4123,7 @@ function checkBoxChecked($checkboxrequest) {
 // ------------------------------------------------------------------------------
     function getRequestParam($param, $clean) {
         if (isset($_POST[$param])) {
-          // Nullbytes abfangen! "tmp" weil bei nur einem zeichen strpos fehlschlägt
+          // Nullbytes abfangen! "tmp" weil bei nur einem zeichen strpos fehlschlï¿½gt
             if (strpos("tmp".$_POST[$param], "\x00") > 0) {
                 die();
             }
