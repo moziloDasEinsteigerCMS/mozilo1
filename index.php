@@ -512,7 +512,6 @@ echo "<pre>";
 print_r($categoriesarray);
 echo "</pre><br>\n";*/
         // numerische Accesskeys für angezeigte Menüpunkte
-        $currentaccesskey = 0;
         // Jedes Element des Arrays ans Menü anhängen
         foreach ($categoriesarray as $currentcategory) {
             # Mod Rewrite
@@ -529,9 +528,8 @@ echo "</pre><br>\n";*/
             }
             // Aktuelle Kategorie als aktiven Menüpunkt anzeigen...
             elseif ($currentcategory == $CAT_REQUEST) {
-                $currentaccesskey++;
                 $mainmenu .= "<li class=\"mainmenu\">".
-                    "<a href=\"".$url."\" class=\"menuactive\" accesskey=\"$currentaccesskey\"".
+                    "<a href=\"".$url."\" class=\"menuactive\"".
                     $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_category_1", catToName($currentcategory, false))).
                     ">".catToName($currentcategory, false)."</a>";
                 if ($CMS_CONF->get("usesubmenu") > 0) {
@@ -541,9 +539,8 @@ echo "</pre><br>\n";*/
             }
             // ...alle anderen als normalen Menüpunkt.
             else {
-                $currentaccesskey++;
                 $mainmenu .= "<li class=\"mainmenu\">".
-                    "<a href=\"".$url."\" class=\"menu\" accesskey=\"$currentaccesskey\"".
+                    "<a href=\"".$url."\" class=\"menu\"".
                      $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_category_1", catToName($currentcategory, false))).
                      ">".catToName($currentcategory, false)."</a>";
                 if ($CMS_CONF->get("usesubmenu") == 2) {
@@ -601,10 +598,8 @@ echo "</pre><br>\n";*/
             }
 
             // alphanumerische Accesskeys (über numerischen ASCII-Code) für angezeigte Menüpunkte
-            $currentaccesskey = 0;
             // Jedes Element des Arrays ans Menü anhängen
             foreach ($contentarray as $currentcontent) {
-                $currentaccesskey++;
                 // Inhaltsseite nicht anzeigen, wenn sie genauso heißt wie die Kategorie
                 if ($CMS_CONF->get("hidecatnamedpages") == "true") {
                     if(substr($currentcontent, 3, strlen($currentcontent) - 7) == substr($CAT_REQUEST, 3, strlen($CAT_REQUEST) - 3) and substr($currentcontent,-(strlen($EXT_LINK))) != $EXT_LINK) {
@@ -631,7 +626,7 @@ echo "</pre><br>\n";*/
                     && (substr($currentcontent, -(strlen($EXT_LINK))) != $EXT_LINK) // aktive Seite
                 ) {
                     $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$url.
-                                                    "\" class=\"".$cssprefix."active\" accesskey=\"".chr($currentaccesskey+96)."\"".
+                                                    "\" class=\"".$cssprefix."active\"".
                                                     $syntax->getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", pageToName($currentcontent, false), catToName($cat, false))).
                                                     ">".
                                                     pageToName($currentcontent, false).
@@ -643,7 +638,7 @@ echo "</pre><br>\n";*/
                         $detailmenu .= '<li class="detailmenu">'.menuLink($currentcontent,$cssprefix)."</li>";
                     } else {
                         $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$url.
-                                                    "\" class=\"".$cssprefix."\" accesskey=\"".chr($currentaccesskey+96)."\"".
+                                                    "\" class=\"".$cssprefix."\"".
                                                     $syntax->getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", pageToName($currentcontent, false), catToName($cat, false))).
                                                     ">".
                                                     pageToName($currentcontent, false).
@@ -669,7 +664,7 @@ echo "</pre><br>\n";*/
 
         $form = "<form accept-charset=\"$CHARSET\" method=\"get\" action=\"index.php.html\" class=\"searchform\"><fieldset id=\"searchfieldset\">"
         ."<input type=\"hidden\" name=\"action\" value=\"search\" />"
-        ."<input type=\"text\" name=\"query\" value=\"\" class=\"searchtextfield\" accesskey=\"s\" />"
+        ."<input type=\"text\" name=\"query\" value=\"\" class=\"searchtextfield\" />"
         ."<input type=\"image\" name=\"action\" value=\"search\" src=\"".$LAYOUT_DIR."/grafiken/searchicon.gif\" alt=\"".$language->getLanguageValue0("message_search_0")."\" class=\"searchbutton\"".getTitleAttribute($language->getLanguageValue0("message_search_0"))." />"
         ."</fieldset></form>";
         return $form;
