@@ -18,7 +18,7 @@ require_once("filesystem.php");
 // Session starten!
 session_start();
 
-// Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
+// Initial: Fehlerausgabe unterdrï¿½cken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 @ini_set("display_errors", 0);
 
 // Initialisierungen
@@ -30,7 +30,7 @@ if(!isset($logindataconf->properties['readonly'])) {
 $basicconf = new Properties("conf/basic.conf");
 $pwcrypt = new Crypt();
 $mailfunctions = new Mail();
-$BASIC_LANGUAGE = new Properties("conf/language_".$basicconf->get("language").".conf");
+$BASIC_LANGUAGE = new Properties("sprachen/language_".$basicconf->get("language").".conf");
 
 // MAXIMALE ANZAHL FALSCHER LOGINS
 $FALSELOGINLIMIT = 3;
@@ -38,7 +38,7 @@ $FALSELOGINLIMIT = 3;
 $LOGINLOCKTIME = 10;
 
 
-// Überprüfen: Existiert ein Benutzer? Wenn nicht: admin:install anlegen
+// ï¿½berprï¿½fen: Existiert ein Benutzer? Wenn nicht: admin:install anlegen
 if (($logindataconf->get("name") == "") || ($logindataconf->get("pw") == "")) {
     $logindataconf->set("name", "admin");
     $logindataconf->set("pw", $pwcrypt->encrypt("install"));
@@ -48,14 +48,14 @@ if (($logindataconf->get("name") == "") || ($logindataconf->get("pw") == "")) {
 $HTML = "<!doctype html public \"-//W3C//DTD HTML 4.0 //EN\"><html>";
 // User hat sich ausgeloggt
 if (isset($_POST['logout'])) {
-    // Session beenden und die Sessiondaten löschen
+    // Session beenden und die Sessiondaten lï¿½schen
     session_destroy();
     unset($_SESSION);
 }
 
 // Wurde das Anmeldeformular verschickt?
 if  (isset($_POST['login'])) {
-    // Zugangsdaten prüfen
+    // Zugangsdaten prï¿½fen
         if (checkLoginData($_POST['username'], $_POST['password'])) {
             // Daten in der Session merken
       $_SESSION['username'] = $_POST['username'];
@@ -65,7 +65,7 @@ if  (isset($_POST['login'])) {
 
 // Anmeldung erfolgreich
 if (isset($_SESSION['login_okay']) and $_SESSION['login_okay']) {
-    // Counter für falsche Logins innerhalb der Sperrzeit zurücksetzen
+    // Counter fï¿½r falsche Logins innerhalb der Sperrzeit zurï¿½cksetzen
     $logindataconf->set("falselogincounttemp", 0);
     // ...ab in den Admin!
     header("location:index.php");
@@ -73,11 +73,11 @@ if (isset($_SESSION['login_okay']) and $_SESSION['login_okay']) {
 
 // Anmeldung fehlerhaft
 elseif  (isset($_POST['login'])) {
-    // Counter hochzählen
+    // Counter hochzï¿½hlen
     $falselogincounttemp = ($logindataconf->get("falselogincounttemp"))+1;
-    $logindataconf->set("falselogincounttemp", $falselogincounttemp); // Zähler für die aktuelle Sperrzeit
+    $logindataconf->set("falselogincounttemp", $falselogincounttemp); // Zï¿½hler fï¿½r die aktuelle Sperrzeit
     $falselogincount = ($logindataconf->get("falselogincount"))+1;
-    $logindataconf->set("falselogincount", $falselogincount); // Gesamtzähler
+    $logindataconf->set("falselogincount", $falselogincount); // Gesamtzï¿½hler
     $HTML .= "<head>"
         ."<link rel=\"stylesheet\" href=\"adminstyle.css\" type=\"text/css\" />"
         ."<title>".getLanguageValue("incorrect_login")."</title>"
@@ -95,7 +95,7 @@ elseif  (isset($_POST['login'])) {
                 .$_SERVER['REMOTE_ADDR']." / ".gethostbyaddr($_SERVER['REMOTE_ADDR'])."\r\n"
                 .getLanguageValue("username").": ".$_POST['username'];
                 
-                // Prüfen ob die Mail-Funktion vorhanden ist
+                // Prï¿½fen ob die Mail-Funktion vorhanden ist
                 if($mailfunctions->isMailAvailable())
                 {
                     $mailfunctions->sendMailToAdmin(getLanguageValue("loginlocked_mailsubject"), $mailcontent);
@@ -123,7 +123,7 @@ else {
             // gesperrtes Formular anzeigen
             $HTML .= login_formular(false);
         } else {
-            // Zähler zurücksetzen
+            // Zï¿½hler zurï¿½cksetzen
             $logindataconf->set("falselogincounttemp", 0);
             // normales Formular anzeigen
             $HTML .= login_formular(true);
@@ -184,7 +184,7 @@ function login_formular($enabled) {
     return $form;
 }
 
-// Logindaten überprüfen
+// Logindaten ï¿½berprï¿½fen
 function checkLoginData($user, $pass)
 {
     global $logindataconf;
