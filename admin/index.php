@@ -3368,7 +3368,7 @@ function plugins($post) {
                         $pos++;
                     }
 
-                    if(count($plugin->getConfig()) > 1) {
+                    if(count($plugin->getConfig()) >= 1) {
                         $pagecontent_conf .= '<tr><td width="100%" colspan="2" class="td_togglen_padding_bottom" nowrap>';
                         $pagecontent_conf .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
 
