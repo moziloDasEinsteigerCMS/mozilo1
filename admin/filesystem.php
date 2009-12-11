@@ -508,7 +508,7 @@ function makeDefaultConf($conf_datei) {
                         'noupload' => 'php,php3,php4,php5'),
                     'digit' => array(
                         'backupmsgintervall' => '30',
-                        'chmodnewfilesatts' => '664',
+                        'chmodnewfilesatts' => '',
                         'lastbackup' => time(),
                         'maximageheight' => '',
                         'maximagewidth' => '',
