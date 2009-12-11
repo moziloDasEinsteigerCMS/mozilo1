@@ -503,7 +503,7 @@ function useChmod($dir = false, $error = NULL) {
 function makeDefaultConf($conf_datei) {
     $basic = array(
                     'text' => array(
-                        'adminmail' => '',
+                        'adminmail' => 'admin%40mozilo.cms',
                         'language' => 'deDE',
                         'noupload' => 'php,php3,php4,php5'),
                     'digit' => array(
@@ -516,7 +516,7 @@ function makeDefaultConf($conf_datei) {
                         'textareaheight' => '270'),
                     'checkbox' => array(
                         'overwriteuploadfiles' => 'false',
-                        'sendadminmail' => 'false',
+                        'sendadminmail' => 'true',
                         'showTooltips' => 'true',
                         'usebigactionicons' => 'false',
                         'showexpert' => 'false'),
@@ -579,10 +579,10 @@ function makeDefaultConf($conf_datei) {
     $formular = array('formularmail' => '',
                         'contactformusespamprotection' => 'true',
                         'contactformwaittime' => '15',
-                        'mail' => 'Mail,true,true',
-                        'message' => 'Nachricht,true,true',
-                        'name' => 'Name,true,true',
-                        'website' => 'Website,true,true');
+                        'mail' => ',true,true',
+                        'message' => ',true,true',
+                        'name' => ',true,true',
+                        'website' => ',true,true');
 
     $logindata = array('falselogincount' => '0',
                         'falselogincounttemp' => '0',
@@ -594,7 +594,7 @@ function makeDefaultConf($conf_datei) {
 
     $downloads = array('_downloadcounterstarttime' => time());
 
-    $version = array('cmsversion' => '1.12alpha',
+    $version = array('cmsversion' => '1.12',
                         'cmsname' => 'Amalia');
 
     $gallery = array('maxheight' => '',
@@ -621,7 +621,7 @@ function makeDefaultConf($conf_datei) {
 
     if(strpos($conf_datei,".conf") > 0) {
         $name = substr(basename($conf_datei),0,-(strlen(".conf")));
-        # beim erzeugen d�rfen sub arrays nicht mit rein
+        # beim erzeugen duerfen sub arrays nicht mit rein
         foreach($$name as $key => $value) {
             if($key == "expert") continue;
             if(is_array($value)) {
