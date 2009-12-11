@@ -9,23 +9,26 @@
 
 
 /* 
-* Abstrakte Basisklasse für moziloCMS-Plugins.
+* Abstrakte Basisklasse fÃ¼r moziloCMS-Plugins.
 *
 * PHP4 kennt das Prinzip der Abstraktion noch nicht,
-* deswegen ist es durch die Hintertür implementiert:
-* Im Konstruktor wird sichergestellt, daß niemand 
+* deswegen ist es durch die HintertÃ¼r implementiert:
+* Im Konstruktor wird sichergestellt, daÃŸ niemand 
 * diese abstrakte Klasse hier direkt instanziieren 
-* kann; dann wird geprüft, ob erbende Klassen auch 
+* kann; dann wird geprÃ¼ft, ob erbende Klassen auch 
 * sauber alle wichtigen Funktionen implementieren.
 
 */
 
+require_once 'Syntax.php';
+require_once 'Language.php';
+
 class Plugin {
     
-    // Membervariable für eventuelle Fehlermeldungen
+    // Membervariable fÃ¼r eventuelle Fehlermeldungen
     var $error;
     
-    // Membervariable für bequemen Zugriff auf die Plugin-Settings
+    // Membervariable fÃ¼r bequemen Zugriff auf die Plugin-Settings
     var $settings; 
     
     /*
@@ -37,7 +40,7 @@ class Plugin {
             trigger_error('This class is abstract; it cannot be instantiated.', E_USER_ERROR);
         }
 
-        // prüfen, ob alle "abstrakten" Methoden implementiert wurden:
+        // prÃ¼fen, ob alle "abstrakten" Methoden implementiert wurden:
         $this->error = null;
         $this->checkForMethod("getContent");
         $this->checkForMethod("getConfig");
@@ -47,7 +50,7 @@ class Plugin {
         if (file_exists("plugins/".get_class($this)."/plugin.conf")) {
             $this->settings = new Properties("plugins/".get_class($this)."/plugin.conf");
         }
-        // Wenn plugin.conf nicht vorhanden ist, wird die Fehlervariable gefüllt
+        // Wenn plugin.conf nicht vorhanden ist, wird die Fehlervariable gefÃ¼llt
         else {
         	// im Admin wird die Klasse Plugin verwendet; die Klasse Syntax kann aber nicht geladen werden. Die Abfrage verhindert einfach eine Fehlermeldung. 
             if(class_exists("Syntax")) {
@@ -59,24 +62,24 @@ class Plugin {
     }
     
     /*
-    * Gibt den Inhalt des Plugins zurück
+    * Gibt den Inhalt des Plugins zurÃ¼ck
     */
     function getPluginContent($param) {
-        // erst prüfen, ob bei der Initialisierung ein Fehler aufgetreten ist
+        // erst prÃ¼fen, ob bei der Initialisierung ein Fehler aufgetreten ist
         if ($this->error == null) {
             return $this->getContent($param);
         }
-        // Bei Fehler: Inhalt der Fehlervariablen zurückgeben
+        // Bei Fehler: Inhalt der Fehlervariablen zurÃ¼ckgeben
         else {
             return $this->error;
         }
     }
     
     /*
-    * Prüft, ob das Objekt eine Methode mit dem übergebenen Namen besitzt
+    * PrÃ¼ft, ob das Objekt eine Methode mit dem Ã¼bergebenen Namen besitzt
     */
     function checkForMethod($method) {
-        // wenn die Methode nicht existiert, wird die Fehlervariable gefüllt
+        // wenn die Methode nicht existiert, wird die Fehlervariable gefÃ¼llt
         if (!method_exists($this, $method)) {
             $syntax = new Syntax();
             $language = new Language();

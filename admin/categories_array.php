@@ -17,7 +17,6 @@ $error_color = array('check_name' => '#CCFFCC',
                 'php_error' => '#33FFFF',
                 'check_doubles_name_cat' => '#33FFFF',
                 'check_doubles_name_page' => '#33FFFF',
-                'check_no_http' => '#33FFFF',
                 'check_doubles_digit_same_cat' => '#FFCCCC');
 
 
@@ -79,7 +78,7 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
             sort($page_array);
             # Wichtig wegen new Inhaltseite
             $page_array[$max_cat_page] = NULL;
-            # die möglichkeit nach action die sachen aufzucklapen (editsite)
+            # die mÃ¶glichkeit nach action die sachen aufzucklapen (editsite)
             $post[$cat]['error_html']['display_cat'] = NULL;
         }
         foreach($page_array as $pos => $file) {
@@ -181,7 +180,7 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
     $max_cat_page = 100;
 
     foreach ($_POST['categories'] as $cat => $tmp) {
-        # die möglichkeit nach action die sachen aufzucklapen (editsite)
+        # die mÃ¶glichkeit nach action die sachen aufzucklapen (editsite)
         $post[$cat]['error_html']['display_cat'] = NULL;
         if(isset($post[$cat]['error_html']['display_cat'])) {
             $post[$cat]['error_html']['display_cat'] = 'style="display:block;" ';
@@ -220,7 +219,7 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
             if(isset($post[$cat]['error_html']['display'][$pos])) {
                 $post[$cat]['error_html']['display'][$pos] = 'style="display:block;" ';
             }
-            # Neue Kategorie oder Inhaltseite Position oder Name dürfen nicht lehr sein
+            # Neue Kategorie oder Inhaltseite Position oder Name dÃ¼rfen nicht lehr sein
             if($pos  == $max_cat_page) {
                 if(empty($_POST['categories'][$cat]['new_position'][$pos]) and !empty($_POST['categories'][$cat]['new_name'][$pos])) {
                     $post['error_messages']['check_new_position_empty']['color'] = $error_color['check_new_position_empty'];
@@ -273,7 +272,7 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
                 # Neue Page Cat
                 if(empty($_POST['categories'][$cat]['new_position'][$pos]) and empty($_POST['categories'][$cat]['position'][$pos])) {
                     $post[$cat]['new_position'][$pos] = NULL;
-                # Neue Position auf Zahl Prüfen und 2stelig machen
+                # Neue Position auf Zahl PrÃ¼fen und 2stelig machen
                 } elseif(ctype_digit($_POST['categories'][$cat]['new_position'][$pos])) {
                     $post[$cat]['new_position'][$pos] = sprintf("%02d",$_POST['categories'][$cat]['new_position'][$pos]);
                 } else {
@@ -352,13 +351,6 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
             $post[$cat]['error_html']['new_url'][$pos] = NULL;
             $post[$cat]['new_url'][$pos] = NULL;
             if(isset($_POST['categories'][$cat]['new_url'][$pos])) {
-/*
-                if(strpos("tmp".strtolower($_POST['categories'][$cat]['new_url'][$pos]),'http%3a//') > 0) {
-                    $_POST['categories'][$cat]['new_url'][$pos] = substr($_POST['categories'][$cat]['new_url'][$pos],9);
-                    $post['error_messages']['check_no_http']['color'] = $error_color['check_no_http'];
-                    $post['error_messages']['check_no_http'][] = $cat;
-                    $post[$cat]['error_html']['new_url'][$pos] = 'style="background-color:'.$error_color['check_no_http'].';" ';
-                }*/
                 $post[$cat]['new_url'][$pos] = trim(str_replace(array("\r\n","\n","\r"),'',$_POST['categories'][$cat]['new_url'][$pos]));
                 if(strlen($post[$cat]['new_url'][$pos]) > "0") {
                     $url_len = strlen($post[$cat]['new_url'][$pos]);
@@ -396,7 +388,7 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
             }
 
             # hab ich hier, drin um bei copymove nicht extra noch eine foreach zu machen
-            # ist dafür zuständig wenn Inhaltseite in andere Kategorie verschoben wird
+            # ist dafÃ¼r zustÃ¤ndig wenn Inhaltseite in andere Kategorie verschoben wird
             if(isset($_POST['categories'][$cat]['new_cat'][$pos])) {
                 $post[$cat]['new_cat'][$pos] = $_POST['categories'][$cat]['new_cat'][$pos];
 #copy in gleicher cat geht nicht
@@ -451,7 +443,7 @@ $max_zeichen = 355;
             }
             unset($name_len,$target_len,$url_len,$ext_len);
 
-# das muss noch auf erlaubte Zeichen geprüft werden
+# das muss noch auf erlaubte Zeichen geprÃ¼ft werden
             if($cat != "cat") {
                 $kategorie = $cat."/";
             } else {
@@ -645,15 +637,15 @@ function categoriesMessages($post) {
 
 # Nur Positions Verschiebung Position -> Neue Position inerhalb einer Kategorie oder Kategorie selbst
 # !!!!! new_position darf nur einmal vorkommen !!!!!!!!!!!!!!
-# Reihenvolge der änderungen:
+# Reihenvolge der Ã¤nderungen:
 # 1. new_positionen
 # 2. Neue Kategorie, Inhaltseiten oder move_copy aus anderer Kategorie wenn diese auf eine new_positionen wierd
 #    die Position geandert und $new_move_cat_page_newposition erzeugt
 # 3. Kategorie oder Inhaltseiten die betroffen sind weil auf ihrer Position eine Verschobene oder
-#    neue Kategorie oder Inhaltseiten soll, dann wierd ein freier Platz für sie gesucht
+#    neue Kategorie oder Inhaltseiten soll, dann wierd ein freier Platz fÃ¼r sie gesucht
 # Gebraucht wird immer Original Position und Neue Position optional ein array mit den neuen Kategorie oder Inhaltseiten
-# wenn bei Neue Kategorie oder Inhaltseite die Position nicht möglich ist wird array $new_move_cat_page_newposition
-# zurückgegeben wo die alten neuen Positionen drin sind
+# wenn bei Neue Kategorie oder Inhaltseite die Position nicht mÃ¶glich ist wird array $new_move_cat_page_newposition
+# zurÃ¼ckgegeben wo die alten neuen Positionen drin sind
 # Aufbau der Arrays:
 # $org_position Position ohne null => Position mit null
 # $new_position Neue Position ohne null => Neue Position mit null
@@ -663,7 +655,7 @@ function position_move($org_position,$new_position,$new_move_cat_page = false) {
     $array_return['move'] = false;
 
     $array_sorce_desti = array_combine($org_position,$new_position);
-    # nur die geänderten positionen ins array
+    # nur die geÃ¤nderten positionen ins array
     foreach($array_sorce_desti as $key => $value) {
         if(empty($key)) unset($array_sorce_desti[$key]);
         if($key == $value) unset($array_sorce_desti[$key]);
@@ -792,14 +784,14 @@ function position_move($org_position,$new_position,$new_move_cat_page = false) {
 #            if(sprintf("%02d",$new_posi) == $org_posi) {
 #            } else {
             if(sprintf("%02d",$new_posi) != $org_posi) {
-                # New_Position => Org_Position ändern nach Org_Position => New_Position und lehre entfernen
+                # New_Position => Org_Position Ã¤ndern nach Org_Position => New_Position und lehre entfernen
                 # Aufbau: Org Position mit null => Neue Position ohne null
                 $array_return['move'][sprintf("%1d",$org_posi)] = sprintf("%02d",$new_posi);
             }
         }
     }
 
-    # nur wenn von dieser fuction die Positionen geändert wurden
+    # nur wenn von dieser fuction die Positionen geÃ¤ndert wurden
     if(isset($new_move_cat_page_newposition)) {
         # Aufbau: Orig Position mit null => Neue (von dieser function) oder Orig Position mit null
         $array_return['move_cat_page_newposition'] = $new_move_cat_page_newposition;

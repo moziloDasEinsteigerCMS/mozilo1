@@ -24,7 +24,7 @@ class Mail {
         $this->sendMail($subject, $content, $from, $from);
     }
 
-    // Sendet eine Mail an die konfigurierte Kontagt-Adresse oder eine Kopie an die Usermail-Adresse
+    // Sendet eine Mail an die konfigurierte Kontakt-Adresse oder eine Kopie an die Usermail-Adresse
     function sendMail($subject, $content, $from, $to) {
         global $CHARSET;
         @mail(html_entity_decode($to,ENT_COMPAT,$CHARSET), html_entity_decode($subject), html_entity_decode($content), $this->getHeader(html_entity_decode($to), html_entity_decode($from)));

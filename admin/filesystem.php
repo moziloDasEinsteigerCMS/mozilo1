@@ -112,7 +112,7 @@ function specialNrDir($dir, $nr)
 
 /*--------------------------------------------------------------------------------
  @author: Oliver Lorenz
- Legt die Ordnerstuktur f�r eine neue Kategorie an
+ Legt die Ordnerstuktur für eine neue Kategorie an
  --------------------------------------------------------------------------------*/
 function createCategory($new_cat) {
     global $specialchars;
