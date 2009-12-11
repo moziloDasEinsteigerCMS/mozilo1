@@ -2,10 +2,10 @@
 
 /***************************************************************
 *
-* Sitemap-Plugin für moziloCMS.
+* Sitemap-Plugin fÃ¼r moziloCMS.
 * 
 * Mit der Variablen {SITEMAP} kann an beliebiger Stelle des CMS
-* (Template oder Inhaltsseiten) die aktuelle Sitemap eingefügt 
+* (Template oder Inhaltsseiten) die aktuelle Sitemap eingefÃ¼gt 
 * werden.
 * 
 ***************************************************************/
@@ -14,7 +14,7 @@ class SITEMAP extends Plugin {
 
     /***************************************************************
     * 
-    * Gibt den HTML-Code zurück, mit dem die Plugin-Variable ersetzt 
+    * Gibt den HTML-Code zurÃ¼ck, mit dem die Plugin-Variable ersetzt 
     * wird. Der String-Parameter $value ist Pflicht, kann aber leer 
     * sein.
     * 
@@ -28,19 +28,19 @@ class SITEMAP extends Plugin {
     
     /***************************************************************
     * 
-    * Gibt die Konfigurationsoptionen als Array zurück.
-    * Ist keine Konfiguration nötig, gibt die Funktion false zurück.
+    * Gibt die Konfigurationsoptionen als Array zurÃ¼ck.
+    * Ist keine Konfiguration nÃ¶tig, gibt die Funktion false zurÃ¼ck.
     * 
     ***************************************************************/
     function getConfig() {
-        return array(); // keine Konfiguration nötig
+        return array(); // keine Konfiguration nÃ¶tig
     } // function getConfig
     
     
     
     /***************************************************************
     * 
-    * Gibt die Plugin-Infos als Array zurück - in dieser 
+    * Gibt die Plugin-Infos als Array zurÃ¼ck - in dieser 
     * Reihenfolge:
     *   - Name des Plugins
     *   - Version des Plugins
@@ -56,7 +56,7 @@ class SITEMAP extends Plugin {
             // Plugin-Version
             "1.0",
             // Kurzbeschreibung
-            "Standard-Sitemap zum Einfügen an beliebiger Stelle",
+            "Standard-Sitemap zum EinfÃ¼gen an beliebiger Stelle",
             // Name des Autors
             "mozilo",
             // Download-URL

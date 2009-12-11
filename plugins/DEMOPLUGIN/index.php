@@ -2,25 +2,25 @@
 
 /***************************************************************
 * 
-* Demo-Plugin für moziloCMS.
+* Demo-Plugin fÃ¼r moziloCMS.
 * 
 * 
-* Jedes moziloCMS-Plugin muß...
+* Jedes moziloCMS-Plugin muÃŸ...
 * - als Verzeichnis [PLUGINNAME] unterhalb von "plugins" liegen.
 * - im Pluginverzeichnis eine plugin.conf mit den Plugin-
 *   Einstellungen enthalten (diese kann auch leer sein).
 * - eine index.php enthalten, in der eine Klasse "[PLUGINNAME]" 
 *   definiert ist.
 * 
-* Die Plugin-Klasse muß...
+* Die Plugin-Klasse muÃŸ...
 * - von der Klasse "Plugin" erben ("class [PLUGINNAME] extends Plugin")
 * - folgende Funktionen enthalten:
 *   getContent($value)
-*       -> gibt die HTML-Ersetzung der Plugin-Variable zurück
+*       -> gibt die HTML-Ersetzung der Plugin-Variable zurÃ¼ck
 *   getConfig()
-*       -> gibt die Konfigurationsoptionen als Array zurück
+*       -> gibt die Konfigurationsoptionen als Array zurÃ¼ck
 *   getInfo()
-*       -> gibt die Plugin-Infos als Array zurück
+*       -> gibt die Plugin-Infos als Array zurÃ¼ck
 * 
 ***************************************************************/
 class DEMOPLUGIN extends Plugin {
@@ -28,7 +28,7 @@ class DEMOPLUGIN extends Plugin {
 
     /***************************************************************
     * 
-    * Gibt den HTML-Code zurück, mit dem die Plugin-Variable ersetzt 
+    * Gibt den HTML-Code zurÃ¼ck, mit dem die Plugin-Variable ersetzt 
     * wird. Der String-Parameter $value ist Pflicht, kann aber leer 
     * sein.
     * 
@@ -39,30 +39,30 @@ class DEMOPLUGIN extends Plugin {
         * 
         * Details (Beispiele folgen weiter unten):
         * 
-        * Es kann auf sämtliche Variablen und Funktionen der index.php 
+        * Es kann auf sÃ¤mtliche Variablen und Funktionen der index.php 
         * zugegriffen werden.
         *
-        * Über die lokale Variable $this->settings hat man Zugriff auf 
+        * Ãœber die lokale Variable $this->settings hat man Zugriff auf 
         * die Werte der Plugin-eigenen plugin.conf.
         * 
         * Der Wert, mit dem die Plugin-Variable letztenendes ersetzt 
-        * werden soll, muß per "return" zurückgegeben werden.
+        * werden soll, muÃŸ per "return" zurÃ¼ckgegeben werden.
         * 
         * Der String-Parameter $value entspricht dem Wert bei 
         * erweiterten Plugin-Variablen: {VARIABLE|wert}
         * Ist die Variable nicht erweitert ( {VARIABLE} ), wird $value
-        * als Leerstring ("") übergeben.
-        * Man kann den $value-Parameter nutzen, muß es aber nicht.
+        * als Leerstring ("") Ã¼bergeben.
+        * Man kann den $value-Parameter nutzen, muÃŸ es aber nicht.
         * 
         ***************************************************************/
         
 
         /***************************************************************
-        * Beispiel: Zugriff auf Werte aus der plugin.conf über das 
+        * Beispiel: Zugriff auf Werte aus der plugin.conf Ã¼ber das 
         * lokale Properties-Objekt $this->settings
         ***************************************************************/
 
-        // Lesend: Der Wert des Schlüssels "demosetting" wird aus der plugin.conf ausgelesen
+        // Lesend: Der Wert des SchlÃ¼ssels "demosetting" wird aus der plugin.conf ausgelesen
         // return $this->settings->get("demosetting"); // zum Testen entkommentieren!
         // Schreibend: Die aktuelle Unixtime wird als "timestring" in die plugin.conf geschrieben ("timestring = 1234567890")
         // $this->settings->set("timestring", time()); // zum Testen entkommentieren!
@@ -79,7 +79,7 @@ class DEMOPLUGIN extends Plugin {
         
         /***************************************************************
         * Beispiel: Nutzung des Parameters $value (der mehrere 
-        * kommaseparierte Werte enthält)
+        * kommaseparierte Werte enthÃ¤lt)
         * - Nutzung: {DEMOPLUGIN|Wert1,Wert2,Wert3,...}
         * - Ausgabe: Der erste Wert ist Wert1
         ***************************************************************/
@@ -94,7 +94,7 @@ class DEMOPLUGIN extends Plugin {
         * - Ausgabe (Bsp.): WILLKOMMEN
         ***************************************************************/
         
-        // Namen aktueller Inhaltsseite in Großbuchstaben zurückgeben
+        // Namen aktueller Inhaltsseite in GroÃŸbuchstaben zurÃ¼ckgeben
         // return (strtoupper($value)); // zum Testen entkommentieren!
     
     
@@ -108,8 +108,8 @@ class DEMOPLUGIN extends Plugin {
     
     
         /***************************************************************
-        * Beispiel: Anzeige des Hauptmenüs (durch Aufruf der Funktion 
-        * der index.php, die das Hauptmenü erstellt) 
+        * Beispiel: Anzeige des HauptmenÃ¼s (durch Aufruf der Funktion 
+        * der index.php, die das HauptmenÃ¼ erstellt) 
         ***************************************************************/
         
         // return getMainMenu(); // zum Testen entkommentieren!
@@ -125,8 +125,8 @@ class DEMOPLUGIN extends Plugin {
     
     
         /***************************************************************
-        * Beispiel: Beliebige Logik, hier eine tageszeitabhängige 
-        * Begrüßung
+        * Beispiel: Beliebige Logik, hier eine tageszeitabhÃ¤ngige 
+        * BegrÃ¼ÃŸung
         ***************************************************************/
 
         $stunde = date("H");
@@ -145,8 +145,8 @@ class DEMOPLUGIN extends Plugin {
     
     /***************************************************************
     * 
-    * Gibt die Konfigurationsoptionen als Array zurück.
-    * Ist keine Konfiguration nötig, ist dieses Array leer.
+    * Gibt die Konfigurationsoptionen als Array zurÃ¼ck.
+    * Ist keine Konfiguration nÃ¶tig, ist dieses Array leer.
     * 
     ***************************************************************/
     function getConfig() {
@@ -155,12 +155,12 @@ class DEMOPLUGIN extends Plugin {
         * 
         * Details (Beispiele folgen weiter unten):
         * 
-        * Die Funktion liefert ein Array zurück. Dieses enthält die 
+        * Die Funktion liefert ein Array zurÃ¼ck. Dieses enthÃ¤lt die 
         * Eingabefelder, mit denen der User im moziloAdmin Einstellungen 
         * am Plugin vornehmen kann.
         * Der "type"-Parameter der Eingabefelder bestimmt, um welche Art 
         * Eingabefeld es sich handelt und ist Pflicht. Folgende Werte
-        * stehen zur Verfügung:
+        * stehen zur VerfÃ¼gung:
         *   text            Textfeld (beliebiger Text)
         *   textarea        mehrzeilige Texteingabe
         *   password        Passwortfeld (Anzeige des Inhalts als ***)
@@ -170,31 +170,31 @@ class DEMOPLUGIN extends Plugin {
         * 
         * Die Werte der Eingabefelder werden in die plugin.conf des 
         * Plugins geschrieben - der Name des Eingabefelds ist dabei der 
-        * Schlüssel in der plugin.conf (siehe Beispiele).
+        * SchlÃ¼ssel in der plugin.conf (siehe Beispiele).
         * 
         ***************************************************************/
         
         
-        // Rückgabe-Array initialisieren
-        // Das muß auf jeden Fall geschehen!
+        // RÃ¼ckgabe-Array initialisieren
+        // Das muÃŸ auf jeden Fall geschehen!
         $config = array();
         
         
         /***************************************************************
         * Beispiel: Normales Textfeld, beliebige Eingaben
-        * - das Textfeld heißt "texteingabe"; gibt der Benutzer "abc" 
+        * - das Textfeld heiÃŸt "texteingabe"; gibt der Benutzer "abc" 
         *   ein und speichert die Plugin-Einstellungen, wird in der 
-        *   plugin.conf folgende Zeile angelegt bzw. überschrieben:
+        *   plugin.conf folgende Zeile angelegt bzw. Ã¼berschrieben:
         *   texteingabe = abc 
         ***************************************************************/
         
         $config['texteingabe']  = array(
             "type" => "text",                           // Pflicht:  Eingabetyp
             "description" => "Bitte Wert eingeben",     // Pflicht:  Beschreibung
-            "maxlength" => "100",                       // optional: maximale Länge
+            "maxlength" => "100",                       // optional: maximale LÃ¤nge
             "size" => "30",                             // optional: dargestellte Zeichen
-            "regex_error" => "Es dürfen nur 3 kleine Buchstaben eingegeben werden bei Bitte Wert eingeben",// optional: error meldung
-            "regex" => "/^[a-z]{3}$/"                   // optional: Erlaubte Werte als regulärer Ausdruck (hier: drei kleine Buchstaben; wird beim Speichern der Einstellungen überprüft)
+            "regex" => "/^[a-z]{3}$/",                   // optional: Erlaubte Werte als regulÃ¤rer Ausdruck (hier: drei kleine Buchstaben; wird beim Speichern der Einstellungen Ã¼berprÃ¼ft)
+            "regex_error" => "Die Eingabe muss genau 3 kleine Buchstaben enthalten." // optional: Fehlermeldung fÃ¼r die RegEx-ÃœberprÃ¼fung
             );
 
             
@@ -207,9 +207,9 @@ class DEMOPLUGIN extends Plugin {
             "cols" => "30",                             // Pflicht:  Spaltenanzahl 
             "rows" => "5",                              // Pflicht:  Zeilenanzahl
             "description" => "Bitte Text eingeben",     // Pflicht:  Beschreibung
-            "regex_error" => "Das sind keine Belibigen Zeichen bei Bitte Text eingeben",// optional: error meldung
-            "regex" => "/^.*$/"                         // optional: Erlaubte Werte als regulärer Ausdruck (hier: beliebige Zeichen; wird beim Speichern der Einstellungen überprüft)
-            );
+            "regex" => "/^.+$/"           ,             // optional: Erlaubte Werte als regulÃ¤rer Ausdruck (hier: wenigstens ein Zeichen; wird beim Speichern der Einstellungen Ã¼berprÃ¼ft)
+            "regex_error" => "Die Eingabe darf nicht leer sein." // optional: Fehlermeldung fÃ¼r die RegEx-ÃœberprÃ¼fung
+        );
 
             
         /***************************************************************
@@ -218,13 +218,13 @@ class DEMOPLUGIN extends Plugin {
         
         $config['passwort']  = array(
             "type" => "password",                       // Pflicht:  Eingabetyp
-            "saveasmd5" => "true",                      // Pflicht:  soll das Passwort MD5-verschlüsselt in der plugin.conf abgelegt werden? (true/false)
+            "saveasmd5" => "true",                      // Pflicht:  soll das Passwort MD5-verschlÃ¼sselt in der plugin.conf abgelegt werden? (true/false)
             "description" => "Bitte Passwort eingeben", // Pflicht:  Beschreibung
-            "maxlength" => "100",                       // optional: maximale Länge
+            "maxlength" => "100",                       // optional: maximale LÃ¤nge
             "size" => "30",                             // optional: dargestellte Zeichen
-            "regex_error" => "mindestens acht Zeichen, bestehend aus Klein- und Großbuchstaben sowie Ziffern bei Bitte Passwort eingeben",// optional: error meldung
-            "regex" => "/^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).*$/" // optional: Erlaubte Werte als regulärer Ausdruck (hier: mindestens acht Zeichen, bestehend aus Klein- und Großbuchstaben sowie Ziffern); wird beim Speichern der Einstellungen überprüft
-            );
+            "regex" => "/^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).*$/", // optional: Erlaubte Werte als regulÃ¤rer Ausdruck (hier: mindestens acht Zeichen, bestehend aus Klein- und GroÃŸbuchstaben sowie Ziffern); wird beim Speichern der Einstellungen Ã¼berprÃ¼ft
+            "regex_error" => "Das Passwort muss aus mindestens acht Zeichen bestehen, Klein- und GroÃŸbuchstaben sowie Ziffern enthalten." // optional: Fehlermeldung fÃ¼r die RegEx-ÃœberprÃ¼fung
+        );
 
             
         /***************************************************************
@@ -244,7 +244,7 @@ class DEMOPLUGIN extends Plugin {
         $config['entwederoder'] = array(
             "type" => "radio",                          // Pflicht:  Eingabetyp
             "description" => "Welche Farbe?",           // Pflicht:  Beschreibung
-            // Pflicht: Beschreibung der einzelnen Auswahlmöglichkeiten
+            // Pflicht: Beschreibung der einzelnen AuswahlmÃ¶glichkeiten
             // entweder so...
             "descriptions" => array(
                 "blau",                 // "blau" wird sowohl angezeigt als auch in die plugin.conf gespeichert
@@ -256,7 +256,7 @@ class DEMOPLUGIN extends Plugin {
             "descriptions" => array(
                 "blau" => "Blau",       // angezeigt wird "Blau", in die plugin.conf gespeichert wird "blau"
                 "rot" => "Rot",
-                "gruen" => "Grün"
+                "gruen" => "GrÃ¼n"
                 )
 */
             );
@@ -269,7 +269,7 @@ class DEMOPLUGIN extends Plugin {
         $config['auswahl'] = array(
             "type" => "select",                         // Pflicht:  Eingabetyp
             "description" => "Ich mache Urlaub in...",  // Pflicht:  Beschreibung
-            // Pflicht:  Beschreibung der einzelnen Auswahlmöglichkeiten
+            // Pflicht:  Beschreibung der einzelnen AuswahlmÃ¶glichkeiten
             // entweder so...
             "descriptions" => array(
                 "Australien",           // "Australien" wird sowohl angezeigt als auch in die plugin.conf gespeichert
@@ -288,14 +288,14 @@ class DEMOPLUGIN extends Plugin {
             ); 
 
         
-        // Nicht vergessen: Das gesamte Array zurückgeben
+        // Nicht vergessen: Das gesamte Array zurÃ¼ckgeben
         return $config;
     } // function getConfig    
     
     
     /***************************************************************
     * 
-    * Gibt die Plugin-Infos als Array zurück - in dieser 
+    * Gibt die Plugin-Infos als Array zurÃ¼ck - in dieser 
     * Reihenfolge:
     *   - Name des Plugins
     *   - Version des Plugins
@@ -311,7 +311,7 @@ class DEMOPLUGIN extends Plugin {
             // Plugin-Version
             "1.0",
             // Kurzbeschreibung
-            "Beispiel-Plugin, das die Möglichkeiten des Plugin-Systems von moziloCMS aufzeigt",
+            "Beispiel-Plugin, das die MÃ¶glichkeiten des Plugin-Systems von moziloCMS aufzeigt",
             // Name des Autors
             "mozilo",
             // Download-URL
