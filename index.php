@@ -1487,7 +1487,7 @@ $CHARSET = 'UTF-8';
         }
 
         // Alle Variablen aus dem Inhalt heraussuchen
-        preg_match_all("/\{(.+)\}/Um", $content, $matches);
+        preg_match_all("/\{(.+)\}/Umsi", $content, $matches);
         // Für jeden Treffer...
         $i = 0;
         foreach ($matches[0] as $match) {
