@@ -280,7 +280,7 @@ $html .= '<table width="90%" cellspacing="0" border="0" cellpadding="0" id="tabl
 $html .= '<tr><td width="100%" id="td_title">';
 $html .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" id="table_titel">';
 $html .= '<tr><td id="td_table_titel_text">'.$ADMIN_TITLE.' - '.$pagetitle.'</td>';
-$html .= '<td width="24" height="24" id="td_table_titel_logout"><form class="form" accept-charset="'.$CHARSET.'" action="login.php" method="post"><input id="design_logout" class="input_button" type="image" name="logout" value="'.getLanguageValue("button_home_logout").'&nbsp;"  src="gfx/icons/'.$icon_size.'/logout.png" title="'.getLanguageValue("button_home_logout").'"'.$tooltip_button_home_logout.'></form></td></tr>';
+$html .= '<td width="24" height="24" id="td_table_titel_logout"><form class="form" accept-charset="'.$CHARSET.'" action="login.php" method="post"><input id="design_logout" class="input_button" type="image" name="logout" value="'.getLanguageValue("button_home_logout").'&nbsp;" accesskey="x" src="gfx/icons/'.$icon_size.'/logout.png" title="'.getLanguageValue("button_home_logout").'"'.$tooltip_button_home_logout.'></form></td></tr>';
 $html .= '</table>';
 
 $html .= "</td></tr>";
