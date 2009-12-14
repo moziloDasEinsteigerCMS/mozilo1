@@ -339,6 +339,9 @@ span.imagesubtitle {
 	max-width : 140px;
 }
 
+span.contentimage {
+}
+
 /* [bildlinks|...] */
 span.leftcontentimage {
 	margin:15px;

@@ -365,11 +365,14 @@ class Syntax {
 
                 // Bildunterschrift merken, wenn vorhanden
                 $subtitle = "";
-                if(substr($attribute,0,10) == "bildlinks=") {
+                if(substr($attribute,0,5) == "bild=") {
+                    $subtitle = substr($attribute,5,strlen($attribute)-5);
+                    $attribute = "bild";
+                }
+                elseif(substr($attribute,0,10) == "bildlinks=") {
                     $subtitle = substr($attribute,10,strlen($attribute)-10);
                     $attribute = "bildlinks";
                 }
-
                 elseif(substr($attribute,0,11) == "bildrechts=") {
                     $subtitle = substr($attribute,11,strlen($attribute)-11);
                     $attribute = "bildrechts";
@@ -433,27 +436,29 @@ class Syntax {
                 // Nun aber das Bild ersetzen!
                 if (!$error) {
                     $alt = $specialchars->rebuildSpecialChars($value,true,true);
-                    // "bildlinks" / "bildrechts"
-                    if (($attribute == "bildlinks") || ($attribute == "bildrechts")) {
-                        $cssclass = "";
-                        if ($attribute == "bildlinks") {
-                            $cssclass = "leftcontentimage";
+                    $cssclass = "";
+                    if ($attribute == "bild") {
+                        $cssclass = "contentimage";
+                    }
+                    if ($attribute == "bildlinks") {
+                        $cssclass = "leftcontentimage";
+                    }
+                    elseif ($attribute == "bildrechts") {
+                        $cssclass = "rightcontentimage";
+                    }
+                    // ohne Untertitel
+                    if ($subtitle == "") {
+                        // normales Bild: ohne <span> rundrum
+                        if ($attribute == "bild") {
+                            $content = str_replace ($match, "<img src=\"$imgsrc\" alt=\"".$language->getLanguageValue1("alttext_image_1", $alt)."\" />", $content);
                         }
-                        elseif ($attribute == "bildrechts") {
-                            $cssclass = "rightcontentimage";
-                        }
-                        // ohne Untertitel
-                        if ($subtitle == "") {
+                        else {
                             $content = str_replace ($match, "<span class=\"$cssclass\"><img src=\"$imgsrc\" alt=\"".$language->getLanguageValue1("alttext_image_1", $alt)."\" class=\"$cssclass\" /></span>", $content);
                         }
-                        // mit Untertitel
-                        else {
-                            $content = str_replace ($match, "<span class=\"$cssclass\"><img src=\"$imgsrc\" alt=\"".$language->getLanguageValue1("alttext_image_1", $alt)."\" class=\"$cssclass\" /><br /><span class=\"imagesubtitle\">$subtitle</span></span>", $content);
-                        }
-                    } 
-                    // "bild"
+                    }
+                    // mit Untertitel
                     else {
-                        $content = str_replace ($match, "<img src=\"$imgsrc\" alt=\"".$language->getLanguageValue1("alttext_image_1", $alt)."\" />", $content);
+                        $content = str_replace ($match, "<span class=\"$cssclass\"><img src=\"$imgsrc\" alt=\"".$language->getLanguageValue1("alttext_image_1", $alt)."\" class=\"$cssclass\" /><br /><span class=\"imagesubtitle\">$subtitle</span></span>", $content);
                     }
                 }
             }
