@@ -195,7 +195,7 @@ function getDirContentAsArray($dir, $hiddeposition = true) {
 }
 
 function dirsize($dir) {
-   if (!is_dir($dir)) return FALSE;
+   if (!is_dir($dir) or !is_readable($dir)) return FALSE;
    $size = 0;
    $dh = opendir($dir);
    while(($entry = readdir($dh)) !== false) {
