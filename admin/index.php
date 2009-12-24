@@ -105,6 +105,10 @@ $DOWNLOAD_COUNTS = new Properties("../conf/downloads.conf",true);
 if(!isset($DOWNLOAD_COUNTS->properties['readonly'])) {
     die($DOWNLOAD_COUNTS->properties['error']);
 }
+$GALLERY_CONF = new Properties("../conf/gallery.conf",true);
+if(!isset($GALLERY_CONF->properties['readonly'])) {
+    die($GALLERY_CONF->properties['error']);
+}
 
 $LOGINCONF = new Properties("conf/logindata.conf",true);
 # die muss schreiben geöffnet werden können
@@ -1468,41 +1472,145 @@ function gallery($post) {
     global $specialchars;
     global $GALLERIES_DIR_REL;
     global $PREVIEW_DIR_NAME;
+    global $GALLERY_CONF;
     $icon_size = "24x24";
     $max_strlen = 255;
 
     $pagecontent = '<input type="hidden" name="action_activ" value="'.getLanguageValue("gallery_button").'">';
 
     if(isset($_POST['gallery']) and is_array($_POST['gallery'])) {
-#echo "neu<br>\n";
         $post['gallery'] = $_POST['gallery'];
-
     }
-#$post = null;
     if(isset($_FILES)) {
-#echo "file<br>\n";
         $post = newGalleryImg($post);
     }
-#    if(isset($_POST['gallery']['new_gallery']) and strlen($_POST['gallery']['new_gallery']) > 0) {
     if(isset($_POST['new_gallery']) and strlen($_POST['new_gallery']) > 0) {
-#echo "neu<br>\n";
         $post = newGallery($post);
-
     }
-
     if(isset($post['action_data']) and !isset($post['error_messages'])) {
         $action_data_key = key($post['action_data']);
         if($action_data_key == "deletegalleryimg") {
-echo "deletegalleryimg<br>\n";
-$post = deleteGalleryImg($post);
+            $post = deleteGalleryImg($post);
         }
         if($action_data_key == "deletegallery") {
-echo "deletegallery<br>\n";
-$post = deleteGallery($post);
+            $post = deleteGallery($post);
+        }
+        $post = editGallery($post);
+    }
+
+    $dircontent = getDirs($GALLERIES_DIR_REL, true);
+    # wenn die Galerie oder die Bilder mit FTP Hochgeladen wurden Automatisch umbennen
+    foreach ($dircontent as $pos => $currentgalerien) {
+        $test_galerie = $specialchars->replaceSpecialChars($specialchars->rebuildSpecialChars($currentgalerien, false, false),false);
+        if($test_galerie != $currentgalerien) {
+            if(in_array($test_galerie,$dircontent)) {
+                $post['error_messages']['gallery_error_ftp_rename_exist'][] = $test_galerie;
+                # die Galerie aus dem array nehmen der fehler muss mit ftp behoben werden
+                unset($dircontent[$pos]);
+                continue;
+            } else {
+                @rename($GALLERIES_DIR_REL."/".$currentgalerien,$GALLERIES_DIR_REL."/".$test_galerie);
+                $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
+                $last_error = @error_get_last();
+                if($last_error['line'] == $line_error) {
+                    $post['error_messages']['php_error'][] = $last_error['message'];
+                    # die Galerie aus dem array nehmen der fehler muss mit ftp behoben werden
+                    unset($dircontent[$pos]);
+                    continue;
+                } elseif(!is_dir($GALLERIES_DIR_REL."/".$test_galerie)) {
+                    $post['error_messages']['gallery_error_ftp_rename'][] = $test_galerie;
+                    # die Galerie aus dem array nehmen der fehler muss mit ftp behoben werden
+                    unset($dircontent[$pos]);
+                    continue;
+                } else {
+                    $post['messages']['gallery_message_ftp_rename'][] =  $test_galerie;
+                    $currentgalerien = $test_galerie;
+                    $dircontent[$pos] = $test_galerie;
+                }
+            }
+        }
+        $error = changeChmod($GALLERIES_DIR_REL."/".$currentgalerien);
+        if(is_array($error)) {
+            $post['error_messages'][key($error)][] = $error[key($error)];
         }
 
-$post = editGallery($post);
-
+        if(!is_dir($GALLERIES_DIR_REL.'/'.$currentgalerien.'/'.$PREVIEW_DIR_NAME)) {
+            @mkdir($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME);
+            $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
+            $last_error = @error_get_last();
+            if($last_error['line'] == $line_error) {
+                $post['error_messages']['php_error'][] = $last_error['message'];
+            } elseif(!is_dir($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME)) {
+                $post['error_messages']['gallery_error_new_preview'][] = $currentgalerien;
+            } else {
+                $post['messages']['gallery_message_ftp_preview'][] =  $test_galerie;
+            }
+        }
+        if(is_dir($GALLERIES_DIR_REL.'/'.$currentgalerien.'/'.$PREVIEW_DIR_NAME)) {
+            $error = changeChmod($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME);
+            if(is_array($error)) {
+                $post['error_messages'][key($error)][] = $error[key($error)];
+            }
+        }
+        $gallerypics[$currentgalerien] = getFiles($GALLERIES_DIR_REL.'/'.$currentgalerien,"");
+        $count_preview_pic = 0;
+        foreach($gallerypics[$currentgalerien] as $pos => $file) {
+            # nur Bilder zulassen
+            if(is_dir($file) or count(@getimagesize($GALLERIES_DIR_REL.'/'.$currentgalerien.'/'.$file)) < 2) {
+                unset($gallerypics[$currentgalerien][$pos]);
+                continue;
+            }
+            $error = changeChmod($GALLERIES_DIR_REL."/".$currentgalerien."/".$file);
+            if(is_array($error)) {
+                $post['error_messages'][key($error)][] = $error[key($error)];
+            }
+            if(is_file($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file)) {
+                $error = changeChmod($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file);
+                if(is_array($error)) {
+                    $post['error_messages'][key($error)][] = $error[key($error)];
+                }
+                $count_preview_pic++;
+            }
+            $test_pic = $specialchars->replaceSpecialChars($specialchars->rebuildSpecialChars($file, false, false),false);
+            if($test_pic != $file) {
+                if(in_array($test_pic,$gallerypics[$currentgalerien])) {
+                    $post['error_messages']['gallery_error_ftp_rename_pic_exist'][] = $currentgalerien." - ".$test_pic;
+                    # das Bild aus dem array nehmen der fehler muss mit ftp behoben werden
+                    unset($gallerypics[$currentgalerien][$pos]);
+                } else {
+                    @rename($GALLERIES_DIR_REL."/".$currentgalerien."/".$file,$GALLERIES_DIR_REL."/".$currentgalerien."/".$test_pic);
+                    $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
+                    $last_error = @error_get_last();
+                    if($last_error['line'] == $line_error) {
+                        $post['error_messages']['php_error'][] = $last_error['message'];
+                        # das Bild aus dem array nehmen der fehler muss mit ftp behoben werden
+                        unset($gallerypics[$currentgalerien][$pos]);
+                    } elseif(!is_file($GALLERIES_DIR_REL."/".$currentgalerien."/".$test_pic)) {
+                        $post['error_messages']['gallery_error_ftp_rename_pic'][] = $currentgalerien." - ".$test_pic;
+                        # das Bild aus dem array nehmen der fehler muss mit ftp behoben werden
+                        unset($gallerypics[$currentgalerien][$pos]);
+                    } else {
+                        if(is_file($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file)) {
+                            @rename($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file,$GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic);
+                            $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
+                            $last_error = @error_get_last();
+                            if($last_error['line'] == $line_error) {
+                                $post['error_messages']['php_error'][] = $last_error['message'];
+                            } elseif(!is_file($GALLERIES_DIR_REL."/".$currentgalerien."/".$test_pic)) {
+                                $post['error_messages']['gallery_error_ftp_rename_pic'][] = $PREVIEW_DIR_NAME."/".$currentgalerien." - ".$test_pic;
+                            }
+                        }
+                        $post['messages']['gallery_message_ftp_rename_pic'][] =  $currentgalerien." - ".$test_pic;
+                        $gallerypics[$currentgalerien][$pos] = $test_pic;
+                    }
+                }
+            }
+        }
+        # hinweis wenn nicht alle vorschau bilder existieren
+        if(count($gallerypics[$currentgalerien]) != $count_preview_pic) {
+            $post['error_messages']['gallery_error_ftp_preview_pic'][] = $currentgalerien;
+        }
+        sort($gallerypics[$currentgalerien]);
     }
 
     $pagecontent .= categoriesMessages($post);
@@ -1525,35 +1633,7 @@ $tooltip_help_edit = NULL;
     $pagecontent .= $tooltip_gallery_help;
     $pagecontent .= "<p>".getLanguageValue("gallery_text")."</p>";
 
-    $pagecontent .= '<table width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
-$tooltip_file_help_overwrite = NULL;
-$overwrite = NULL;
-$tooltip_help_edit = NULL;
-    $pagecontent .= '<tr><td class="td_toggle">';
-    $pagecontent .= '<input type="submit" name="action_data[gallery]" value="'.getLanguageValue("gallery_button_change").'" class="input_submit">';
-    $pagecontent .= '&nbsp;&nbsp;<input class="input_check_copy" type="checkbox" name="overwrite" value="on"'.$tooltip_file_help_overwrite.$overwrite.'>&nbsp;<span'.$tooltip_file_help_overwrite.$overwrite.'>'.getLanguageValue("files_button_overwrite").'</span>';
-    $pagecontent .= '</td></tr>';
-
-    $pagecontent .= '<tr><td width="100%" class="td_toggle_new">';
-    # Neue GAllery
-    $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
-    $pagecontent .= '<tr><td width="30%" class="td_left_title"><b>'.getLanguageValue("gallery_new").'</b></td>';
-    $pagecontent .= '<td width="70%" class="td_left_title">&nbsp;</td>';
-    $pagecontent .= '</tr><tr>';
-#<b>'.getLanguageValue("gallery_titel_scale").'</b>
-    $pagecontent .= '';
-    $pagecontent .= '<td width="30%" class="td_left_title"><input type="text" class="input_text" name="new_gallery" value="" maxlength="'.$max_strlen.'"></td>';
-    $pagecontent .= '<td width="70%" class="td_left_title">&nbsp;</td>';
-#<input class="input_cms_zahl" size="4" name="new_max_width" value="" maxlength="4"><input class="input_cms_zahl" size="4" name="new_max_height" value="" maxlength="4">
-    $pagecontent .= '</tr></table>';
-
-    $pagecontent .= '</td></tr>';
-
-    # Die getLanguageValue() und createTooltipWZ() erzeugen
-#    $array_getLanguageValue = array("","","","","","",
-#        "","","","","",
-#        "","");
-    $array_getLanguageValue = array("gallery_scale",
+    $array_getLanguageValue = array("gallery_scale","gallery_scale_thumbs",
         "gallery_picsperrow","gallery_usethumbs","gallery_target","gallery_scaleimages",
         "gallery_rebuildthumbs","gallery_size","gallery_subtitle","gallery_button_cut","gallery_newname",
         "gallery_button_img_delete","gallery_button_gallery_delete");
@@ -1563,7 +1643,7 @@ $tooltip_help_edit = NULL;
         ${"text_".$language} = getLanguageValue($language);
     }
  
-    $array_getTooltipValue = array("help_target_blank","help_target_self","help_target","gallery_help_scale","gallery_help_input_scale",
+    $array_getTooltipValue = array("help_target_blank","help_target_self","help_target","gallery_help_scale","gallery_help_scale_thumbs","gallery_help_input_scale",
         "gallery_help_picsperrow","gallery_help_input_picsperrow","gallery_help_use_thumbs","gallery_help_all_picture_scale",
         "gallery_help_all_thumbs_new","gallery_help_size","gallery_help_picture","gallery_help_subtitle","gallery_help_name",
         "gallery_help_del","gallery_help_target","gallery_help_conf","gallery_help_edit","gallery_help_newname");
@@ -1578,30 +1658,110 @@ $tooltip_help_edit = NULL;
         }
     }
 
+    if(!isset($post['gallery']['error_html']['display_setings'])) {
+        $post['gallery']['error_html']['display_setings'] = NULL;
+    }
+    if(!isset($post['gallery']['error_html']['maxwidth'])) {
+        $post['gallery']['error_html']['maxwidth'] = NULL;
+    }
+    if(!isset($post['gallery']['error_html']['maxheight'])) {
+        $post['gallery']['error_html']['maxheight'] = NULL;
+    }
+    if(!isset($post['gallery']['error_html']['maxthumbwidth'])) {
+        $post['gallery']['error_html']['maxthumbwidth'] = NULL;
+    }
+    if(!isset($post['gallery']['error_html']['maxthumbheight'])) {
+        $post['gallery']['error_html']['maxthumbheight'] = NULL;
+    }
+    if(!isset($post['gallery']['error_html']['gallerypicsperrow'])) {
+        $post['gallery']['error_html']['gallerypicsperrow'] = NULL;
+    }
 
-    $dircontent = getDirs($GALLERIES_DIR_REL, true);
+    $pagecontent .= '<table width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
+$tooltip_file_help_overwrite = NULL;
+$overwrite = NULL;
+$tooltip_help_edit = NULL;
+    $pagecontent .= '<tr><td class="td_toggle">';
+    $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
+
+    $pagecontent .= '<tr><td width="85%" class="td_left_title"><input type="submit" name="action_data[gallery]" value="'.getLanguageValue("gallery_button_change").'" class="input_submit">';
+    $pagecontent .= '&nbsp;&nbsp;<input class="input_check_copy" type="checkbox" name="overwrite" value="on"'.$tooltip_file_help_overwrite.$overwrite.'>&nbsp;<span'.$tooltip_file_help_overwrite.'><b>'.getLanguageValue("files_button_overwrite").'</b></span></td>';
+
+    $pagecontent .= '<td width="15%" class="td_icons">';
+    if(getRequestParam('javascript', true)) {
+        $pagecontent .= '<span id="toggle_settings_conf_linkBild"'.$tooltip_gallery_help_conf.'></span>';
+    }
+    $pagecontent .= '</td></tr></table>';
+    $pagecontent .= '</td></tr>';
+    $pagecontent .= '<tr><td width="100%" align="right" class="td_toggle" id="toggle_settings_conf"'.$post['gallery']['error_html']['display_setings'].'>';
+    # setings start
+    $pagecontent .= '<table width="98%" cellspacing="0" border="1" cellpadding="0" class="table_data"><tr>';
+    $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_scale.'><b>'.$text_gallery_scale.'</b></td>';
+    $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxwidth]" value="'.$GALLERY_CONF->get("maxwidth").'"'.$post['gallery']['error_html']['maxwidth'].$tooltip_gallery_help_input_scale.' />&nbsp;x&nbsp;<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxheight]" value="'.$GALLERY_CONF->get("maxheight").'"'.$post['gallery']['error_html']['maxheight'].$tooltip_gallery_help_input_scale.' />&nbsp;'.getLanguageValue("pixels").'</td>';
+/**/
+    $checket = NULL;
+    if($GALLERY_CONF->get("usethumbs") == "true") {
+        $checket = ' checked="checked"';
+    }
+    $checket_self = NULL;
+    $checket_blank = ' checked="checked"';
+    if($GALLERY_CONF->get("target") == "_self") {
+        $checket_self = ' checked="checked"';
+        $checket_blank = NULL;
+    }
+
+    $pagecontent .= '</tr><tr>';
+    $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_target.'><b>'.$text_gallery_target.'</b></td>';
+    $pagecontent .= '<td width="20%" class="td_left_title_padding_bottom"><b'.$tooltip_help_target.'>Target:</b>&nbsp;&nbsp;blank&nbsp;<input type="radio" name="gallery[setings][target]" value="_blank"'.$tooltip_help_target_blank.$checket_blank.'>&nbsp;oder&nbsp;self&nbsp;<input type="radio" name="gallery[setings][target]" value="_self"'.$tooltip_help_target_self.$checket_self.'></td>';
+    $pagecontent .= '</tr><tr>';
+    $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_use_thumbs.'><b>'.$text_gallery_usethumbs.'</b></td>';
+    $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery[setings][usethumbs]" value="true"'.$tooltip_gallery_help_use_thumbs.$checket.'></td>';
+
+    if($ADMIN_CONF->get('showexpert') == "true") {
+        $pagecontent .= '</tr><tr>';
+        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_scale_thumbs.'><b>'.$text_gallery_scale_thumbs.'</b></td>';
+        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxthumbwidth]" value="'.$GALLERY_CONF->get("maxthumbwidth").'"'.$post['gallery']['error_html']['maxthumbwidth'].$tooltip_gallery_help_input_scale.' />&nbsp;x&nbsp;<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxthumbheight]" value="'.$GALLERY_CONF->get("maxthumbheight").'"'.$post['gallery']['error_html']['maxthumbheight'].$tooltip_gallery_help_input_scale.' />&nbsp;'.getLanguageValue("pixels").'</td>';
+
+
+        $pagecontent .= '</tr><tr>';
+        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_picsperrow.'><b>'.$text_gallery_picsperrow.'</b></td>';
+        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="2" name="gallery[setings][gallerypicsperrow]" value="'.$GALLERY_CONF->get("gallerypicsperrow").'"'.$post['gallery']['error_html']['gallerypicsperrow'].$tooltip_gallery_help_input_picsperrow.' /></td>';
+    }
+    $pagecontent .= '</tr><tr>';
+    $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_all_picture_scale.'><b>'.$text_gallery_scaleimages.'</b></td>';
+    $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery[scale_max]" value="true"'.$tooltip_gallery_help_all_picture_scale.'></td>';
+    $pagecontent .= '</tr><tr>';
+    $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_all_thumbs_new.'><b>'.$text_gallery_rebuildthumbs.'</b></td>';
+    $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery[make_thumbs]" value="true"'.$tooltip_gallery_help_all_thumbs_new.'></td>';
+    $pagecontent .= '</tr>';
+    $pagecontent .= '</table>';
+
+    if(getRequestParam('javascript', true)) {
+        $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_settings_conf\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\'info_button\');</script>';
+    }
+    $pagecontent .= '</td></tr>';
+    # setings end
+
+    $pagecontent .= '<tr><td width="100%" class="td_toggle_new">';
+    # Neue GAllery
+    $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
+    $pagecontent .= '<tr><td width="30%" class="td_left_title"><b>'.getLanguageValue("gallery_new").'</b></td>';
+    $pagecontent .= '<td width="70%" class="td_left_title">&nbsp;</td>';
+    $pagecontent .= '</tr><tr>';
+    $pagecontent .= '';
+    $pagecontent .= '<td width="30%" class="td_left_title"><input type="text" class="input_text" name="new_gallery" value="" maxlength="'.$max_strlen.'"></td>';
+    $pagecontent .= '<td width="70%" class="td_left_title">&nbsp;</td>';
+    $pagecontent .= '</tr></table>';
+    $pagecontent .= '</td></tr>';
     $toggle_pos = 0;
     foreach ($dircontent as $pos => $currentgalerien) {
-        if(!isset($post['gallery']['error_html']['display'][$currentgalerien])) {
-            $post['gallery']['error_html']['display'][$currentgalerien] = NULL;
-        }
-        if(!isset($post['gallery']['error_html']['display_setings'][$currentgalerien])) {
-            $post['gallery']['error_html']['display_setings'][$currentgalerien] = NULL;
-        }
         if(!isset($post['gallery']['error_html']['newname'][$currentgalerien])) {
             $post['gallery']['error_html']['newname'][$currentgalerien] = NULL;
         }
-        if(!isset($post['gallery']['error_html']['maxwidth'][$currentgalerien])) {
-            $post['gallery']['error_html']['maxwidth'][$currentgalerien] = NULL;
-        }
-        if(!isset($post['gallery']['error_html']['maxheight'][$currentgalerien])) {
-            $post['gallery']['error_html']['maxheight'][$currentgalerien] = NULL;
-        }
-        if(!isset($post['gallery']['error_html']['picsperrow'][$currentgalerien])) {
-            $post['gallery']['error_html']['picsperrow'][$currentgalerien] = NULL;
+        if(!isset($post['gallery']['error_html']['display'][$currentgalerien])) {
+            $post['gallery']['error_html']['display'][$currentgalerien] = NULL;
         }
 
-        $conf = new Properties("$GALLERIES_DIR_REL/".$currentgalerien."/gallery.conf",true);
         $pagecontent .= '<tr><td width="100%" class="td_toggle">';
         $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
 
@@ -1612,81 +1772,16 @@ $tooltip_help_edit = NULL;
         }
         $pagecontent .= '<input type="image" class="input_img_button_last" name="action_data[deletegallery]['.$currentgalerien.']" value="'.$text_gallery_button_gallery_delete.'" src="gfx/icons/'.$icon_size.'/delete.png" title="löschen"'.$tooltip_gallery_help_del.'></td></tr></table>';
         $pagecontent .= '</td></tr>';
-
-
-
         $pagecontent .= '<tr><td width="100%" id="toggle_'.$toggle_pos.'" align="right" class="td_togglen_padding_bottom"'.$post['gallery']['error_html']['display'][$currentgalerien].'>';
-
-#$error_color['maxwidth'] = null;
-#$error_color['maxheight'] = null;
-#$error_color['picsperrow'] = null;
-#$text_file_button_cut = "Entfernen";
-
-
         # gallery setup
         $pagecontent .= '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data"><tr>';
-        $pagecontent .= '<td width="55%" class="td_left_title_padding_bottom">';#<b>Setings</b>
-        if(getRequestParam('javascript', true)) {
-            $pagecontent .= '<span id="toggle_'.$toggle_pos.'conf_linkBild"'.$tooltip_gallery_help_conf.'></span>';
-        }
+        $pagecontent .= '<td width="30%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_newname.'>';#<b>Setings</b>
+        $pagecontent .= '<b>'.$text_gallery_newname.'</b>';
         $pagecontent .= '</td>';
-        $pagecontent .= '<td width="45%" align="right" valign="top" class="td_title"><b>Dateien Hochladen</b></td>';
+        $pagecontent .= '<td width="70%" align="right" valign="top" class="td_title"><b>Dateien Hochladen</b></td>';
         $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="55%" align="left" valign="top">';
-
-
-        $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data" id="toggle_'.$toggle_pos.'conf"'.$post['gallery']['error_html']['display_setings'][$currentgalerien].'><tr>';
-
-
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_newname.'><b>'.$text_gallery_newname.'</b></td>';
-        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_text" name="gallery['.$currentgalerien.'][newname]" value="" maxlength="'.$max_strlen.'"'.$post['gallery']['error_html']['newname'][$currentgalerien].$tooltip_gallery_help_newname.'></td>';
-
-#$post['gallery']['error_html']['new_name'][$gallery]
-
-        $pagecontent .= '</tr><tr>';
-
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_scale.'><b>'.$text_gallery_scale.'</b></td>';
-        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery['.$currentgalerien.'][setings][maxwidth]" value="'.$conf->get("maxwidth").'"'.$post['gallery']['error_html']['maxwidth'][$currentgalerien].$tooltip_gallery_help_input_scale.' />&nbsp;x&nbsp;<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery['.$currentgalerien.'][setings][maxheight]" value="'.$conf->get("maxheight").'"'.$post['gallery']['error_html']['maxheight'][$currentgalerien].$tooltip_gallery_help_input_scale.' />&nbsp;'.getLanguageValue("pixels").'</td>';
-
-        $checket = NULL;
-        if($conf->get("usethumbs") == "true") {
-            $checket = ' checked="checked"';
-        }
-        $checket_self = NULL;
-        $checket_blank = ' checked="checked"';
-        if($conf->get("target") == "_self") {
-            $checket_self = ' checked="checked"';
-            $checket_blank = NULL;
-        }
-
-        $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_target.'><b>'.$text_gallery_target.'</b></td>';
-        $pagecontent .= '<td width="20%" class="td_left_title_padding_bottom"><b'.$tooltip_help_target.'>Target:</b>&nbsp;&nbsp;blank&nbsp;<input type="radio" name="gallery['.$currentgalerien.'][setings][target]" value="_blank"'.$tooltip_help_target_blank.$checket_blank.'>&nbsp;oder&nbsp;self&nbsp;<input type="radio" name="gallery['.$currentgalerien.'][setings][target]" value="_self"'.$tooltip_help_target_self.$checket_self.'></td>';
-
-        $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_use_thumbs.'><b>'.$text_gallery_usethumbs.'</b></td>';
-        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery['.$currentgalerien.'][setings][usethumbs]" value="true"'.$tooltip_gallery_help_use_thumbs.$checket.'></td>';
-        $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_picsperrow.'><b>'.$text_gallery_picsperrow.'</b></td>';
-        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="2" name="gallery['.$currentgalerien.'][setings][picsperrow]" value="'.$conf->get("picsperrow").'"'.$post['gallery']['error_html']['picsperrow'][$currentgalerien].$tooltip_gallery_help_input_picsperrow.' /></td>';
-
-
-        $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_all_picture_scale.'><b>'.$text_gallery_scaleimages.'</b></td>';
-        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery['.$currentgalerien.'][scale_max]" value="true"'.$tooltip_gallery_help_all_picture_scale.'></td>';
-        $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_all_thumbs_new.'><b>'.$text_gallery_rebuildthumbs.'</b></td>';
-        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery['.$currentgalerien.'][make_thumbs]" value="true"'.$tooltip_gallery_help_all_thumbs_new.'></td>';
-        $pagecontent .= '</tr>';
-        $pagecontent .= '</table>';
-        if(getRequestParam('javascript', true)) {
-            $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$toggle_pos.'conf\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\'info_button\');</script>';
-        }
-
-
-        $pagecontent .= '</td>';
- 
-        $pagecontent .= '<td width="45%" align="right" valign="top" class="td_togglen_padding_bottom">';
+        $pagecontent .= '<td width="30%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_newname.'><input type="text" class="input_text" name="gallery['.$currentgalerien.'][newname]" value="" maxlength="'.$max_strlen.'"'.$post['gallery']['error_html']['newname'][$currentgalerien].$tooltip_gallery_help_newname.'></td>';
+        $pagecontent .= '<td width="70%" align="right" valign="top" class="td_togglen_padding_bottom">';
         $pagecontent .= '<input type="file" id="uploadfileinput_'.$pos.'" name="uploadfile['.$currentgalerien.']" class="uploadfileinput">
                         <div id="files_list_'.$pos.'" class="text_cat_page"></div>
                         <script type="text/javascript">
@@ -1696,48 +1791,18 @@ $tooltip_help_edit = NULL;
                         multi_selector.addElement( document.getElementById( \'uploadfileinput_'.$pos.'\' ) , \''.$currentgalerien.'\' );
                         </script>';
         $pagecontent .= '</td>';
-#        $pagecontent .= '</tr></table>';
-
-
-
- 
         $pagecontent .= '</tr></table>';
-
-/*
-gallerymaxheight = 375
-gallerymaxwidth = 400
-gallerypicsperrow = 5
-galleryusethumbs = false*/
-
-# $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("resizeimages", $ADMIN_CONF->get("resizeimages") == "true") . getLanguageValue("admin_input_imagesmax").'<br><input type="text" class="input_cms_zahl" size="4" maxlength="4" name="maximagewidth" value="'.$ADMIN_CONF->get("maximagewidth").'"'.$error_color['maximagewidth'].' />&nbsp;x&nbsp;<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="maximageheight" value="'.$ADMIN_CONF->get("maximageheight").'"'.$error_color['maximageheight'].' />&nbsp;' . getLanguageValue("pixels") . '</td>';
-
-
-
         # inhalt gallery
         $pagecontent .= '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
         $subtitle = new Properties("$GALLERIES_DIR_REL/".$currentgalerien."/texte.conf",true);
-        $counter = 0;
-        // alle Bilder der Galerie ins array
-        $gallerypics = getFiles($GALLERIES_DIR_REL.'/'.$currentgalerien,"");
-        foreach($gallerypics as $pos => $file) {
-            # nur Bilder zulassen
-            if(is_dir($file) or count(@getimagesize($GALLERIES_DIR_REL.'/'.$currentgalerien.'/'.$file)) < 2) {
-                unset($gallerypics[$pos]);
-            }
-        }
-        sort($gallerypics);
-
         $max_cols = 3;
         $max_cols_check = $max_cols;
-#$test_zeile = 1;
-#$neu = 1;
         $td_width = round(100 / $max_cols).'%';
         $pagecontent .= "<tr>";
         $new_tr = false;
-        foreach ($gallerypics as $pos => $file) {
+        foreach ($gallerypics[$currentgalerien] as $pos => $file) {
             # ausgleich weil pos mit 0 anfängt
             $pos = $pos + 1;
-#            $counter++;
             $lastsavedanchor = "";#$lastsavedanchor = " id=\"lastsavedimage\"";
             $size = getimagesize($GALLERIES_DIR_REL."/".$currentgalerien."/".$file);
             // Vorschaubild anzeigen, wenn vorhanden; sonst Originalbild
@@ -1746,26 +1811,14 @@ galleryusethumbs = false*/
             } else {
                 $preview = $GALLERIES_DIR_REL."/".$currentgalerien."/".$file;
             }
-#            if($pos == $max_cols_check + 1) {
             if($new_tr === true) {
                 $pagecontent .= "<tr>";
                 $new_tr = false;
             }
-
             $pagecontent .= '<td width="'.$td_width.'" align="left" valign="top" class="td_gallery_img">';
-/*
-$pagecontent .= 'neu pos = '.$neu."<br>\n";
-$pagecontent .= 'zeile = '.$test_zeile."<br>\n";
-$pagecontent .= "pos = $pos max_cols = $max_cols_check<br>\n";
-*/
-
-#100px
-
-
             $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_gallery_img">
                             <tr><td rowspan="5" valign="top" width="10%" style="padding-right:10px;"><a href="'.$specialchars->replaceSpecialChars($GALLERIES_DIR_REL."/".$currentgalerien."/".$file,true).'" target="_blank"'.$tooltip_gallery_help_picture.'>';
             $pagecontent .= '<img src="'.$specialchars->replaceSpecialChars($preview,true).'" alt="'.$specialchars->rebuildSpecialChars($file, true, true).'" style="height:60px;border:none;" />';
-
             $pagecontent .= '</a></td>
                             <td height="1%" class="td_left_title"'.$tooltip_gallery_help_size.'><b>'.$text_gallery_size.'</b></td></tr>
                             <tr><td height="1%" class="td_togglen_padding_bottom">'.$size[0].' x '.$size[1].' Pixel</td></tr>
@@ -1780,19 +1833,15 @@ $pagecontent .= "pos = $pos max_cols = $max_cols_check<br>\n";
                             </td></tr></table>
                             </td></tr>
                             </table>';
-            $pagecontent .= "</td>";#action_data[gallery]
-#action_data[deletegalleryimg]['.$currentgalerien.']['.$file.'] value="$text_file_button_delete"
+            $pagecontent .= "</td>";
             if($pos == $max_cols_check) {
-#$test_zeile++;
                 $pagecontent .= "</tr>";
-                if(count($gallerypics) >  $max_cols_check) {
+                if(count($gallerypics[$currentgalerien]) >  $max_cols_check) {
                     $max_cols_check = $pos + $max_cols;
                     $new_tr = true;
-#$neu = $pos;
                 }
             }
         }
-
         # wenn die spalten nicht $max_cols sind dann den rest noch erstellen
         if($pos != $max_cols_check) {
             for($rest = $pos + 1;$rest <= $max_cols_check;$rest++) {# '.$rest.'
@@ -1800,66 +1849,46 @@ $pagecontent .= "pos = $pos max_cols = $max_cols_check<br>\n";
             }
             $pagecontent .= '</tr>';
         }
-
         $pagecontent .= '</table>';
-
-
         if(getRequestParam('javascript', true)) {
             $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$toggle_pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\'info_button\');</script>';
         }
         $pagecontent .= '</td></tr>';
-
         $toggle_pos++;
     }
     $pagecontent .= '</table>';
-
-
-
-
-
     return array(getLanguageValue("gallery_button"), $pagecontent);
 }
 
 
 function newGalleryImg($post) {
-#    global $CONTENT_DIR_REL;
-    global $error_color;
     global $PREVIEW_DIR_NAME;
     global $GALLERIES_DIR_REL;
     global $specialchars;
+    global $GALLERY_CONF;
 
     $forceoverwrite = "";
     if (isset($_POST['overwrite'])) {
         $forceoverwrite = $_POST['overwrite'];
     }
 
-
     foreach($_FILES as $array_name => $tmp) {
         if($_FILES[$array_name]['error'] == 0) {
             $gallery = explode("_",$array_name);
-/*
-echo "<pre>";
-print_r($gallery);
-echo "</pre><br>\n";*/
-#            $cat = sprintf("%02d",$gallery_tmp[1])."_".specialNrDir("$CONTENT_DIR_REL", sprintf("%02d",$gallery_tmp[1]));
-#echo "file = ".$gallery[1]."<br>\n";
-
-# $forceoverwrite muss noch eingebaut werden!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            $error = uploadFile($_FILES[$array_name], $gallery[1], $forceoverwrite, true);
+            $error = uploadFile($_FILES[$array_name], $GALLERIES_DIR_REL."/".$gallery[1]."/", $forceoverwrite,$GALLERY_CONF->get('maxwidth'), $GALLERY_CONF->get('maxtheight'));
             if(!empty($error)) {
                 $post['error_messages'][key($error)][] = $gallery[1]."/".$error[key($error)];
-#                $key = array_keys($post['categories']['cat']['position'], $gallery[1]);
-#                $post['categories']['cat']['error_html']['display'][sprintf("%1d",$key[0])] = 'style="display:block;" ';
-#                $post['categories']['cat']['error_html']['name'][sprintf("%1d",$key[0])] = 'style="background-color:'.$error_color[key($error)].';" ';
             } else {
-                if(extension_loaded("gd")) {
+                if($GALLERY_CONF->get("usethumbs") == "true") {
                     require_once("../Image.php");
-                    $gallery_setings = new Properties($GALLERIES_DIR_REL."/".$gallery[1]."/gallery.conf",true);
-                    scaleImage($specialchars->replaceSpecialChars($_FILES[$array_name]['name'],false), $GALLERIES_DIR_REL."/".$gallery[1]."/", $GALLERIES_DIR_REL."/".$gallery[1]."/$PREVIEW_DIR_NAME/", $gallery_setings->get('maxthumbwidth'), $gallery_setings->get('maxthumbheight'));
-                    // chmod, wenn so eingestellt
-#                    if ($ADMIN_CONF->get("chmodnewfiles") == "true")
-#                    if(strlen($ADMIN_CONF->get("chmodnewfilesatts")) > 0)
-#                        chmod($GALLERIES_DIR_REL."/".$gallery[1]."/$PREVIEW_DIR_NAME/".$_FILES[$array_name]['name'], getChmod());
+                    $pict = $specialchars->replaceSpecialChars($_FILES[$array_name]['name'],false);
+                    $size    = GetImageSize($GALLERIES_DIR_REL."/".$gallery[1]."/".$pict);
+                    if($size[0] <= $GALLERY_CONF->get('maxthumbwidth') and $size[1] <= $GALLERY_CONF->get('maxthumbheight')) {
+                        copy($GALLERIES_DIR_REL."/".$gallery[1]."/".$pict,$GALLERIES_DIR_REL."/".$gallery[1]."/".$PREVIEW_DIR_NAME."/".$pict);
+                    } else {
+                        scaleImage($pict, $GALLERIES_DIR_REL."/".$gallery[1]."/", $GALLERIES_DIR_REL."/".$gallery[1]."/".$PREVIEW_DIR_NAME."/", $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'));
+                    }
+                    useChmod($GALLERIES_DIR_REL."/".$gallery[1]."/".$PREVIEW_DIR_NAME."/".$pict);
                 }
                 $post['messages']['gallery_message_new_img'][] = $_FILES[$array_name]['name']." <b>></b> ".$gallery[1];
                 $post['gallery']['error_html']['display'][$gallery[1]] = ' style="display:block;"';
@@ -1898,7 +1927,7 @@ function newGallery($post) {
                     if($last_error['line'] == $line_error) {
                         $post['error_messages']['php_error'][] = $last_error['message'];
                     } elseif(!is_dir($GALLERIES_DIR_REL."/".$galleryname."/".$PREVIEW_DIR_NAME)) {
-                        $post['error_messages']['gallery_error_new'][] = $galleryname;
+                        $post['error_messages']['gallery_error_new_preview'][] = $galleryname;
                     } else {
                         @touch($GALLERIES_DIR_REL."/".$galleryname."/texte.conf");
                         $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
@@ -1908,36 +1937,19 @@ function newGallery($post) {
                         } elseif(!is_file($GALLERIES_DIR_REL."/".$galleryname."/texte.conf")) {
                             $post['error_messages']['gallery_error_datei_conf'][] = $galleryname."/texte.conf";
                         } else {
-#                            @touch($GALLERIES_DIR_REL."/".$galleryname."/gallery.conf");
-                            $handle = @fopen($GALLERIES_DIR_REL."/".$galleryname."/gallery.conf","w");
-                            $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-                            $last_error = @error_get_last();
-                            if($last_error['line'] == $line_error) {
-                                $post['error_messages']['php_error'][] = $last_error['message'];
-                            } elseif(!is_file($GALLERIES_DIR_REL."/".$galleryname."/gallery.conf")) {
-                                $post['error_messages']['gallery_error_datei_conf'][] = $galleryname."/gallery.conf";
-                            } else {
-                                # das kann nur in der gallery.conf geändert werden deshalb hier rein
-                                fwrite($handle,"maxthumbheight = 120\nmaxthumbwidth = 120\n");
-                                fclose($handle);
-                                $error = changeChmod($GALLERIES_DIR_REL."/".$galleryname);
-                                if(is_array($error)) {
-                                    $post['error_messages'][key($error)][] = $error[key($error)];
-                                }
-                                $error = changeChmod($GALLERIES_DIR_REL."/".$galleryname."/".$PREVIEW_DIR_NAME);
-                                if(is_array($error)) {
-                                    $post['error_messages'][key($error)][] = $error[key($error)];
-                                }
-                                $error = changeChmod($GALLERIES_DIR_REL."/".$galleryname."/texte.conf");
-                                if(is_array($error)) {
-                                    $post['error_messages'][key($error)][] = $error[key($error)];
-                                }
-                                $error = changeChmod($GALLERIES_DIR_REL."/".$galleryname."/gallery.conf");
-                                if(is_array($error)) {
-                                    $post['error_messages'][key($error)][] = $error[key($error)];
-                                }
-                                $post['messages']['gallery_message_new'][] = $specialchars->rebuildSpecialChars($galleryname, true, true);
+                            $error = changeChmod($GALLERIES_DIR_REL."/".$galleryname);
+                            if(is_array($error)) {
+                                $post['error_messages'][key($error)][] = $error[key($error)];
                             }
+                            $error = changeChmod($GALLERIES_DIR_REL."/".$galleryname."/".$PREVIEW_DIR_NAME);
+                            if(is_array($error)) {
+                                $post['error_messages'][key($error)][] = $error[key($error)];
+                            }
+                            $error = changeChmod($GALLERIES_DIR_REL."/".$galleryname."/texte.conf");
+                            if(is_array($error)) {
+                                $post['error_messages'][key($error)][] = $error[key($error)];
+                            }
+                            $post['messages']['gallery_message_new'][] = $specialchars->rebuildSpecialChars($galleryname, true, true);
                         }
                     }
                 }
@@ -1956,15 +1968,65 @@ function editGallery($post) {
     global $GALLERIES_DIR_REL;
     global $ALLOWED_SPECIALCHARS_REGEX;
     global $PREVIEW_DIR_NAME;
+    global $GALLERY_CONF;
+    global $ADMIN_CONF;
 
+    # Gallery Setings setzen
+/*    if(!isset($post['gallery']['setings']['usethumbs'])) {
+        $post['gallery']['setings']['usethumbs'] = NULL;
+    }*/
+    # wenn expert eingeschaltet wird müssen die expert $post gefüllt werden
+    $gallery = makeDefaultConf("gallery");
+    if($ADMIN_CONF->get('showexpert') == "false") {
+        foreach($gallery['expert'] as $syntax) {
+            $post['gallery']['setings'][$syntax] = $GALLERY_CONF->get($syntax);
+        }
+    }
+    if(!isset($post['gallery']['setings']['usethumbs'])) {
+        $post['gallery']['setings']['usethumbs'] = "false";
+    } else {
+        $post['gallery']['setings']['usethumbs'] = "true";
+    }
+    foreach($post['gallery']['setings'] as $seting => $value) {
+        if($GALLERY_CONF->get($seting) != $value) {
+            if($seting == 'maxheight' and strlen($value) > 0 and !ctype_digit($value)) {
+                $post['error_messages']['check_digit']['color'] = "#FFC197";
+                $post['gallery']['error_html']['maxheight'] = 'style="background-color:#FFC197;" ';
+            } elseif($seting == 'maxwidth' and strlen($value) > 0 and !ctype_digit($value)) {
+                $post['error_messages']['check_digit']['color'] = "#FFC197";
+                $post['gallery']['error_html']['maxwidth'] = 'style="background-color:#FFC197;" ';
+            } elseif($seting == 'gallerypicsperrow' and !ctype_digit($value)) {
+                $post['error_messages']['check_digit']['color'] = "#FFC197";
+                $post['gallery']['error_html']['gallerypicsperrow'] = 'style="background-color:#FFC197;" ';
+            } elseif($seting == 'maxthumbheight' and strlen($value) > 0 and !ctype_digit($value)) {
+                $post['error_messages']['check_digit']['color'] = "#FFC197";
+                $post['gallery']['error_html']['maxthumbheight'] = 'style="background-color:#FFC197;" ';
+            } elseif($seting == 'maxthumbwidth' and strlen($value) > 0 and !ctype_digit($value)) {
+                $post['error_messages']['check_digit']['color'] = "#FFC197";
+                $post['gallery']['error_html']['maxthumbwidth'] = 'style="background-color:#FFC197;" ';
+            } else {
+                $GALLERY_CONF->set($seting, $value);
+            }
+
+            $post['gallery']['error_html']['display_setings'] = ' style="display:block;"';
+            if(isset($GALLERY_CONF->properties['error'])) {
+                $post['error_messages']['gallery_error_setings'][] = $GALLERY_CONF->properties['error'];
+                return $post;
+            }
+            $post['messages']['gallery_messages_setings'][] = NULL;
+        }
+    }
+
+    # Galerien durchgehen und änderungen machen
     foreach($post['gallery'] as $gallery => $gallery_array) {
+# musss noch geändert werden!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if($gallery == "setings" or $gallery == "error_html" or $gallery == "make_thumbs" or $gallery == "scale_max") continue;
         # Neuer Gallery Name
         if(isset($post['gallery'][$gallery]['newname']) and strlen($post['gallery'][$gallery]['newname']) > 0) {
             $newname = $specialchars->replaceSpecialChars($post['gallery'][$gallery]['newname'],false);
             if(!preg_match($ALLOWED_SPECIALCHARS_REGEX, $newname) or stristr($newname,"%5E")) {
                 $post['error_messages']['check_name']['color'] = "#FFC197";
                 $post['gallery']['error_html']['newname'][$gallery] = 'style="background-color:#FFC197;" ';
-                $post['gallery']['error_html']['display_setings'][$gallery] = ' style="display:block;"';
                 $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
             } else {
                 @rename($GALLERIES_DIR_REL."/".$gallery,$GALLERIES_DIR_REL."/".$newname);
@@ -1983,12 +2045,11 @@ function editGallery($post) {
             }
         }
 
-
         # Subtitel setzen
         if(isset($post['gallery'][$gallery]['subtitle'])) {
             $gallery_subtitel = new Properties($GALLERIES_DIR_REL."/".$gallery."/texte.conf",true);
             foreach($post['gallery'][$gallery]['subtitle'] as $img => $subtitel) {
-                if($gallery_subtitel->get($img) != $subtitel) {
+                if($gallery_subtitel->get($img) != $subtitel and is_file($GALLERIES_DIR_REL."/".$gallery."/".$img)) {
                     $gallery_subtitel->set($img, $subtitel);
                     $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
                     if(isset($gallery_subtitel->properties['error'])) {
@@ -2001,59 +2062,33 @@ function editGallery($post) {
             }
         }
 
-        # Gallery Setings setzen
-        $gallery_setings = new Properties($GALLERIES_DIR_REL."/".$gallery."/gallery.conf",true);
-        if(!isset($post['gallery'][$gallery]['setings']['usethumbs'])) {
-            $post['gallery'][$gallery]['setings']['usethumbs'] = NULL;
-        }
-        foreach($post['gallery'][$gallery]['setings'] as $seting => $value) {
-            if($gallery_setings->get($seting) != $value) {
-                if($seting == 'maxheight' and strlen($value) > 0 and !ctype_digit($value)) {
-                    $post['error_messages']['check_digit']['color'] = "#FFC197";
-                    $post['gallery']['error_html']['maxheight'][$gallery] = 'style="background-color:#FFC197;" ';
-                } elseif($seting == 'maxwidth' and strlen($value) > 0 and !ctype_digit($value)) {
-                    $post['error_messages']['check_digit']['color'] = "#FFC197";
-                    $post['gallery']['error_html']['maxwidth'][$gallery] = 'style="background-color:#FFC197;" ';
-                } elseif($seting == 'picsperrow' and !ctype_digit($value)) {
-                    $post['error_messages']['check_digit']['color'] = "#FFC197";
-                    $post['gallery']['error_html']['picsperrow'][$gallery] = 'style="background-color:#FFC197;" ';
-                } else {
-                    $gallery_setings->set($seting, $value);
-                }
-                $post['gallery']['error_html']['display_setings'][$gallery] = ' style="display:block;"';
-                $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
-                if(isset($gallery_setings->properties['error'])) {
-                    $post['error_messages']['gallery_error_setings'][] = $gallery_setings->properties['error'];
-                    return $post;
-                }
-                $post['messages']['gallery_messages_setings'][] = NULL;
-            }
-        }
-
         #make_thumbs
-        if(isset($post['gallery'][$gallery]['make_thumbs'])) {
-            if($gallery_setings->get("usethumbs") == "true") {
+        if(isset($post['gallery']['make_thumbs'])) {
+            if($GALLERY_CONF->get("usethumbs") == "true") {
                 require_once("../Image.php");
                 $gallerypics = getFiles($GALLERIES_DIR_REL.'/'.$gallery,"");
                 foreach($gallerypics as $pos => $file) {
                     # nur Bilder zulassen
-                    if(!is_dir($file) and count(@getimagesize($GALLERIES_DIR_REL.'/'.$gallery.'/'.$file)) > 2) {
-                        scaleImage($file, $GALLERIES_DIR_REL.'/'.$gallery.'/', $GALLERIES_DIR_REL.'/'.$gallery.'/'.$PREVIEW_DIR_NAME.'/', $gallery_setings->get('maxthumbwidth'), $gallery_setings->get('maxthumbheight'));
+                    if(!is_dir($GALLERIES_DIR_REL.'/'.$gallery.'/'.$file)) {
+                        $size = @GetImageSize($GALLERIES_DIR_REL.'/'.$gallery.'/'.$file);
+                        if($size[0] <= $GALLERY_CONF->get('maxthumbwidth') and $size[1] <= $GALLERY_CONF->get('maxthumbheight')) {
+                            copy($GALLERIES_DIR_REL.'/'.$gallery.'/'.$file,$GALLERIES_DIR_REL."/".$gallery."/".$PREVIEW_DIR_NAME."/".$file);
+                        } else {
+                            scaleImage($file, $GALLERIES_DIR_REL.'/'.$gallery.'/', $GALLERIES_DIR_REL.'/'.$gallery.'/'.$PREVIEW_DIR_NAME.'/', $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'));
+                        }
                         $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
                         $post['messages']['gallery_messages_make_thumbs'][] = NULL;
                     }
                 }
             } else {
                 $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
-                $post['gallery']['error_html']['display_setings'][$gallery] = ' style="display:block;"';
                 $post['error_messages']['gallery_error_no_make_thumbs'][] = NULL;
             }
         }
         #scale_max
-        if(isset($post['gallery'][$gallery]['scale_max'])) {
-            if(isset($post['gallery']['error_html']['maxwidth'][$gallery]) or isset($post['gallery']['error_html']['maxheight'][$gallery])) {
+        if(isset($post['gallery']['scale_max']) and ($GALLERY_CONF->get('maxwidth') > 0 or $GALLERY_CONF->get('maxheight') > 0)) {
+            if(isset($post['gallery']['error_html']['maxwidth']) or isset($post['gallery']['error_html']['maxheight'])) {
                 $post['error_messages']['gallery_error_no_scale_max'][] = NULL;
-                $post['gallery']['error_html']['display_setings'][$gallery] = ' style="display:block;"';
                 $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
             } else {
                 require_once("../Image.php");
@@ -2062,8 +2097,8 @@ function editGallery($post) {
                     $test_img = @getimagesize($GALLERIES_DIR_REL.'/'.$gallery.'/'.$file);
                     # nur Bilder zulassen
                     if(!is_dir($file) and count($test_img) > 2) {
-                        if($test_img[0] > $gallery_setings->get('maxwidth') or $test_img[1] > $gallery_setings->get('maxheight')) {
-                            scaleImage($file, $GALLERIES_DIR_REL.'/'.$gallery.'/', $GALLERIES_DIR_REL.'/'.$gallery.'/', $gallery_setings->get('maxwidth'), $gallery_setings->get('maxheight'));
+                        if($test_img[0] > $GALLERY_CONF->get('maxwidth') or $test_img[1] > $GALLERY_CONF->get('maxheight')) {
+                            scaleImage($file, $GALLERIES_DIR_REL.'/'.$gallery.'/', $GALLERIES_DIR_REL.'/'.$gallery.'/', $GALLERY_CONF->get('maxwidth'), $GALLERY_CONF->get('maxheight'));
                             $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
                             $post['messages']['gallery_messages_scale_max'][] = NULL;
                         }
@@ -2095,7 +2130,6 @@ function deleteGalleryImg($post) {
             } elseif(is_file("$GALLERIES_DIR_REL/".$gallery."/".$del_file)) {
                 $post['error_messages']['gallery_error_deleted_img'][] = $gallery." <b>></b> ".$del_file;
             } else {
-#                $post['messages']['gallery_message_deleted'][] = $gallery." <b>></b> ".$del_file;
                 if(file_exists($GALLERIES_DIR_REL."/".$gallery."/".$PREVIEW_DIR_NAME."/".$del_file)) {
                     @unlink($GALLERIES_DIR_REL."/".$gallery."/".$PREVIEW_DIR_NAME."/".$del_file);
                     $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
@@ -2104,8 +2138,6 @@ function deleteGalleryImg($post) {
                         $post['error_messages']['php_error'][] = $last_error['message'];
                     } elseif(is_file("$GALLERIES_DIR_REL/".$gallery."/".$del_file)) {
                         $post['error_messages']['gallery_error_deleted_img'][] = $gallery."/".$PREVIEW_DIR_NAME."/ <b>></b> ".$del_file;
-                    } else {
-#                       $post['messages']['gallery_message_deleted'][] = $gallery."/vorschau/ <b>></b> ".$del_file;
                     }
                 }
                 $subtitle = new Properties("$GALLERIES_DIR_REL/".$gallery."/texte.conf",true);
@@ -2113,12 +2145,10 @@ function deleteGalleryImg($post) {
                 $post['messages']['gallery_message_deleted_img'][] = $gallery." <b>></b> ".$del_file;
             }
             $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
-#            return $post;
         }
     } else {
         $post['ask'] = getLanguageValue("gallery_ask_delete_img").':<br><span style="font-weight:normal;">->&nbsp;&nbsp;'.$specialchars->rebuildSpecialChars($del_file,true,true).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletegalleryimg]['.$gallery.']" value="'.$del_file.'">';
         $post['gallery']['error_html']['display'][$gallery] = 'style="display:block;" ';
-#        return $post;
     }
     return $post;
 }
@@ -2133,7 +2163,6 @@ function deleteGallery($post) {
     if(!isset($_POST['confirm'])) {
         $del_gallery = key($post['action_data']['deletegallery']);
         $post['ask'] = getLanguageValue("gallery_ask_delete").'<br><span style="font-weight:normal;">-&gt;&nbsp;&nbsp;'.messagesOutLen($specialchars->rebuildSpecialChars($del_gallery, true, true)).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletegallery]" value="'.$post['action_data']['deletegallery'].'"><input type="hidden" name="del_gallery" value="'.$del_gallery.'">';
-#        return $post;
     }
     # Gallery Löschen    
     if(isset($_POST['confirm']) and $_POST['confirm'] == "true" and isset($_POST['del_gallery']) and !empty($_POST['del_gallery'])) {
@@ -2141,12 +2170,10 @@ function deleteGallery($post) {
         $post['error_messages'] = deleteDir($del_gallery);
         if(!file_exists($GALLERIES_DIR_REL."/".$_POST['del_gallery'])) {
             $post['messages']['gallery_message_deleted'][] = $_POST['del_gallery'];
-#            return $post;
         } else {
             if(!isset($post['error_messages'])) {
                 $post['error_messages']['gallery_error_deleted'][] = $_POST['del_gallery'];
             }
-#            return $post;
         }
     }
     return $post;
@@ -2342,7 +2369,7 @@ function files($post) {
 
                 $pagecontent .= $titel_dateien.'<tr><td class="td_left_title_padding_bottom"><a class="file_link" href="'.$CONTENT_DIR_REL.'/'.$specialchars->replaceSpecialChars($file,true).'/dateien/'.$specialchars->replaceSpecialChars($subfile,true).'" target="_blank"'.$tooltip_files_help_show.'>'.$specialchars->rebuildSpecialChars($subfile,true,true).'</a></td>'
                 .'<td class="td_left_title_padding_bottom" nowrap><span class="text_info">'.convertFileSizeUnit($filesize).'</span></td>'
-                .'<td class="td_left_title_padding_bottom" nowrap><span class="text_info">'.strftime(getLanguageValue("_dateformat"), $uploadtime).'</span></td>'
+                .'<td class="td_left_title_padding_bottom" nowrap><span class="text_info">'.@strftime(getLanguageValue("_dateformat"), $uploadtime).'</span></td>'
                 .'<td class="td_center_title_padding_bottom" nowrap><span class="text_info">'.$downloads." ".$downloadsperdaytext.'</span></td>';
                 $pagecontent .= '<td class="td_left_title_padding_bottom" nowrap>';
                 $pagecontent .= '<input type="image" class="input_img_button_last" name="action_data[deletefile]['.$post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos].']['.$subfile.']" value="'.$text_files_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$text_files_button_delete.'"'.$tooltip_files_help_delete.'>';
@@ -2357,7 +2384,7 @@ function files($post) {
         }
 
         if(getRequestParam('javascript', true)) {
-            $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.getLanguageValue("button_edit").'\');</script>';
+            $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.getLanguageValue("files_button_edit").'\');</script>';
         }
         $pagecontent .= '</td></tr>';
     }
@@ -2372,6 +2399,8 @@ function files($post) {
 function newFile($post) {
     global $CONTENT_DIR_REL;
     global $error_color;
+    global $ADMIN_CONF;
+
     $forceoverwrite = "";
     if (isset($_POST['overwrite'])) {
         $forceoverwrite = $_POST['overwrite'];
@@ -2382,7 +2411,7 @@ function newFile($post) {
         if($_FILES[$array_name]['error'] == 0) {
             $cat_pos= explode("_",$array_name);
             $cat = sprintf("%02d",$cat_pos[1])."_".specialNrDir("$CONTENT_DIR_REL", sprintf("%02d",$cat_pos[1]));
-            $error = uploadFile($_FILES[$array_name], $cat, $forceoverwrite);
+            $error = uploadFile($_FILES[$array_name], $CONTENT_DIR_REL."/".$cat."/dateien/", $forceoverwrite,$ADMIN_CONF->get("maximagewidth"),$ADMIN_CONF->get("maximageheight"));
             if(!empty($error)) {
                 $post['error_messages'][key($error)][] = $cat."/".$error[key($error)];
                 $key = array_keys($post['categories']['cat']['position'], substr($cat,0,2));
@@ -4024,24 +4053,10 @@ function setLayoutAndDependentSettings($layoutfolder) {
 }
 
 // Hochgeladene Datei ueberpruefen und speichern
-function uploadFile($uploadfile, $cat, $forceoverwrite, $gallery = false){
+function uploadFile($uploadfile, $destination, $forceoverwrite,$MAX_IMG_WIDTH,$MAX_IMG_HEIGHT){
     global $ADMIN_CONF;
     global $specialchars;
-    global $CONTENT_DIR_REL;
-    global $GALLERIES_DIR_REL;
 
-    $dir_real = $CONTENT_DIR_REL;
-    $die_dateien = "/dateien/";
-    $MAX_IMG_WIDTH = $ADMIN_CONF->get("maximagewidth");
-    $MAX_IMG_HEIGHT = $ADMIN_CONF->get("maximageheight");
-    if($gallery !== false) {
-        $dir_real = $GALLERIES_DIR_REL;
-        $die_dateien = NULL;
-        $gallery_conf = new Properties("$GALLERIES_DIR_REL/".$cat."/gallery.conf",true);
-        $MAX_IMG_WIDTH = $gallery_conf->get("maxwidth");
-        $MAX_IMG_HEIGHT = $gallery_conf->get("maxheight");
-
-    }
     $uploadfile_name = $specialchars->replaceSpecialChars($uploadfile['name'],false);
     if (isset($uploadfile) and !$uploadfile['error']) {
         // nicht erlaubte Endung
@@ -4053,26 +4068,27 @@ function uploadFile($uploadfile, $cat, $forceoverwrite, $gallery = false){
             return array("files_error_name" => $uploadfile_name);
         }
         // Datei vorhanden und "Überschreiben"-Checkbox nicht aktiviert
-        elseif (file_exists($dir_real.'/'.$cat.'/'.$die_dateien.$uploadfile_name) && ($forceoverwrite != "on")) {
+        elseif (file_exists($destination.$uploadfile_name) && ($forceoverwrite != "on")) {
             return array("files_error_exists" => $uploadfile_name);
         }
         // alles okay, hochladen!
         else {
-            $savepath = $dir_real.'/'.$cat.'/'.$die_dateien.$uploadfile_name;
-            move_uploaded_file($uploadfile['tmp_name'], $savepath);
+#            $savepath = $dir_real.'/'.$cat.'/'.$die_dateien.$uploadfile_name;
+            move_uploaded_file($uploadfile['tmp_name'], $destination.$uploadfile_name);
             // chmod, wenn so eingestellt
-            useChmod($savepath);
-            if($ADMIN_CONF->get("resizeimages") == "true" or $gallery !== false) {
+            useChmod($destination.$uploadfile_name);#maximagewidth maximageheight
+            if(!empty($MAX_IMG_WIDTH) or !empty($MAX_IMG_HEIGHT)) {
+#            if($ADMIN_CONF->get("resizeimages") == "true" or $gallery !== false) {
                 // Bilddaten feststellen
-                $size = getimagesize($savepath);
+                $size = getimagesize($destination.$uploadfile_name);
                 // Mimetype herausfinden
                 $image_typ = strtolower(str_replace('image/','',$size['mime']));
                 # nur wenns ein bild ist
                 if($image_typ == "gif" or $image_typ == "png" or $image_typ == "jpeg") {
                     require_once("../Image.php");
-                    if($size[0] > $MAX_IMG_WIDTH or $size[1] > $MAX_IMG_HEIGHT) {
-                        scaleImage($uploadfile_name, $dir_real.'/'.$cat.'/'.$die_dateien.'/', $dir_real.'/'.$cat.'/'.$die_dateien.'/', $MAX_IMG_WIDTH, $MAX_IMG_HEIGHT);
-                    }
+#                    if($size[0] > $MAX_IMG_WIDTH or $size[1] > $MAX_IMG_HEIGHT) {
+                        scaleImage($uploadfile_name, $destination, $destination, $MAX_IMG_WIDTH, $MAX_IMG_HEIGHT);
+#                    }
                 }
             }
         return;

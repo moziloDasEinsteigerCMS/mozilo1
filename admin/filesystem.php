@@ -598,12 +598,17 @@ function makeDefaultConf($conf_datei) {
                         'cmsname' => 'Amalia');
 
     $gallery = array('maxheight' => '',
+                    'maxwidth' => '',
+                    'target' => '_blank',
+                    'usethumbs' => 'true',
+                    'maxthumbheight' => '100',
+                    'maxthumbwidth' => '100',
+                    'gallerypicsperrow' => '4',
+                    'expert' => array(
                         'maxthumbheight' => '100',
                         'maxthumbwidth' => '100',
-                        'maxwidth' => '',
-                        'picsperrow' => '4',
-                        'target' => '_blank',
-                        'usethumbs' => 'true');
+                        'gallerypicsperrow' => '4')
+                    );
 
     $aufgaben = array('3 + 7' => '10',
                         '5 - 3' => '2',
