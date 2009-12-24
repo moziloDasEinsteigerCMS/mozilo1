@@ -4041,6 +4041,7 @@ function renameCategoryInDownloadStats($oldcatname, $newcatname) {
 // Überschreibt die layoutabhängigen CMS-Einstellungen usesubmenu und gallerypicsperrow
 function setLayoutAndDependentSettings($layoutfolder) {
     global $CMS_CONF;
+    global $GALLERY_CONF;
 
     $settingsfile = "../layouts/$layoutfolder/layoutsettings.conf";
 
@@ -4052,6 +4053,7 @@ function setLayoutAndDependentSettings($layoutfolder) {
         if(isset($layoutsettings->properties['usesubmenu']))
             return $layoutsettings->properties['usesubmenu'];
             $CMS_CONF->set("usesubmenu", $layoutsettings->get("usesubmenu"));
+            $GALLERY_CONF->set("gallerypicsperrow", $layoutsettings->get("gallerypicsperrow"));
     }
 }
 
