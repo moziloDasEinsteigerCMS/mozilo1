@@ -605,6 +605,7 @@ function makeDefaultConf($conf_datei) {
                     'maxthumbwidth' => '100',
                     'gallerypicsperrow' => '4',
                     'expert' => array(
+                        'usethumbs' => 'true',
                         'maxthumbheight' => '100',
                         'maxthumbwidth' => '100',
                         'gallerypicsperrow' => '4')

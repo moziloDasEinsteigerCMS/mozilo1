@@ -1713,11 +1713,11 @@ $tooltip_help_edit = NULL;
     $pagecontent .= '</tr><tr>';
     $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_target.'><b>'.$text_gallery_target.'</b></td>';
     $pagecontent .= '<td width="20%" class="td_left_title_padding_bottom"><b'.$tooltip_help_target.'>Target:</b>&nbsp;&nbsp;blank&nbsp;<input type="radio" name="gallery[setings][target]" value="_blank"'.$tooltip_help_target_blank.$checket_blank.'>&nbsp;oder&nbsp;self&nbsp;<input type="radio" name="gallery[setings][target]" value="_self"'.$tooltip_help_target_self.$checket_self.'></td>';
-    $pagecontent .= '</tr><tr>';
-    $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_use_thumbs.'><b>'.$text_gallery_usethumbs.'</b></td>';
-    $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery[setings][usethumbs]" value="true"'.$tooltip_gallery_help_use_thumbs.$checket.'></td>';
-
     if($ADMIN_CONF->get('showexpert') == "true") {
+        $pagecontent .= '</tr><tr>';
+        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_use_thumbs.'><b>'.$text_gallery_usethumbs.'</b></td>';
+        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery[setings][usethumbs]" value="true"'.$tooltip_gallery_help_use_thumbs.$checket.'></td>';
+
         $pagecontent .= '</tr><tr>';
         $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_scale_thumbs.'><b>'.$text_gallery_scale_thumbs.'</b></td>';
         $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxthumbwidth]" value="'.$GALLERY_CONF->get("maxthumbwidth").'"'.$post['gallery']['error_html']['maxthumbwidth'].$tooltip_gallery_help_input_scale.' />&nbsp;x&nbsp;<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxthumbheight]" value="'.$GALLERY_CONF->get("maxthumbheight").'"'.$post['gallery']['error_html']['maxthumbheight'].$tooltip_gallery_help_input_scale.' />&nbsp;'.getLanguageValue("pixels").'</td>';
@@ -1982,12 +1982,15 @@ function editGallery($post) {
             $post['gallery']['setings'][$syntax] = $GALLERY_CONF->get($syntax);
         }
     }
-    if(!isset($post['gallery']['setings']['usethumbs'])) {
-        $post['gallery']['setings']['usethumbs'] = "false";
-    } else {
-        $post['gallery']['setings']['usethumbs'] = "true";
+    if($ADMIN_CONF->get('showexpert') == "true") {
+        if(!isset($post['gallery']['setings']['usethumbs'])) {
+            $post['gallery']['setings']['usethumbs'] = "false";
+        } else {
+            $post['gallery']['setings']['usethumbs'] = "true";
+        }
     }
     foreach($post['gallery']['setings'] as $seting => $value) {
+        if($ADMIN_CONF->get('showexpert') == "false" and in_array($seting,$gallery['expert'])) continue;
         if($GALLERY_CONF->get($seting) != $value) {
             if($seting == 'maxheight' and strlen($value) > 0 and !ctype_digit($value)) {
                 $post['error_messages']['check_digit']['color'] = "#FFC197";
