@@ -118,9 +118,9 @@ class Properties {
             $error_read = $BASIC_LANGUAGE->properties['properties_read'];
         } else {
             $error_nofile = "die Datei Existiert nicht: ";
-            $error_readonly = "kann die Datei nur lesend öffnen (Dateirechte prüfen): ";
-            $error_write = "kann die Datei nicht schreibend öffnen (Dateirechte prüfen): ";
-            $error_read = "kann die Datei nicht Lesend oder schreibend öffnen (Dateirechte prüfen): ";
+            $error_readonly = "kann die Datei nur lesend Ã¶ffnen (Dateirechte prÃ¼fen): ";
+            $error_write = "kann die Datei nicht schreibend Ã¶ffnen (Dateirechte prÃ¼fen): ";
+            $error_read = "kann die Datei nicht Lesend oder schreibend Ã¶ffnen (Dateirechte prÃ¼fen): ";
         }
 
         if (!file_exists($this->file)) {
@@ -166,13 +166,13 @@ class Properties {
             $error_write = $BASIC_LANGUAGE->properties['properties_write'];
         } else {
             $error_lock_existed = "kann setings nicht schreiben es existiert eine Sperdatei: ";
-            $error_lock_touch = "kann Sperdatei Datei nicht anlegen (Dateirechte prüfen): ";
-            $error_lock_del = "kann Sperdatei Datei nicht löschen (Dateirechte prüfen): ";
-            $error_write = "kann die Datei nicht schreibend öffnen (Dateirechte prüfen): ";
+            $error_lock_touch = "kann Sperdatei Datei nicht anlegen (Dateirechte prÃ¼fen): ";
+            $error_lock_del = "kann Sperdatei Datei nicht lÃ¶schen (Dateirechte prÃ¼fen): ";
+            $error_write = "kann die Datei nicht schreibend Ã¶ffnen (Dateirechte prÃ¼fen): ";
         }
-        // Vorm Schreiben erst auf eine mögliche Sperre überprüfen (Schutz vor konkurrierenden Schreibzugriffen)
+        // Vorm Schreiben erst auf eine mÃ¶gliche Sperre Ã¼berprÃ¼fen (Schutz vor konkurrierenden Schreibzugriffen)
         $islocked = true;
-        // für die aktuelle Properties-Datei existiert eine Sperrdatei, sie ist also bereits geöffnet!
+        // fÃ¼r die aktuelle Properties-Datei existiert eine Sperrdatei, sie ist also bereits geÃ¶ffnet!
         if (file_exists($this->file.".lck")) {
             return $this->properties['error'] = $error_lock_existed.$this->file.".lck";
         }
@@ -185,12 +185,12 @@ class Properties {
             if (!@touch($this->file.".lck")) {
                 return $this->properties['error'] = $error_lock_touch.$this->file.".lck";
             }
-            // Datei schreibend öffnen
+            // Datei schreibend Ã¶ffnen
             if (!@fopen($this->file, "a+")) {
                 @fclose($this->file);
-                return $this->properties['error'] = $error_write.$this->file;
-                // Löschen der Sperrdatei und Abbruch, wenn das Öffnen nicht klappt
+                // LÃ¶schen der Sperrdatei und Abbruch, wenn das Ã¶ffnen nicht klappt
                 @unlink($this->file.".lck");
+                return $this->properties['error'] = $error_write.$this->file;
                 if (file_exists($this->file.".lck")) {
                     return $this->properties['error'] = $error_lock_del.$this->file.".lck";
                 }
@@ -210,9 +210,9 @@ class Properties {
             }
             // ...und speichern
             fputs($file, $content);
-            // Datei wieder schließen
+            // Datei wieder schliessen
             fclose($file);
-            // Sperrdatei wieder löschen
+            // Sperrdatei wieder lÃ¶schen
             @unlink($this->file.".lck");
             if (file_exists($this->file.".lck")) {
                 return $this->properties['error'] = $error_lock_del.$this->file.".lck";
