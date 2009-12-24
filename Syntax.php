@@ -16,7 +16,7 @@ class Syntax {
     var $MAIL_REGEX;
     var $USER_SYNTAX;
     var $TARGETBLANK_LINK;
-    var $TARGETBLANK_GALLERY;
+#    var $TARGETBLANK_GALLERY;
     var $TARGETBLANK_DOWNLOAD;
     var $anchorcounter;
     var $headlineinfos;
@@ -27,8 +27,8 @@ class Syntax {
 // ------------------------------------------------------------------------------
     function Syntax(){
         global $CMS_CONF;
-        // Regulärer Audruck zur Überprüfung von Links
-        // Überprüfung auf Validität >> protokoll :// (username:password@) [(sub.)server.tld|ip-adresse] (:port) (subdirs|files)
+        // Regulï¿½rer Audruck zur ï¿½berprï¿½fung von Links
+        // ï¿½berprï¿½fung auf Validitï¿½t >> protokoll :// (username:password@) [(sub.)server.tld|ip-adresse] (:port) (subdirs|files)
                     // protokoll                (https?|t?ftps?|gopher|telnets?|mms|imaps?|irc|pop3s?|rdp|smb|smtps?|sql|ssh):\/\/
                     // username:password@       (\w)+\:(\w)+\@
                     // (sub.)server.tld         ((\w)+\.)?(\w)+\.[a-zA-Z]{2,4}
@@ -39,21 +39,21 @@ class Syntax {
         $this->MAIL_REGEX   = "/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/";
         $this->USER_SYNTAX  = new Properties("conf/syntax.conf");
         
-        // Externe Links in neuem Fenster öffnen?
+        // Externe Links in neuem Fenster ï¿½ffnen?
         if ($CMS_CONF->get("targetblank_link") == "true") {
             $this->TARGETBLANK_LINK = " target=\"_blank\"";
         }
         else {
             $this->TARGETBLANK_LINK = "";
         }
-/*        // Galerie-Links in neuem Fenster öffnen?
+/*        // Galerie-Links in neuem Fenster ï¿½ffnen?
         if ($CMS_CONF->get("targetblank_gallery") == "true") {
             $this->TARGETBLANK_GALLERY = " target=\"_blank\"";
         }
         else {
             $this->TARGETBLANK_GALLERY = "";
         }*/
-        // Download-Links in neuem Fenster öffnen?
+        // Download-Links in neuem Fenster ï¿½ffnen?
         if ($CMS_CONF->get("targetblank_download") == "true") {
             $this->TARGETBLANK_DOWNLOAD = " target=\"_blank\"";
         }
@@ -65,7 +65,7 @@ class Syntax {
     
 
 // ------------------------------------------------------------------------------
-// Umsetzung der übergebenen CMS-Syntax in HTML, Rückgabe als String
+// Umsetzung der ï¿½bergebenen CMS-Syntax in HTML, Rï¿½ckgabe als String
 // ------------------------------------------------------------------------------
     function convertContent($content, $cat, $firstrecursion) {
         global $CONTENT_DIR_ABS;
@@ -80,17 +80,20 @@ class Syntax {
         global $CHARSET;
         global $CMS_CONF;
         global $language;
+        global $GALLERY_CONF;
+global $LAYOUT_DIR_PHP;
+#global $TEMPLATE_FILE;
 
         if ($firstrecursion) {
             $content = $this->prepareContent($content);
-            // Überschriften einlesen
+            // ï¿½berschriften einlesen
             $this->headlineinfos = $this->getHeadlineInfos($content);
         }
 
         // Nach Texten in eckigen Klammern suchen
         preg_match_all("/\[([^\[\]]+)\|([^\[\]]*)\]/Um", $content, $matches);
         $i = 0;
-        // Für jeden Treffer...
+        // Fï¿½r jeden Treffer...
         foreach ($matches[0] as $match) {
             // ...Auswertung und Verarbeitung der Informationen
             $attribute = $matches[1][$i];
@@ -108,7 +111,7 @@ class Syntax {
                         case 2: { 
                             if (substr($value, 0, 11) == "http://www.")
                                 $shortenendlink = substr($value, 11, strlen($value)-11);
-                            // zusätzlich: mit "http://" beginnende Links ohne das "http://" anzeigen
+                            // zusï¿½tzlich: mit "http://" beginnende Links ohne das "http://" anzeigen
                             elseif (substr($value, 0, 7) == "http://")
                                 $shortenendlink = substr($value, 7, strlen($value)-7);
                             break;
@@ -131,7 +134,7 @@ class Syntax {
 
             // externer Link mit eigenem Text
             elseif (substr($attribute,0,5) == "link=") {
-                // Überprüfung auf korrekten Link
+                // ï¿½berprï¿½fung auf korrekten Link
                 if (preg_match($this->LINK_REGEX, $value)) {
                     $content = str_replace ($match, "<a class=\"link\" href=\"$value\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", $value)).$this->TARGETBLANK_LINK.">".substr($attribute, 5, strlen($attribute)-5)."</a>", $content);
                 }
@@ -142,7 +145,7 @@ class Syntax {
 
             // Mail-Link mit eigenem Text
             elseif (substr($attribute,0,5) == "mail=") {
-                // Überprüfung auf korrekten Link
+                // ï¿½berprï¿½fung auf korrekten Link
                 if (preg_match($this->MAIL_REGEX, $value)) {
                     $content = str_replace ($match, "<a class=\"mail\" href=\"".obfuscateAdress("mailto:$value", 3)."\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", obfuscateAdress("$value", 3))).">".substr($attribute, 5, strlen($attribute)-5)."</a>", $content);
                 }
@@ -151,14 +154,14 @@ class Syntax {
                 }
             }
             elseif ($attribute == "mail"){
-                // Überprüfung auf Validität
+                // ï¿½berprï¿½fung auf Validitï¿½t
                 if (preg_match($this->MAIL_REGEX, $value))
                     $content = str_replace ($match, "<a class=\"mail\" href=\"".obfuscateAdress("mailto:$value", 3)."\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", obfuscateAdress("$value", 3))).">".obfuscateAdress("$value", 3)."</a>", $content);
                 else
                     $content = str_replace ($match, $this->createDeadlink($value, $language->getLanguageValue1("tooltip_link_mail_error_1", $value)), $content);
             }
 
-            // Kategorie-Link (überprüfen, ob Kategorie existiert)
+            // Kategorie-Link (ï¿½berprï¿½fen, ob Kategorie existiert)
             // Kategorie-Link mit eigenem Text
             elseif ($attribute == "kategorie" or substr($attribute,0,10) == "kategorie=") {
                 $link_text = $value;
@@ -178,7 +181,7 @@ class Syntax {
                 }
             }
 
-            // Link auf Inhaltsseite in aktueller oder anderer Kategorie (überprüfen, ob Inhaltsseite existiert)
+            // Link auf Inhaltsseite in aktueller oder anderer Kategorie (ï¿½berprï¿½fen, ob Inhaltsseite existiert)
             // Link auf Inhaltsseite in aktueller oder anderer Kategorie mit beliebigem Text
             elseif ($attribute == "seite" or substr($attribute,0,6) == "seite=") {
                 $seite = html_entity_decode($value,ENT_COMPAT,$CHARSET);
@@ -231,7 +234,7 @@ class Syntax {
                 }
             }
 
-            // Verweise auf Absätze innerhalb der Inhaltsseite
+            // Verweise auf Absï¿½tze innerhalb der Inhaltsseite
             elseif (($attribute == "absatz") || (substr($attribute,0,7) == "absatz=")) {
                 // Beschreibungstext extrahieren
                 if(substr($attribute,0,7) == "absatz=") {
@@ -242,7 +245,7 @@ class Syntax {
                 } 
                 $pos = 0;
                 foreach ($this->headlineinfos as $headline_info) {
-                    // $headline_info besteht aus Überschriftstyp (1/2/3) und Wert
+                    // $headline_info besteht aus ï¿½berschriftstyp (1/2/3) und Wert
                     if ($headline_info[1] == $value) {
                         // "Nach oben"-Verweis
                         if ($pos == 0)
@@ -257,7 +260,7 @@ class Syntax {
             }
             
 
-            // Datei aus dem Dateiverzeichnis (überprüfen, ob Datei existiert)
+            // Datei aus dem Dateiverzeichnis (ï¿½berprï¿½fen, ob Datei existiert)
             // Datei aus dem Dateiverzeichnis mit beliebigem Text
             elseif ($attribute == "datei" or substr($attribute,0,6) == "datei=") {
                 $datei = html_entity_decode($value,ENT_COMPAT,$CHARSET);
@@ -307,37 +310,20 @@ class Syntax {
                 $link_text = "";
                 if(substr($attribute,0,8) == "galerie=") {
                     $link_text = substr($attribute, 8, strlen($attribute)-8);
-                }
-                else {
+                } else {
                     $link_text = $value;
                 }
                 
                 if (file_exists("./$GALLERIES_DIR/$cleanedvalue")) {
-                    $handle = opendir("./$GALLERIES_DIR/$cleanedvalue");
-                    $j=0;
-                    while ($file = readdir($handle)) {
-                        if (is_file("./$GALLERIES_DIR/$cleanedvalue/".$file) && ($file <> "texte.conf")) {
-                            $j++;
-                        }
-                    }
-                    closedir($handle);
-                    $GALLERY_CONF = new Properties("./".$GALLERIES_DIR."/".$cleanedvalue."/gallery.conf");
                     // Galerie einbetten
                     if ($GALLERY_CONF->get("target") == "_self") {
                         require_once("gallery.php");
-                        $gal_request = html_entity_decode($value,ENT_COMPAT,$CHARSET);
-                        if (isset($_GET["gal"]) and $_GET["gal"]==$gal_request) {
-                            $gallery->parseGalleryParameters($gal_request,$_GET["index"]);
-                        }
-                        else {
-                            $gallery->parseGalleryParameters($gal_request,null);
-                        }
-                        $url = "index.php?cat=$CAT_REQUEST&amp;page=$PAGE_REQUEST&amp;";
-                        if($CMS_CONF->get("modrewrite") == "true") {
-                            $url = $URL_BASE.$CAT_REQUEST."/".$PAGE_REQUEST.".html?";
-                        }
-                        $gallery->setLinkPrefix($url); 
-                        $gallerycontent = $pagecontent = preg_replace('/(\r\n|\r|\n)/', '{newline_in_include_tag}', $gallery->renderGallery());
+                        $gallery_template = $specialchars->rebuildSpecialChars($LAYOUT_DIR_PHP."/gallerytemplate.html", false, false);
+                        if (!$file = @fopen($gallery_template, "r"))
+                            die($language->getLanguageValue1("message_template_error_1", $gallery_template));
+                        $template = fread($file, filesize($gallery_template));
+                        fclose($file);
+                        $gallerycontent = preg_replace('/(\r\n|\r|\n)/', '{newline_in_include_tag}', $gallery->renderGallery($template,$cleanedvalue));
                         // Embedded-Template nicht gefunden
                         if ($gallerycontent == null) {
                             $content = str_replace ($match, $this->createDeadlink($value, $language->getLanguageValue0("tooltip_embeddedgallery_template_error_0")), $content);
@@ -345,9 +331,16 @@ class Syntax {
                         else {
                             $content = str_replace ($match, $gallerycontent, $content);
                         }
-                    }
-                    else {
-                        $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE."gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"".$GALLERY_CONF->get("target")."\">$link_text</a>", $content);
+                    } else {
+                        $j=0;
+                        $handle = opendir("./$GALLERIES_DIR/$cleanedvalue");
+                        while ($file = readdir($handle)) {
+                            if (is_file("./$GALLERIES_DIR/$cleanedvalue/".$file) && ($file <> "texte.conf")) {
+                                $j++;
+                            }
+                        }
+                        closedir($handle);
+                        $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE."index.php.html?gal=$cleanedvalue\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"".$GALLERY_CONF->get("target")."\">$link_text</a>", $content);
                     }
                 }
                 // Galerie nicht vorhanden
@@ -463,7 +456,7 @@ class Syntax {
                 }
             }
 
-            // linksbündiger Text
+            // linksbï¿½ndiger Text
             if ($attribute == "links"){
                 $content = str_replace ("$match", "<p class=\"alignleft\">".$value."</p>", $content);
             }
@@ -478,7 +471,7 @@ class Syntax {
                 $content = str_replace ("$match", "<p class=\"alignjustify\">".$value."</p>", $content);
             }
 
-            // rechtsbündiger Text
+            // rechtsbï¿½ndiger Text
             elseif ($attribute == "rechts"){
                 $content = str_replace ("$match", "<p class=\"alignright\">".$value."</p>", $content);
             }
@@ -494,7 +487,7 @@ class Syntax {
             }
 
             // Text fettkursiv 
-            // (VERALTET seit Version 1.7 - nur aus Gründen der Abwärtskompatibilität noch mitgeführt)
+            // (VERALTET seit Version 1.7 - nur aus Grï¿½nden der Abwï¿½rtskompatibilitï¿½t noch mitgefï¿½hrt)
             elseif ($attribute == "fettkursiv") {
                 $content = str_replace ($match, "<b class=\"contentbold\"><i class=\"contentitalic\">$value</i></b>", $content);
             }
@@ -509,17 +502,17 @@ class Syntax {
                 $content = str_replace ($match, "<s class=\"contentstrikethrough \">$value</s>", $content);
             }
 
-            // Überschrift groß
+            // ï¿½berschrift groï¿½
             elseif ($attribute == "ueber1"){
                 $content = preg_replace("/".preg_quote($match, '/')."/", "<h1 id=\"a".$this->anchorcounter++."\">$value</h1>", $content,1);
             }
 
-            // Überschrift mittel
+            // ï¿½berschrift mittel
             elseif ($attribute == "ueber2"){
                 $content = preg_replace("/".preg_quote($match, '/')."/", "<h2 id=\"a".$this->anchorcounter++."\">$value</h2>", $content,1);
             }
 
-            // Überschrift normal
+            // ï¿½berschrift normal
             elseif ($attribute == "ueber3"){
                 $content = preg_replace("/".preg_quote($match, '/')."/", "<h3 id=\"a".$this->anchorcounter++."\">$value</h3>", $content,1);
             }
@@ -534,20 +527,20 @@ class Syntax {
                 $content = str_replace ("$match", "<ol><li>$value</li></ol>", $content);
             }
 
-            // Liste, einfache Einrückung
-            // (VERALTET seit Version 1.10 - nur aus Gründen der Abwärtskompatibilität noch mitgeführt)
+            // Liste, einfache Einrï¿½ckung
+            // (VERALTET seit Version 1.10 - nur aus Grï¿½nden der Abwï¿½rtskompatibilitï¿½t noch mitgefï¿½hrt)
             elseif ($attribute == "liste1"){
                 $content = str_replace ("$match", "<ul><li>$value</li></ul>", $content);
             }
 
-            // Liste, doppelte Einrückung
-            // (VERALTET seit Version 1.10 - nur aus Gründen der Abwärtskompatibilität noch mitgeführt)
+            // Liste, doppelte Einrï¿½ckung
+            // (VERALTET seit Version 1.10 - nur aus Grï¿½nden der Abwï¿½rtskompatibilitï¿½t noch mitgefï¿½hrt)
             elseif ($attribute == "liste2"){
                 $content = str_replace ("$match", "<ul><ul><li>$value</li></ul></ul>", $content);
             }
 
-            // Liste, dreifache Einrückung
-            // (VERALTET seit Version 1.10 - nur aus Gründen der Abwärtskompatibilität noch mitgeführt)
+            // Liste, dreifache Einrï¿½ckung
+            // (VERALTET seit Version 1.10 - nur aus Grï¿½nden der Abwï¿½rtskompatibilitï¿½t noch mitgefï¿½hrt)
             elseif ($attribute == "liste3"){
                 $content = str_replace ("$match", "<ul><ul><ul><li>$value</li></ul></ul></ul>", $content);
             }
@@ -560,13 +553,13 @@ class Syntax {
 
 /* 
 Sie sollten diese Auskommentierung nur entfernen, wenn Sie wirklich sicher wissen, was 
-sie tun. mozilo weist mit Nachdruck darauf hin, daß die verwendete PHP-Funktion "eval()" 
+sie tun. mozilo weist mit Nachdruck darauf hin, daï¿½ die verwendete PHP-Funktion "eval()" 
 ein erhebliches Sicherheitsrisiko darstellen kann und deswegen nicht leichtfertig 
 verwendet werden sollte!
 
-            // Ausführung von PHP-Code
+            // Ausfï¿½hrung von PHP-Code
             elseif ($attribute == "php") {
-                // Formatierungen rückgängig machen, um den reinen PHP-Code zu erhalten!
+                // Formatierungen rï¿½ckgï¿½ngig machen, um den reinen PHP-Code zu erhalten!
                 $value = preg_replace("/&#(\d*);/Umsie", "''.chr('\\1').''", $value);
                 $value = preg_replace("/&#092;/Umsi", "&amp;#092;", $value);
                 $value = preg_replace("/&#036;/Umsi", "&amp;#036;", $value);
@@ -682,7 +675,7 @@ verwendet werden sollte!
 
             // Farbige Elemente
             elseif (substr($attribute,0,6) == "farbe=") {
-                // Überprüfung auf korrekten Hexadezimalwert
+                // ï¿½berprï¿½fung auf korrekten Hexadezimalwert
                 if (preg_match("/^([a-f]|\d){6}$/i", substr($attribute, 6, strlen($attribute)-6))) {
                     $content = str_replace ("$match", "<span style=\"color:#".substr($attribute, 6, strlen($attribute)-6).";\">".$value."</span>", $content);
                 }
@@ -691,7 +684,7 @@ verwendet werden sollte!
                 }
             }
 
-            // Attribute, die nicht zugeordnet werden können
+            // Attribute, die nicht zugeordnet werden kï¿½nnen
             else {
                 // Attribut am "=" aufsplitten und Attributnamen herausfiltern
                 $equalpos = strpos($attribute, "=");
@@ -711,7 +704,7 @@ verwendet werden sollte!
                     // Platzhalter {VALUE} im definierten Syntaxelement ersetzen
                     $replacetext = str_replace("{VALUE}", $value, replacePlaceholders($this->USER_SYNTAX->get($attribute),"", ""));
                     /* 
-                    //Einfach Kommentarzeichen entfernen, wenn folgende Funktionalität gewünscht ist:
+                    //Einfach Kommentarzeichen entfernen, wenn folgende Funktionalitï¿½t gewï¿½nscht ist:
                     // Platzhalter {DESCRIPTION} wird durch $value ersetzt, wenn $description selbst leer ist
                     if ($description == "")
                         $replacetext = str_replace("{DESCRIPTION}", $value, $replacetext);
@@ -742,16 +735,16 @@ verwendet werden sollte!
             $content = preg_replace('/(\r\n|\r|\n)/', '$1<br />', $content);
             // Zeilenwechsel nach Blockelementen entfernen
             // Tag-Beginn                                       <
-            // optional: Slash bei schließenden Tags            (\/?)
+            // optional: Slash bei schlieï¿½enden Tags            (\/?)
             // Blockelemente                                    (address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)
             // optional: sonstige Zeichen (z.B. Attribute)      ([^>]*)
             // Tag-Ende                                         >
             // optional: Zeilenwechsel                          (\r\n|\r|\n)?
-            // <br /> mit oder ohne Slash (das, was raus muß!)  <br \/? >
+            // <br /> mit oder ohne Slash (das, was raus muï¿½!)  <br \/? >
             $content = preg_replace('/<(\/?)(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)([^>]*)>(\r\n|\r|\n)?<br \/?>/', "<$1$2$3>$4",$content);
-            // direkt aufeinanderfolgende Listen zusammenführen
+            // direkt aufeinanderfolgende Listen zusammenfï¿½hren
             $content = preg_replace('/<\/ul>(\r\n|\r|\n)?<ul>/', '', $content);
-            // direkt aufeinanderfolgende numerierte Listen zusammenführen
+            // direkt aufeinanderfolgende numerierte Listen zusammenfï¿½hren
             $content = preg_replace('/<\/ol>(\r\n|\r|\n)?<ol>/', '', $content);
         }
 
@@ -760,7 +753,7 @@ verwendet werden sollte!
         // Zeilenwechsel in HTML-Tags wiederherstellen    
         $content = preg_replace('/{newline_in_html_tag}/', "\n", $content);
 
-        // Konvertierten Seiteninhalt zurückgeben
+        // Konvertierten Seiteninhalt zurï¿½ckgeben
     return $content;
     }
 
@@ -778,14 +771,14 @@ verwendet werden sollte!
     
 
 // ------------------------------------------------------------------------------
-// Inhaltsverzeichnis aus den übergebenen Überschrift-Infos aufbauen
+// Inhaltsverzeichnis aus den ï¿½bergebenen ï¿½berschrift-Infos aufbauen
 // ------------------------------------------------------------------------------
     function getToC($pagerequest) {
         global $language;
         $tableofcontents = "<div class=\"tableofcontents\">";
         if (count($this->headlineinfos) > 1) {
             $tableofcontents .= "<ul>";
-            // Schleife über Überschriften-Array (0 ist der Seitenanfang - auslassen)
+            // Schleife ï¿½ber ï¿½berschriften-Array (0 ist der Seitenanfang - auslassen)
             for ($toc_counter=1; $toc_counter < count($this->headlineinfos); $toc_counter++) {
                 $link = "<a class=\"page\" href=\"#a$toc_counter\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_anchor_goto_1", $this->headlineinfos[$toc_counter][1])).">".$this->headlineinfos[$toc_counter][1]."</a>";
                 if ($this->headlineinfos[$toc_counter][0] >= "2") {
@@ -809,19 +802,19 @@ verwendet werden sollte!
     }
 
 // ------------------------------------------------------------------------------
-// Hilfsfunktion: Überschrift-Infos einlesen
+// Hilfsfunktion: ï¿½berschrift-Infos einlesen
 // ------------------------------------------------------------------------------
     function getHeadlineInfos($content) {
         global $language;
-        // "absatz"-Links vorbereiten: Alle Überschriften einlesen
+        // "absatz"-Links vorbereiten: Alle ï¿½berschriften einlesen
         preg_match_all("/\[(ueber([\d]))\|([^\[\]]+)\]/", $content, $matches);
-        // $headlines besteht aus Arrays, die zwei Werte beinhalten: Überschriftstyp (1/2/3) und Wert
+        // $headlines besteht aus Arrays, die zwei Werte beinhalten: ï¿½berschriftstyp (1/2/3) und Wert
         $headlines = array();
         $headlines[0] = array("0", $language->getLanguageValue0("anchor_top_0"));
 
         $i = 0;
         foreach ($matches[0] as $match) {
-            // gefundene Überschriften im Array $headlines merken
+            // gefundene ï¿½berschriften im Array $headlines merken
             $headlines[$i+1] = (array($matches[2][$i], $matches[3][$i]));
             //echo ($i+1) ." >>> ". $matches[2][$i].", ".$matches[3][$i]."<hr>";
             $i++;
@@ -844,7 +837,7 @@ verwendet werden sollte!
         $content = preg_replace("/&amp;#092;/Umsi", "&#092;", $content);
         $content = preg_replace("/\^(.)/Umsie", "'&#'.ord('\\1').';'", $content);
         $content = $specialchars->numeric_entities_decode($content); 
-        // Für Einrückungen
+        // Fï¿½r Einrï¿½ckungen
         $content = str_replace("  ","&nbsp;&nbsp;",$content);
 
         // Platzhalter ersetzen

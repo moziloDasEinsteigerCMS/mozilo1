@@ -25,6 +25,7 @@ echo "</pre>";
     $specialchars   = new SpecialChars();
     $CMS_CONF     = new Properties("conf/main.conf");
     $VERSION_CONF  = new Properties("conf/version.conf");
+    $GALLERY_CONF  = new Properties("conf/gallery.conf");
     require_once("Language.php");
     $language       = new Language();
     require_once("Syntax.php");
@@ -52,9 +53,13 @@ $CHARSET = 'UTF-8';
     $EXT_LINK       = ".lnk";
 
     // Config-Parameter auslesen
-    $LAYOUT_DIR     = "layouts/".$specialchars->replaceSpecialChars($CMS_CONF->get("cmslayout"),true);
-    $TEMPLATE_FILE  = $LAYOUT_DIR."/template.html";
-    $LAYOUT_DIR     = $URL_BASE.$LAYOUT_DIR;
+    $LAYOUT_DIR_PHP     = "layouts/".$specialchars->replaceSpecialChars($CMS_CONF->get("cmslayout"),true);
+    $TEMPLATE_FILE  = $LAYOUT_DIR_PHP."/template.html";
+    if ($GALLERY_CONF->get("target") == "_blank" and isset($_GET["gal"])) {
+        $TEMPLATE_FILE  = $LAYOUT_DIR_PHP."/gallerytemplate.html";
+    }
+
+    $LAYOUT_DIR     = $URL_BASE.$LAYOUT_DIR_PHP;
     $CSS_FILE       = $LAYOUT_DIR."/css/style.css";
     $FAVICON_FILE   = $LAYOUT_DIR."/favicon.ico";
     // Einstellungen für Kontaktformular
@@ -122,8 +127,6 @@ $CHARSET = 'UTF-8';
         global $EXT_PAGE;
         global $CMS_CONF;
 
-#echo $CAT_REQUEST."<br>\n";
-#echo $PAGE_REQUEST."<br>\n";
         // Überprüfung der gegebenen Parameter
         if (
                 // Wenn keine Kategorie übergeben wurde...
@@ -179,9 +182,10 @@ $CHARSET = 'UTF-8';
         global $specialchars;
         global $URL_BASE;
         global $CHARSET;
+        global $GALLERY_CONF;
 
     if (!$file = @fopen($specialchars->rebuildSpecialChars($TEMPLATE_FILE, false, false), "r"))
-        die($language->getLanguageValue1("message_template_error_1", $TEMPLATE_FILE));
+        die($language->getLanguageValue1("message_template_error_1", $specialchars->rebuildSpecialChars($TEMPLATE_FILE, false, false)));
     $template = fread($file, filesize($specialchars->rebuildSpecialChars($TEMPLATE_FILE, false, false)));
     fclose($file);
         // Platzhalter des Templates mit Inhalt füllen
@@ -308,7 +312,15 @@ $CHARSET = 'UTF-8';
 
     // Kontaktformular
     $HTML = preg_replace('/{TABLEOFCONTENTS}/', $syntax->getToC($pagecontent), $HTML);
-    
+
+    if ($GALLERY_CONF->get("target") == "_blank" and isset($_GET["gal"])) {
+        require_once("gallery.php");
+        if (isset($_GET["gal"])) {
+            $gal_request = $specialchars->replaceSpecialChars(html_entity_decode($_GET["gal"], ENT_COMPAT, $CHARSET),false);
+            $HTML = $gallery->renderGallery($HTML,$gal_request);
+        }
+    }
+
     // Benutzer-Variablen ersetzen
     $HTML = replacePluginVariables($HTML);
     
@@ -696,8 +708,8 @@ $CHARSET = 'UTF-8';
         
         $lastchangedpage = $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true);
         $linktolastchangedpage = "<a href=\"index.php?cat=".$latestchanged['cat']."&amp;page=".substr($latestchanged['file'], 0, strlen($latestchanged['file'])-4)."\"".getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true), $specialchars->rebuildSpecialChars(substr($latestchanged['cat'], 3, strlen($latestchanged['cat'])-3), true, true)))." id=\"lastchangelink\">".$lastchangedpage."</a>";
-        $lastchangedate = strftime($language->getLanguageValue0("_dateformat_0"), date($latestchanged['time']));
-        
+        $lastchangedate = @strftime($language->getLanguageValue0("_dateformat_0"), date($latestchanged['time']));
+
         return array($lastchangedpage, $linktolastchangedpage,$lastchangedate);
     }
 
