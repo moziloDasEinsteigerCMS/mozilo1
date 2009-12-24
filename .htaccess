@@ -2,5 +2,5 @@ Options -Indexes
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteRule admin/index.php$ admin/index.php [QSA,L]
-RewriteRule .html$ index.php?rewrite [QSA,L]
+RewriteRule .html$ index.php [QSA,L]
 </IfModule>
