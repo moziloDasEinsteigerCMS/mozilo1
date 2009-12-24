@@ -38,33 +38,35 @@ class Thumbnail {
     // ------------------------------------------------------------------------------
     // Thumbnail anlegen
     // ------------------------------------------------------------------------------
-    function scaleImage($pic, $dir_origin, $dir_target, $maxWidth = false, $maxHeight = false) {
+    function scaleImage($pic, $dir_origin, $dir_target, $maxWidth, $maxHeight) {
+        # nichts machen $maxWidth und $maxHeight sind lehr
+        if(empty($maxHeight) and empty($maxWidth)) return;
+        if(!extension_loaded("gd")) return;
         // --------------------------------------------------------------------
-        // Variablen
-        // --------------------------------------------------------------------
-        if($maxWidth === false or empty($maxWidth)) {
-            $maxWidth  = 134; // Maximal Breite des Bildes
-        }
-        if($maxHeight === false or empty($maxHeight)) {
-            $maxHeight = 100; // Maximal höhe des Bildes
-        }
-
-        // --------------------------------------------------------------------
-        // Bildgröße und MIME Type holen
+        // BildgrÃ¶ÃŸe und MIME Type holen
         // --------------------------------------------------------------------
         $size    = GetImageSize($dir_origin.$pic);
         $mime    = $size['mime'];
         $width  = $size[0];
         $height = $size[1];
+        // --------------------------------------------------------------------
+        // Variablen
+        // --------------------------------------------------------------------
+        if(empty($maxHeight) and !empty($maxWidth)) {
+            $maxHeight = ($height / $width) * $maxWidth;
+        }
+        if(empty($maxWidth) and !empty($maxHeight)) {
+            $maxWidth = ($width / $height) * $maxHeight;
+        }
 
         // --------------------------------------------------------------------
-        // Sicherheitsüberprüfungen
+        // SicherheitsÃ¼berprÃ¼fungen
         // --------------------------------------------------------------------
 
         // Der Bildname darf folgende Zeichen nicht enthalten / : .. < >
          if ( strpos($pic, ':') || preg_match('/(\.\.|<|>)/', $pic) )
          {
-             die("Error: Bilddatei ". $dir_origin . $pic ."enthält nicht gültige Zeichen!");
+             die("Error: Bilddatei ". $dir_origin . $pic ."enthÃ¤lt nicht gÃ¼ltige Zeichen!");
          }
 
         // Handelt es sich bei der Datei auch wirklich um ein Bild
@@ -75,30 +77,30 @@ class Thumbnail {
 
 
         // --------------------------------------------------------------------
-        // Die Seitenverhältnisse von Breite zu Höhe und Höhe zu Breite ermitteln,
-        // und dann die Breite und Höhe für das Vorschaubild ermitteln,
-        // aber nur, wenn das Originalbild größer als das Zielbild ist
+        // Die SeitenverhÃ¶ltnisse von Breite zu HÃ¶he und HÃ¶he zu Breite ermitteln,
+        // und dann die Breite und HÃ¶he fÃ¼r das Vorschaubild ermitteln,
+        // aber nur, wenn das Originalbild grÃ¶ÃŸer als das Zielbild ist
         // --------------------------------------------------------------------
         $xRatio        = $maxWidth / $width;
         $yRatio        = $maxHeight / $height;
 
         if ($xRatio * $height < $maxHeight)
-        { // Bildmaße auf Basis der Breite
+        { // BildmaÃŸe auf Basis der Breite
             $tnHeight    = ceil($xRatio * $height);
             $tnWidth    = $maxWidth;
         }
-        else // Bildmaße auf Basis der Höhe
+        else // BildmaÃŸe auf Basis der HÃ¶he
         {
             $tnWidth    = ceil($yRatio * $width);
              $tnHeight    = $maxHeight;
         }
-        # Bild grösse = Neue grösse also nicht zu tun
-        if($tnWidth == $width and $tnHeight == $height) {
+        # Bild grÃ¶sse <= Neue grÃ¶sse also nicht zu tun
+        if($width <= $tnWidth and $height <= $tnHeight) {
             return;
         }
 
         // --------------------------------------------------------------------
-        // Hauptteil zum Vorschaubilder erstellen
+        // Hauptteil zum Scalieren erstellen
         // --------------------------------------------------------------------
 
         // Welche Funktionen sollen genutzt werden um die Vorschaubilder zu erzeugen
@@ -117,7 +119,7 @@ class Thumbnail {
                 $creationFunction    = 'ImageCreateFromPng';
                 $outputFunction        = 'ImagePng';
                 $doSharpen            = TRUE;
-                 // PNG braucht einen Kompressionslevel 0 (Keine Kompression) bis 9 - (5 sollte ausreichen für Vorschaubilder)
+                 // PNG braucht einen Kompressionslevel 0 (Keine Kompression) bis 9 - (5 sollte ausreichen fÃ¼r Vorschaubilder)
                 $quality            = 5;
             break;
 
@@ -142,7 +144,7 @@ class Thumbnail {
         // Das Quellbild in ein Objekt laden
         $src    = $creationFunction($dir_origin.$pic);
 
-        // Ein leeres Objekt für das Ziel anlegen
+        // Ein leeres Objekt fÃ¼r das Ziel anlegen
         $dst    = imagecreatetruecolor($tnWidth, $tnHeight);
 
         // Transparenz im Bild einschalten (nur GIF und PNG)
@@ -158,20 +160,20 @@ class Thumbnail {
                 imagecolortransparent($dst, $transparencyIndex);
 
                 // Wenn GIF und Transparenz gefunden, dann DO_SHARPEN ausschalten.
-                // Führt sonst zu unschönen ergebnissen
+                // FÃ¼hrt sonst zu unschÃ¶nen ergebnissen
                 if (in_array($size['mime'], array('image/gif')))
                     $doSharpen = FALSE;
             }
         }
 
-        // Jetzt wird das Bild in das Objekt $dst geladen und die größe verändert
+        // Jetzt wird das Bild in das Objekt $dst geladen und die grÃ¶sse verÃ¤ndert
         ImageCopyResampled($dst, $src, 0, 0, 0, 0, $tnWidth, $tnHeight, $width, $height);
 
 
-        // Hier wird versucht das Zielbild noch etwas schärfer zu bekommen
+        // Hier wird versucht das Zielbild noch etwas schÃ¤rfer zu bekommen
         // Das Basiert auf zwei dingen
-        // 1. Die Different der Quell- und Zielgröße
-        // 2. Der Finalen Größe
+        // 1. Die Different der Quell- und ZielgrÃ¶sse
+        // 2. Der Finalen GrÃ¶sse
         if ($doSharpen)
         {
             $sharpness    = findSharp($width, $tnWidth);
@@ -190,7 +192,7 @@ class Thumbnail {
         $outputFunction($dst, $dir_target.$pic, $quality);
         chmod($dir_target.$pic, getChmod());
 
-        // Aufräumen
+        // AufrÃ¤umen
         ImageDestroy($src);
         ImageDestroy($dst);
     }
