@@ -419,8 +419,6 @@ function home($post) {
         $gdlibinstalled = '<span style="color:#ff0000;font-weight:bold;">'.getLanguageValue("no").'</span>';
     }
 
-# das fehlt noch !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# if ($ADMIN_CONF->get("adminmail") != "" && $MAILFUNCTIONS->isMailAvailable()) {
     $test_mail_adress = NULL;
     if($ADMIN_CONF->get("adminmail") != "") {
         $test_mail_adress = $ADMIN_CONF->get("adminmail");
@@ -429,7 +427,7 @@ function home($post) {
         $test_mail_adress = getRequestParam('test_mail_adresse', true);
     }
     // Testmail schicken
-    if (getRequestParam('test_mail', true)) {
+    if (getRequestParam('test_mail', true) and $MAILFUNCTIONS->isMailAvailable()) {
         if (getRequestParam('test_mail_adresse', true) and getRequestParam('test_mail_adresse', true) != "") {
             $MAILFUNCTIONS->sendMail(getLanguageValue("mailtest_mailsubject"), getLanguageValue("mailtest_mailcontent"),getRequestParam('test_mail_adresse', true),getRequestParam('test_mail_adresse', true));
             $post['messages']['home_messages_test_mail'][] = getRequestParam('test_mail_adresse', true);
@@ -437,6 +435,8 @@ function home($post) {
         else {
             $post['error_messages']['home_error_test_mail'][] = NULL;
         }
+    } else {
+        $post['error_messages']['home_messages_no_mail'][] = NULL;
     }
 
 
