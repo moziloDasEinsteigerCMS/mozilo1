@@ -9,7 +9,7 @@
 */
 
 
-/* Mailklasse für moziloCMS */
+/* Mailklasse fÃ¼r moziloCMS */
 
 class Mail {
     
@@ -43,7 +43,7 @@ class Mail {
             ."X-mailer: moziloCMS ".$VERSION_CONF->get("cmsversion");
     }
     
-    // Prüft ob die Mail-Funktion verfügbar ist
+    // PrÃ¼ft ob die Mail-Funktion verfÃ¼gbar ist
     function isMailAvailable()
     {
         return function_exists("mail");
