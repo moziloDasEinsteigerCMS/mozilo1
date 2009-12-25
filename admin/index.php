@@ -427,16 +427,17 @@ function home($post) {
         $test_mail_adress = getRequestParam('test_mail_adresse', true);
     }
     // Testmail schicken
-    if (getRequestParam('test_mail', true) and $MAILFUNCTIONS->isMailAvailable()) {
+    if (getRequestParam('test_mail', true)) {
         if (getRequestParam('test_mail_adresse', true) and getRequestParam('test_mail_adresse', true) != "") {
-            $MAILFUNCTIONS->sendMail(getLanguageValue("mailtest_mailsubject"), getLanguageValue("mailtest_mailcontent"),getRequestParam('test_mail_adresse', true),getRequestParam('test_mail_adresse', true));
-            $post['messages']['home_messages_test_mail'][] = getRequestParam('test_mail_adresse', true);
-        }
-        else {
+            if($MAILFUNCTIONS->isMailAvailable()) {
+                $MAILFUNCTIONS->sendMail(getLanguageValue("mailtest_mailsubject"), getLanguageValue("mailtest_mailcontent"),getRequestParam('test_mail_adresse', true),getRequestParam('test_mail_adresse', true));
+                $post['messages']['home_messages_test_mail'][] = getRequestParam('test_mail_adresse', true);
+            } else {
+                $post['error_messages']['home_messages_no_mail'][] = NULL;
+            }
+        } else {
             $post['error_messages']['home_error_test_mail'][] = NULL;
         }
-    } else {
-        $post['error_messages']['home_messages_no_mail'][] = NULL;
     }
 
 
