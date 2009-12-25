@@ -1,14 +1,14 @@
 <?php
 
-/* 
-* 
+/*
+*
 * $Revision$
 * $LastChangedDate$
 * $Author$
 *
 */
 
-    session_start(); 
+session_start();
 
 /*
 echo "<pre style=\"position:fixed;background-color:#000;color:#0f0;padding:5px;font-family:monospace;border:2px solid #777;\">";
@@ -1179,7 +1179,7 @@ $CHARSET = 'UTF-8';
         $errormessage = "";
         $form = "";
         
-        if (isset($_SESSION)) {
+        if (isset($_SESSION['contactform_name'])) {
             $name       = getRequestParam($_SESSION['contactform_name'], false);
             $mail       = getRequestParam($_SESSION['contactform_mail'], false);
             $website    = getRequestParam($_SESSION['contactform_website'], false);
