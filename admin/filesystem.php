@@ -427,7 +427,7 @@ function getChmod($dir = false) {
     return false;
 }
 
-function changeChmod($file,$error = NULL) {
+function changeChmod($file) {
     $error_new = NULL;
     $dir = NULL;
     if(is_dir($file)) {
@@ -458,7 +458,7 @@ function useChmod($dir = false, $error = NULL) {
         foreach($ordner as $dirs) {
             $error_tmp = useChmod($dirs,$error);
             if(is_array($error_tmp)) {
-                $error[key($error_tmp)][] = $error_tmp[key($error_tmp)];
+                $error[key($error_tmp)] = $error_tmp[key($error_tmp)];
             }
         }
         return $error;
@@ -468,7 +468,7 @@ function useChmod($dir = false, $error = NULL) {
             return;
         }
         if(is_dir($dir)) {
-            $error_tmp = changeChmod($dir,$error);
+            $error_tmp = changeChmod($dir);
             if(is_array($error_tmp)) {
                 $error[key($error_tmp)][] = $error_tmp[key($error_tmp)];
             }
@@ -478,10 +478,10 @@ function useChmod($dir = false, $error = NULL) {
                     if(is_dir($dir.'/'.$file)) {
                         $error_tmp = useChmod($dir.'/'.$file,$error);
                         if(is_array($error_tmp)) {
-                            $error[key($error_tmp)][] = $error_tmp[key($error_tmp)];
+                            $error[key($error_tmp)] = $error_tmp[key($error_tmp)];
                         }
                     } elseif(is_file($dir.'/'.$file)) {
-                        $error_tmp = changeChmod($dir.'/'.$file,$error);
+                        $error_tmp = changeChmod($dir.'/'.$file);
                         if(is_array($error_tmp)) {
                             $error[key($error_tmp)][] = $error_tmp[key($error_tmp)];
                         }
@@ -490,7 +490,7 @@ function useChmod($dir = false, $error = NULL) {
             }
             closedir($handle);
         } elseif(is_file($dir)) {
-            $error_tmp = changeChmod($dir,$error);
+            $error_tmp = changeChmod($dir);
             if(is_array($error_tmp)) {
                 $error[key($error_tmp)][] = $error_tmp[key($error_tmp)];
             }
