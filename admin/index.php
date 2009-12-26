@@ -3279,7 +3279,7 @@ function admin($post) {
             // Zeile "VORHANDENE DATEIEN BEIM UPLOAD ÜBERSCHREIBEN"
             $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("admin_text_defaultoverwrite").'</td>';
             $pagecontent .= '<td class="td_cms_left">'
-            .buildCheckBox("overwrite", ($ADMIN_CONF->get("overwriteuploadfiles") == "true"))
+            .buildCheckBox("overwriteuploadfiles", ($ADMIN_CONF->get("overwriteuploadfiles") == "true"))
             .getLanguageValue("admin_input_defaultoverwrite").'</td>';
             $pagecontent .= "</tr>";
         }
