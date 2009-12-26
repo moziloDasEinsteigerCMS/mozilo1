@@ -47,7 +47,13 @@ class SpecialChars {
         global $CHARSET;
         $text = rawurldecode($text);
         if($html) {
-            $text = htmlentities($text,ENT_COMPAT,$CHARSET);
+            $test = htmlentities($text,ENT_COMPAT,$CHARSET);
+            if(empty($test)) {
+                # htmlentities gibt einen lehren sring zurück wenn im string ein unbekantes zeichen ist
+                # iconv entfernt es einfach
+                $test = htmlentities(@iconv($CHARSET,$CHARSET.'//IGNORE',$text),ENT_COMPAT,$CHARSET);
+            }
+            $text = $test;
             $text = str_replace('&amp;#','&#',$text);
         }
         // Leerzeichen
