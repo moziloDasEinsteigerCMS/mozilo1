@@ -39,7 +39,7 @@ function getLanguageValue($confpara)
  --------------------------------------------------------------------------------*/
 function getDirs($dir,$complet = false,$exclude_link = false)
 {
-    global $specialchars;
+
     $vergeben = array();
     if (is_dir($dir))
     {
