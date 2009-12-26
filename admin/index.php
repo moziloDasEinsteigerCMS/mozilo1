@@ -2605,7 +2605,7 @@ function config($post) {
 
         // Speichern der benutzerdefinierten Syntaxelemente -> ERWEITERN UM PRÜFUNG!
         # nur Speichern wenn auch benutzt wird
-        if($CMS_CONF->get('usecmssyntax') == "true" and $ADMIN_CONF->get('showexpert') == "true") {
+        if($CMS_CONF->get('usecmssyntax') == "true") {
             # usecmssyntax wurde eingeschaltet aus syntax.conf lesen
             if(!isset($post['usersyntax'])) {
                 $usersyntax_array = file($USER_SYNTAX_FILE);
