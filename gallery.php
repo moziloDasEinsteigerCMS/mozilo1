@@ -264,15 +264,15 @@ class Gallery {
 // Beschreibung zum aktuellen Bild anzeigen
 // ------------------------------------------------------------------------------
     function getCurrentDescription($picname) {
-        global $CHARSET;
-    
+        global $specialchars;
+
         // Keine Bilder im Galerieverzeichnis?
         if (count($this->picarray) == 0)
             return "&nbsp;";
         // Bildbeschreibung einlesen
         $description = $this->alldescriptions->get($picname);
         if(strlen($description) > 0) {
-            return htmlentities($description,ENT_COMPAT,$CHARSET);
+            return $specialchars->rebuildSpecialChars($description,false,true);
         } else {
             return "&nbsp;";
         }
