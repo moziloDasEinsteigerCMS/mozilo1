@@ -272,9 +272,9 @@ $CHARSET = 'UTF-8';
     $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle), $HTML);
 
     // Meta-Tag "keywords"
-    $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $specialchars->numeric_entities_decode($CMS_CONF->get("websitekeywords")), $HTML);
+    $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $specialchars->rebuildSpecialChars($CMS_CONF->get("websitekeywords"),false,true), $HTML);
     // Meta-Tag "description"
-    $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $specialchars->numeric_entities_decode($CMS_CONF->get("websitedescription")), $HTML);
+    $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $specialchars->rebuildSpecialChars($CMS_CONF->get("websitedescription"),false,true), $HTML);
 
     $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
     $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
@@ -1074,7 +1074,7 @@ $CHARSET = 'UTF-8';
         global $LAYOUT_DIR;
 
         // Titel der Website
-        $content = preg_replace('/{WEBSITE_NAME}/', $specialchars->numeric_entities_decode($CMS_CONF->get("websitetitle")), $content);
+        $content = preg_replace('/{WEBSITE_NAME}/', $specialchars->rebuildSpecialChars($CMS_CONF->get("websitetitle"),false,true), $content);
         // Layout-Verzeichnis
         $content = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR, $content);
 
