@@ -1100,7 +1100,6 @@ function editSite($post) {
     $cat = key($post['action_data']['editsite']);
     $page = $post['action_data']['editsite'][$cat];
 
-    $input_merker = NULL;
     $post['editsite'] = 'yes';
     $content = "editsite";
     if(isset($_POST['save']) or isset($_POST['savetemp'])) {
@@ -1128,15 +1127,17 @@ function editSite($post) {
             }
             $content = $_POST['pagecontent'];
         }
+        if(!isset($post['error_messages']))
+            $post['messages']['page_message_edit'][] = NULL;
         if(isset($_POST['savetemp']) or isset($post['error_messages'])) {
-            $post['content'] = showEditPageForm($cat, $page,$content).$input_merker;
+            $post['content'] = showEditPageForm($cat, $page,$content);
         } else {
             $post['editsite'] = 'no';
         }
     } elseif(isset($_POST['cancel'])) {
         $post['editsite'] = 'no';
     } else {
-        $post['content'] = showEditPageForm($cat, $page,$content).$input_merker;
+        $post['content'] = showEditPageForm($cat, $page,$content);
     }
     $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
     $post['makepara'] = "yes";
