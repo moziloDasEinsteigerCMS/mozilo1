@@ -8,14 +8,13 @@
  *
  */
 
+session_start();
 
 $ADMIN_TITLE = "moziloAdmin";
 
 #$CHARSET = 'ISO-8859-1';
 $CHARSET = 'UTF-8';
 
-session_start();
- 
 $debug = "ja"; # ja oder nein
  // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 if($debug != "ja")
