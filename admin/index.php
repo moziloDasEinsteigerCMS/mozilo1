@@ -4050,10 +4050,10 @@ function setLayoutAndDependentSettings($layoutfolder) {
     if(isset($layoutsettings->properties['error'])) {
         return $layoutsettings->properties;
     } else {
+        $CMS_CONF->set("usesubmenu", $layoutsettings->get("usesubmenu"));
+        $GALLERY_CONF->set("gallerypicsperrow", $layoutsettings->get("gallerypicsperrow"));
         if(isset($layoutsettings->properties['usesubmenu']))
             return $layoutsettings->properties['usesubmenu'];
-            $CMS_CONF->set("usesubmenu", $layoutsettings->get("usesubmenu"));
-            $GALLERY_CONF->set("gallerypicsperrow", $layoutsettings->get("gallerypicsperrow"));
     }
 }
 
