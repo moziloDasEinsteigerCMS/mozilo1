@@ -1,2 +1,5 @@
+Options -Indexes
+<IfModule mod_rewrite.c>
 RewriteEngine On
-RewriteRule ^rewrite([^/]*).htm$ index.php?link=$1 [L]
+RewriteRule .php$ index.php?link=rewrite [L]
+</IfModule>

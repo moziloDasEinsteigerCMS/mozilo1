@@ -337,6 +337,10 @@ if ($LOGINCONF->get("falselogincount") > 0) {
     }
 }
 
+if(!isset($_REQUEST['link']) and $CMS_CONF->get('modrewrite') == "true") {
+    $html .= returnMessage(false, getLanguageValue("error_no_modrewrite"));
+}
+
 $html .= $error_backup;
 // Warnung, wenn die letzte Backupwarnung mehr als $intervallsetting Tage her ist
 $intervallsetting = $ADMIN_CONF->get("backupmsgintervall");
@@ -400,11 +404,16 @@ function home($post) {
     global $MAILFUNCTIONS;
     
     $pagecontent = NULL;
-
+/*
     if(isset($_GET['link']) and $_GET['link'] == 1) {
         $post['error_messages']['home_error_mod_rewrite'][] = NULL;
     } elseif(isset($_GET['link']) and $_GET['link'] == 2) {
         $post['messages']['home_messages_mod_rewrite'][] = NULL;
+    }*/
+    if(isset($_REQUEST['link']) and $_REQUEST['link'] == "rewrite") {
+        $modrewrite = '<span style="color:#00ff00;font-weight:bold;">'.getLanguageValue("home_messages_mod_rewrite").'</span>';
+    } else {
+        $modrewrite = '<span style="color:#ff0000;font-weight:bold;">'.getLanguageValue("home_error_mod_rewrite").'</span>';
     }
     $safemode = getLanguageValue("no");
     if(ini_get('safe_mode')) {
@@ -496,7 +505,8 @@ function home($post) {
     ."</tr>"
     ."<tr>"
     .'<td width="50%" class="td_cms_left">'.getLanguageValue("home_text_mod_rewrite")."</td>"
-    .'<td width="50%" class="td_cms_left"><a href="rewrite2.htm" style="color:#ff0000;font-weight:bold;">'.getLanguageValue("home_button_mod_rewrite").'</a></td>'
+    .'<td width="50%" class="td_cms_left">'.$modrewrite.'</td>'
+#    .'<td width="50%" class="td_cms_left">'.$modrewrite.'<a href="rewrite2.htm" style="color:#ff0000;font-weight:bold;">'.getLanguageValue("home_button_mod_rewrite").'</a></td>'
     ."</tr>"
     ."<tr>"
     .'<td width="100%" class="td_cms_titel" colspan="2"><b>'.getLanguageValue("home_titel_test_mail").'</b></td>'
@@ -2585,6 +2595,10 @@ function config($post) {
                     if(isset($post[$syntax_name])) {
                         $checkbox = $post[$syntax_name];
                     }
+                    if($syntax_name == "modrewrite" and !isset($_REQUEST['link']) and isset($post[$syntax_name]) and $post[$syntax_name] == "true") {
+                        $checkbox = "false";
+                        $post['error_messages']['config_error_modrewrite'][] = NULL;
+                    }
                     if($error_messages === false and $CMS_CONF->get($syntax_name) != $checkbox) {
                         $CMS_CONF->set($syntax_name, $checkbox);
                     }
@@ -2705,6 +2719,7 @@ function config($post) {
         $post['error_messages']['config_error_layouts_existed'][] = $CMS_CONF->get('cmslayout');
         $error_color['cmslayout'] = ' style="background-color:#FF7029;"';
     }
+
     $pagecontent .= categoriesMessages($post);
 /* tooltips noch einbauen!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     $array_getTooltipValue = array("admin_help_language","admin_help_adminmail","admin_help_chmodnewfiles",
