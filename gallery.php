@@ -10,7 +10,7 @@
 
 class Gallery {
 
-    // Initial: Fehlerausgabe unterdr�cken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
+    // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
     # @ini_set("display_errors", 0);
 
     // ------------------------------------------------------------------------------    
@@ -50,7 +50,7 @@ class Gallery {
         else
             $this->usethumbs = false;
 
-        // �bergebene Parameter �berpr�fen
+        // Übergebene Parameter überprüfen
         $this->gal_request        = $specialchars->replacespecialchars($gallery,false);
         $this->dir_gallery        = "./galerien/".$this->gal_request."/";
         $this->dir_thumbs         = $this->dir_gallery."vorschau/";
