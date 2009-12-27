@@ -37,8 +37,7 @@ abstract class ImageFetcher
         foreach($this->photos as $albums_key => $albums_value)
         {
             $album = $doc->createElement("album");
-            $album->setAttribute("descr","descr ".$albums_key);
-            $album->setAttribute("title","titel ".$albums_key);
+            $album->setAttribute("title",$albums_key);
 
             // iterate through all photos of the album
             foreach ($albums_value as $photos)
