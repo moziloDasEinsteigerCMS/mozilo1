@@ -3389,8 +3389,8 @@ function plugins($post) {
     $pagecontent .= '<span class="titel">'.getLanguageValue("plugins_titel").'</span>';
     $pagecontent .= $tooltip_plugins_help;
     $pagecontent .= "<p>".getLanguageValue("plugins_text")."</p>";
-    $pagecontent .= '<input type="submit" class="input_submit" name="apply" value="'.getLanguageValue("plugins_submit").'"/>';
     $pagecontent .= '<table width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
+    $pagecontent .= '<tr><td width="100%" class="td_toggle"><input type="submit" class="input_submit" name="apply" value="'.getLanguageValue("plugins_submit").'"/></td></tr>';
 
     $dircontent = getDirs("../$PLUGIN_DIR", true);
     $toggle_pos = 0;
@@ -3398,20 +3398,39 @@ function plugins($post) {
         if (file_exists("../$PLUGIN_DIR/".$currentelement."/index.php")) {
             require_once("../$PLUGIN_DIR/".$currentelement."/index.php");
             $plugin = new $currentelement();
+            $plugin_error = false;
+            if(file_exists("../$PLUGIN_DIR/".$currentelement."/plugin.conf")) {
+                $conf_plugin = new Properties("../$PLUGIN_DIR/".$currentelement."/plugin.conf",true);
+                $plugin_error_conf = NULL;
+                if(isset($conf_plugin->properties['error'])) {
+                    $plugin_error_conf = returnMessage(false, getLanguageValue("properties_write").'&nbsp;&nbsp;<span style="font-weight:normal;">'.$currentelement.'/plugin.conf</span>');
+                    $plugin_error = true;
+                }
+            }
+            if(getRequestParam('apply', true)) {
+                $check_activ = "false";
+                if(isset($_POST[$currentelement]['activ'])) {
+                    $check_activ = "true";
+                }
+                if($conf_plugin->get("activ") != $check_activ) {
+                    $conf_plugin->set("activ",$check_activ);
+                }
+            }
+
             // Enthält der Code eine Klasse mit dem Namen des Plugins?
             if (class_exists($currentelement)) {
                 $plugin_info = $plugin->getInfo();
                 $pagecontent .= '<tr><td width="100%" class="td_toggle">';
                 $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
-                $plugin_error = false;
                 if(isset($plugin_info[0])) {
                     $plugin_name = $plugin_info[0];
                 } else {
                     $plugin_name = getLanguageValue('plugins_error').' <span style="color:#ff0000">'.$currentelement.'</span>';
                     $plugin_error = true;
                 }
-                $pagecontent .= '<tr><td width="85%" class="td_titel"><span class="text_cat_page">'.$plugin_name.'</span></td>';
-                $pagecontent .= '<td width="85%" class="td_icons">';
+                $pagecontent .= '<tr><td width="70%" class="td_titel" nowrap><span class="text_cat_page">'.$plugin_name.'</span>'.$plugin_error_conf.'</td>';
+                $pagecontent .= '<td width="15%" class="">Activieren&nbsp;'.buildCheckBox($currentelement.'[activ]', ($conf_plugin->get("activ") == "true")).'</td>';
+                $pagecontent .= '<td width="15%" class="td_icons">';
                 if(getRequestParam('javascript', true) and $plugin_error === false) {
                     $pagecontent .= '<span id="toggle_'.$toggle_pos.'_linkBild"'.$tooltip_help_edit.'></span>';
                 }
@@ -3442,17 +3461,10 @@ function plugins($post) {
 
                         $config = $plugin->getConfig();
                         foreach($config as $name => $inhalt) {
-                            $error = NULL;
-                            # plugin.conf in class einlessen wen vorhanden und schreibbar ist
-                            if(file_exists("../$PLUGIN_DIR/".$currentelement."/plugin.conf")) {
-                                $conf_plugin = new Properties("../$PLUGIN_DIR/".$currentelement."/plugin.conf",true);
-                                if(isset($conf_plugin->properties['error'])) {
-                                    unset($conf_plugin);
-                                    $messages = returnMessage(false, getLanguageValue("properties_write").'&nbsp;&nbsp;<span style="font-weight:normal;">plugin.conf</span>');
-                                    $display_toggle = ' style="display:block;"';
-                                    break;
-                                }
+                            if($conf_plugin->get("activ") == "false") {
+                                break;
                             }
+                            $error = NULL;
                             # Änderungen schreiben isset($_POST['apply'])
                             if(getRequestParam('apply', true)) {
                                 if(isset($_POST[$currentelement][$name])) {
@@ -3463,12 +3475,12 @@ function plugins($post) {
                                     } else {
                                         $conf_inhalt = str_replace(array("\r\n","\r","\n"),"<br>",trim($_POST[$currentelement][$name]));
                                     }
+                                    if(isset($config[$name]['regex_error'])) {
+                                        $regex_error = $config[$name]['regex_error'];
+                                    } else {
+                                        $regex_error = getLanguageValue("plugins_messages_input");
+                                    }
                                     if(isset($config[$name]['regex']) and strlen($conf_inhalt) > 0) {
-                                        if(isset($config[$name]['regex_error'])) {
-                                            $regex_error = $config[$name]['regex_error'];
-                                        } else {
-                                            $regex_error = getLanguageValue("plugins_messages_input");
-                                        }
                                         if(preg_match($config[$name]['regex'], $conf_inhalt)) {
                                             # bei Password und verschlüsselung an
                                             if($config[$name]['type'] == "password" and $config[$name]['saveasmd5'] == "true") {
