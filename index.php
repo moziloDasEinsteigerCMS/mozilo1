@@ -26,6 +26,7 @@ echo "</pre>";
     $CMS_CONF     = new Properties("conf/main.conf");
     $VERSION_CONF  = new Properties("conf/version.conf");
     $GALLERY_CONF  = new Properties("conf/gallery.conf");
+    $USER_SYNTAX  = new Properties("conf/syntax.conf");
     require_once("Language.php");
     $language       = new Language();
     require_once("Syntax.php");
