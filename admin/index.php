@@ -3461,9 +3461,6 @@ function plugins($post) {
 
                         $config = $plugin->getConfig();
                         foreach($config as $name => $inhalt) {
-                            if($conf_plugin->get("activ") == "false") {
-                                break;
-                            }
                             $error = NULL;
                             # Änderungen schreiben isset($_POST['apply'])
                             if(getRequestParam('apply', true)) {
@@ -3487,7 +3484,7 @@ function plugins($post) {
                                                 $conf_inhalt = md5($conf_inhalt);
                                             }
                                             # nur in conf schreiben wenn sich der wert geändert hat
-                                            if($conf_plugin->get($name) != $conf_inhalt) {
+                                            if($conf_plugin->get("activ") == "true" and $conf_plugin->get($name) != $conf_inhalt) {
                                                 $conf_plugin->set($name,$conf_inhalt);
                                                 $display_toggle = ' style="display:block;"';
                                                 $messages = returnMessage(true, $regex_error);
@@ -3499,19 +3496,19 @@ function plugins($post) {
                                         }
                                     } else {
                                         # nur in conf schreiben wenn sich der wert geändert hat und es kein password ist
-                                        if($conf_plugin->get($name) != $conf_inhalt and $config[$name]['type'] != "password") {
+                                        if($conf_plugin->get("activ") == "true" and $conf_plugin->get($name) != $conf_inhalt and $config[$name]['type'] != "password") {
                                             $conf_plugin->set($name,$conf_inhalt);
                                             $display_toggle = ' style="display:block;"';
                                             $messages = returnMessage(true, $regex_error);
                                         }
                                    }
                                 # checkbox
-                                } elseif($config[$name]['type'] == "checkbox" and $conf_plugin->get($name) == "true") {
+                                } elseif($conf_plugin->get("activ") == "true" and $config[$name]['type'] == "checkbox" and $conf_plugin->get($name) == "true") {
                                     $conf_plugin->set($name,"false");
                                     $display_toggle = ' style="display:block;"';
                                     $messages = returnMessage(true, getLanguageValue("plugins_messages_input"));
                                 # variable gibts also schreiben mit lehren wert
-                                } elseif($conf_plugin->get($name)) {
+                                } elseif($conf_plugin->get("activ") == "true" and $conf_plugin->get($name)) {
                                     $conf_plugin->set($name,"");
                                     $display_toggle = ' style="display:block;"';
                                     $messages = returnMessage(true, getLanguageValue("plugins_messages_input"));
