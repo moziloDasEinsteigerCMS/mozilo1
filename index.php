@@ -262,56 +262,78 @@ $CHARSET = 'UTF-8';
         $pagecontent = highlight($pagecontent, $HIGHLIGHT_REQUEST);
     }
 
-    $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
-    $HTML = preg_replace('/{CHARSET}/', $CHARSET, $HTML);
-    $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
-    $HTML = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR, $HTML);
+    $HTML = $template;
+    if(strpos($HTML,'{CSS_FILE}') !== false)
+        $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $HTML);
+    if(strpos($HTML,'{CHARSET}') !== false)
+        $HTML = preg_replace('/{CHARSET}/', $CHARSET, $HTML);
+    if(strpos($HTML,'{FAVICON_FILE}') !== false)
+        $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
+    if(strpos($HTML,'{LAYOUT_DIR}') !== false)
+        $HTML = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR, $HTML);
 
     // Platzhalter ersetzen
     $HTML = replacePlaceholders($HTML, $cattitle, $pagetitle);
-    $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle), $HTML);
+    if(strpos($HTML,'{WEBSITE_TITLE}') !== false)
+        $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle), $HTML);
 
     // Meta-Tag "keywords"
-    $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $specialchars->rebuildSpecialChars($CMS_CONF->get("websitekeywords"),false,true), $HTML);
+    if(strpos($HTML,'{WEBSITE_KEYWORDS}') !== false)
+        $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $specialchars->rebuildSpecialChars($CMS_CONF->get("websitekeywords"),false,true), $HTML);
     // Meta-Tag "description"
-    $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $specialchars->rebuildSpecialChars($CMS_CONF->get("websitedescription"),false,true), $HTML);
+    if(strpos($HTML,'{WEBSITE_DESCRIPTION}') !== false)
+        $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $specialchars->rebuildSpecialChars($CMS_CONF->get("websitedescription"),false,true), $HTML);
 
-    $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
-    $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
+    if(strpos($HTML,'{CONTENT}') !== false)
+        $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
+    if(strpos($HTML,'{MAINMENU}') !== false)
+        $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
 
-    // Detailmenü (nicht zeigen, wenn Submenüs aktiviert sind)
-    if ($CMS_CONF->get("usesubmenu") > 0) {
-        $HTML = preg_replace('/{DETAILMENU}/', "", $HTML);
-    }
-    else {
-        $HTML = preg_replace('/{DETAILMENU}/', getDetailMenu($CAT_REQUEST), $HTML);
+    if(strpos($HTML,'{DETAILMENU}') !== false) {
+        // Detailmenü (nicht zeigen, wenn Submenüs aktiviert sind)
+        if ($CMS_CONF->get("usesubmenu") > 0) {
+            $HTML = preg_replace('/{DETAILMENU}/', "", $HTML);
+        }
+        else {
+            $HTML = preg_replace('/{DETAILMENU}/', getDetailMenu($CAT_REQUEST), $HTML);
+        }
     }
     // Suchformular
-    $HTML = preg_replace('/{SEARCH}/', getSearchForm(), $HTML);
+    if(strpos($HTML,'{SEARCH}') !== false)
+        $HTML = preg_replace('/{SEARCH}/', getSearchForm(), $HTML);
 
     // Letzte Änderung
     $lastchangeinfo = getLastChangedContentPageAndDate();
     // - Name der zuletzt geänderten Inhaltsseite
     // - kompletter Link auf diese Inhaltsseite  
     // - formatiertes Datum der letzten Änderung
-    $HTML = preg_replace('/{LASTCHANGEDTEXT}/', $language->getLanguageValue0("message_lastchange_0"), $HTML);
-    $HTML = preg_replace('/{LASTCHANGEDPAGE}/', $lastchangeinfo[0], $HTML);
-    $HTML = preg_replace('/{LASTCHANGEDPAGELINK}/', $lastchangeinfo[1], $HTML);
-    $HTML = preg_replace('/{LASTCHANGEDATE}/', $lastchangeinfo[2], $HTML);
+    if(strpos($HTML,'{LASTCHANGEDTEXT}') !== false)
+        $HTML = preg_replace('/{LASTCHANGEDTEXT}/', $language->getLanguageValue0("message_lastchange_0"), $HTML);
+    if(strpos($HTML,'{LASTCHANGEDPAGE}') !== false)
+        $HTML = preg_replace('/{LASTCHANGEDPAGE}/', $lastchangeinfo[0], $HTML);
+    if(strpos($HTML,'{LASTCHANGEDPAGELINK}') !== false)
+        $HTML = preg_replace('/{LASTCHANGEDPAGELINK}/', $lastchangeinfo[1], $HTML);
+    if(strpos($HTML,'{LASTCHANGEDATE}') !== false)
+        $HTML = preg_replace('/{LASTCHANGEDATE}/', $lastchangeinfo[2], $HTML);
     // Platzhalter {LASTCHANGE} ist obsolet seit 1.12! Wird nur aus Gründen der Abwärtskompatibilität noch ersetzt 
-    $HTML = preg_replace('/{LASTCHANGE}/', $language->getLanguageValue0("message_lastchange_0")." ".$lastchangeinfo[1]." (".$lastchangeinfo[2].")", $HTML); 
+    if(strpos($HTML,'{LASTCHANGE}') !== false)
+        $HTML = preg_replace('/{LASTCHANGE}/', $language->getLanguageValue0("message_lastchange_0")." ".$lastchangeinfo[1]." (".$lastchangeinfo[2].")", $HTML); 
     
     // Sitemap-Link
-    $HTML = preg_replace('/{SITEMAPLINK}/', "<a href=\"index.php?action=sitemap\" id=\"sitemaplink\"".getTitleAttribute($language->getLanguageValue0("tooltip_showsitemap_0")).">".$language->getLanguageValue0("message_sitemap_0")."</a>", $HTML);
+    if(strpos($HTML,'{SITEMAPLINK}') !== false)
+        $HTML = preg_replace('/{SITEMAPLINK}/', "<a href=\"index.php?action=sitemap\" id=\"sitemaplink\"".getTitleAttribute($language->getLanguageValue0("tooltip_showsitemap_0")).">".$language->getLanguageValue0("message_sitemap_0")."</a>", $HTML);
     
     // CMS-Info-Link
-    $HTML = preg_replace('/{CMSINFO}/', getCmsInfo(), $HTML);
+    if(strpos($HTML,'{CMSINFO}') !== false)
+        $HTML = preg_replace('/{CMSINFO}/', getCmsInfo(), $HTML);
       
     // Kontaktformular
-    $HTML = preg_replace('/{CONTACT}/', buildContactForm(), $HTML);
+    if(strpos($HTML,'{CONTACT}') !== false)
+        $HTML = preg_replace('/{CONTACT}/', buildContactForm(), $HTML);
 
     // Kontaktformular
-    $HTML = preg_replace('/{TABLEOFCONTENTS}/', $syntax->getToC($pagecontent), $HTML);
+    if(strpos($HTML,'{TABLEOFCONTENTS}') !== false)
+        $HTML = preg_replace('/{TABLEOFCONTENTS}/', $syntax->getToC($pagecontent), $HTML);
 
     if ($GALLERY_CONF->get("target") == "_blank" and isset($_GET["gal"])) {
         require_once("gallery.php");
