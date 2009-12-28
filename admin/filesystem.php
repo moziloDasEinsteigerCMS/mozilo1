@@ -433,6 +433,10 @@ function changeChmod($file) {
     if(is_dir($file)) {
         $dir = true;
     }
+    # nicht zu tuhn
+    if(getChmod() === false) {
+        return $error_new;
+    }
     @chmod($file, getChmod($dir));
     $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
     $last_error = @error_get_last();
