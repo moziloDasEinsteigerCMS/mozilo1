@@ -15,8 +15,8 @@
 INHALT
 ######
         
-        Projekt "Flatfile-basiertes CMS für Einsteiger"
-        Sprachunterstützung
+        Projekt "Flatfile-basiertes CMS fï¿½r Einsteiger"
+        Sprachunterstï¿½tzung
         Klasse ITF04-1
         Industrieschule Chemnitz
 
@@ -38,10 +38,6 @@ class Language {
 // ------------------------------------------------------------------------------
     function Language() {
         global $CMS_CONF;
-        # das ist ein hack für die gallery.php
-        if(!isset($CMS_CONF->properties['cmslanguage'])) {
-            $CMS_CONF     = new Properties("conf/main.conf");
-        }
 
         $currentlanguage = $CMS_CONF->get("cmslanguage");
         if (($currentlanguage == "") || (!file_exists("sprachen/$currentlanguage.conf")))
@@ -60,7 +56,7 @@ class Language {
 
 
 // ------------------------------------------------------------------------------
-// Sprachelement mit einem zusätzlichen Parameter aus Sprachdatei holen
+// Sprachelement mit einem zusï¿½tzlichen Parameter aus Sprachdatei holen
 // ------------------------------------------------------------------------------
     function getLanguageValue1($phrase, $param1) {
         global $CHARSET;
@@ -71,7 +67,7 @@ class Language {
 
 
 // ------------------------------------------------------------------------------
-// Sprachelement mit zwei zusätzlichen Parametern aus Sprachdatei holen
+// Sprachelement mit zwei zusï¿½tzlichen Parametern aus Sprachdatei holen
 // ------------------------------------------------------------------------------
     function getLanguageValue2($phrase, $param1, $param2) {
         global $CHARSET;
