@@ -118,7 +118,7 @@ class Gallery {
                     foreach($this->picarray as $pic) {
                         $title = NULL;
                         if(isset($alldescriptions->properties[$pic])) $title = $alldescriptions->properties[$pic];
-                        $xml .= '<image title="'.$title.'" date="'.@date ("F d Y", filemtime("./galerien/".$gallery."/".$pic)).'" link="'.$cat_activ.'galerien/'.rawurlencode($gallery).'/'.rawurlencode($pic).'" thumbnail="'.$cat_activ.'galerien/'.rawurlencode($gallery).'/vorschau/'.rawurlencode($pic).'" image="'.$cat_activ.'galerien/'.rawurlencode($gallery).'/'.rawurlencode($pic).'">Bildname: '.$pic.'</image>'."\n";
+                        $xml .= '<image title="'.$title.'" date="'.@date ("F d Y", filemtime("./galerien/".$gallery."/".$pic)).'" link="'.$cat_activ.'galerien/'.rawurlencode($gallery).'/'.rawurlencode($pic).'" thumbnail="'.$cat_activ.'galerien/'.rawurlencode($gallery).'/vorschau/'.rawurlencode($pic).'" image="'.$cat_activ.'galerien/'.rawurlencode($gallery).'/'.rawurlencode($pic).'">Bildname: '.$specialchars->rebuildSpecialChars($pic, false, false).'</image>'."\n";
                     }
                     $xml .= '</album>'."\n";
                 } else {
@@ -409,7 +409,7 @@ class Gallery {
         while ($file = readdir($currentdir)){
             if(isValidDirOrFile($file) and (in_array(strtolower(substr(strrchr($file, "."), 1, strlen(strrchr($file, "."))-1)), $filetypes))) {
                 // ...wenn alles passt, ans Bilder-Array anhängen
-                array_push($picarray, $file);
+                $picarray[] = $file;
             }
         }
         closedir($currentdir);
@@ -435,7 +435,7 @@ function getGalsAsArray($dir,$flashxmltime) {
         }
     }
     closedir($currentdir);
-    natcasesort($galarray);
+    ksort($galarray);
     return $galarray;
 }
 
