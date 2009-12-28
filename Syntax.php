@@ -45,13 +45,6 @@ class Syntax {
         else {
             $this->TARGETBLANK_LINK = "";
         }
-/*        // Galerie-Links in neuem Fenster �ffnen?
-        if ($CMS_CONF->get("targetblank_gallery") == "true") {
-            $this->TARGETBLANK_GALLERY = " target=\"_blank\"";
-        }
-        else {
-            $this->TARGETBLANK_GALLERY = "";
-        }*/
         // Download-Links in neuem Fenster �ffnen?
         if ($CMS_CONF->get("targetblank_download") == "true") {
             $this->TARGETBLANK_DOWNLOAD = " target=\"_blank\"";
