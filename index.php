@@ -1517,10 +1517,15 @@ $CHARSET = 'UTF-8';
         $dircontent = getDirContentAsArray(getcwd()."/$PLUGIN_DIR", false, false);
         foreach ($dircontent as $currentelement) {
             if (file_exists(getcwd()."/$PLUGIN_DIR/".$currentelement."/index.php")) {
-                array_push($availableplugins, $currentelement);
+                if(file_exists(getcwd()."/$PLUGIN_DIR/".$currentelement."/plugin.conf")) {
+                    $conf_plugin = new Properties(getcwd()."/$PLUGIN_DIR/".$currentelement."/plugin.conf",true);
+                }
+                if($conf_plugin->get("activ") == "true") {
+                    array_push($availableplugins, $currentelement);
+                }
             }
         }
-
+        unset($conf_plugin);
         // Alle Variablen aus dem Inhalt heraussuchen
         preg_match_all("/\{(.+)\}/Umsi", $content, $matches);
         // Für jeden Treffer...
