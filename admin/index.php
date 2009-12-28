@@ -2970,12 +2970,10 @@ function config($post) {
         $pagecontent .= '<tr><td class="td_cms_titel" colspan="2">'.getLanguageValue("config_titel_expert").'</td></tr>';
         // Zeile "showhiddenpagesin"
         $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_showhiddenpages").'</td>';
-        $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("showhiddenpagesinlastchanged", ($CMS_CONF->get("showhiddenpagesinlastchanged") == "true")).getLanguageValue("config_input_lastchanged").'<br>'.buildCheckBox("showhiddenpagesinsearch", ($CMS_CONF->get("showhiddenpagesinsearch") == "true")).getLanguageValue("config_input_search").'<br>'.buildCheckBox("showhiddenpagesinsitemap", ($CMS_CONF->get("showhiddenpagesinsitemap") == "true")).getLanguageValue("config_input_sitemap").'</td></tr>';
+        $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("showhiddenpagesinlastchanged", ($CMS_CONF->get("showhiddenpagesinlastchanged") == "true")).getLanguageValue("config_input_lastchanged").'<br>'.buildCheckBox("showhiddenpagesinsearch", ($CMS_CONF->get("showhiddenpagesinsearch") == "true")).getLanguageValue("config_input_search").'<br>'.buildCheckBox("showhiddenpagesinsitemap", ($CMS_CONF->get("showhiddenpagesinsitemap") == "true")).getLanguageValue("config_input_sitemap").'<br>'.buildCheckBox("showhiddenpagesasdefaultpage", ($CMS_CONF->get("showhiddenpagesasdefaultpage") == "true")).getLanguageValue("config_input_pagesasdefaultpage").'<br>'.buildCheckBox("showhiddenpagesincmsvariables", ($CMS_CONF->get("showhiddenpagesincmsvariables") == "true")).getLanguageValue("config_input_pagesincmsvariables").'</td></tr>';
         // Zeile "Links öffnen self blank"
         $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_target").'</td>';
-        $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("targetblank_download", ($CMS_CONF->get("targetblank_download") == "true")).getLanguageValue("config_input_download")
-#.'<br>'.buildCheckBox("targetblank_gallery", ($CMS_CONF->get("targetblank_gallery") == "true")).getLanguageValue("config_input_gallery")
-.'<br>'.buildCheckBox("targetblank_link", ($CMS_CONF->get("targetblank_link") == "true")).getLanguageValue("config_input_link").'</td></tr>';
+        $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("targetblank_download", ($CMS_CONF->get("targetblank_download") == "true")).getLanguageValue("config_input_download").'<br>'.buildCheckBox("targetblank_link", ($CMS_CONF->get("targetblank_link") == "true")).getLanguageValue("config_input_link").'</td></tr>';
         // Zeile "wenn page == cat"
         $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_catnamedpages").'</td>';
         $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("hidecatnamedpages", ($CMS_CONF->get("hidecatnamedpages") == "true")).getLanguageValue("config_input_catnamedpages").'</td></tr>';
@@ -3097,7 +3095,11 @@ function admin($post) {
                         $error_messages = $syntax_name;
                     }
                     if($error_messages === false and $ADMIN_CONF->get($syntax_name) != $text) {
-                        $ADMIN_CONF->set($syntax_name, $specialchars->replaceSpecialChars($text,false));
+                        if($syntax_name == 'adminmail') {
+                            $ADMIN_CONF->set($syntax_name, $text);
+                        } else {
+                            $ADMIN_CONF->set($syntax_name, $specialchars->replaceSpecialChars($text,false));
+                        }
                     }
         
                 }
@@ -3965,7 +3967,7 @@ if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
                             $cleanpagename = $specialchars->rebuildSpecialChars(substr($file, 3, strlen($file) - 3 - strlen($EXT_PAGE)), true, true);
                             $completepagename = $cleanpagename;
                             if (substr($file, strlen($file)-4, 4) == $EXT_HIDDEN)
-                            $completepagename = $cleanpagename." (".getLanguageValue("hiddenpage").")";
+                            $completepagename = $cleanpagename." (".getLanguageValue("page_saveashidden").")";
                             if ($catdir == $currentcat)
                             array_push($elements, array($spacer.$completepagename, $cleanpagename));
                             else
