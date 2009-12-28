@@ -14,7 +14,7 @@ class Syntax {
     var $LANG;
     var $LINK_REGEX;
     var $MAIL_REGEX;
-    var $USER_SYNTAX;
+#    var $USER_SYNTAX;
     var $TARGETBLANK_LINK;
 #    var $TARGETBLANK_GALLERY;
     var $TARGETBLANK_DOWNLOAD;
@@ -37,7 +37,6 @@ class Syntax {
                     // subdirs|files            (\w)+
         $this->LINK_REGEX   = "/^(https?|t?ftps?|gopher|telnets?|mms|imaps?|irc|pop3s?|rdp|smb|smtps?|sql|ssh|svn)\:\/\/((\w)+\:(\w)+\@)?[((\w)+\.)?(\w)+\.[a-zA-Z]{2,4}|([\d]{1,3}\.){3}[\d]{1,3}](\:[\d]{1,5})?((\w)+)?$/";
         $this->MAIL_REGEX   = "/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/";
-        $this->USER_SYNTAX  = new Properties("conf/syntax.conf");
         
         // Externe Links in neuem Fenster �ffnen?
         if ($CMS_CONF->get("targetblank_link") == "true") {
@@ -83,6 +82,7 @@ class Syntax {
         global $GALLERY_CONF;
 global $LAYOUT_DIR_PHP;
 #global $TEMPLATE_FILE;
+        global $USER_SYNTAX;
 
         if ($firstrecursion) {
             $content = $this->prepareContent($content);
@@ -392,7 +392,7 @@ global $LAYOUT_DIR_PHP;
                 if (count($valuearray) == 1) {
                     // Bilddatei existiert
                     if (file_exists("./$CONTENT_DIR_REL/$cat/$CONTENT_FILES_DIR/$value")) {
-                        $imgsrc = $specialchars->replaceSpecialChars("$CONTENT_DIR_REL/$cat/$CONTENT_FILES_DIR/$value",true);
+                        $imgsrc = $specialchars->replaceSpecialChars($URL_BASE."$CONTENT_DIR_REL/$cat/$CONTENT_FILES_DIR/$value",true);
                     }
                     // externes Bild
                     elseif (preg_match($this->LINK_REGEX, $value)) {
@@ -410,7 +410,7 @@ global $LAYOUT_DIR_PHP;
                     // Kategorie existiert
                     if ((!$requestedcat=="") && (file_exists("./$CONTENT_DIR_REL/$requestedcat"))) {
                         // Bilddatei existiert
-                        if (file_exists("./$CONTENT_DIR_REL/$requestedcat/$CONTENT_FILES_DIR/".$valuearray[1])) {
+                        if (file_exists($URL_BASE."$CONTENT_DIR_REL/$requestedcat/$CONTENT_FILES_DIR/".$valuearray[1])) {
                             $imgsrc = $specialchars->replaceSpecialChars("$CONTENT_DIR_REL/$requestedcat/$CONTENT_FILES_DIR/$valuearray[1]",true);
                         }
                         // Bilddatei existiert nicht
@@ -700,9 +700,9 @@ verwendet werden sollte!
                 }
 
                 // das Attribut ist als benutzerdefiniertes Syntaxelement bekannt
-                if ($this->USER_SYNTAX->keyExists($attribute)) {
+                if ($USER_SYNTAX->keyExists($attribute)) {
                     // Platzhalter {VALUE} im definierten Syntaxelement ersetzen
-                    $replacetext = str_replace("{VALUE}", $value, replacePlaceholders($this->USER_SYNTAX->get($attribute),"", ""));
+                    $replacetext = str_replace("{VALUE}", $value, replacePlaceholders($USER_SYNTAX->get($attribute),"", ""));
                     /* 
                     //Einfach Kommentarzeichen entfernen, wenn folgende Funktionalit�t gew�nscht ist:
                     // Platzhalter {DESCRIPTION} wird durch $value ersetzt, wenn $description selbst leer ist
