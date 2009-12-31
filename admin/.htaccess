@@ -1,5 +1,5 @@
-Options -Indexes
 <IfModule mod_rewrite.c>
 RewriteEngine On
-RewriteRule .php$ index.php?link=rewrite [L]
+RewriteRule login.php$ login.php [QSA,L]
+RewriteRule index.php$ index.php?link=rewrite [QSA,L]
 </IfModule>
