@@ -493,7 +493,6 @@ $CHARSET = 'UTF-8';
         global $EXT_PAGE;
         global $EXT_LINK;
 
-#echo "$dir<br>\n";
         $currentdir = opendir($dir);
         $i=0;
         $files = "";
@@ -724,10 +723,6 @@ $CHARSET = 'UTF-8';
         }
         }
         closedir($currentdir);
-/*                        $url = "index.php?cat=$currentcategory&amp;page=".substr($matchingpage, 0, strlen($matchingpage) - 4);
-                        if($CMS_CONF->get("modrewrite") == "true") {
-                            $url = $URL_BASE.$currentcategory."/".substr($matchingpage, 0, strlen($matchingpage) - 4).".html";
-                        }*/
         
         $lastchangedpage = $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true);
         $linktolastchangedpage = "<a href=\"index.php?cat=".$latestchanged['cat']."&amp;page=".substr($latestchanged['file'], 0, strlen($latestchanged['file'])-4)."\"".getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true), $specialchars->rebuildSpecialChars(substr($latestchanged['cat'], 3, strlen($latestchanged['cat'])-3), true, true)))." id=\"lastchangelink\">".$lastchangedpage."</a>";
@@ -982,12 +977,6 @@ $CHARSET = 'UTF-8';
             // ...dann setze das Treffer-Flag
             $ismatch = true;
         }
-
-/*        echo "pageContainsWord($cat, $page, $query, $firstrecursion)";
-        if ($ismatch)
-            echo "<b> -> TREFFER!</b>";
-        echo "<br>";
-*/        
         // Ergebnis zurückgeben
         return $ismatch;
     }
@@ -1477,19 +1466,6 @@ $CHARSET = 'UTF-8';
         $tmp = array_keys($confarray);
         $randnum = rand(0, count($confarray)-1);
         return array($tmp[$randnum],$confarray[$tmp[$randnum]]);
-    }
-
-// ------------------------------------------------------------------------------
-// zeigt Galerie anstelle eines Seiteninhalts an
-// ------------------------------------------------------------------------------    
-    function getEmbeddedGallery() { 
-        global $language;
-        
-        include("gallery.php");
-        $gallery->setLinkPrefix("index.php?action=gallery&amp;");        
-        return array($gallery->renderGallery(),
-                     $language->getLanguageValue1("message_gallery_1", $gallery->getGalleryName()),
-                     $gallery->getCurrentIndex());
     }
 // ------------------------------------------------------------------------------
 // Hilfsfunktion: Bestimmt die Inputnamen neu
