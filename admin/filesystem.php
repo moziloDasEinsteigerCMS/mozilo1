@@ -273,7 +273,6 @@ function updateReferencesInAllContentPages($oldCategory, $oldPage, $newCategory,
                     // Ersetzung nur vornehmen, wenn überhaupt Referenzen auftauchen
                     if ($result[0]) {
                         // Inhaltsseite speichern
-/*                        $error['updateReferences'] = saveContentToPage($result[1], $CONTENT_DIR_REL."/".$currentcategory."/".$currentpage);*/
                         $error_tmp = saveContentToPage($result[1], $CONTENT_DIR_REL."/".$currentcategory."/".$currentpage);
                         if(!empty($error_tmp)) {
                             if(is_array($error)) {
@@ -326,7 +325,7 @@ function updateReferencesInText($currentPagesContent, $currentPagesCategory, $mo
     $allowed_attributes = array("seite","kategorie","datei","bild","bildlinks","bildrechts","include");
 
     // Für jeden Treffer...
-$debug = true;
+$debug = false;
     foreach ($matches[0] as $match) {
 if($debug) echo "alle matches = $match -----------<br>\n";
         # ein Hack weil dieses preg_match_all nicht mit ^, [ und ] im attribut umgehen kann
@@ -410,7 +409,8 @@ if($debug) echo "<br>\n";
     // Konvertierten Seiteninhalt zurückgeben
     return array($changesmade, $currentPagesContent);
 }
-/**/
+
+# gibt die Rechte zurück ist $dir true wird das x bit gesetzt
 function getChmod($dir = false) {
     global $ADMIN_CONF;
     $mode = $ADMIN_CONF->get("chmodnewfilesatts");
@@ -427,6 +427,7 @@ function getChmod($dir = false) {
     return false;
 }
 
+# ändert die dateirechte
 function changeChmod($file) {
     $error_new = NULL;
     $dir = NULL;
@@ -452,6 +453,7 @@ function changeChmod($file) {
     return $error_new;
 }
 
+# änder die dateirechte Recursiv wenn kein Parameter über geben wird das array $ordner benutzt
 function useChmod($dir = false, $error = NULL) {
     global $error;
 
@@ -636,7 +638,7 @@ function makeDefaultConf($conf_datei) {
 
     $passwords = array('# Kategorie/Inhaltsseite' => 'password');
 
-
+    # ist eine *.conf datei angegeben wird das jeweilige array ohne expert und nur der inhalt der subarrays zurückgegeben
     if(strpos($conf_datei,".conf") > 0) {
         $name = substr(basename($conf_datei),0,-(strlen(".conf")));
         # beim erzeugen duerfen sub arrays nicht mit rein
@@ -652,6 +654,7 @@ function makeDefaultConf($conf_datei) {
             }
         }
         return $return_array;
+    # ist es keine *.conf einfach das ganze array zurück
     } else {
         return $$conf_datei;
     }

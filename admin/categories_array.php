@@ -19,7 +19,7 @@ $error_color = array('check_name' => '#CCFFCC',
                 'check_doubles_name_page' => '#33FFFF',
                 'check_doubles_digit_same_cat' => '#FFCCCC');
 
-
+# beim ersten aufruf von cat oder page mussen einige variable vorbereitet werden
 function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
     global $EXT_LINK;
     global $error_color;
@@ -31,7 +31,7 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
     if(count($cat_array) > $max_cat_page) {
         $post['error_messages']['check_too_many_categories'][] = NULL;
     }
-
+    # wenn es nur cat ist wird $cat_array = cat $page_array = $cat_array
     if($pages === false) {
         sort($cat_array);
         # Wichtig wegen new Kategorie
@@ -72,7 +72,6 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
             }
             if(count($page_array) > $max_cat_page) {
                 $post['error_messages']['check_too_many_pages']['color'] = $error_color['check_too_many_pages'];
-                #$post['error_messages']['check_too_many_pages'][] = $cat;
                 $post[$cat]['error_html']['cat_name'] = 'style="background-color:'.$error_color['check_too_many_pages'].';" ';
             }
             sort($page_array);
@@ -154,14 +153,12 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
                         $post[$cat]['error_html']['name'][$pos] = 'style="background-color:'.$error_color['check_doubles_name_page'].';" ';
                         $post[$cat]['error_html']['display_cat'] = 'style="display:block;" ';
                         $post['error_messages']['check_doubles_name_page']['color'] = $error_color['check_doubles_name_page'];
-                        #$post['error_messages']['check_doubles_name_page'][$pos] = substr($cat,3)." -&gt; ".$file;
                     } else {
                         foreach(array_keys($test_doubles_name[$cat],$file_name) as $pos_doubles) {
                             $post[$cat]['error_html']['name'][$pos_doubles] = 'style="background-color:'.$error_color['check_doubles_name_cat'].';" ';
                         }
                         $post[$cat]['error_html']['name'][$pos] = 'style="background-color:'.$error_color['check_doubles_name_cat'].';" ';
                         $post['error_messages']['check_doubles_name_cat']['color'] = $error_color['check_doubles_name_cat'];
-                        #$post['error_messages']['check_doubles_name_cat'][$pos] = $file;
                     }
                 }
                 $test_doubles_name[$cat][$pos] = $file_name;
@@ -171,6 +168,7 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
     return $post;
 }
 
+# die daten die von cat oder page übermitelt wurden überprüfen
 function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
     global $EXT_LINK;
     global $specialchars;
@@ -391,9 +389,7 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
             # ist dafür zuständig wenn Inhaltseite in andere Kategorie verschoben wird
             if(isset($_POST['categories'][$cat]['new_cat'][$pos])) {
                 $post[$cat]['new_cat'][$pos] = $_POST['categories'][$cat]['new_cat'][$pos];
-#copy in gleicher cat geht nicht
                 if($post[$cat]['new_cat'][$pos] != $cat or !empty($post[$cat]['copy'][$pos])) {
-#                if($post[$cat]['new_cat'][$pos] != $cat) {
                     $post['move_copy']['source']['cat'][$pos] = $cat;
                     $post['move_copy']['source']['position'][$pos] = $post[$cat]['position'][$pos];
                     $post['move_copy']['source']['name'][$pos] = $post[$cat]['name'][$pos];
@@ -427,10 +423,9 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
                     }
                 }
             }
-            # bei meinen provider wird die Verzeichnis tiefe mit gerechnet bei ftp??????????
-            # $max_zeichen = 255 - strlen(getcwd()) + 1;
+            # maximale länge der ordner oder dateinamen
             $max_zeichen = 255;
-$max_zeichen = 355;
+            # prüfen der cat page auf max_zeichen
             if((3 + $name_len + $target_len + $url_len + $ext_len) > $max_zeichen) {
                 if(!empty($post[$cat]['new_url'][$pos])) {
                     $post[$cat]['error_html']['new_url'][$pos] = 'style="background-color:'.$error_color['check_name_too_long'].';" ';
@@ -443,12 +438,12 @@ $max_zeichen = 355;
             }
             unset($name_len,$target_len,$url_len,$ext_len);
 
-# das muss noch auf erlaubte Zeichen geprüft werden
             if($cat != "cat") {
                 $kategorie = $cat."/";
             } else {
                 $kategorie = NULL;
             }
+            # existiert die cat oder page überhaupt
             if(!isset($post[$cat]['url'][$pos]) and isset($post[$cat]['position'][$pos]) and isset($post[$cat]['name'][$pos])) {
                 $file_test = $CONTENT_DIR_REL.$kategorie.$post[$cat]['position'][$pos]."_".$post[$cat]['name'][$pos].$post[$cat]['ext'][$pos];
                 If(is_file($file_test)) {
@@ -488,6 +483,7 @@ $max_zeichen = 355;
         }
     } # foreach cat end
 
+    # prüfen wenn page in andere cat cp oder mv wird obs die da schonn gibt
     if(isset($move_copy_test)) {
         foreach($move_copy_test['new_cat'] as $move_copy_pos => $tmp) {
             $newname = $move_copy_test['name'][$move_copy_pos];
@@ -509,18 +505,12 @@ $max_zeichen = 355;
                 $tmp_pos_name = array_keys($post[$cat]['name'], $newname);
                 $tmp_pos_new_name = array_keys($post[$cat]['new_name'], $newname);
                 # Neu Name gipts schonn auser wenn der Name auch Umbenant wird
-#copy in gleicher cat geht nicht
                 if(count($tmp_pos_name) > 0 and $cat != $org_cat) {
-#                if(count($tmp_pos_name) > 0) {
                     $post[$cat]['error_html']['name'][$tmp_pos_name[0]] = 'style="background-color:'.$error_color['check_name_exist'].';" ';
-# alt                   $post[$cat]['error']['category_error_exist'][$tmp_pos_name[0]] = true;
                     $post['error_messages']['check_name_exist']['color'] = $error_color['check_name_exist'];
                     $post['error_messages']['check_name_exist'][] = NULL;
                 }
-#copy in gleicher cat geht nicht
                 if(count($tmp_pos_new_name) > 0 and $cat != $org_cat) {
-#                if(count($tmp_pos_new_name) > 0) {
-# alt                   $post[$cat]['error']['category_error_exist'][$tmp_pos_new_name[0]] = true;
                     $post['error_messages']['check_name_exist']['color'] = $error_color['check_name_exist'];
                     $post['error_messages']['check_name_exist'][] = NULL;
                     $post[$cat]['error_html']['new_name'][$tmp_pos_new_name[0]] = 'style="background-color:'.$error_color['check_name_exist'].';" ';
@@ -531,7 +521,6 @@ $max_zeichen = 355;
                 } else {
                     $post[$org_cat]['error_html']['new_name'][$org_pos] = 'style="background-color:'.$error_color['check_name_exist'].';" ';
                 }
-#copy in gleicher cat geht nicht
                 if($cat == $org_cat) {
                         $post['error_messages']['check_copy_same_cat']['color'] = $error_color['check_copy_same_cat'];
                         $post['error_messages']['check_copy_same_cat'][] = NULL;
@@ -546,15 +535,10 @@ $max_zeichen = 355;
             }
         }
     }
-/*
-echo "<pre>";
-echo "<br>\n post['move_copy'] --------------------<br>\n";
-print_r($post['move_copy']);
-echo "</pre><br>\n";*/
     return $post;
 }
 
-
+# hilfs function um messges text der keine lehrzeichen hat ab $max_string_len umzubrechen
 function messagesOutLen($string) {
     $max_string_len = 105;
     $new_string = NULL;
@@ -575,7 +559,7 @@ function messagesOutLen($string) {
     return $new_string;
 }
 
-
+# messages und error_messages erzeugen
 function categoriesMessages($post) {
 
     function Messages($post, $message_art, $message_error) {
@@ -688,7 +672,6 @@ function position_move($org_position,$new_position,$new_move_cat_page = false) {
             # wenn der Platz im $array_new_posi frei einfach rein ansonsten eine freie suchen
             if(empty($array_new_posi[sprintf("%1d",$new_cat_page)])) {
                 $array_new_posi[sprintf("%1d",$new_cat_page)] = $new_cat_page;
-#                $new_move_cat_page_newposition[$new_cat_page] = $new_cat_page;
             } else {
                 # freie Position suchen
                 # Richtung = $posi bis $max_cat_page
@@ -734,9 +717,6 @@ function position_move($org_position,$new_position,$new_move_cat_page = false) {
     # ab hier die Org_Position in $array_new_posi einbauen
     for($posi = 0; $posi < $max_cat_page; $posi++) {
         # nichts mehr zu tun raus
-#        if($change_count <= 0) {
-#            break;
-#        }
         if(isset($back) and $back == $posi) {
             break;
         }
@@ -750,7 +730,6 @@ function position_move($org_position,$new_position,$new_move_cat_page = false) {
             for($new_posi = $posi; $new_posi < $max_cat_page; $new_posi++) {
                 if(empty($array_new_posi[$new_posi])) {
                     $array_new_posi[$new_posi] = $array_org[$posi];
-#                    $change_count--;
                     break;
                 }
             }
@@ -759,9 +738,6 @@ function position_move($org_position,$new_position,$new_move_cat_page = false) {
     if(isset($back) and $back == $posi) {
         $merk_posi = $posi;
         for($posi = $max_cat_page - 1; $posi >= $merk_posi; $posi--) {
-#            if($change_count <= 0) {
-#                break;
-#            }
             if(isset($array_org[$posi]) and empty($array_new_posi[$posi])) {
                 continue;
             # hier wird umbenant
@@ -771,7 +747,6 @@ function position_move($org_position,$new_position,$new_move_cat_page = false) {
                 for($new_posi = $posi; $new_posi >= 0; $new_posi--) {
                     if(empty($array_new_posi[$new_posi])) {
                         $array_new_posi[$new_posi] = $array_org[$posi];
-#                        $change_count--;
                         break;
                     }
                 }
@@ -781,8 +756,6 @@ function position_move($org_position,$new_position,$new_move_cat_page = false) {
     # in $array_new_posi sind die Positionen so eingeortnet New_Position => Org_Position
     foreach($array_new_posi as $new_posi => $org_posi) {
         if(!empty($array_new_posi[$new_posi])) {
-#            if(sprintf("%02d",$new_posi) == $org_posi) {
-#            } else {
             if(sprintf("%02d",$new_posi) != $org_posi) {
                 # New_Position => Org_Position ändern nach Org_Position => New_Position und lehre entfernen
                 # Aufbau: Org Position mit null => Neue Position ohne null

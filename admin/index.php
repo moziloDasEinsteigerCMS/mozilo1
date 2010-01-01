@@ -25,28 +25,20 @@ if($debug != "ja")
 
  // Session Fixation durch Vergabe einer neuen Session-ID beim ersten Login verhindern
  if (!isset($_SESSION['PHPSESSID'])) {
- session_regenerate_id(true);
- $_SESSION['PHPSESSID'] = true;
+    session_regenerate_id(true);
+    $_SESSION['PHPSESSID'] = true;
  }
 
 if($debug == "ja") {
     ob_start();
-#echo getcwd()." = getcwd<br>\n";
-#echo $_SERVER['REQUEST_URI']." = REQUEST_URI<br>\n";
-#echo __FILE__." = file<br>\n";
     echo "SESSION -------------------\n";
     print_r($_SESSION);
     echo "POST -------------------\n";
     print_r($_POST);
     echo "FILES -------------------\n";
     print_r($_FILES);
-/**/    echo "REQUEST -------------------\n";
+    echo "REQUEST -------------------\n";
     print_r($_REQUEST);
-#    echo "GET -------------------\n";
-#    print_r($_GET);
-#    echo "SERVER -------------------\n";
-#    print_r($_SERVER);
-#    echo "</pre></div>";
     $debug_txt = ob_get_contents();
     ob_end_clean();
 }
@@ -170,16 +162,19 @@ $EXT_DRAFT     = ".tmp";
 $EXT_LINK     = ".lnk";
 
 $post = NULL;
+# hier das tabs array
 $array_tabs = array("home","category","page","files","gallery","config","admin","plugins");
 $action = 'home';
 foreach($array_tabs as $pos => $tab) {
+    # actives tab
     if(isset($_POST['action_'.$pos])) {
         $action = $tab;
         $post['makepara'] = "yes";
         break;
     }
+    # actives tab in dem grad gearbeitet wird
     if(isset($_POST['action_activ'])) {
-    $action_html = $specialchars->rebuildSpecialChars($_POST['action_activ'], false, true);
+        $action_html = $specialchars->rebuildSpecialChars($_POST['action_activ'], false, true);
         if($action_html == getLanguageValue($tab."_button")) {
             $action = $tab;
             break;
@@ -216,6 +211,7 @@ if(isset($_POST['action_data'])) {
     }
 }
 
+# POST umsetzen nach $post bei config und admin
 if($action == 'config' or $action == 'admin' ) {
     if(is_array($_POST) and count($_POST) > 0) {
         foreach($_POST as $key => $inhalt) {
@@ -404,12 +400,6 @@ function home($post) {
     global $MAILFUNCTIONS;
     
     $pagecontent = NULL;
-/*
-    if(isset($_GET['link']) and $_GET['link'] == 1) {
-        $post['error_messages']['home_error_mod_rewrite'][] = NULL;
-    } elseif(isset($_GET['link']) and $_GET['link'] == 2) {
-        $post['messages']['home_messages_mod_rewrite'][] = NULL;
-    }*/
     if(isset($_REQUEST['link']) and $_REQUEST['link'] == "rewrite") {
         $modrewrite = '<span style="color:#00ff00;font-weight:bold;">'.getLanguageValue("home_messages_mod_rewrite").'</span>';
     } else {
@@ -448,7 +438,6 @@ function home($post) {
         }
     }
 
-
     $pagecontent .= categoriesMessages($post);
 
     $pagecontent .= '<span class="titel">'.getLanguageValue("home_button").'</span>';
@@ -481,7 +470,6 @@ function home($post) {
     // Zeile "Installationspfad"
     ."<tr>"
     .'<td width="50%" class="td_cms_left">'.getLanguageValue("installpath_text")."</td>"
-#    .'<td class="config_row2">".dirname(getcwd()."..")."</td>"
     .'<td width="50%" class="td_cms_left">'.$path."</td>"
     ."</tr>"
     // Zeile "PHP-Version"
@@ -506,7 +494,6 @@ function home($post) {
     ."<tr>"
     .'<td width="50%" class="td_cms_left">'.getLanguageValue("home_text_mod_rewrite")."</td>"
     .'<td width="50%" class="td_cms_left">'.$modrewrite.'</td>'
-#    .'<td width="50%" class="td_cms_left">'.$modrewrite.'<a href="rewrite2.htm" style="color:#ff0000;font-weight:bold;">'.getLanguageValue("home_button_mod_rewrite").'</a></td>'
     ."</tr>"
     ."<tr>"
     .'<td width="100%" class="td_cms_titel" colspan="2"><b>'.getLanguageValue("home_titel_test_mail").'</b></td>'
@@ -751,8 +738,6 @@ function editCategory($post) {
 
     # Rename $orgname[$pos] -> $newname[$pos]
     if(isset($newname)) {
-        $mesages = NULL;
-        $error_mesages = NULL;
         foreach ($newname as $pos => $tmp) {
             @rename("$CONTENT_DIR_REL/".$orgname[$pos], "$CONTENT_DIR_REL/".$newname[$pos]);
             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
@@ -892,10 +877,8 @@ function page($post) {
              $post = copymoveSite($post);
         }
     }
-# das noch anpassen!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     $pagecontent .= '<input type="hidden" name="checkpara" value="yes">';
 
-# brauch ich das yes?????????????????????????????????????????????????????
     if(isset($post['makepara']) and $post['makepara'] == "yes") {
         $post['categories'] = makePostCatPageReturnVariable($CONTENT_DIR_REL,true);
         if(isset($post['categories']['error_messages'])) {
@@ -1312,7 +1295,6 @@ function copymoveSite($post) {
                 $last_error = @error_get_last();
                 if($last_error['line'] == $line_error) {
                     $post['error_messages']['php_error'][] = $last_error['message'];
-# was ist mit target??????????????????????????????????????????????
                     if(substr($rename_orgname[$cat][$z],3) != substr($rename_newname[$cat][$z],3)) {
                         $post['display'][$cat]['error_html']['display'][sprintf("%1d",substr($rename_orgname[$cat][$z],0,2))] = 'style="display:block;" '; # letzte cat ausklappen
                     }
@@ -1320,7 +1302,6 @@ function copymoveSite($post) {
                     $post['makepara'] = "no"; # kein makePostCatPageReturnVariable()
                 } elseif(!is_file($CONTENT_DIR_REL."/".$cat."/".$rename_newname[$cat][$z])) {
                     $post['error_messages']['page_error_rename'][] =  $cat."/".$rename_orgname[$cat][$z]." <b>></b> ".$cat."/".$rename_newname[$cat][$z];
- # was ist mit target??????????????????????????????????????????????
                    if(substr($rename_orgname[$cat][$z],3) != substr($rename_newname[$cat][$z],3)) {
                         $post['display'][$cat]['error_html']['display'][sprintf("%1d",substr($rename_orgname[$cat][$z],0,2))] = 'style="display:block;" '; # letzte cat ausklappen
                     }
@@ -1389,13 +1370,11 @@ function copymoveSite($post) {
                 # Fehler meldung
                 if(isset($error)) {
                     $post['makepara'] = "yes"; # kein makePostCatPageReturnVariable()
-#                    $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
                     $post['display'][dirname($move_orgname[$cat][$z])]['error_html']['display_cat'] = 'style="display:block;" ';
                     unset($error);
                 } else {
                 # Erfogs meldungen
                     $post['messages']['page_message_copy_move'][] = $move_orgname[$cat][$z]." <b>></b> ".$move_newname[$cat][$z];
-#                    $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
                     $post['display'][dirname($move_orgname[$cat][$z])]['error_html']['display_cat'] = 'style="display:block;" ';
                     $post['makepara'] = "yes"; # makePostCatPageReturnVariable()
                 }
@@ -2277,7 +2256,6 @@ function files($post) {
     $pagecontent .= $tooltip_files_help;
     $pagecontent .= "<p>".getLanguageValue("files_text")."</p>";
 
-# im admin prüfen wenn conf nicht von hand ????????????????????????????????????????????
     $maxnumberoffiles = $ADMIN_CONF->get("maxnumberofuploadfiles");
     if (!is_numeric($maxnumberoffiles) || ($maxnumberoffiles < 1)) {
         $maxnumberoffiles = 5;
@@ -2989,10 +2967,6 @@ function config($post) {
     if(!isset($CMS_CONF->properties['error']) or !isset($CONTACT_CONF->properties['error'])) {
         $pagecontent .= '<tr><td class="td_cms_submit" colspan="2">';
         $pagecontent .= '<input type="submit" name="apply" class="input_submit" value="'.getLanguageValue("config_submit").'" />';
-/*
-        if($ADMIN_CONF->get('showexpert') == "true") {
-            $pagecontent .= '&nbsp;&nbsp;&nbsp;'.getLanguageValue("config_input_default").buildCheckBox("default", "false").'</td></tr>';
-        }*/
     }
 
     $pagecontent .= "</table>";
@@ -3105,7 +3079,6 @@ function admin($post) {
                 }
                 if($type == 'digit') {
                     if($syntax_name == 'lastbackup') {
-        # das muss noch!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         continue;
                     }
                     if(isset($post[$syntax_name])) {
@@ -3330,7 +3303,6 @@ function admin($post) {
             $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("admin_text_imagesmax");
             $pagecontent .= "</td>";
             $pagecontent .= '<td class="td_cms_left">';
-#            $pagecontent .= buildCheckBox("resizeimages", $ADMIN_CONF->get("resizeimages") == "true") . getLanguageValue("admin_input_imagesmax").'<br>';
             $pagecontent .= '<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="maximagewidth" value="'.$ADMIN_CONF->get("maximagewidth").'"'.$error_color['maximagewidth'].' />&nbsp;x&nbsp;<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="maximageheight" value="'.$ADMIN_CONF->get("maximageheight").'"'.$error_color['maximageheight'].' />&nbsp;' . getLanguageValue("pixels") . '</td>';
             $pagecontent .= "</tr>";
         }
@@ -3355,10 +3327,6 @@ function admin($post) {
         if($LOGINCONF->get("initialsetup") == "true") {
             $pagecontent .= '&nbsp;&nbsp;&nbsp;<input type="submit" name="default_pw" class="input_submit" value="'.getLanguageValue("admin_submit_default_pw").'">';
         }
-/*
-        if($ADMIN_CONF->get('showexpert') == "true") {
-            $pagecontent .= '&nbsp;&nbsp;&nbsp;'.getLanguageValue("admin_input_default").buildCheckBox("default", "false");
-        }*/
         $pagecontent .= '</td></tr>';
     }
     $pagecontent .= "</table>";
@@ -3957,7 +3925,7 @@ function returnOverviewSelectbox($type, $currentcat) {
         case 1:
             $categories = getDirContentAsArray($CONTENT_DIR_REL, false);
             foreach ($categories as $catdir) {
-if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
+                if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
                 if (isValidDirOrFile($catdir)) {
                     $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
                     array_push($elements, array($cleancatname, $cleancatname));
@@ -4129,12 +4097,10 @@ function uploadFile($uploadfile, $destination, $forceoverwrite,$MAX_IMG_WIDTH,$M
         }
         // alles okay, hochladen!
         else {
-#            $savepath = $dir_real.'/'.$cat.'/'.$die_dateien.$uploadfile_name;
             move_uploaded_file($uploadfile['tmp_name'], $destination.$uploadfile_name);
             // chmod, wenn so eingestellt
             useChmod($destination.$uploadfile_name);#maximagewidth maximageheight
             if(!empty($MAX_IMG_WIDTH) or !empty($MAX_IMG_HEIGHT)) {
-#            if($ADMIN_CONF->get("resizeimages") == "true" or $gallery !== false) {
                 // Bilddaten feststellen
                 $size = getimagesize($destination.$uploadfile_name);
                 // Mimetype herausfinden
@@ -4142,9 +4108,7 @@ function uploadFile($uploadfile, $destination, $forceoverwrite,$MAX_IMG_WIDTH,$M
                 # nur wenns ein bild ist
                 if($image_typ == "gif" or $image_typ == "png" or $image_typ == "jpeg") {
                     require_once("../Image.php");
-#                    if($size[0] > $MAX_IMG_WIDTH or $size[1] > $MAX_IMG_HEIGHT) {
-                        scaleImage($uploadfile_name, $destination, $destination, $MAX_IMG_WIDTH, $MAX_IMG_HEIGHT);
-#                    }
+                    scaleImage($uploadfile_name, $destination, $destination, $MAX_IMG_WIDTH, $MAX_IMG_HEIGHT);
                 }
             }
         return;
