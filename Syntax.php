@@ -269,7 +269,7 @@ global $LAYOUT_DIR_PHP;
                         $link_text = $value;
                     }
                     if (file_exists("./$CONTENT_DIR_REL/$cat/$CONTENT_FILES_DIR/$datei")) {
-                        $content = str_replace ($match, "<a class=\"file\" href=\"download.php?cat=$cat&amp;file=$datei\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_file_1", $value))."".$this->TARGETBLANK_DOWNLOAD.">$link_text</a>", $content);
+                        $content = str_replace ($match, "<a class=\"file\" href=\"".$URL_BASE."download.php?cat=$cat&amp;file=$datei\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_file_1", $value))."".$this->TARGETBLANK_DOWNLOAD.">$link_text</a>", $content);
                     }
                     else {
                         $content = str_replace ($match, $this->createDeadlink($value, $language->getLanguageValue1("tooltip_link_file_error_1", $value)), $content);
@@ -285,7 +285,7 @@ global $LAYOUT_DIR_PHP;
                         $link_text = $specialchars->rebuildSpecialChars($datei,true,true);
                     if ((!$datei_cat == "") && (file_exists("./$CONTENT_DIR_REL/$datei_cat"))) {
                         if (file_exists("./$CONTENT_DIR_REL/$datei_cat/$CONTENT_FILES_DIR/$datei")) {
-                            $content = str_replace ($match, "<a class=\"file\" href=\"download.php?cat=$datei_cat&amp;file=$datei\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_file_2", $html_datei, $html_datei_cat)).$this->TARGETBLANK_DOWNLOAD.">".$link_text."</a>", $content);
+                            $content = str_replace ($match, "<a class=\"file\" href=\"".$URL_BASE."download.php?cat=$datei_cat&amp;file=$datei\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_file_2", $html_datei, $html_datei_cat)).$this->TARGETBLANK_DOWNLOAD.">".$link_text."</a>", $content);
                         }
                         else {
                             $content = str_replace ($match, $this->createDeadlink($html_datei, $language->getLanguageValue2("tooltip_link_file_error_2", $html_datei, $html_datei_cat)), $content);
