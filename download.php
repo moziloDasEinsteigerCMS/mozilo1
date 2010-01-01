@@ -10,10 +10,10 @@
 
     require_once("Properties.php");
     
-    // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
+    // Initial: Fehlerausgabe unterdrÃ¼cken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
     @ini_set("display_errors", 0);
 
-    $ERRORMESSAGE = "Fehlerhafter Parameter übergeben.";    
+    $ERRORMESSAGE = "Fehlerhafter Parameter Ãœbergeben.";    
     $DOWNLOADS = new Properties("conf/downloads.conf");
 
     $CAT     = preg_replace('/(\/|\\\)/', "", rawurlencode($_REQUEST['cat']));
@@ -25,7 +25,7 @@
         die($ERRORMESSAGE);
     }
         
-    // Alles okay, Downloadzähler inkrementieren und Datei ausliefern
+    // Alles okay, DownloadzÃ¤hler inkrementieren und Datei ausliefern
     else {
         $DOWNLOADS->set($CAT.":".$FILE, $DOWNLOADS->get($CAT.":".$FILE) + 1);
         download($PATH);
@@ -45,7 +45,7 @@
         $file_extension = strtolower(substr(strrchr($filename,"."),1));
         
         
-        // abhängig von der Extension; Content-Type setzen
+        // abhÃ¤ngig von der Extension; Content-Type setzen
         switch( $file_extension ) {
               case "pdf": $ctype="application/pdf"; break;
               case "exe": $ctype="application/octet-stream"; break;
@@ -81,12 +81,12 @@
         header("Cache-Control: public"); 
         header("Content-Description: File Transfer");
         
-        // oben ausgewählter Content-Type
+        // oben ausgewÃ¤hlter Content-Type
         header("Content-Type: $ctype");
         
         // Datei direkt im Browser anzeigen (inline); Dateinamen setzen
         $header="Content-Disposition: inline; filename=".$filename.";";
-        // Mit "Content-Disposition: attachment" wird der Download über ein Downloadfenster erzwungen:
+        // Mit "Content-Disposition: attachment" wird der Download Ã¼ber ein Downloadfenster erzwungen:
         /*    $header="Content-Disposition: attachment; filename=".$filename.";";*/
         header($header );
         header("Content-Transfer-Encoding: binary");
