@@ -38,14 +38,14 @@ class Thumbnail {
     // ------------------------------------------------------------------------------
     // Thumbnail anlegen
     // ------------------------------------------------------------------------------
-    function scaleImage($pic, $dir_origin, $dir_target, $maxWidth, $maxHeight) {
+    function scaleImage($pic, $dir_origin, $dir_target, $maxWidth, $maxHeight, $make_thumbs = false) {
         # nichts machen $maxWidth und $maxHeight sind lehr
         if(empty($maxHeight) and empty($maxWidth)) return;
         if(!extension_loaded("gd")) return;
         // --------------------------------------------------------------------
         // Bildgröße und MIME Type holen
         // --------------------------------------------------------------------
-        $size    = GetImageSize($dir_origin.$pic);
+        $size    = @GetImageSize($dir_origin.$pic);
         $mime    = $size['mime'];
         $width  = $size[0];
         $height = $size[1];
@@ -72,7 +72,8 @@ class Thumbnail {
         // Handelt es sich bei der Datei auch wirklich um ein Bild
         if ( substr($mime, 0, 6) != 'image/' )
         {
-            die ("Error: Bei der Datei handelt es nicht um ein Bild: ". $dir_origin . $pic ." => MIMETYPE: ". $mime);
+            return 0;
+            #die ("Error: Bei der Datei handelt es nicht um ein Bild: ". $dir_origin . $pic ." => MIMETYPE: ". $mime);
         }
 
 
@@ -96,7 +97,8 @@ class Thumbnail {
         }
         # Bild grösse <= Neue grösse also nicht zu tun
         if($width <= $tnWidth and $height <= $tnHeight) {
-            return;
+            # Vorschaubilder neu erzwingen $make_thumbs = true
+            if($make_thumbs === false) return;
         }
 
         // --------------------------------------------------------------------
@@ -135,7 +137,7 @@ class Thumbnail {
 
             // alles andere wird einfach copiert (Sollte noch verbessert werden!)
             default:
-                copy($dir_origin.$pic, $dir_target.$pic);
+#                copy($dir_origin.$pic, $dir_target.$pic);
                 return;
             break;
         }
