@@ -403,8 +403,8 @@ global $LAYOUT_DIR_PHP;
                     // Kategorie existiert
                     if ((!$requestedcat=="") && (file_exists("./$CONTENT_DIR_REL/$requestedcat"))) {
                         // Bilddatei existiert
-                        if (file_exists($URL_BASE."$CONTENT_DIR_REL/$requestedcat/$CONTENT_FILES_DIR/".$valuearray[1])) {
-                            $imgsrc = $specialchars->replaceSpecialChars("$CONTENT_DIR_REL/$requestedcat/$CONTENT_FILES_DIR/$valuearray[1]",true);
+                        if (file_exists("$CONTENT_DIR_REL/$requestedcat/$CONTENT_FILES_DIR/".$valuearray[1])) {
+                            $imgsrc = $specialchars->replaceSpecialChars($URL_BASE."$CONTENT_DIR_REL/$requestedcat/$CONTENT_FILES_DIR/$valuearray[1]",true);
                         }
                         // Bilddatei existiert nicht
                         else {
@@ -436,7 +436,7 @@ global $LAYOUT_DIR_PHP;
                     if ($subtitle == "") {
                         // normales Bild: ohne <span> rundrum
                         if ($attribute == "bild") {
-                            $content = str_replace ($match, "<img src=\"$imgsrc\" alt=\"".$language->getLanguageValue1("alttext_image_1", $alt)."\" />", $content);
+                            $content = str_replace ($match, "<img src=\"$imgsrc\" alt=\"".$language->getLanguageValue1("alttext_image_1", $alt)."\" class=\"$cssclass\" />", $content);
                         }
                         else {
                             $content = str_replace ($match, "<span class=\"$cssclass\"><img src=\"$imgsrc\" alt=\"".$language->getLanguageValue1("alttext_image_1", $alt)."\" class=\"$cssclass\" /></span>", $content);
