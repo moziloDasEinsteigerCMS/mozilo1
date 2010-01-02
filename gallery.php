@@ -421,8 +421,8 @@ class Gallery {
 // Alle Galerien, Rückgabe als Array
 // ------------------------------------------------------------------------------
 function getGalsAsArray($dir,$flashxmltime) {
-    $galarray = array();
     $currentdir = opendir($dir);
+    $galarray = array();
     // Alle Dateien des übergebenen Verzeichnisses einlesen...
     while (false !== ($file = readdir($currentdir))) {
         if(isValidDirOrFile($file)) {
@@ -431,11 +431,32 @@ function getGalsAsArray($dir,$flashxmltime) {
                 $if_new = "true";
             }
             // ...wenn alles passt, ans Bilder-Array anhängen
-            $galarray[$file] = $if_new;
+            # ist erstes zeichen eine zahl
+            if(ctype_digit(substr($file,0,1))) {
+                $galarray_digit[$file] = $if_new;
+            # ist erstes zeichen keine zahl
+            } else {
+                $galarray_text[$file] = $if_new;
+            }
         }
     }
     closedir($currentdir);
-    ksort($galarray);
+    # die mit einer zahl anfangen rückwerts sortieren
+    krsort($galarray_digit);
+    # die nicht mit einer zahl anfangen normal sortieren
+    ksort($galarray_text);
+    # zuerst die mit einer zahl beginnen ins array schreiben
+    if(isset($galarray_digit)) {
+        foreach($galarray_digit as $dir => $if_new) {
+            $galarray[$dir] = $if_new;
+        }
+    }
+    # dann die nicht mit einer zahl beginnen ins array schreiben
+    if(isset($galarray_text)) {
+        foreach($galarray_text as $dir => $if_new) {
+            $galarray[$dir] = $if_new;
+        }
+    }
     return $galarray;
 }
 
