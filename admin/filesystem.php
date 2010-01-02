@@ -618,11 +618,11 @@ function makeDefaultConf($conf_datei) {
                     'text' => array(
                         'target' => '_blank'),
                     'expert' => array(
-                        'usedfgallery' => 'false',
-                        'usethumbs' => 'true',
-                        'maxthumbheight' => '100',
-                        'maxthumbwidth' => '100',
-                        'gallerypicsperrow' => '4')
+                        'usedfgallery',
+                        'usethumbs',
+                        'maxthumbheight',
+                        'maxthumbwidth',
+                        'gallerypicsperrow')
                     );
 
     $aufgaben = array('3 + 7' => '10',
