@@ -1,0 +1,20 @@
+﻿Witaj w moziloCMS - łatwym, wygodnym i darmowym systemie zarządzania treścią (CMS), 
+który działa bez SQL. 
+ 
+Dziękujemy, ze zdecydowałeś się na moziloCMS! 
+ 
+UWAGA: w pliku "instalacja.txt" w gł. katalogu znajdują się podstawowe informacje 
+dotyczące instalacji CMS-u w języku polskim.
+ 
+O tym, jak działa system zarządzania treścią moziloCMS, 
+jak się go stosuje i instaluje oraz jak się w nim pracuje, przeczytać można więcej na stronie: 
+http://cms.mozilo.de (obecnie tylko w jęz. niemieckim).  
+
+moziloCMS podlega warunkom General Public License (GPL). 
+Oznacza to, iż może być dowolnie stosowany, zmieniany i 
+rozpowszechniany, podlega jednak nawet w zmienionych wersjach  warunkom GPL. 
+Warunki GPL przeczytać można w całośći w pliku gpl.txt znajdującym się 
+w głównym katalogu moziloCMS.
+ 
+Miłej zabawy i wielu sukcesów z moziloCMS! 
+Życzy zespół mozilo. 
