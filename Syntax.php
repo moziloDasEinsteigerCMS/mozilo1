@@ -333,7 +333,11 @@ global $LAYOUT_DIR_PHP;
                             }
                         }
                         closedir($handle);
-                        $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE."index.php.html?gal=$cleanedvalue\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"".$GALLERY_CONF->get("target")."\">$link_text</a>", $content);
+                        $modrewrite_dumy = NULL;
+                        if($CMS_CONF->get("modrewrite") == "true") {
+                            $modrewrite_dumy = ".html";
+                        }
+                        $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE."index.php$modrewrite_dumy?gal=$cleanedvalue\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"".$GALLERY_CONF->get("target")."\">$link_text</a>", $content);
                     }
                 }
                 // Galerie nicht vorhanden
