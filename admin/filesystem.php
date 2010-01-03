@@ -509,7 +509,7 @@ function useChmod($dir = false, $error = NULL) {
 function makeDefaultConf($conf_datei) {
     $basic = array(
                     'text' => array(
-                        'adminmail' => 'admin%40mozilo.cms',
+                        'adminmail' => '',
                         'language' => 'deDE',
                         'noupload' => 'php,php3,php4,php5'),
                     'digit' => array(
@@ -522,7 +522,7 @@ function makeDefaultConf($conf_datei) {
                         'textareaheight' => '270'),
                     'checkbox' => array(
                         'overwriteuploadfiles' => 'false',
-                        'sendadminmail' => 'true',
+                        'sendadminmail' => 'false',
                         'showTooltips' => 'true',
                         'usebigactionicons' => 'false',
                         'showexpert' => 'false'),
@@ -549,7 +549,7 @@ function makeDefaultConf($conf_datei) {
                     'select' => array(
                         'cmslanguage' => 'Deutsch',
                         'cmslayout' => 'moziloCMS%202009',
-                        'defaultcat' => '',
+                        'defaultcat' => '10_Willkommen',
                         'menu2' => 'no_menu2',
                         'titlebarformat' => '%7BWEBSITE%7D'),
                     'checkbox' => array(
