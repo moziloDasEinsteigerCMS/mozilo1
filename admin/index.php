@@ -1607,9 +1607,6 @@ function gallery($post) {
                                 $post['error_messages']['php_error'][] = $last_error['message'];
                             } elseif(!is_file($GALLERIES_DIR_REL."/".$currentgalerien."/".$test_pic)) {
                                 $post['error_messages']['gallery_error_ftp_rename_pic'][] = $PREVIEW_DIR_NAME."/".$currentgalerien." - ".$test_pic;
-                            } else {
-#                        $post['messages']['gallery_message_ftp_rename_pic'][] =  $currentgalerien." - ".$test_pic;
-#                        $gallerypics[$currentgalerien][$pos] = $test_pic;
                             }
                         }
                         if($GALLERY_CONF->get("usethumbs") == "true" and !is_file($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic)) {
