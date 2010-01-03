@@ -690,7 +690,11 @@ $CHARSET = 'UTF-8';
         global $CHARSET;
         global $LAYOUT_DIR;
 
-        $form = "<form accept-charset=\"$CHARSET\" method=\"get\" action=\"index.php.html\" class=\"searchform\"><fieldset id=\"searchfieldset\">"
+        $modrewrite_dumy = NULL;
+        if($CMS_CONF->get("modrewrite") == "true") {
+            $modrewrite_dumy = ".html";
+        }
+        $form = "<form accept-charset=\"$CHARSET\" method=\"get\" action=\"index.php$modrewrite_dumy\" class=\"searchform\"><fieldset id=\"searchfieldset\">"
         ."<input type=\"hidden\" name=\"action\" value=\"search\" />"
         ."<input type=\"text\" name=\"query\" value=\"\" class=\"searchtextfield\" />"
         ."<input type=\"image\" name=\"action\" value=\"search\" src=\"".$LAYOUT_DIR."/grafiken/searchicon.gif\" alt=\"".$language->getLanguageValue0("message_search_0")."\" class=\"searchbutton\"".getTitleAttribute($language->getLanguageValue0("message_search_0"))." />"
@@ -852,7 +856,7 @@ $CHARSET = 'UTF-8';
                 }
 
                 $matchingpages = array();
-                $i = 0;
+#                $i = 0;
 
                 // Alle Inhaltsseiten durchsuchen
                 foreach ($contentarray as $currentcontent) {
@@ -868,8 +872,8 @@ $CHARSET = 'UTF-8';
                         if (pageContainsWord($currentcategory, $currentcontent, $query, true)) {
                             // wenn noch nicht im Treffer-Array: hinzufügen
                             if (!in_array($currentcontent, $matchingpages))
-                                $matchingpages[$i] = $currentcontent;
-                            $i++;
+                                $matchingpages[] = $currentcontent;
+#                            $i++;
                         }
                     }
                 }
@@ -880,15 +884,15 @@ $CHARSET = 'UTF-8';
                     $categoryname = catToName($currentcategory, false);
                     $searchresults .= "<h2>$categoryname</h2><ul>";
                     foreach ($matchingpages as $matchingpage) {
-                        $url = "index.php?cat=$currentcategory&amp;page=".substr($matchingpage, 0, strlen($matchingpage) - 4);
+                        $url = "index.php?cat=$currentcategory&amp;page=".substr($matchingpage, 0, strlen($matchingpage) - 4)."&amp;";
                         if($CMS_CONF->get("modrewrite") == "true") {
-                            $url = $URL_BASE.$currentcategory."/".substr($matchingpage, 0, strlen($matchingpage) - 4).".html";
+                            $url = $URL_BASE.$currentcategory."/".substr($matchingpage, 0, strlen($matchingpage) - 4).".html?";
                         }
                         $pagename = pageToName($matchingpage, false);
                         $filepath = $CONTENT_DIR_REL."/".$currentcategory."/".$matchingpage;
                         $searchresults .= "<li>".
                             "<a href=\"".$url.
-                            "?highlight=".rawurlencode($highlightparameter)."\"".
+                            "highlight=".$specialchars->replaceSpecialChars($highlightparameter,false)."\"".
                             getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", $pagename, $categoryname)).">".
                             highlight($pagename,$highlightparameter).
                             "</a>".
@@ -1021,7 +1025,7 @@ $CHARSET = 'UTF-8';
 // ------------------------------------------------------------------------------
     function highlight($content, $phrasestring) {
         // Zu highlightende Begriffe kommen kommasepariert ("begriff1,begriff2")-> in Array wandeln
-        $phrasestring = rawurldecode($phrasestring);
+#        $phrasestring = rawurldecode($phrasestring);
         $phrasearray = explode(",", $phrasestring);
         // jeden Begriff highlighten
         foreach($phrasearray as $phrase) {
@@ -1029,7 +1033,7 @@ $CHARSET = 'UTF-8';
             $phrase = preg_quote($phrase);
             // Slashes im zu highlightenden Text escapen
             $phrase = preg_replace("/\//", "\\\\/", $phrase);
-            $phrase = htmlentities($phrase);
+#            $phrase = htmlentities($phrase);
             //$content = preg_replace("/((<[^>]*|{CONTACT})|$phrase)/ie", '"\2"=="\1"? "\1":"<span class=\"highlight\">\1</span>"', $content);
             $content = preg_replace("/((<[^>]*|{CONTACT})|$phrase)/ie", '"\2"=="\1"? "\1":"<span class=\"highlight\">\1</span>"', $content); 
         }
