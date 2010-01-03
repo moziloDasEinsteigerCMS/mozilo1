@@ -1,16 +1,16 @@
-Danke, daß Sie sich für moziloCMS entschieden haben!
+Danke, daÃŸ Sie sich fÃ¼r moziloCMS entschieden haben!
 
 Wie moziloCMS funktioniert, wie man es einrichtet und
 wie man damit arbeitet, ist detailliert auf 
 http://cms.mozilo.de beschrieben. 
 
 moziloCMS steht unter der General Public License (GPL).
-Das heißt, es darf beliebig genutzt, verändert und 
-verbreitet werden, unterliegt in veränderten Versionen 
+Das heiÃŸt, es darf beliebig genutzt, verÃ¤ndert und 
+verbreitet werden, unterliegt in verÃ¤nderten Versionen 
 aber wieder der GPL.
 Sie finden die GPL im Volltext als gpl.txt im 
 moziloCMS-Hauptverzeichnis.
 
 
-Nun aber viel Spaß und Erfolg mit Ihrem moziloCMS!
+Nun aber viel SpaÃŸ und Erfolg mit Ihrem moziloCMS!
 Ihr mozilo-Team
