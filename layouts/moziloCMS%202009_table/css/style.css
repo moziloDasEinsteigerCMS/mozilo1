@@ -1,0 +1,167 @@
+body {
+    line-height: 16px;
+    font-family: "tahoma", sans-serif;
+    font-size: 76%;
+    margin: 0px;
+    padding: 0px;
+    color:#666666;
+    background-color: #fff;
+}
+
+input, textarea  {
+    border: 1pt solid #6A849D;
+    font: normal 10px tahoma;
+    color: #707070;
+    margin:0px 0px 5px 0px;
+}
+
+a{
+    color: #6A849D;
+    text-decoration: underline;
+}
+
+a:hover{
+    color: #AE6427;
+}
+
+a:visited{
+}
+
+.head_left_right {
+    background-image: url(../grafiken/back_blue.jpg);
+    background-repeat: repeat-x;
+}
+
+.head_center {
+    background-image: url(../grafiken/head_blue_center.jpg);
+    background-repeat: repeat-x;
+}
+
+.content_left {
+    background-image: url(../grafiken/content_left.jpg);
+    background-repeat: no-repeat;
+    background-position:top right;
+}
+
+.content_right {
+    background-image: url(../grafiken/content_right.jpg);
+    background-repeat: no-repeat;
+    background-position:top left;
+}
+
+#content {
+    text-align: justify;
+    font-size: 0.9em;
+    margin: 0;
+    padding: 0;
+    padding-top:5px;
+    padding-left:50px;
+    padding-right:10px;
+    background-color:#fff;
+    color: #666666;
+}
+
+div.embeddedgallery {
+    height:450px;
+    text-align:center;
+}
+
+.fontsize_1 {
+    font-size: 1px;
+    line-height: 1px;
+}
+
+#rightmenu {
+    font-size:0.9em;
+    margin: 0;
+    padding: 0;
+    background-image: url(../grafiken/shad.jpg);
+    background-repeat: no-repeat;
+    background-position:8px 10px;
+    padding-top:10px;
+    padding-left:10px;
+}
+
+#rightmenu h1 {
+    border-bottom: 1px dotted #993333;
+    font-size: 12px;
+    font-weight: bold;
+    color: #993333;
+}
+
+#rightmenu a {
+    display: block;
+    background: url(../grafiken/arrow.gif) no-repeat center left ;
+    background-position: 4px;
+    padding: 2px 2px 5px 15px;
+    margin: 0 0 1px 0;
+    text-decoration: none;
+}
+
+#rightmenu a.submenu {
+    background: url(../grafiken/arrow.gif) no-repeat;
+    background-position:20px center;
+    padding: 2px 2px 5px 35px;
+    margin: 0 0 1px 0;
+}
+
+#rightmenu a.submenuactive {
+    background: url(../grafiken/arrow.gif) no-repeat;
+    background-position:20px center;
+    padding: 2px 2px 5px 35px;
+    margin: 0 0 1px 0;
+    color: #AE6427;
+}
+
+#rightmenu a:hover {
+    color: #AE6427;
+}
+
+ul.mainmenu {
+    margin: 0px;
+    padding: 0px;
+}
+
+li.mainmenu {
+    display:inline;
+}
+
+ul.detailmenu {
+    margin: 0px;
+    padding: 0px;
+}
+
+li.detailmenu {
+    display:inline;
+}
+
+ul.gallerymenu, ul.gallerynumbermenu {
+    margin: 0px;
+    padding: 0px;
+}
+
+li.gallerymenu, li.gallerynumbermenu {
+    display:inline;
+    padding-right: 7px;
+}
+
+a.gallerymenu, a.gallerynumbermenu {
+    text-decoration:none;
+}
+
+a.gallerymenuactive, a.gallerynumbermenuactive { 
+    color: #AE6427;
+    text-decoration:none;
+}
+
+.footer {
+    font-size: 10px;
+    color:#6A849D;
+    background-image: url(../grafiken/footer_center.jpg);
+    background-repeat: repeat-x;
+    background-position:left bottom;
+}
+
+
+
+
