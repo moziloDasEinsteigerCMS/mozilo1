@@ -2052,13 +2052,13 @@ function editGallery($post) {
                 if(!isset($post['messages']['gallery_messages_setings'])) {
                     $post['messages']['gallery_messages_setings'][] = NULL;
                 }
+            $post['gallery']['error_html']['display_setings'] = ' style="display:block;"';
             }
             if($error_messages !== false) {
                 $post['error_messages'][$error_messages]['color'] = "#FF7029";
                 $post['error_messages'][$error_messages][] = NULL;
                 $post['gallery']['error_html'][$syntax_name] = 'style="background-color:#FF7029;" ';
             }
-            $post['gallery']['error_html']['display_setings'] = ' style="display:block;"';
         }
     }
 
@@ -2120,7 +2120,7 @@ function editGallery($post) {
                     if(!is_dir($GALLERIES_DIR_REL.'/'.$gallery.'/'.$file)) {
                         scaleImage($file, $GALLERIES_DIR_REL.'/'.$gallery.'/', $GALLERIES_DIR_REL.'/'.$gallery.'/'.$PREVIEW_DIR_NAME.'/', $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'),true);
                         $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
-                        $post['messages']['gallery_messages_make_thumbs'][] = NULL;
+                        $post['messages']['gallery_messages_make_thumbs'][$gallery] = $gallery;
                     }
                 }
             } else {
@@ -2143,7 +2143,7 @@ function editGallery($post) {
                         if($test_img[0] > $GALLERY_CONF->get('maxwidth') or $test_img[1] > $GALLERY_CONF->get('maxheight')) {
                             scaleImage($file, $GALLERIES_DIR_REL.'/'.$gallery.'/', $GALLERIES_DIR_REL.'/'.$gallery.'/', $GALLERY_CONF->get('maxwidth'), $GALLERY_CONF->get('maxheight'));
                             $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
-                            $post['messages']['gallery_messages_scale_max'][] = NULL;
+                            $post['messages']['gallery_messages_scale_max'][$gallery] = $gallery;
                         }
                     }
                 }
