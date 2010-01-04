@@ -4095,7 +4095,7 @@ function setLayoutAndDependentSettings($layoutfolder) {
 
     // Einstellungen aus Layout-Settings laden und in den CMS-Einstellungen ueberschreiben
     $layoutsettings = new Properties($settingsfile);
-    if(isset($layoutsettings->properties['error'])) {
+    if(!isset($layoutsettings->properties['readonly'])) {
         return $layoutsettings->properties;
     } else {
         $CMS_CONF->set("usesubmenu", $layoutsettings->get("usesubmenu"));
