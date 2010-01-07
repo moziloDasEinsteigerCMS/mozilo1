@@ -306,7 +306,7 @@ global $LAYOUT_DIR_PHP;
                 } else {
                     $link_text = $value;
                 }
-                
+
                 if (file_exists("./$GALLERIES_DIR/$cleanedvalue")) {
                     // Galerie einbetten
                     if ($GALLERY_CONF->get("target") == "_self") {
@@ -560,7 +560,7 @@ verwendet werden sollte!
                 $value = preg_replace("/&#(\d*);/Umsie", "''.chr('\\1').''", $value);
                 $value = preg_replace("/&#092;/Umsi", "&amp;#092;", $value);
                 $value = preg_replace("/&#036;/Umsi", "&amp;#036;", $value);
-                $value = html_entity_decode($value,ENT_COMPAT,'ISO-8859-1');
+                $value = html_entity_decode($value,ENT_COMPAT,$CHARSET);
                 ob_start();
                 $value = eval($value);
                 $value = ob_get_contents();
