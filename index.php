@@ -263,14 +263,10 @@ $CHARSET = 'UTF-8';
     }
 
     $HTML = $template;
-    if(strpos($HTML,'{CSS_FILE}') !== false)
-        $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $HTML);
-    if(strpos($HTML,'{CHARSET}') !== false)
-        $HTML = preg_replace('/{CHARSET}/', $CHARSET, $HTML);
-    if(strpos($HTML,'{FAVICON_FILE}') !== false)
-        $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
-    if(strpos($HTML,'{LAYOUT_DIR}') !== false)
-        $HTML = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR_URL, $HTML);
+    $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $HTML);
+    $HTML = preg_replace('/{CHARSET}/', $CHARSET, $HTML);
+    $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
+    $HTML = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR_URL, $HTML);
 
     // Platzhalter ersetzen
     $HTML = replacePlaceholders($HTML, $cattitle, $pagetitle);
@@ -278,14 +274,11 @@ $CHARSET = 'UTF-8';
         $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle), $HTML);
 
     // Meta-Tag "keywords"
-    if(strpos($HTML,'{WEBSITE_KEYWORDS}') !== false)
-        $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $specialchars->rebuildSpecialChars($CMS_CONF->get("websitekeywords"),false,true), $HTML);
+    $HTML = preg_replace('/{WEBSITE_KEYWORDS}/', $specialchars->rebuildSpecialChars($CMS_CONF->get("websitekeywords"),false,true), $HTML);
     // Meta-Tag "description"
-    if(strpos($HTML,'{WEBSITE_DESCRIPTION}') !== false)
-        $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $specialchars->rebuildSpecialChars($CMS_CONF->get("websitedescription"),false,true), $HTML);
+    $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $specialchars->rebuildSpecialChars($CMS_CONF->get("websitedescription"),false,true), $HTML);
 
-    if(strpos($HTML,'{CONTENT}') !== false)
-        $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
+    $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
     if(strpos($HTML,'{MAINMENU}') !== false)
         $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
 
@@ -303,25 +296,20 @@ $CHARSET = 'UTF-8';
         $HTML = preg_replace('/{SEARCH}/', getSearchForm(), $HTML);
 
     // Letzte Änderung
-    $lastchangeinfo = getLastChangedContentPageAndDate();
-    // - Name der zuletzt geänderten Inhaltsseite
-    // - kompletter Link auf diese Inhaltsseite  
-    // - formatiertes Datum der letzten Änderung
-    if(strpos($HTML,'{LASTCHANGEDTEXT}') !== false)
+    if(strpos($HTML,'{LASTCHANGE') !== false) {
+        $lastchangeinfo = getLastChangedContentPageAndDate();
+        // - Name der zuletzt geänderten Inhaltsseite
+        // - kompletter Link auf diese Inhaltsseite  
+        // - formatiertes Datum der letzten Änderung
         $HTML = preg_replace('/{LASTCHANGEDTEXT}/', $language->getLanguageValue0("message_lastchange_0"), $HTML);
-    if(strpos($HTML,'{LASTCHANGEDPAGE}') !== false)
         $HTML = preg_replace('/{LASTCHANGEDPAGE}/', $lastchangeinfo[0], $HTML);
-    if(strpos($HTML,'{LASTCHANGEDPAGELINK}') !== false)
         $HTML = preg_replace('/{LASTCHANGEDPAGELINK}/', $lastchangeinfo[1], $HTML);
-    if(strpos($HTML,'{LASTCHANGEDATE}') !== false)
         $HTML = preg_replace('/{LASTCHANGEDATE}/', $lastchangeinfo[2], $HTML);
-    // Platzhalter {LASTCHANGE} ist obsolet seit 1.12! Wird nur aus Gründen der Abwärtskompatibilität noch ersetzt 
-    if(strpos($HTML,'{LASTCHANGE}') !== false)
+        // Platzhalter {LASTCHANGE} ist obsolet seit 1.12! Wird nur aus Gründen der Abwärtskompatibilität noch ersetzt 
         $HTML = preg_replace('/{LASTCHANGE}/', $language->getLanguageValue0("message_lastchange_0")." ".$lastchangeinfo[1]." (".$lastchangeinfo[2].")", $HTML); 
-    
+    }
     // Sitemap-Link
-    if(strpos($HTML,'{SITEMAPLINK}') !== false)
-        $HTML = preg_replace('/{SITEMAPLINK}/', "<a href=\"index.php?action=sitemap\" id=\"sitemaplink\"".getTitleAttribute($language->getLanguageValue0("tooltip_showsitemap_0")).">".$language->getLanguageValue0("message_sitemap_0")."</a>", $HTML);
+    $HTML = preg_replace('/{SITEMAPLINK}/', "<a href=\"index.php?action=sitemap\" id=\"sitemaplink\"".getTitleAttribute($language->getLanguageValue0("tooltip_showsitemap_0")).">".$language->getLanguageValue0("message_sitemap_0")."</a>", $HTML);
     
     // CMS-Info-Link
     if(strpos($HTML,'{CMSINFO}') !== false)
@@ -1097,7 +1085,8 @@ $CHARSET = 'UTF-8';
             // "unbehandelter" Name der aktuellen Kategorie ("10_M%FCllers%20Kuh")
             $content = preg_replace('/{CATEGORY}/', $CAT_REQUEST, $content);
             // "sauberer" Name der aktuellen Kategorie ("Müllers Kuh")
-            $content = preg_replace('/{CATEGORY_NAME}/', catToName($CAT_REQUEST, true), $content);
+            if(strpos($content,'{CATEGORY_NAME}') !== false)
+                $content = preg_replace('/{CATEGORY_NAME}/', catToName($CAT_REQUEST, true), $content);
         }
         // Suche, Sitemap
         else {
@@ -1113,21 +1102,26 @@ $CHARSET = 'UTF-8';
             // Dateiname der aktuellen Inhaltsseite ("10_M%FCllers%20Kuh.txt")
             $content = preg_replace('/{PAGE_FILE}/', $PAGE_FILE, $content);
             // "sauberer" Name der aktuellen Inhaltsseite ("Müllers Kuh")
-            $content = preg_replace('/{PAGE_NAME}/', pageToName($PAGE_FILE, true), $content);
+            if(strpos($content,'{PAGE_NAME}') !== false)
+                $content = preg_replace('/{PAGE_NAME}/', pageToName($PAGE_FILE, true), $content);
             
-            $neighbourPages = getNeighbourPages($PAGE_REQUEST);
-            // "unbehandelter" Name der vorigen Inhaltsseite ("00_Der%20M%FCller")
-            $content = preg_replace('/{PREVIOUS_PAGE}/', substr($neighbourPages[0], 0, strlen($neighbourPages[0]) - 4), $content);
-            // Dateiname der vorigen Inhaltsseite ("00_Der%20M%FCller.txt")
-            $content = preg_replace('/{PREVIOUS_PAGE_FILE}/', $neighbourPages[0], $content);
-            // "sauberer" Name der vorigen Inhaltsseite ("Der Müller")
-            $content = preg_replace('/{PREVIOUS_PAGE_NAME}/', pageToName($neighbourPages[0], true), $content);
-            // "unbehandelter" Name der nächsten Inhaltsseite ("20_M%FCllers%20M%FChle")
-            $content = preg_replace('/{NEXT_PAGE}/', substr($neighbourPages[1], 0, strlen($neighbourPages[1]) - 4), $content);
-            // Dateiname der nächsten Inhaltsseite ("20_M%FCllers%20M%FChle.txt")
-            $content = preg_replace('/{NEXT_PAGE_FILE}/', $neighbourPages[1], $content);
-            // "sauberer" Name der nächsten Inhaltsseite ("Müllers Mühle")
-            $content = preg_replace('/{NEXT_PAGE_NAME}/', pageToName($neighbourPages[1], true), $content);
+            if(strpos($content,'{PREVIOUS_') !== false or strpos($content,'{NEXT_') !== false) {
+                $neighbourPages = getNeighbourPages($PAGE_REQUEST);
+                // "unbehandelter" Name der vorigen Inhaltsseite ("00_Der%20M%FCller")
+                $content = preg_replace('/{PREVIOUS_PAGE}/', substr($neighbourPages[0], 0, strlen($neighbourPages[0]) - 4), $content);
+                // Dateiname der vorigen Inhaltsseite ("00_Der%20M%FCller.txt")
+                $content = preg_replace('/{PREVIOUS_PAGE_FILE}/', $neighbourPages[0], $content);
+                // "sauberer" Name der vorigen Inhaltsseite ("Der Müller")
+                if(strpos($content,'{PREVIOUS_PAGE_NAME}') !== false)
+                    $content = preg_replace('/{PREVIOUS_PAGE_NAME}/', pageToName($neighbourPages[0], true), $content);
+                // "unbehandelter" Name der nächsten Inhaltsseite ("20_M%FCllers%20M%FChle")
+                $content = preg_replace('/{NEXT_PAGE}/', substr($neighbourPages[1], 0, strlen($neighbourPages[1]) - 4), $content);
+                // Dateiname der nächsten Inhaltsseite ("20_M%FCllers%20M%FChle.txt")
+                $content = preg_replace('/{NEXT_PAGE_FILE}/', $neighbourPages[1], $content);
+                // "sauberer" Name der nächsten Inhaltsseite ("Müllers Mühle")
+                if(strpos($content,'{NEXT_PAGE_NAME}') !== false)
+                    $content = preg_replace('/{NEXT_PAGE_NAME}/', pageToName($neighbourPages[1], true), $content);
+            }
         }
         // Suche, Sitemap
         else {
@@ -1434,6 +1428,7 @@ $CHARSET = 'UTF-8';
         global $CONTENT_DIR_ABS;
         global $CAT_REQUEST;
         global $CMS_CONF;
+        global $EXT_LINK;
         
         // leer initialisieren
         $neighbourPages = array("", "");
@@ -1441,6 +1436,8 @@ $CHARSET = 'UTF-8';
         $pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true, $CMS_CONF->get("showhiddenpagesincmsvariables") == "true");
         // Schleife über alle Seiten
         for ($i = 0; $i < count($pagesarray); $i++) {
+            if(substr($pagesarray[$i], -(strlen($EXT_LINK))) == $EXT_LINK)
+                continue;
             if ($page == substr($pagesarray[$i], 0, strlen($pagesarray[$i]) - 4)) {
                 // vorige Seite (nur setzen, wenn aktuelle nicht die erste ist)
                 if ($i > 0) {
