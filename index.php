@@ -53,16 +53,15 @@ $CHARSET = 'UTF-8';
     $EXT_DRAFT      = ".tmp";
     $EXT_LINK       = ".lnk";
 
-    // Config-Parameter auslesen
-    $LAYOUT_DIR_PHP     = "layouts/".$specialchars->replaceSpecialChars($CMS_CONF->get("cmslayout"),true);
-    $TEMPLATE_FILE  = $LAYOUT_DIR_PHP."/template.html";
+    $LAYOUT_DIR     = "layouts/".$CMS_CONF->get("cmslayout");
+    $TEMPLATE_FILE  = $LAYOUT_DIR."/template.html";
     if ($GALLERY_CONF->get("target") == "_blank" and isset($_GET["gal"])) {
-        $TEMPLATE_FILE  = $LAYOUT_DIR_PHP."/gallerytemplate.html";
+        $TEMPLATE_FILE  = $LAYOUT_DIR."/gallerytemplate.html";
     }
 
-    $LAYOUT_DIR     = $URL_BASE.$LAYOUT_DIR_PHP;
-    $CSS_FILE       = $LAYOUT_DIR."/css/style.css";
-    $FAVICON_FILE   = $LAYOUT_DIR."/favicon.ico";
+    $LAYOUT_DIR_URL = $specialchars->replaceSpecialChars($URL_BASE.$LAYOUT_DIR,true);
+    $CSS_FILE       = $LAYOUT_DIR_URL."/css/style.css";
+    $FAVICON_FILE   = $LAYOUT_DIR_URL."/favicon.ico";
     // Einstellungen für Kontaktformular
     $contactformconfig  = new Properties("formular/formular.conf");
     $contactformcalcs   = new Properties("formular/aufgaben.conf");
@@ -168,7 +167,7 @@ $CHARSET = 'UTF-8';
         global $CSS_FILE;
         global $HTML;
         global $FAVICON_FILE;
-        global $LAYOUT_DIR;
+        global $LAYOUT_DIR_URL;
         global $TEMPLATE_FILE;
         global $USE_CMS_SYNTAX;
         global $WEBSITE_NAME;
@@ -185,9 +184,9 @@ $CHARSET = 'UTF-8';
         global $CHARSET;
         global $GALLERY_CONF;
 
-    if (!$file = @fopen($specialchars->rebuildSpecialChars($TEMPLATE_FILE, false, false), "r"))
-        die($language->getLanguageValue1("message_template_error_1", $specialchars->rebuildSpecialChars($TEMPLATE_FILE, false, false)));
-    $template = fread($file, filesize($specialchars->rebuildSpecialChars($TEMPLATE_FILE, false, false)));
+    if (!$file = @fopen($TEMPLATE_FILE, "r"))
+        die($language->getLanguageValue1("message_template_error_1", $TEMPLATE_FILE));
+    $template = fread($file, filesize($TEMPLATE_FILE));
     fclose($file);
         // Platzhalter des Templates mit Inhalt füllen
         $pagecontentarray = array();
@@ -271,7 +270,7 @@ $CHARSET = 'UTF-8';
     if(strpos($HTML,'{FAVICON_FILE}') !== false)
         $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
     if(strpos($HTML,'{LAYOUT_DIR}') !== false)
-        $HTML = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR, $HTML);
+        $HTML = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR_URL, $HTML);
 
     // Platzhalter ersetzen
     $HTML = replacePlaceholders($HTML, $cattitle, $pagetitle);
@@ -688,7 +687,7 @@ $CHARSET = 'UTF-8';
         global $CMS_CONF;
         global $specialchars;
         global $CHARSET;
-        global $LAYOUT_DIR;
+        global $LAYOUT_DIR_URL;
 
         $modrewrite_dumy = NULL;
         if($CMS_CONF->get("modrewrite") == "true") {
@@ -697,7 +696,7 @@ $CHARSET = 'UTF-8';
         $form = "<form accept-charset=\"$CHARSET\" method=\"get\" action=\"index.php$modrewrite_dumy\" class=\"searchform\"><fieldset id=\"searchfieldset\">"
         ."<input type=\"hidden\" name=\"action\" value=\"search\" />"
         ."<input type=\"text\" name=\"query\" value=\"\" class=\"searchtextfield\" />"
-        ."<input type=\"image\" name=\"action\" value=\"search\" src=\"".$LAYOUT_DIR."/grafiken/searchicon.gif\" alt=\"".$language->getLanguageValue0("message_search_0")."\" class=\"searchbutton\"".getTitleAttribute($language->getLanguageValue0("message_search_0"))." />"
+        ."<input type=\"image\" name=\"action\" value=\"search\" src=\"".$LAYOUT_DIR_URL."/grafiken/searchicon.gif\" alt=\"".$language->getLanguageValue0("message_search_0")."\" class=\"searchbutton\"".getTitleAttribute($language->getLanguageValue0("message_search_0"))." />"
         ."</fieldset></form>";
         return $form;
     }
@@ -1087,12 +1086,12 @@ $CHARSET = 'UTF-8';
         global $PAGE_REQUEST;
         global $PAGE_FILE;
         global $EXT_PAGE;
-        global $LAYOUT_DIR;
+        global $LAYOUT_DIR_URL;
 
         // Titel der Website
         $content = preg_replace('/{WEBSITE_NAME}/', $specialchars->rebuildSpecialChars($CMS_CONF->get("websitetitle"),false,true), $content);
         // Layout-Verzeichnis
-        $content = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR, $content);
+        $content = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR_URL, $content);
 
         if ($CAT_REQUEST != "") {
             // "unbehandelter" Name der aktuellen Kategorie ("10_M%FCllers%20Kuh")

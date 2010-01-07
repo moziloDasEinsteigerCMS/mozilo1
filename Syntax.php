@@ -73,7 +73,7 @@ class Syntax {
         global $CMS_CONF;
         global $language;
         global $GALLERY_CONF;
-global $LAYOUT_DIR_PHP;
+global $LAYOUT_DIR;
 #global $TEMPLATE_FILE;
         global $USER_SYNTAX;
 
@@ -311,7 +311,7 @@ global $LAYOUT_DIR_PHP;
                     // Galerie einbetten
                     if ($GALLERY_CONF->get("target") == "_self") {
                         require_once("gallery.php");
-                        $gallery_template = $specialchars->rebuildSpecialChars($LAYOUT_DIR_PHP."/gallerytemplate.html", false, false);
+                        $gallery_template = $LAYOUT_DIR."/gallerytemplate.html";
                         if (!$file = @fopen($gallery_template, "r"))
                             die($language->getLanguageValue1("message_template_error_1", $gallery_template));
                         $template = fread($file, filesize($gallery_template));
