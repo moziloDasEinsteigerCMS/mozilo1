@@ -55,7 +55,9 @@ $CHARSET = 'UTF-8';
 
     $LAYOUT_DIR     = "layouts/".$CMS_CONF->get("cmslayout");
     $TEMPLATE_FILE  = $LAYOUT_DIR."/template.html";
-    if ($GALLERY_CONF->get("target") == "_blank" and isset($_GET["gal"])) {
+
+    # wenn ein Plugin die Galerie benutzt und sie blank ist
+    if ($GALLERY_CONF->get("target") == "_blank" and isset($_GET["gal"]) and isset($_GET["plugin"])) {
         $TEMPLATE_FILE  = $LAYOUT_DIR."/gallerytemplate.html";
     }
 
@@ -163,6 +165,8 @@ $CHARSET = 'UTF-8';
 // ------------------------------------------------------------------------------
 // HTML-Template einlesen und verarbeiten
 // ------------------------------------------------------------------------------
+    # wird später gebraucht um deactivierte Plugin Platzhalter zu Löschen
+    $deactiv_plugins = array();
     function readTemplate() {
         global $CSS_FILE;
         global $HTML;
@@ -183,6 +187,8 @@ $CHARSET = 'UTF-8';
         global $URL_BASE;
         global $CHARSET;
         global $GALLERY_CONF;
+        global $GALLERIES_DIR;
+        global $deactiv_plugins;
 
     if (!$file = @fopen($TEMPLATE_FILE, "r"))
         die($language->getLanguageValue1("message_template_error_1", $TEMPLATE_FILE));
@@ -263,6 +269,10 @@ $CHARSET = 'UTF-8';
     }
 
     $HTML = $template;
+    $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
+    // Benutzer-Variablen ersetzen
+    $HTML = replacePluginVariables($HTML);
+
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $HTML);
     $HTML = preg_replace('/{CHARSET}/', $CHARSET, $HTML);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
@@ -278,7 +288,6 @@ $CHARSET = 'UTF-8';
     // Meta-Tag "description"
     $HTML = preg_replace('/{WEBSITE_DESCRIPTION}/', $specialchars->rebuildSpecialChars($CMS_CONF->get("websitedescription"),false,true), $HTML);
 
-    $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
     if(strpos($HTML,'{MAINMENU}') !== false)
         $HTML = preg_replace('/{MAINMENU}/', getMainMenu(), $HTML);
 
@@ -323,16 +332,15 @@ $CHARSET = 'UTF-8';
     if(strpos($HTML,'{TABLEOFCONTENTS}') !== false)
         $HTML = preg_replace('/{TABLEOFCONTENTS}/', $syntax->getToC($pagecontent), $HTML);
 
-    if ($GALLERY_CONF->get("target") == "_blank" and isset($_GET["gal"])) {
-        require_once("gallery.php");
-        if (isset($_GET["gal"])) {
-            $gal_request = $specialchars->replaceSpecialChars(html_entity_decode($_GET["gal"], ENT_COMPAT, $CHARSET),false);
-            $HTML = $gallery->renderGallery($HTML,$gal_request);
+    # Titel der Galerie wird bei blank benutzt
+    if(strpos($HTML,'{CURRENTGALLERY}') !== false) {
+        if(getRequestParam('gal', true)) {
+            $HTML = preg_replace('/{CURRENTGALLERY}/', $specialchars->rebuildSpecialChars(getRequestParam('gal', true),false,true), $HTML);
         }
     }
 
-    // Benutzer-Variablen ersetzen
-    $HTML = replacePluginVariables($HTML);
+    # deactivierte Plugin Platzhalter Löschen
+    $HTML = str_replace($deactiv_plugins,"",$HTML);
     
     }
     
@@ -341,8 +349,13 @@ $CHARSET = 'UTF-8';
 // ------------------------------------------------------------------------------
     function getPasswordForm() {
         global $language;
+        global $CMS_CONF;
+        $mod_rewrite = NULL;
+        if($CMS_CONF->get("modrewrite") == "true") {
+            $mod_rewrite = ".html";
+        }
         // TODO: sollte auch wahlweise über ein Template gehen
-        return '<form action="index.php?'.$_SERVER['QUERY_STRING'].'" method="post">
+        return '<form action="index.php'.$mod_rewrite.'?'.$_SERVER['QUERY_STRING'].'" method="post">
         '.$language->getLanguageValue0("passwordform_pagepasswordplease_0").' 
         <input type="password" name="password" />
         <input type="submit" value="'.$language->getLanguageValue0("passwordform_send_0").'" />
@@ -466,7 +479,6 @@ $CHARSET = 'UTF-8';
         else
             return array("","","");
     }
-
 
 
 // ------------------------------------------------------------------------------
@@ -843,7 +855,6 @@ $CHARSET = 'UTF-8';
                 }
 
                 $matchingpages = array();
-#                $i = 0;
 
                 // Alle Inhaltsseiten durchsuchen
                 foreach ($contentarray as $currentcontent) {
@@ -860,7 +871,6 @@ $CHARSET = 'UTF-8';
                             // wenn noch nicht im Treffer-Array: hinzufügen
                             if (!in_array($currentcontent, $matchingpages))
                                 $matchingpages[] = $currentcontent;
-#                            $i++;
                         }
                     }
                 }
@@ -918,9 +928,8 @@ $CHARSET = 'UTF-8';
             fclose($handle);
             // Zuerst: includierte Seiten herausfinden!
             preg_match_all("/\[include\|([^\[\]]*)\]/Um", $content, $matches);
-            $i = 0;
             // Für jeden Treffer...
-            foreach ($matches[1] as $match) {
+            foreach ($matches[1] as $i => $match) {
                 // ...Auswertung und Verarbeitung der Informationen
                 $valuearray = explode(":", $matches[1][$i]);
                 // Inhaltsseite in aktueller Kategorie
@@ -946,7 +955,6 @@ $CHARSET = 'UTF-8';
                         }
                     }
                 }
-                $i++;
             }
 
             // ...und alle Syntax-Tags entfernen. Gesucht werden soll nur im reinen Text
@@ -1486,27 +1494,32 @@ $CHARSET = 'UTF-8';
         global $PLUGIN_DIR;
         global $syntax;
         global $language;
-        
+        global $GALLERY_CONF;
+        global $deactiv_plugins;
+
         $availableplugins = array();
         
         // alle Plugins einlesen
         $dircontent = getDirContentAsArray(getcwd()."/$PLUGIN_DIR", false, false);
         foreach ($dircontent as $currentelement) {
             if (file_exists(getcwd()."/$PLUGIN_DIR/".$currentelement."/index.php")) {
-                if(file_exists(getcwd()."/$PLUGIN_DIR/".$currentelement."/plugin.conf")) {
-                    $conf_plugin = new Properties(getcwd()."/$PLUGIN_DIR/".$currentelement."/plugin.conf",true);
-                }
-                if($conf_plugin->get("activ") == "true") {
-                    array_push($availableplugins, $currentelement);
-                }
+                $availableplugins[] = $currentelement;
             }
         }
-        unset($conf_plugin);
         // Alle Variablen aus dem Inhalt heraussuchen
         preg_match_all("/\{(.+)\}/Umsi", $content, $matches);
+
+        # nur zur abwärts kompatiebelen Galerie solte irgendwann raus
+        # Plugin Platzhalter kommt über die Url nur bei Galerie blank
+        if ($GALLERY_CONF->get("target") == "_blank"
+                and isset($_GET["gal"])
+                and isset($_GET["plugin"])
+                and getRequestParam("plugin", true) == "Galerie"
+            ) {
+            $matches[1][] = getRequestParam("plugin", true);
+        }
         // Für jeden Treffer...
-        $i = 0;
-        foreach ($matches[0] as $match) {
+        foreach ($matches[1] as $i => $match) {
             // ...erstmal schauen, ob ein Wert dabeisteht, z.B. {VARIABLE|wert}
             $valuearray = explode("|", $matches[1][$i]);
             if (sizeof($valuearray) > 1) {
@@ -1522,6 +1535,15 @@ $CHARSET = 'UTF-8';
             // ...überprüfen, ob es eine zugehörige Plugin-PHP-Datei gibt
             if (in_array($currentvariable, $availableplugins)) {
                 $replacement = "";
+                if(file_exists(getcwd()."/$PLUGIN_DIR/".$currentvariable."/plugin.conf")) {
+                    $conf_plugin = new Properties(getcwd()."/$PLUGIN_DIR/".$currentvariable."/plugin.conf",true);
+                    if($conf_plugin->get("activ") == "false") {
+                        # array fühlen mit deactivierte Plugin Platzhalter wird oben dann ersetzt mit NULL
+                        $deactiv_plugins[] = '{'.$matches[1][$i].'}';
+                        unset($conf_plugin);
+                        continue;
+                    }
+                }
                 // Plugin-Code includieren
                 require_once(getcwd()."/$PLUGIN_DIR/".$currentvariable."/index.php");
                 // Enthält der Code eine Klasse mit dem Namen des Plugins?
@@ -1531,12 +1553,25 @@ $CHARSET = 'UTF-8';
                     $replacement = $currentpluginobject->getPluginContent($currentvalue);
                 }
                 else {
-                    $replacement = $syntax->createDeadlink($matches[0][$i], $language->getLanguageValue1("plugin_error_1", $currentvariable));
+                    $replacement = $syntax->createDeadlink('{'.$matches[1][$i].'}', $language->getLanguageValue1("plugin_error_1", $currentvariable));
                 }
+                # nur zur abwärts kompatiebelen Galerie solte irgendwann raus
+                # nur wens gallery und blank und get=plugin und kein Platzhalter $matches[1][$i] ist
+                # und {EMBEDDED_TEMPLATE_START} enthalten ist
+                if ($GALLERY_CONF->get("target") == "_blank"
+                    and isset($_GET["gal"])
+                    and isset($_GET["plugin"])
+                    and getRequestParam("plugin", true) == "Galerie"
+                    ) {
+                    preg_match("/\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_START\}[\s|\t]*--\>(.*)\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_END\}[\s|\t]*--\>/Umsi", $content, $galmatches);
+                    if (sizeof($galmatches) > 1) {
+                        $content = str_replace($galmatches[1], $replacement, $content);
+                    }
+                } else {
                 // Variable durch Plugin-Inhalt (oder Fehlermeldung) ersetzen
                 $content = preg_replace('/{'.preg_quote($matches[1][$i], '/').'}/Um', $replacement, $content);
+                }
             }
-            $i++;
         }
         return $content;
     }
