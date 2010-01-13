@@ -1609,7 +1609,8 @@ function gallery($post) {
                                 $post['error_messages']['gallery_error_ftp_rename_pic'][] = $PREVIEW_DIR_NAME."/".$currentgalerien." - ".$test_pic;
                             }
                         }
-                        if($GALLERY_CONF->get("usethumbs") == "true" and !is_file($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic)) {
+#                        if($GALLERY_CONF->get("usethumbs") == "true" and !is_file($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic)) {
+                        if(!is_file($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic)) {
                             require_once("../Image.php");
                             scaleImage($test_pic, $GALLERIES_DIR_REL.'/'.$currentgalerien.'/', $GALLERIES_DIR_REL.'/'.$currentgalerien.'/'.$PREVIEW_DIR_NAME.'/', $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'));
                             if(is_file($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic)) {
@@ -1624,7 +1625,8 @@ function gallery($post) {
             }
         }
         # hinweis wenn nicht alle vorschau bilder existieren
-        if($GALLERY_CONF->get("usethumbs") == "true" and count($gallerypics[$currentgalerien]) != $count_preview_pic) {
+#        if($GALLERY_CONF->get("usethumbs") == "true" and count($gallerypics[$currentgalerien]) != $count_preview_pic) {
+        if(count($gallerypics[$currentgalerien]) != $count_preview_pic) {
             $post['error_messages']['gallery_error_ftp_preview_pic'][] = $currentgalerien;
         }
         sort($gallerypics[$currentgalerien]);
@@ -1743,17 +1745,17 @@ $tooltip_help_edit = NULL;
         $pagecontent .= '</tr><tr>';
         $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_picsperrow.'><b>'.$text_gallery_picsperrow.'</b></td>';
         $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="2" name="gallery[setings][gallerypicsperrow]" value="'.$GALLERY_CONF->get("gallerypicsperrow").'"'.$post['gallery']['error_html']['gallerypicsperrow'].$tooltip_gallery_help_input_picsperrow.' /></td>';
-        $pagecontent .= '</tr><tr>';
+/*        $pagecontent .= '</tr><tr>';
         $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_usedfgallery.'><b>'.$text_gallery_usedfgallery.'</b></td>';
-        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><span'.$tooltip_gallery_help_usedfgallery.'>'.buildCheckBox("gallery[setings][usedfgallery]", $GALLERY_CONF->get("usedfgallery")).'</span></td>';
+        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><span'.$tooltip_gallery_help_usedfgallery.'>'.buildCheckBox("gallery[setings][usedfgallery]", $GALLERY_CONF->get("usedfgallery")).'</span></td>';*/
     }
 /*    $pagecontent .= '</tr><tr>';
     $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_all_picture_scale.'><b>'.$text_gallery_scaleimages.'</b></td>';
     $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery[scale_max]" value="true"'.$tooltip_gallery_help_all_picture_scale.'></td>';
     $pagecontent .= '</tr><tr>';
     $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_all_thumbs_new.'><b>'.$text_gallery_rebuildthumbs.'</b></td>';
-    $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery[make_thumbs]" value="true"'.$tooltip_gallery_help_all_thumbs_new.'></td>';
-    $pagecontent .= '</tr>';*/
+    $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery[make_thumbs]" value="true"'.$tooltip_gallery_help_all_thumbs_new.'></td>';*/
+    $pagecontent .= '</tr>';
     $pagecontent .= '</table>';
 
     if(getRequestParam('javascript', true)) {
@@ -1911,7 +1913,7 @@ function newGalleryImg($post) {
             if(!empty($error)) {
                 $post['error_messages'][key($error)][] = $gallery[1]."/".$error[key($error)];
             } else {
-                if($GALLERY_CONF->get("usethumbs") == "true") {
+#                if($GALLERY_CONF->get("usethumbs") == "true") {
                     require_once("../Image.php");
                     $pict = $specialchars->replaceSpecialChars($_FILES[$array_name]['name'],false);
                     $size    = GetImageSize($GALLERIES_DIR_REL."/".$gallery[1]."/".$pict);
@@ -1921,7 +1923,7 @@ function newGalleryImg($post) {
                         scaleImage($pict, $GALLERIES_DIR_REL."/".$gallery[1]."/", $GALLERIES_DIR_REL."/".$gallery[1]."/".$PREVIEW_DIR_NAME."/", $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'));
                     }
                     useChmod($GALLERIES_DIR_REL."/".$gallery[1]."/".$PREVIEW_DIR_NAME."/".$pict);
-                }
+#                }
                 $post['messages']['gallery_message_new_img'][] = $_FILES[$array_name]['name']." <b>></b> ".$gallery[1];
                 $post['gallery']['error_html']['display'][$gallery[1]] = ' style="display:block;"';
             }
@@ -2034,10 +2036,10 @@ function editGallery($post) {
             }
             if($type == 'checkbox') {
                 $syntax_value = "false";
-                if($syntax_name == "usedfgallery" and isset($post['gallery']['setings'][$syntax_name]) and $GALLERY_CONF->get("usethumbs") == "false") {
+/*                if($syntax_name == "usedfgallery" and isset($post['gallery']['setings'][$syntax_name]) and $GALLERY_CONF->get("usethumbs") == "false") {
                     $GALLERY_CONF->set("usethumbs", "true");
                     $post['error_messages']['gallery_error_usethumbs_true'][] = NULL;
-                }
+                }*/
                 if(isset($post['gallery']['setings'][$syntax_name])) {
                     $syntax_value = $post['gallery']['setings'][$syntax_name];
                 }
@@ -2063,6 +2065,7 @@ function editGallery($post) {
     }
 
     # die gallery.xml generel löschen wenn der Galerien Tag aufgerufen wird
+    # benutz die dfGalerie
     if(file_exists($GALLERIES_DIR_REL."/gallery.xml"))
         @unlink($GALLERIES_DIR_REL."/gallery.xml");
 
@@ -2849,7 +2852,7 @@ function config($post) {
     $pagecontent .= "</select></td>";
     $pagecontent .= "</tr>";
     // Zeile "MENU2"
-    $pagecontent .= "<tr><td class=\"td_cms_left\">".getLanguageValue("config_text_menu2")."</td>";
+/*    $pagecontent .= "<tr><td class=\"td_cms_left\">".getLanguageValue("config_text_menu2")."</td>";
     $pagecontent .= "<td class=\"td_cms_left\">";
     $pagecontent .= "<select name=\"menu2\" class=\"input_cms_select\"".$error_color['menu2'].">";
     $selected = NULL;
@@ -2869,7 +2872,7 @@ function config($post) {
     }
     $pagecontent .= "</select></td>";
     $pagecontent .= "</tr>";
-
+*/
     if($ADMIN_CONF->get('showexpert') == "true") {
         // Zeile "NUTZE SUBMENÜ"
         $checked0 = "";
@@ -3365,6 +3368,7 @@ function admin($post) {
 
 function plugins($post) {
     global $ADMIN_CONF;
+    global $CHARSET;
     $icon_size = "24x24";
 
     $PLUGIN_DIR = "plugins";
@@ -3447,9 +3451,11 @@ function plugins($post) {
                     foreach($plugins_info_array as $info) {
                         if($pos == 4) {
                             $plugin_info[$pos] = '<a href="'.$plugin_info[$pos].'" target="_blank">'.$plugin_info[$pos].'</a>';
+                        } else {
+                            $plugin_info[$pos] = htmlentities($plugin_info[$pos],ENT_COMPAT,$CHARSET);
                         }
                         if(isset($plugin_info[$pos])) {
-                            $pagecontent_conf .= '<tr><td width="0%" class="td_togglen_padding_bottom" nowrap><b class="text_grau">'.getLanguageValue($info).'</b></td><td width="90%" class="td_togglen_padding_bottom">'.$plugin_info[$pos].'</td></tr>';
+                            $pagecontent_conf .= '<tr><td width="10%" class="td_left_title_padding_bottom" nowrap><b class="text_grau">'.getLanguageValue($info).'</b></td><td width="90%" class="td_togglen_padding_bottom">'.$plugin_info[$pos].'</td></tr>';
                         }
                         $pos++;
                     }
