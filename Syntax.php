@@ -73,8 +73,8 @@ class Syntax {
         global $CMS_CONF;
         global $language;
         global $GALLERY_CONF;
-global $LAYOUT_DIR;
-#global $TEMPLATE_FILE;
+        global $LAYOUT_DIR;
+        global $PLUGIN_DIR;
         global $USER_SYNTAX;
 
         if ($firstrecursion) {
@@ -310,6 +310,12 @@ global $LAYOUT_DIR;
                 if (file_exists("./$GALLERIES_DIR/$cleanedvalue")) {
                     // Galerie einbetten
                     if ($GALLERY_CONF->get("target") == "_self") {
+                        if(file_exists($PLUGIN_DIR."/Galerie/index.php")) {
+                            $content = str_replace ($match, '{Galerie|'.$cleanedvalue.'}', $content);
+                        } else {
+                            $content = str_replace ($match, $this->createDeadlink($value, $language->getLanguageValue1("plugin_error_1", $value)), $content);
+                        }
+/*
                         require_once("gallery.php");
                         $gallery_template = $LAYOUT_DIR."/gallerytemplate.html";
                         if (!$file = @fopen($gallery_template, "r"))
@@ -323,7 +329,7 @@ global $LAYOUT_DIR;
                         }
                         else {
                             $content = str_replace ($match, $gallerycontent, $content);
-                        }
+                        }*/
                     } else {
                         $j=0;
                         $handle = opendir("./$GALLERIES_DIR/$cleanedvalue");
@@ -337,7 +343,8 @@ global $LAYOUT_DIR;
                         if($CMS_CONF->get("modrewrite") == "true") {
                             $modrewrite_dumy = ".html";
                         }
-                        $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE."index.php$modrewrite_dumy?gal=$cleanedvalue\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"".$GALLERY_CONF->get("target")."\">$link_text</a>", $content);
+#                        $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE."index.php$modrewrite_dumy?gal=$cleanedvalue\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"".$GALLERY_CONF->get("target")."\">$link_text</a>", $content);
+                        $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE."index.php$modrewrite_dumy?gal=$cleanedvalue&amp;plugin=Galerie\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"".$GALLERY_CONF->get("target")."\">$link_text</a>", $content);
                     }
                 }
                 // Galerie nicht vorhanden
