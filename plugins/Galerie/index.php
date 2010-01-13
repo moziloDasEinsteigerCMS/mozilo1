@@ -305,8 +305,10 @@ class Galerie extends Plugin {
             $next = 1;
         else
             $next = $index+1;
-$template = NULL;
-#        if ($embedded == "_self") {
+        $template = NULL;
+        if($this->settings->get("gallerytemplate")) {
+            $template = '<div class="embeddedgallery">'.$this->settings->get("gallerytemplate").'</div>';
+        } else { 
             $gallery_template = $LAYOUT_DIR."/gallerytemplate.html";
             if (!$file = @fopen($gallery_template, "r"))
                 die($language->getLanguageValue1("message_template_error_1", $gallery_template));
@@ -316,7 +318,7 @@ $template = NULL;
             if ($template == false) {
                 return false;
             }
-#        }
+        }
         $html = $template;
 
         if (count($picarray) == 0) {
@@ -360,6 +362,12 @@ $template = NULL;
         // Rückgabe-Array initialisieren
         // Das muß auf jeden Fall geschehen!
         $config = array();
+        $config['gallerytemplate'] = array(
+            "type" => "textarea",                       // Pflicht:  Eingabetyp 
+            "cols" => "50",                             // Pflicht:  Spaltenanzahl 
+            "rows" => "7",                              // Pflicht:  Zeilenanzahl
+            "description" => "Hier kann aus de Platzhaltern ein Galerietemplate erstelt werden",     // Pflicht:  Beschreibung
+        );
         // Nicht vergessen: Das gesamte Array zurückgeben
         return $config;
     } // function getConfig    
@@ -383,7 +391,7 @@ $template = NULL;
             // Plugin-Version
             "1.12",
             // Kurzbeschreibung
-            'Erzeugt die moziloCMS Galerie Platzhalter = {Galerie|Meine Galerie, Optinal Text für Link Galerie blank}. Erzeugt wird das Ausehen über die gallerytemplate.html im Layout Verzeichnis. "<!-- {EMBEDDED_TEMPLATE_START} --> {GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION} optinal noch {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX} <!-- {EMBEDDED_TEMPLATE_END} -->"',
+            'Erzeugt die moziloCMS Galerie Platzhalter = {Galerie|Meine Galerie, Optinal Text für Link Galerie blank}. Erzeugt wird das Ausehen über die gallerytemplate.html im Layout Verzeichnis oder man Fühlt unten das Textfeld mit diesen Platzhaltern {GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION} optinal noch {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}. Es sind auch <br /> (Zeilenumbruch erlaubt)',
             // Name des Autors
            "mozilo",
             // Download-URL
