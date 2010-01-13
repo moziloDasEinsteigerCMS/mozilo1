@@ -550,7 +550,7 @@ function makeDefaultConf($conf_datei) {
                         'cmslanguage' => 'Deutsch',
                         'cmslayout' => 'moziloCMS%202009',
                         'defaultcat' => '10_Willkommen',
-                        'menu2' => 'no_menu2',
+#                        'menu2' => 'no_menu2',
                         'titlebarformat' => '%7BWEBSITE%7D'),
                     'checkbox' => array(
                         'hidecatnamedpages' => 'false',
@@ -613,12 +613,12 @@ function makeDefaultConf($conf_datei) {
                         'maxthumbwidth' => '100',
                         'gallerypicsperrow' => '4'),
                     'checkbox' => array(
-                        'usethumbs' => 'true', # reihen folge ist wichtig
-                        'usedfgallery' => 'false'), # reihen folge ist wichtig
+                        'usethumbs' => 'true'), # reihen folge ist wichtig
+#                        'usedfgallery' => 'false'), # reihen folge ist wichtig
                     'text' => array(
                         'target' => '_blank'),
                     'expert' => array(
-                        'usedfgallery',
+#                        'usedfgallery',
                         'usethumbs',
                         'maxthumbheight',
                         'maxthumbwidth',
