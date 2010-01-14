@@ -56,8 +56,8 @@ $CHARSET = 'UTF-8';
     $LAYOUT_DIR     = "layouts/".$CMS_CONF->get("cmslayout");
     $TEMPLATE_FILE  = $LAYOUT_DIR."/template.html";
 
-    # wenn ein Plugin die Galerie benutzt und sie blank ist
-    if ($GALLERY_CONF->get("target") == "_blank" and isset($_GET["gal"]) and isset($_GET["plugin"])) {
+    # wenn ein Plugin die Galerie benutzt und sie blank ist 
+    if ($GALLERY_CONF->get("target") == "_blank" and getRequestParam("gal", true) and getRequestParam("plugin", true)) {
         $TEMPLATE_FILE  = $LAYOUT_DIR."/gallerytemplate.html";
     }
 
@@ -334,7 +334,7 @@ $CHARSET = 'UTF-8';
 
     # Titel der Galerie wird bei blank benutzt
     if(strpos($HTML,'{CURRENTGALLERY}') !== false) {
-        if(getRequestParam('gal', true)) {
+        if(getRequestParam('gal', false)) {
             $HTML = preg_replace('/{CURRENTGALLERY}/', $specialchars->rebuildSpecialChars(getRequestParam('gal', true),false,true), $HTML);
         }
     }
@@ -1512,8 +1512,9 @@ $CHARSET = 'UTF-8';
         # nur zur abwärts kompatiebelen Galerie solte irgendwann raus
         # Plugin Platzhalter kommt über die Url nur bei Galerie blank
         if ($GALLERY_CONF->get("target") == "_blank"
-                and isset($_GET["gal"])
-                and isset($_GET["plugin"])
+                and getRequestParam("gal", false)
+
+                and getRequestParam("plugin", false)
                 and getRequestParam("plugin", true) == "Galerie"
             ) {
             $matches[1][] = getRequestParam("plugin", true);
@@ -1559,8 +1560,8 @@ $CHARSET = 'UTF-8';
                 # nur wens gallery und blank und get=plugin und kein Platzhalter $matches[1][$i] ist
                 # und {EMBEDDED_TEMPLATE_START} enthalten ist
                 if ($GALLERY_CONF->get("target") == "_blank"
-                    and isset($_GET["gal"])
-                    and isset($_GET["plugin"])
+                    and getRequestParam("gal", false)
+                    and getRequestParam("plugin", false)
                     and getRequestParam("plugin", true) == "Galerie"
                     ) {
                     preg_match("/\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_START\}[\s|\t]*--\>(.*)\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_END\}[\s|\t]*--\>/Umsi", $content, $galmatches);
