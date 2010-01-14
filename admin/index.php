@@ -42,7 +42,11 @@ if($debug == "ja") {
     $debug_txt = ob_get_contents();
     ob_end_clean();
 }
-
+if(is_file("../DefaultConf.php")) {
+    require_once("../DefaultConf.php");
+} else {
+    die("Fatal Error ../DefaultConf.php Datei existiert nicht");
+}
 require_once("filesystem.php");
 require_once("string.php");
 require_once("../Smileys.php");
