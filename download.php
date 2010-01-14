@@ -8,13 +8,14 @@
 *
 */
 
+    require_once("DefaultConf.php");
     require_once("Properties.php");
     
     // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
     @ini_set("display_errors", 0);
 
     $ERRORMESSAGE = "Fehlerhafter Parameter Übergeben.";    
-    $DOWNLOADS = new Properties("conf/downloads.conf");
+    $DOWNLOADS = new Properties("conf/downloads.conf".true);
 
     $CAT     = preg_replace('/(\/|\\\)/', "", rawurlencode($_REQUEST['cat']));
     $FILE = preg_replace('/(\/|\\\)/', "", rawurlencode($_REQUEST['file']));

@@ -16,6 +16,7 @@ print_r($_REQUEST);
 echo "</pre>";
 */
 
+    require_once("DefaultConf.php");
     require_once("SpecialChars.php");
     require_once("Properties.php");
     
@@ -23,10 +24,10 @@ echo "</pre>";
 #    @ini_set("display_errors", 0);
 
     $specialchars   = new SpecialChars();
-    $CMS_CONF     = new Properties("conf/main.conf");
-    $VERSION_CONF  = new Properties("conf/version.conf");
-    $GALLERY_CONF  = new Properties("conf/gallery.conf");
-    $USER_SYNTAX  = new Properties("conf/syntax.conf");
+    $CMS_CONF     = new Properties("conf/main.conf",true);
+    $VERSION_CONF  = new Properties("conf/version.conf",true);
+    $GALLERY_CONF  = new Properties("conf/gallery.conf",true);
+    $USER_SYNTAX  = new Properties("conf/syntax.conf",true);
     require_once("Language.php");
     $language       = new Language();
     require_once("Syntax.php");
@@ -65,8 +66,8 @@ $CHARSET = 'UTF-8';
     $CSS_FILE       = $LAYOUT_DIR_URL."/css/style.css";
     $FAVICON_FILE   = $LAYOUT_DIR_URL."/favicon.ico";
     // Einstellungen für Kontaktformular
-    $contactformconfig  = new Properties("formular/formular.conf");
-    $contactformcalcs   = new Properties("formular/aufgaben.conf");
+    $contactformconfig  = new Properties("formular/formular.conf",true);
+    $contactformcalcs   = new Properties("formular/aufgaben.conf",true);
 
 
     $WEBSITE_NAME = $specialchars->rebuildSpecialChars($CMS_CONF->get("websitetitle"),false,true);
@@ -221,7 +222,7 @@ $CHARSET = 'UTF-8';
         // zunächst Passwort als gesetzt und nicht eingegeben annehmen
         $passwordok = false;
         if (file_exists("conf/passwords.conf")) {
-            $passwords = new Properties("conf/passwords.conf"); // alle Passwörter laden
+            $passwords = new Properties("conf/passwords.conf", true); // alle Passwörter laden
             if ($passwords->keyExists($CAT_REQUEST.'/'.$PAGE_REQUEST)) { // nach Passwort für diese Seite suchen
                 $cattitle    = catToName($CAT_REQUEST, true);
                 $pagetitle   = $language->getLanguageValue0("passwordform_title_0");
