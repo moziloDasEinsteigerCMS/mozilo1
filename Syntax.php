@@ -297,59 +297,20 @@ class Syntax {
                 }
             }
 
-            // Galerie
+            // Galerie auf Plugin umleiten
             elseif (($attribute == "galerie") || (substr($attribute,0,8) == "galerie=")) {
-                $cleanedvalue = $specialchars->replaceSpecialChars(html_entity_decode($value, ENT_COMPAT, $CHARSET),false);
-                $link_text = "";
-                if(substr($attribute,0,8) == "galerie=") {
-                    $link_text = substr($attribute, 8, strlen($attribute)-8);
-                } else {
-                    $link_text = $value;
-                }
-
-                if (file_exists("./$GALLERIES_DIR/$cleanedvalue")) {
-                    // Galerie einbetten
-                    if ($GALLERY_CONF->get("target") == "_self") {
-                        if(file_exists($PLUGIN_DIR."/Galerie/index.php")) {
-                            $content = str_replace ($match, '{Galerie|'.$cleanedvalue.'}', $content);
-                        } else {
-                            $content = str_replace ($match, $this->createDeadlink($value, $language->getLanguageValue1("plugin_error_1", $value)), $content);
-                        }
-/*
-                        require_once("gallery.php");
-                        $gallery_template = $LAYOUT_DIR."/gallerytemplate.html";
-                        if (!$file = @fopen($gallery_template, "r"))
-                            die($language->getLanguageValue1("message_template_error_1", $gallery_template));
-                        $template = fread($file, filesize($gallery_template));
-                        fclose($file);
-                        $gallerycontent = preg_replace('/(\r\n|\r|\n)/', '{newline_in_include_tag}', $gallery->renderGallery($template,$cleanedvalue));
-                        // Embedded-Template nicht gefunden
-                        if ($gallerycontent == null) {
-                            $content = str_replace ($match, $this->createDeadlink($value, $language->getLanguageValue0("tooltip_embeddedgallery_template_error_0")), $content);
-                        }
-                        else {
-                            $content = str_replace ($match, $gallerycontent, $content);
-                        }*/
+                if (file_exists($PLUGIN_DIR."/Galerie/index.php")) {
+                    $link_text = "";
+                    if(substr($attribute,0,8) == "galerie=") {
+                        $link_text = ','.substr($attribute, 8, strlen($attribute)-8);
                     } else {
-                        $j=0;
-                        $handle = opendir("./$GALLERIES_DIR/$cleanedvalue");
-                        while ($file = readdir($handle)) {
-                            if (is_file("./$GALLERIES_DIR/$cleanedvalue/".$file) && ($file <> "texte.conf")) {
-                                $j++;
-                            }
-                        }
-                        closedir($handle);
-                        $modrewrite_dumy = NULL;
-                        if($CMS_CONF->get("modrewrite") == "true") {
-                            $modrewrite_dumy = ".html";
-                        }
-#                        $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE."index.php$modrewrite_dumy?gal=$cleanedvalue\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"".$GALLERY_CONF->get("target")."\">$link_text</a>", $content);
-                        $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE."index.php$modrewrite_dumy?gal=$cleanedvalue&amp;plugin=Galerie\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"".$GALLERY_CONF->get("target")."\">$link_text</a>", $content);
+                        $link_text = ','.$value;
                     }
+                        $content = str_replace ($match, '{Galerie|'.$value.$link_text.'}', $content);
                 }
-                // Galerie nicht vorhanden
+                // Galerie Plugin nicht vorhanden
                 else {
-                    $content = str_replace ($match, $this->createDeadlink($value, $language->getLanguageValue1("tooltip_link_gallery_error_1", $value)), $content);
+                    $content = str_replace ($match, $this->createDeadlink($value, $language->getLanguageValue1("plugin_error_1", $value)), $content);
                 }
             }
 
