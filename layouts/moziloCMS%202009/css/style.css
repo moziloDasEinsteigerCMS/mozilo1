@@ -264,7 +264,7 @@ a.gallerymenuactive, a.gallerynumbermenuactive {
 }
 
 /* -------------------------------------------------------- */
-/* Hauptmenüpunkt */
+/* HauptmenÃ¼punkt */
 /* -------------- */
 a.menu {
     color: #993333;
@@ -275,7 +275,7 @@ a.menu:hover {
 
 
 /* -------------------------------------------------------- */
-/* Aktiver Hauptmenüpunkt */
+/* Aktiver HauptmenÃ¼punkt */
 /* ---------------------- */
 a.menuactive {
         border-bottom: 1px dotted #993333;
@@ -293,7 +293,7 @@ a.menuactive:hover {
 
 
 /* -------------------------------------------------------- */
-/* Detailmenüpunkt */
+/* DetailmenÃ¼punkt */
 /* --------------- */
 a.detailmenu {
 }
@@ -302,7 +302,7 @@ a.detailmenu:hover {
 
 
 /* -------------------------------------------------------- */
-/* Aktiver Detailmenüpunkt */
+/* Aktiver DetailmenÃ¼punkt */
 /* ----------------------- */
 a.detailmenuactive {
 }
@@ -311,7 +311,7 @@ a.detailmenuactive:hover {
 
 
 /* -------------------------------------------------------- */
-/* Submenüpunkt */
+/* SubmenÃ¼punkt */
 /* --------------- */
 a.submenu {
 }
@@ -320,7 +320,7 @@ a.submenu:hover {
 
 
 /* -------------------------------------------------------- */
-/* Aktiver Submenüpunkt */
+/* Aktiver SubmenÃ¼punkt */
 /* ----------------------- */
 a.submenuactive {
 }
