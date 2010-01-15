@@ -2068,11 +2068,6 @@ function editGallery($post) {
         }
     }
 
-    # die gallery.xml generel löschen wenn der Galerien Tag aufgerufen wird
-    # benutz die dfGalerie
-    if(file_exists($GALLERIES_DIR_REL."/gallery.xml"))
-        @unlink($GALLERIES_DIR_REL."/gallery.xml");
-
     # Galerien durchgehen und änderungen machen
     foreach($post['gallery'] as $gallery => $gallery_array) {
         if($gallery == "setings" or $gallery == "error_html" or $gallery == "make_thumbs" or $gallery == "scale_max") continue;
