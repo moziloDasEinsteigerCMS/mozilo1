@@ -1514,9 +1514,9 @@ $CHARSET = 'UTF-8';
         # Plugin Platzhalter kommt über die Url nur bei Galerie blank
         if ($GALLERY_CONF->get("target") == "_blank"
                 and getRequestParam("gal", false)
-
                 and getRequestParam("plugin", false)
                 and getRequestParam("plugin", true) == "Galerie"
+                and !strstr($content,"{Galerie")
             ) {
             $matches[1][] = getRequestParam("plugin", true);
         }
@@ -1564,6 +1564,7 @@ $CHARSET = 'UTF-8';
                     and getRequestParam("gal", false)
                     and getRequestParam("plugin", false)
                     and getRequestParam("plugin", true) == "Galerie"
+                    and strstr($content,"{EMBEDDED_TEMPLATE_START}")
                     ) {
                     preg_match("/\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_START\}[\s|\t]*--\>(.*)\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_END\}[\s|\t]*--\>/Umsi", $content, $galmatches);
                     if (sizeof($galmatches) > 1) {
