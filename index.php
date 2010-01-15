@@ -57,8 +57,8 @@ $CHARSET = 'UTF-8';
     $LAYOUT_DIR     = "layouts/".$CMS_CONF->get("cmslayout");
     $TEMPLATE_FILE  = $LAYOUT_DIR."/template.html";
 
-    # wenn ein Plugin die Galerie benutzt und sie blank ist 
-    if ($GALLERY_CONF->get("target") == "_blank" and getRequestParam("gal", true) and getRequestParam("plugin", true)) {
+    # wenn ein Plugin die gallerytemplate.html benutzten möchte und sie blank ist 
+    if ($GALLERY_CONF->get("target") == "_blank" and getRequestParam("gal", true)) {
         $TEMPLATE_FILE  = $LAYOUT_DIR."/gallerytemplate.html";
     }
 
