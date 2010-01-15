@@ -43,7 +43,7 @@ h2
     margin-bottom:5px;
     text-decoration:none;
 }*/
-h3 /* Titel erklärung*/
+h3 /* Titel erklï¿½rung*/
 {
     /*font-size: 12px;*/
     margin-top:10px;
@@ -74,9 +74,10 @@ p /* Text miteilung*/
     top:10px;*/
     padding:0px;
     margin:0px;
-    /**/margin-left:10px;
+    margin-left:10px;
     margin-top:10px;
     margin-right:10%;
+    margin-bottom:10px;
     background:#F8F8F8;
     border:none;
 }
@@ -173,7 +174,7 @@ p /* Text miteilung*/
     background:none;
     border: 1px solid #C0C0C0;
     border-bottom:none;
-    border-bottom:1px solid #C9D7EB; /*kleiner hack für ie das unter button keine strich*/
+    border-bottom:1px solid #C9D7EB; /*kleiner hack fï¿½r ie das unter button keine strich*/
     background-color:#C9D7EB;
     text-align:left;
     overflow:visible;
@@ -302,8 +303,8 @@ p /* Text miteilung*/
     /*width:70%;*/
 }
 
-/*  Das "span" nicht löschen !!!
-    ist wichtig für toggle der tabelen zellen beim firefox3.5 andere nicht getestet stimt sonst die breite nicht
+/*  Das "span" nicht lï¿½schen !!!
+    ist wichtig fï¿½r toggle der tabelen zellen beim firefox3.5 andere nicht getestet stimt sonst die breite nicht
     keine anung warum ist aber so
 
 span {
