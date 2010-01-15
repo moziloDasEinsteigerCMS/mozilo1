@@ -428,7 +428,7 @@ class Galerie extends Plugin {
             // Plugin-Version
             "1.12",
             // Kurzbeschreibung
-            'Erzeugt die moziloCMS Galerie. Platzhalter = {Galerie} für die gallerytemplate.html im Layout Verzeichnis und für dir Inhaltseite {Galerie|Meine Galerie, Optinal Text für Link Galerie blank}. Erzeugt wird das Ausehen über die gallerytemplate.html im Layout Verzeichnis oder man Fühlt unten das Textfeld mit diesen Platzhaltern {GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION} optinal noch {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}.Zeilenumbruch wird Interpretiert',
+            'Erzeugt die moziloCMS Galerie. Platzhalter = {Galerie} für die gallerytemplate.html im Layout Verzeichnis und für dir Inhaltseite {Galerie|Meine Galerie, Optinal Text für Link Galerie blank}. Erzeugt wird das Ausehen über die gallerytemplate.html im Layout Verzeichnis oder man Fühlt unten das Textfeld mit diesen Platzhaltern {GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION} optinal noch {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}.',
             // Name des Autors
            "mozilo",
             // Download-URL
