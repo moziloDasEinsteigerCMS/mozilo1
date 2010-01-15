@@ -15,7 +15,7 @@ $ADMIN_TITLE = "moziloAdmin";
 #$CHARSET = 'ISO-8859-1';
 $CHARSET = 'UTF-8';
 
-$debug = "ja"; # ja oder nein
+$debug = "nein"; # ja oder nein
  // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 if($debug != "ja")
     @ini_set("display_errors", 0);
