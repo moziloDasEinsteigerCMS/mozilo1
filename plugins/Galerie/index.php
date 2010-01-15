@@ -290,7 +290,7 @@ class Galerie extends Plugin {
         }
 
         # Galerie erzeugen
-        if (($embedded == "_self") or (getRequestParam('gal', false) and getRequestParam('gal', false))) {
+        if (($embedded == "_self") or (getRequestParam('gal', false) and getRequestParam('plugin', false))) {
 
             $alldescriptions = new Properties($dir_gallery."texte.conf");
 
@@ -319,7 +319,11 @@ class Galerie extends Plugin {
                 $next = $index+1;
             $template = NULL;
             if($this->settings->get("gallerytemplate")) {
-                $template = '<div class="embeddedgallery">'.$this->settings->get("gallerytemplate").'</div>';
+                if ($embedded == "_self") {
+                    $template = '<div class="embeddedgallery">'.$this->settings->get("gallerytemplate").'</div>';
+                } else {
+                    $template = $this->settings->get("gallerytemplate");
+                }
             } else { 
                 $gallery_template = $LAYOUT_DIR."/gallerytemplate.html";
                 if (!$file = @fopen($gallery_template, "r"))
@@ -424,7 +428,7 @@ class Galerie extends Plugin {
             // Plugin-Version
             "1.12",
             // Kurzbeschreibung
-            'Erzeugt die moziloCMS Galerie Platzhalter = {Galerie|Meine Galerie, Optinal Text für Link Galerie blank}. Erzeugt wird das Ausehen über die gallerytemplate.html im Layout Verzeichnis oder man Fühlt unten das Textfeld mit diesen Platzhaltern {GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION} optinal noch {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}. Es sind auch <br /> (Zeilenumbruch erlaubt)',
+            'Erzeugt die moziloCMS Galerie. Platzhalter = {Galerie} für die gallerytemplate.html im Layout Verzeichnis und für dir Inhaltseite {Galerie|Meine Galerie, Optinal Text für Link Galerie blank}. Erzeugt wird das Ausehen über die gallerytemplate.html im Layout Verzeichnis oder man Fühlt unten das Textfeld mit diesen Platzhaltern {GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION} optinal noch {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}.Zeilenumbruch wird Interpretiert',
             // Name des Autors
            "mozilo",
             // Download-URL
