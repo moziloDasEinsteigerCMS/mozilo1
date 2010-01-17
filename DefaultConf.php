@@ -108,11 +108,9 @@ function makeDefaultConf($conf_datei) {
                         'gallerypicsperrow' => '4'),
                     'checkbox' => array(
                         'usethumbs' => 'true'), # reihen folge ist wichtig
-#                        'usedfgallery' => 'false'), # reihen folge ist wichtig
                     'text' => array(
-                        'target' => '_blank'),
+                        'target' => '_self'),
                     'expert' => array(
-#                        'usedfgallery',
                         'usethumbs',
                         'maxthumbheight',
                         'maxthumbwidth',
