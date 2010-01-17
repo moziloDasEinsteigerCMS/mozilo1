@@ -1502,6 +1502,10 @@ $CHARSET = 'UTF-8';
         
         // alle Plugins einlesen
         $dircontent = getDirContentAsArray(getcwd()."/$PLUGIN_DIR", false, false);
+        # Plugin Galerie gipts nicht manuel hinzufügen
+        if(!is_dir(getcwd()."/$PLUGIN_DIR/Galerie")) {
+            $availableplugins[] = "Galerie";
+        }
         foreach ($dircontent as $currentelement) {
             if (file_exists(getcwd()."/$PLUGIN_DIR/".$currentelement."/index.php")) {
                 $availableplugins[] = $currentelement;
@@ -1537,17 +1541,23 @@ $CHARSET = 'UTF-8';
             // ...überprüfen, ob es eine zugehörige Plugin-PHP-Datei gibt
             if (in_array($currentvariable, $availableplugins)) {
                 $replacement = "";
-                if(file_exists(getcwd()."/$PLUGIN_DIR/".$currentvariable."/plugin.conf")) {
-                    $conf_plugin = new Properties(getcwd()."/$PLUGIN_DIR/".$currentvariable."/plugin.conf",true);
-                    if($conf_plugin->get("activ") == "false") {
-                        # array fühlen mit deactivierte Plugin Platzhalter wird oben dann ersetzt mit NULL
-                        $deactiv_plugins[] = '{'.$matches[1][$i].'}';
-                        unset($conf_plugin);
-                        continue;
+                # Plugin Galerie gibts nicht dann brauchen wir auch geine plugin.conf
+                if($currentvariable == "Galerie" and !is_dir(getcwd()."/$PLUGIN_DIR/".$currentvariable)) {
+                    # Plugin-Code includieren aus der gallery.php
+                    require_once(getcwd()."/gallery.php");
+                } else {
+                   if(file_exists(getcwd()."/$PLUGIN_DIR/".$currentvariable."/plugin.conf")) {
+                        $conf_plugin = new Properties(getcwd()."/$PLUGIN_DIR/".$currentvariable."/plugin.conf",true);
+                        if($conf_plugin->get("activ") == "false") {
+                            # array fühlen mit deactivierte Plugin Platzhalter wird oben dann ersetzt mit NULL
+                            $deactiv_plugins[] = '{'.$matches[1][$i].'}';
+                            unset($conf_plugin);
+                            continue;
+                        }
                     }
+                    // Plugin-Code includieren
+                    require_once(getcwd()."/$PLUGIN_DIR/".$currentvariable."/index.php");
                 }
-                // Plugin-Code includieren
-                require_once(getcwd()."/$PLUGIN_DIR/".$currentvariable."/index.php");
                 // Enthält der Code eine Klasse mit dem Namen des Plugins?
                 if (class_exists($currentvariable)) {
                     // Objekt instanziieren und Inhalt holen!
