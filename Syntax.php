@@ -299,14 +299,14 @@ class Syntax {
 
             // Galerie auf Plugin umleiten
             elseif (($attribute == "galerie") || (substr($attribute,0,8) == "galerie=")) {
-                if (file_exists($PLUGIN_DIR."/Galerie/index.php")) {
+                if (file_exists($PLUGIN_DIR."/Galerie/index.php") or file_exists("gallery.php")) {
                     $link_text = "";
                     if(substr($attribute,0,8) == "galerie=") {
                         $link_text = ','.substr($attribute, 8, strlen($attribute)-8);
                     } else {
                         $link_text = ','.$value;
                     }
-                        $content = str_replace ($match, '{Galerie|'.$value.$link_text.'}', $content);
+                    $content = str_replace ($match, '{Galerie|'.$value.$link_text.'}', $content);
                 }
                 // Galerie Plugin nicht vorhanden
                 else {
