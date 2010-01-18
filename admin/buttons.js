@@ -10,9 +10,9 @@ function insert(aTag, eTag, keepSelectedText) {
   var input = document.forms['form'].elements['pagecontent'];
   var scrolltop = input.scrollTop;
   input.focus();
-  /* für Internet Explorer */
+  /* fÃ¼r Internet Explorer */
   if(typeof document.selection != 'undefined') {
-    /* Einfügen des Formatierungscodes */
+    /* EinfÃ¼gen des Formatierungscodes */
     var range = document.selection.createRange();
     var insText = range.text;
     if (keepSelectedText == true) {
@@ -29,10 +29,10 @@ function insert(aTag, eTag, keepSelectedText) {
     }
     range.select();
   }
-  /* für neuere auf Gecko basierende Browser */
+  /* fÃ¼r neuere auf Gecko basierende Browser */
   else if(typeof input.selectionStart != 'undefined')
   {
-    /* Einfügen des Formatierungscodes */
+    /* EinfÃ¼gen des Formatierungscodes */
     var start = input.selectionStart;
     var end = input.selectionEnd;
     var insText = input.value.substring(start, end);
@@ -51,19 +51,19 @@ function insert(aTag, eTag, keepSelectedText) {
     input.selectionStart = pos;
     input.selectionEnd = pos;
   }
-  /* für die übrigen Browser */
+  /* fÃ¼r die Ãœbrigen Browser */
   else
   {
-    /* Abfrage der Einfügeposition */
+    /* Abfrage der EinfÃ¼geposition */
     var pos;
     var re = new RegExp('^[0-9]{0,3}$');
     while(!re.test(pos)) {
-      pos = prompt("Einfügen an Position (0.." + input.value.length + "):", "0");
+      pos = prompt("EinfÃ¼gen an Position (0.." + input.value.length + "):", "0");
     }
     if(pos > input.value.length) {
       pos = input.value.length;
     }
-    /* Einfügen des Formatierungscodes */
+    /* EinfÃ¼gen des Formatierungscodes */
     var insText = prompt("Bitte geben Sie den zu formatierenden Text ein:");
     input.value = input.value.substr(0, pos) + aTag + insText + eTag + input.value.substr(pos);
   }
@@ -75,6 +75,17 @@ function insertAndResetSelectbox(selectbox) {
 		insert(selectbox.options[selectbox.selectedIndex].value, '', false);
 		selectbox.selectedIndex = 0;
 	}
+}
+
+function insertPluginAndResetSelectbox(selectbox) {
+    if (selectbox.selectedIndex > 0) {
+        if (selectbox.options[selectbox.selectedIndex].value.search(/\|/) != -1) {
+            insert(selectbox.options[selectbox.selectedIndex].value, '}', true);
+        } else {
+            insert(selectbox.options[selectbox.selectedIndex].value, '', false);
+        }
+        selectbox.selectedIndex = 0;
+    }
 }
 
 function insertTagAndResetSelectbox(selectbox) {
