@@ -3822,6 +3822,22 @@ function returnUserSyntaxSelectbox() {
     return $content;
 }
 
+// Selectbox mit allen benutzerdefinierten Syntaxelementen
+function returnPlatzhalterSelectbox() {
+    global $specialchars;
+
+    $platzhalter_array = makePlatzhalter();
+    $selectbox = '<select class="usersyntaxselectbox" name="platzhalter" onchange="insertAndResetSelectbox(this);">'
+    .'<option class="noaction" value="">'.getLanguageValue("toolbar_platzhalter").'</option>';
+    foreach ($platzhalter_array as $value) {
+        $language = str_replace(array('{','}'),'',$value);
+        $selectbox .= '<option value="'.$value.'">'.$value.' '.getLanguageValue("toolbar_platzhalter_".$language).'</option>';
+    }
+    $selectbox .= '</select>';
+    return $selectbox;
+}
+
+
 // Selectbox mit allen Plugin Platzhaltern die nichts mit dem Template zu tun haben
 function returnPluginSelectbox() {
     global $PLUGIN_DIR;
@@ -3963,7 +3979,7 @@ function returnFormatToolbar($currentcat) {
         $content .= "<table><tr><td>".returnSmileyBar()."</td></tr></table>";
     }
     # Plugins
-    $content .= "<table><tr><td>".returnPluginSelectbox()."</td></tr></table>";
+    $content .= "<table><tr><td>".returnPluginSelectbox().'</td><td style="padding-left:22px;">'.returnPlatzhalterSelectbox()."</td></tr></table>";
 
     $content .= "</div>";
     return $content;
