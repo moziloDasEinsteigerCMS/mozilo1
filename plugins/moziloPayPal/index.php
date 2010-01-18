@@ -86,7 +86,9 @@ class moziloPayPal extends Plugin {
             // Name des Autors
             "mozilo",
             // Download-URL
-            "http://cms.mozilo.de"
+            "http://cms.mozilo.de",
+            array('{moziloPayPal|}' => 'Überschrieft Spenden',
+                '{moziloPayPal}' => 'ohne Überschrieft')
             );
     } // function getInfo
 
