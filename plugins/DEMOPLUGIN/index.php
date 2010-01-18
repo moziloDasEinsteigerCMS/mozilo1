@@ -297,25 +297,43 @@ class DEMOPLUGIN extends Plugin {
     * 
     * Gibt die Plugin-Infos als Array zurück - in dieser 
     * Reihenfolge:
-    *   - Name des Plugins
-    *   - Version des Plugins
+    *   - Name des Plugins + Version
+    *   - für moziloCMS-Version
     *   - Kurzbeschreibung
     *   - Name des Autors
     *   - Download-URL
+    *   - Platzhalter für die Selectbox
     * 
     ***************************************************************/
     function getInfo() {
         return array(
-            // Plugin-Name
+            // Plugin-Name + Version
             "Plugin-Demo",
-            // Plugin-Version
-            "1.0",
+            // moziloCMS-Version
+            "1.12",
             // Kurzbeschreibung
             "Beispiel-Plugin, das die Möglichkeiten des Plugin-Systems von moziloCMS aufzeigt",
             // Name des Autors
             "mozilo",
             // Download-URL
-            "http://cms.mozilo.de"
+            "http://cms.mozilo.de",
+            # Platzhalter für die Selectbox im Inhaltseite Edit wenn lehr erscheint es nicht in Selectbox
+            # Beispiel:
+            #        Platzhalter => Kurtzbeschreibung
+            # array('{Platzhalter|}' => 'Meine Platzhalter, Optinal Text für Link Platzhalter blank')
+            # in Selectbox erscheint {Platzhalter|Meine Kurtzbeschreibung, Optinal Text für Link Platzhalter blank}
+            # in Inhaltseite {Platzhalter|}
+            # oder   Platzhalter => Kurtzbeschreibung
+            # array('{Platzhalter}' => 'Optional Kurtzbeschreibung')
+            # in Selectbox erscheint {Platzhalter}
+            # in Inhaltseite {Platzhalter}
+            # und mit mehreren die alle in der Selectbox erscheint
+            # array('{Platzhalter_1}' => 'Kurtzbeschreibung_1', '{Platzhalter_2}' => 'Kurtzbeschreibung_2')
+            array('{DEMOPLUGIN}' => 'Optional Kurtzbeschreibung',
+                    '{DEMOPLUGIN|}' => 'Meine Kurtzbeschreibung, Optinal Text für Link Platzhalter blank',
+                    '{DEMOPLUGIN|Value_1,}' => 'Meine Kurtzbeschreibung',
+                    '{DEMOPLUGIN|Value_2,}' => 'Meine Kurtzbeschreibung'
+                    )
             );
     } // function getInfo
 
