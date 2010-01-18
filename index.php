@@ -1548,7 +1548,7 @@ $CHARSET = 'UTF-8';
                 } else {
                    if(file_exists(getcwd()."/$PLUGIN_DIR/".$currentvariable."/plugin.conf")) {
                         $conf_plugin = new Properties(getcwd()."/$PLUGIN_DIR/".$currentvariable."/plugin.conf",true);
-                        if($conf_plugin->get("activ") == "false") {
+                        if($conf_plugin->get("active") == "false") {
                             # array fühlen mit deactivierte Plugin Platzhalter wird oben dann ersetzt mit NULL
                             $deactiv_plugins[] = '{'.$matches[1][$i].'}';
                             unset($conf_plugin);
