@@ -143,22 +143,50 @@ p /* Text miteilung*/
     vertical-align:bottom;
 }
 
-.td_button /*zelle um button*/
+#table_buttons a
 {
-    padding:0;
-    margin:0;
-    border:none;
-    border-bottom: 1px solid #C0C0C0;
     vertical-align:bottom;
+    text-decoration:none;
+    font-weight:bold;
+    font-size:12px;
+    color:#000000;
 }
 
-.td_button_activ /*zelle um button*/
-{
+.td_button {
     padding:0;
     margin:0;
-    border:none;
-    vertical-align:bottom;
 }
+
+.td_button_activ {
+    padding:0;
+    margin:0;
+}
+
+.td_button a {
+    display:block;
+    padding:0;
+    margin:0;
+    padding-left:5px;
+    padding-right:10px;
+    padding-top:3px;
+    padding-bottom:0px;
+    border: 1px solid #C0C0C0;
+    background-color:#C9D7EB;
+}
+
+.td_button_activ a
+{
+    display:block;
+    margin:0;
+    padding-left:5px;
+    padding-right:10px;
+    padding-top:3px;
+    padding-bottom:5px;
+    border: 1px solid #C0C0C0;
+    border-bottom:none;
+    background-color:#F8F8F8;
+}
+
 .rest_td_tabs
 {
     margin:0px;
@@ -167,87 +195,12 @@ p /* Text miteilung*/
     vertical-align:bottom;
 }
 
-.button_tab /*der button*/
+.tab_img
 {
-    padding:0;
-    margin:0;
-    background:none;
-    border: 1px solid #C0C0C0;
-    border-bottom:none;
-    border-bottom:1px solid #C9D7EB; /*kleiner hack f�r ie das unter button keine strich*/
-    background-color:#C9D7EB;
-    text-align:left;
-    overflow:visible;
+    margin:0px;
+    padding:0px;
+    margin-right:5px;
 }
-
-* html .button_tab {  /* nur fuer Internet Explorer */
-  width:100%;     /* Version 5.x */
-  w\idth:100%;    /* Version 6 */
-}
-
-.button_tab_activ /*der button*/
-{
-    padding:0;
-    margin:0;
-    background:none;
-    border: 1px solid #C0C0C0;
-    border-bottom:none;
-    text-align:left;
-    background-color:transparent;
-    /*background-color:#ffffff;*/
-    background-color:#F8F8F8;
-    overflow:visible;
-}
-
-* html .button_tab_activ {  /* nur fuer Internet Explorer */
-  width:100%;     /* Version 5.x */
-  w\idth:100%;    /* Version 6 */
-}
-
-.button_tab_inhalt /*tabelle im button*/
-{
-    padding:0;
-    margin-left:2px;
-    margin-right:2px;
-    margin-top:2px;
-    margin-bottom:0px;
-    vertical-align:bottom;
-}
-
-.button_tab_inhalt_activ /*tabelle im button*/
-{
-    padding:0;
-    margin-left:2px;
-    margin-right:2px;
-    margin-top:2px;
-    margin-bottom:5px;
-}
-
-.button_tab_icon /*zelle in tabelle im button*/
-{
-    margin:0;
-    padding:0;
-    vertical-align:bottom;
-}
-
-.button_tab_text /*zelle in tabelle im button*/
-{
-    margin:0;
-    padding:0;
-    padding-right:5px;
-    padding-left:3px;
-    color: #000000;
-    font-size:11px;
-    font-weight:bold;
-    text-align:left;
-    vertical-align:bottom;
-}
-/*.button_tab_text .access_key
-{
-    font-size:11px;
-}
-*/
-
 
 #td_tabs
 {
