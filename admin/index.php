@@ -3412,11 +3412,11 @@ function plugins($post) {
             }
             if(getRequestParam('apply', true)) {
                 $check_activ = "false";
-                if(isset($_POST[$currentelement]['activ'])) {
+                if(isset($_POST[$currentelement]['active'])) {
                     $check_activ = "true";
                 }
-                if($conf_plugin->get("activ") != $check_activ) {
-                    $conf_plugin->set("activ",$check_activ);
+                if($conf_plugin->get("active") != $check_activ) {
+                    $conf_plugin->set("active",$check_activ);
                 }
             }
 
@@ -3432,7 +3432,7 @@ function plugins($post) {
                     $plugin_error = true;
                 }
                 $pagecontent .= '<tr><td width="70%" class="td_titel" nowrap><span class="text_cat_page">'.$plugin_name.'</span>'.$plugin_error_conf.'</td>';
-                $pagecontent .= '<td width="15%" class="">Activieren&nbsp;'.buildCheckBox($currentelement.'[activ]', ($conf_plugin->get("activ") == "true")).'</td>';
+                $pagecontent .= '<td width="15%" class="">'.getLanguageValue("plugins_titel_active").'&nbsp;'.buildCheckBox($currentelement.'[active]', ($conf_plugin->get("active") == "true")).'</td>';
                 $pagecontent .= '<td width="15%" class="td_icons">';
                 if(getRequestParam('javascript', true) and $plugin_error === false) {
                     $pagecontent .= '<span id="toggle_'.$toggle_pos.'_linkBild"'.$tooltip_help_edit.'></span>';
@@ -3491,7 +3491,7 @@ function plugins($post) {
                                                 $conf_inhalt = md5($conf_inhalt);
                                             }
                                             # nur in conf schreiben wenn sich der wert geändert hat
-                                            if($conf_plugin->get("activ") == "true" and $conf_plugin->get($name) != $conf_inhalt) {
+                                            if($conf_plugin->get("active") == "true" and $conf_plugin->get($name) != $conf_inhalt) {
                                                 $conf_plugin->set($name,$conf_inhalt);
                                                 $display_toggle = ' style="display:block;"';
                                                 $messages = returnMessage(true, $regex_error);
@@ -3503,19 +3503,19 @@ function plugins($post) {
                                         }
                                     } else {
                                         # nur in conf schreiben wenn sich der wert geändert hat und es kein password ist
-                                        if($conf_plugin->get("activ") == "true" and $conf_plugin->get($name) != $conf_inhalt and $config[$name]['type'] != "password") {
+                                        if($conf_plugin->get("active") == "true" and $conf_plugin->get($name) != $conf_inhalt and $config[$name]['type'] != "password") {
                                             $conf_plugin->set($name,$conf_inhalt);
                                             $display_toggle = ' style="display:block;"';
                                             $messages = returnMessage(true, $regex_error);
                                         }
                                    }
                                 # checkbox
-                                } elseif($conf_plugin->get("activ") == "true" and $config[$name]['type'] == "checkbox" and $conf_plugin->get($name) == "true") {
+                                } elseif($conf_plugin->get("active") == "true" and $config[$name]['type'] == "checkbox" and $conf_plugin->get($name) == "true") {
                                     $conf_plugin->set($name,"false");
                                     $display_toggle = ' style="display:block;"';
                                     $messages = returnMessage(true, getLanguageValue("plugins_messages_input"));
                                 # variable gibts also schreiben mit lehren wert
-                                } elseif($conf_plugin->get("activ") == "true" and $conf_plugin->get($name)) {
+                                } elseif($conf_plugin->get("active") == "true" and $conf_plugin->get($name)) {
                                     $conf_plugin->set($name,"");
                                     $display_toggle = ' style="display:block;"';
                                     $messages = returnMessage(true, getLanguageValue("plugins_messages_input"));
