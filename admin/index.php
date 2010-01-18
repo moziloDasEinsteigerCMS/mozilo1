@@ -167,17 +167,19 @@ $EXT_DRAFT     = ".tmp";
 $EXT_LINK     = ".lnk";
 
 $post = NULL;
+# getRequestParam() ferarbeitet nur $_POST sachen deshalb hier eine ausname
+if(isset($_REQUEST['javascript']) and $_REQUEST['javascript'] == "ja") $_POST['javascript'] = "ja";
 # hier das tabs array
 $array_tabs = array("home","category","page","files","gallery","config","admin","plugins");
 $action = 'home';
 foreach($array_tabs as $pos => $tab) {
     # actives tab
-    if(isset($_POST['action_'.$pos])) {
+    if(isset($_REQUEST['action_'.$pos])) {
         $action = $tab;
         $post['makepara'] = "yes";
         break;
     }
-    # actives tab in dem grad gearbeitet wird
+    # actives tab in dem grade gearbeitet wird
     if(isset($_POST['action_activ'])) {
         $action_html = $specialchars->rebuildSpecialChars($_POST['action_activ'], false, true);
         if($action_html == getLanguageValue($tab."_button")) {
@@ -288,7 +290,7 @@ $html .= '<tr><td width="100%" id="td_tabs">';
 
 $html .= '<table width="100%" id="table_buttons" cellspacing="0" cellpadding="0" border="0">';
 $html .= '<tr>';
-
+/*
 # Menue Tabs erzeugen
 foreach($array_tabs as $position => $language) {
     if($ADMIN_CONF->get("showTooltips") == "true") {
@@ -301,13 +303,29 @@ foreach($array_tabs as $position => $language) {
     if($action == $language) $activ = "_activ"; else $activ = NULL;
     $html .= '<td width="2%" class="td_button'.$activ.'" nowrap>';
     $html .= '<form class="form" accept-charset="'.$CHARSET.'" action="index.php" method="post">';
-    $html .= '<script type="text/javascript">document.write(\'<input type="hidden" name="javascript" value="ja">\');</script>';
+#    $html .= '<script type="text/javascript">document.write(\'<input type="hidden" name="javascript" value="ja">\');</script>';
     $html .= '<button class="button_tab'.$activ.'" type="submit" name="action_'.$position.'" value="'.getLanguageValue($language."_button").'" title="'.getLanguageValue($language."_button").'"'.$tooltip.'>';
     $html .= '<table width="50%" class="button_tab_inhalt'.$activ.'" cellspacing="0" cellpadding="0" border="0"><tr><td width="2%" class="button_tab_icon"><img src="gfx/icons/'.$icon_size.'/'.$language.'.png" alt="" width="24" height="24" hspace="0" vspace="0" border="0"></td><td width="98%" class="button_tab_text">'.getLanguageValue($language."_button").'</td></tr></table>';
     $html .= '</button>';
     $html .= '</form>';
     $html .= '</td>';
 
+}*/
+
+# Menue Tabs erzeugen
+foreach($array_tabs as $position => $language) {
+    if($ADMIN_CONF->get("showTooltips") == "true") {
+        $tooltip = createTooltipWZ($language."_button",$language."_text",",WIDTH,400");
+    } else {
+        $tooltip = NULL;
+    }
+
+    if($action == $language) $activ = "_activ"; else $activ = NULL;
+    $html .= '<td align="left" valign="bottom" width="2%" class="td_button'.$activ.'" nowrap'.$tooltip.'>';
+    $html .= '<a id="tab_'.$position.'" href="index.php?action_'.$position.'='.$language.'" title="'.getLanguageValue($language."_button").'"><img class="tab_img" src="gfx/icons/'.$icon_size.'/'.$language.'.png" alt="" hspace="0" vspace="0" border="0">'.getLanguageValue($language."_button").'</a>';
+    $html .= '<script type="text/javascript">document.getElementById("tab_'.$position.'").href="index.php?action_'.$position.'='.$language.'&javascript=ja";</script>';
+    $html .= '</td>';
+# width="24" height="24"
 }
 
 $html .= '<td class="rest_td_tabs">&nbsp;</td>';
@@ -2744,7 +2762,7 @@ function config($post) {
         }
     }*/
 
-    if(isset($post['javascript']) and $ADMIN_CONF->get("showTooltips") == "true") {
+    if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
         $tooltip_config_help = '<img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"'.createTooltipWZ("","config_help",",WIDTH,400,CLICKCLOSE,true").'>';
     } else {
         $tooltip_config_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration&amp;page=70_Konfiguration" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
@@ -3212,14 +3230,14 @@ function admin($post) {
 
     # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getTooltipValue as $language) {
-        if(isset($post['javascript']) and $ADMIN_CONF->get("showTooltips") == "true") {
+        if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
             ${"tooltip_".$language} = createTooltipWZ("",$language,",WIDTH,200,CLICKCLOSE,true");
         } else {
             ${"tooltip_".$language} = NULL;
         }
     }
 
-    if(isset($post['javascript']) and $ADMIN_CONF->get("showTooltips") == "true") {
+    if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
         $tooltip_admin_help = '<img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"'.createTooltipWZ("","admin_help",",WIDTH,400,CLICKCLOSE,true").'>';
     } else {
         $tooltip_admin_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration&amp;page=70_Konfiguration" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
