@@ -1,4 +1,29 @@
 <?php
+
+# Alle Platzhalter als array mit Beschreibung
+function makePlatzhalter() {
+    $platzhalter = array('{CATEGORY}',
+                        '{CATEGORY_NAME}',
+                        '{PAGE}',
+                        '{PAGE_NAME}',
+                        '{PAGE_FILE}',
+                        '{PREVIOUS_PAGE}',
+                        '{PREVIOUS_PAGE_NAME}',
+                        '{PREVIOUS_PAGE_FILE}',
+                        '{NEXT_PAGE}',
+                        '{NEXT_PAGE_NAME}',
+                        '{NEXT_PAGE_FILE}',
+                        '{SEARCH}',
+                        '{LASTCHANGE}',
+                        '{SITEMAPLINK}',
+                        '{CMSINFO}',
+                        '{CONTACT}',
+                        '{TABLEOFCONTENTS}',
+                        '{CURRENTGALLERY}');
+
+    return $platzhalter;
+}
+
 # $conf_datei = voller pfad und conf Dateiname oder nur Array Name
 function makeDefaultConf($conf_datei) {
     $basic = array(
