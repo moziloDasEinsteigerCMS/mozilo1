@@ -156,6 +156,7 @@ $CONTENT_DIR_REL        = "../".$CONTENT_DIR_NAME;
 $GALLERIES_DIR_NAME    = "galerien";
 $GALLERIES_DIR_REL    = "../".$GALLERIES_DIR_NAME;
 $PREVIEW_DIR_NAME        = "vorschau";
+$PLUGIN_DIR = "plugins";
 
 $ALLOWED_SPECIALCHARS_REGEX = $specialchars->getSpecialCharsRegex();
 
@@ -3368,9 +3369,9 @@ function admin($post) {
 function plugins($post) {
     global $ADMIN_CONF;
     global $CHARSET;
-    $icon_size = "24x24";
+    global $PLUGIN_DIR;
 
-    $PLUGIN_DIR = "plugins";
+    $icon_size = "24x24";
 
     require_once("../Plugin.php");
 
@@ -3444,19 +3445,21 @@ function plugins($post) {
                 $pagecontent_conf = NULL;
                 if($plugin_error === false) {
                     $pagecontent_start_conf = '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
-                    # Plugin Infos
+                    # Plugin Infos die reinvolge ist wichtig
                     $plugins_info_array = array("plugins_titel_version","plugins_titel_description","plugins_titel_author","plugins_titel_web");
-                    $pos = 1;
-                    foreach($plugins_info_array as $info) {
-                        if($pos == 4) {
+                    foreach($plugins_info_array as $pos => $info) {
+                        if($pos == 3) {
                             $plugin_info[$pos] = '<a href="'.$plugin_info[$pos].'" target="_blank">'.$plugin_info[$pos].'</a>';
                         } else {
                             $plugin_info[$pos] = htmlentities($plugin_info[$pos],ENT_COMPAT,$CHARSET);
                         }
                         if(isset($plugin_info[$pos])) {
-                            $pagecontent_conf .= '<tr><td width="10%" class="td_left_title_padding_bottom" nowrap><b class="text_grau">'.getLanguageValue($info).'</b></td><td width="90%" class="td_togglen_padding_bottom">'.$plugin_info[$pos].'</td></tr>';
+                            $pagecontent_conf .= '<tr><td width="10%" valign="top" class="td_left_title_padding_bottom" nowrap><b class="text_grau">'.getLanguageValue($info).'</b></td><td width="90%" class="td_togglen_padding_bottom">'.$plugin_info[$pos].'</td></tr>';
                         }
-                        $pos++;
+                        if($pos == 3) {
+                            # Das getInfo() array hat mehr wie 4 einträge wir brauchen hier aber nur die 4
+                            break;
+                        }
                     }
 
                     if(count($plugin->getConfig()) >= 1) {
@@ -3811,12 +3814,43 @@ function returnUserSyntaxSelectbox() {
     ksort($usersyntaxarray);
 
     $content = "<select class=\"usersyntaxselectbox\" name=\"usersyntax\" onchange=\"insertTagAndResetSelectbox(this);\">"
-    ."<option value=\"\">".getLanguageValue("toolbar_usersyntax")."</option>";
+    ."<option class=\"noaction\" value=\"\">".getLanguageValue("toolbar_usersyntax")."</option>";
     foreach ($usersyntaxarray as $key => $value) {
         $content .= "<option value=\"".$key."\">[".$key."|...]</option>";
     }
     $content .= "</select>";
     return $content;
+}
+
+// Selectbox mit allen Plugin Platzhaltern die nichts mit dem Template zu tun haben
+function returnPluginSelectbox() {
+    global $PLUGIN_DIR;
+    global $specialchars;
+
+    require_once("../Plugin.php");
+    $plugins = getDirContentAsArray("../".$PLUGIN_DIR, false);
+    $selectbox = '<select class="usersyntaxselectbox" name="plugins" onchange="insertPluginAndResetSelectbox(this);">'
+    .'<option class="noaction" value="">'.getLanguageValue("toolbar_plugins").'</option>';
+    foreach ($plugins as $currentplugins) {
+        if (file_exists("../$PLUGIN_DIR/".$currentplugins."/index.php")) {
+            require_once("../$PLUGIN_DIR/".$currentplugins."/index.php");
+            $plugin = new $currentplugins();
+            $plugin_info = $plugin->getInfo();
+            if(isset($plugin_info[5]) and is_array($plugin_info[5])) {
+                foreach($plugin_info[5] as $platzh => $info) {
+                    if(strpos($platzh,'|') > 0) {
+                        $info = str_replace('}',' '.$info.'}',$platzh);
+                        $selectbox .= '<option value="'.str_replace('}','',$platzh).'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
+                    } else {
+                        $info = $platzh.' '.$info;
+                        $selectbox .= '<option value="'.$platzh.'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
+                    }
+                }
+            }
+        }
+    }
+    $selectbox .= "</select>";
+    return $selectbox;
 }
 
 
@@ -3926,8 +3960,10 @@ function returnFormatToolbar($currentcat) {
 
     // Smileys
     if ($CMS_CONF->get("replaceemoticons") == "true") {
-        $content .= "<table><tr><td colspan=\"2\">".returnSmileyBar()."</td></tr></table>";
+        $content .= "<table><tr><td>".returnSmileyBar()."</td></tr></table>";
     }
+    # Plugins
+    $content .= "<table><tr><td>".returnPluginSelectbox()."</td></tr></table>";
 
     $content .= "</div>";
     return $content;
@@ -3940,7 +3976,7 @@ function returnFormatToolbarIcon($tag) {
 
 
 // Rueckgabe einer Selectbox mit Elementen, die per Klick in die Inhaltsseite uebernommen werden können
-// $type: 1=Kategorien 2=Inhaltsseiten 3=Dateien 4=Galerien
+// $type: 1=Kategorien & nhaltsseiten 2=Dateien 3=Galerien
 function returnOverviewSelectbox($type, $currentcat) {
     global $specialchars;
     global $CONTENT_DIR_REL;
@@ -3962,18 +3998,18 @@ function returnOverviewSelectbox($type, $currentcat) {
                 if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
                 if (isValidDirOrFile($catdir)) {
                     $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
-                    array_push($elements, array($cleancatname, $cleancatname));
+                    $elements[] = array($cleancatname, $cleancatname);
                     $handle = opendir("$CONTENT_DIR_REL/$catdir");
                     while (($file = readdir($handle))) {
                         if (isValidDirOrFile($file) && is_file("$CONTENT_DIR_REL/$catdir/$file") && ((substr($file, strlen($file)-4, 4) == $EXT_PAGE) || (substr($file, strlen($file)-4, 4) == $EXT_HIDDEN))) {
                             $cleanpagename = $specialchars->rebuildSpecialChars(substr($file, 3, strlen($file) - 3 - strlen($EXT_PAGE)), true, true);
                             $completepagename = $cleanpagename;
                             if (substr($file, strlen($file)-4, 4) == $EXT_HIDDEN)
-                            $completepagename = $cleanpagename." (".getLanguageValue("page_saveashidden").")";
+                                $completepagename = $cleanpagename." (".getLanguageValue("page_saveashidden").")";
                             if ($catdir == $currentcat)
-                            array_push($elements, array($spacer.$completepagename, $cleanpagename));
+                                $elements[] = array($spacer.$completepagename, $cleanpagename);
                             else
-                            array_push($elements, array($spacer.$completepagename, $cleancatname.":".$cleanpagename));
+                                $elements[] = array($spacer.$completepagename, $cleancatname.":".$cleanpagename);
                         }
                     }
                     closedir($handle);
@@ -3982,7 +4018,7 @@ function returnOverviewSelectbox($type, $currentcat) {
             $selectname = "pages";
             break;
 
-            // Dateien
+        // Dateien
         case 2:
             // alle Kategorien durchgehen
             $categories = getDirContentAsArray($CONTENT_DIR_REL, false);
@@ -3990,20 +4026,20 @@ function returnOverviewSelectbox($type, $currentcat) {
                 if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
                 if (isValidDirOrFile($catdir)) {
                     $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
-                    array_push($elements, array($cleancatname, ":".$cleancatname));
+                    $elements[] = array($cleancatname, ":".$cleancatname);
                     $handle = opendir("$CONTENT_DIR_REL/$catdir/dateien");
                     $currentcat_filearray = array();
                     while (($file = readdir($handle))) {
                         if (isValidDirOrFile($file) && is_file("$CONTENT_DIR_REL/$catdir/dateien/$file")) {
-                            array_push($currentcat_filearray, $file);
+                            $currentcat_filearray[] = $file;
                         }
                     }
                     natcasesort($currentcat_filearray);
                     foreach ($currentcat_filearray as $current_file) {
                         if ($catdir == $currentcat)
-                        array_push($elements, array($spacer.$specialchars->rebuildSpecialChars($current_file, true, true), $specialchars->rebuildSpecialChars($current_file, true, true)));
+                            $elements[] = array($spacer.$specialchars->rebuildSpecialChars($current_file, true, true), $specialchars->rebuildSpecialChars($current_file, true, true));
                         else
-                        array_push($elements, array($spacer.$specialchars->rebuildSpecialChars($current_file, true, true), $cleancatname.":".$specialchars->rebuildSpecialChars($current_file, true, true)));
+                            $elements[] = array($spacer.$specialchars->rebuildSpecialChars($current_file, true, true), $cleancatname.":".$specialchars->rebuildSpecialChars($current_file, true, true));
                     }
                     closedir($handle);
                 }
@@ -4011,11 +4047,11 @@ function returnOverviewSelectbox($type, $currentcat) {
             $selectname = "files";
             break;
 
-            // Galerien
+        // Galerien
         case 3:
             $galleries = getDirContentAsArray($GALLERIES_DIR_REL, false);
             foreach ($galleries as $currentgallery) {
-                array_push($elements, array($specialchars->rebuildSpecialChars($currentgallery, false, true), $specialchars->rebuildSpecialChars($currentgallery, false, false)));
+                $elements[] = array($specialchars->rebuildSpecialChars($currentgallery, false, true), $specialchars->rebuildSpecialChars($currentgallery, false, false));
             }
             $selectname = "gals";
             break;
