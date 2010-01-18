@@ -325,7 +325,7 @@ $html .= '<form name="form" class="form" accept-charset="'.$CHARSET.'" action="i
 $html .= '<script type="text/javascript">document.write(\'<input type="hidden" name="javascript" value="ja">\');</script>';
 
 
-if($LOGINCONF->get("initialpw") == "true") {
+if($LOGINCONF->get("initialpw") == "true" and $LOGINCONF->get("initialsetup") == "false") {
     $html .= returnMessage(false, getLanguageValue("initialpw"));
 }
 
@@ -3062,7 +3062,7 @@ function admin($post) {
     }
 
     if($LOGINCONF->get("initialsetup") == "true") {
-        $post['error_messages']['initialsetup'][] = NULL;
+        $post['messages']['initialsetup'][] = NULL;
     }
 
     // Auswertung des Formulars
