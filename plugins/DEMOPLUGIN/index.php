@@ -321,18 +321,18 @@ class DEMOPLUGIN extends Plugin {
             # Beispiel:
             #        Platzhalter => Kurtzbeschreibung
             # array('{Platzhalter|}' => 'Meine Platzhalter, Optinal Text für Link Platzhalter blank')
-            # in Selectbox erscheint {Platzhalter|Meine Kurtzbeschreibung, Optinal Text für Link Platzhalter blank}
+            # in Selectbox erscheint {Platzhalter|Optional Meine Kurtzbeschreibung, Optinal Text für Link Platzhalter blank}
             # in Inhaltseite {Platzhalter|}
             # oder   Platzhalter => Kurtzbeschreibung
             # array('{Platzhalter}' => 'Optional Kurtzbeschreibung')
             # in Selectbox erscheint {Platzhalter}
             # in Inhaltseite {Platzhalter}
             # und mit mehreren die alle in der Selectbox erscheint
-            # array('{Platzhalter_1}' => 'Kurtzbeschreibung_1', '{Platzhalter_2}' => 'Kurtzbeschreibung_2')
+            # array('{Platzhalter_1}' => 'Optional Kurtzbeschreibung_1', '{Platzhalter_2}' => 'Optional Kurtzbeschreibung_2')
             array('{DEMOPLUGIN}' => 'Optional Kurtzbeschreibung',
-                    '{DEMOPLUGIN|}' => 'Meine Kurtzbeschreibung, Optinal Text für Link Platzhalter blank',
-                    '{DEMOPLUGIN|Value_1,}' => 'Meine Kurtzbeschreibung',
-                    '{DEMOPLUGIN|Value_2,}' => 'Meine Kurtzbeschreibung'
+                    '{DEMOPLUGIN|}' => 'Optional Meine Kurtzbeschreibung, Optinal Text für Link Platzhalter blank',
+                    '{DEMOPLUGIN|Value_1,}' => 'Optional Meine Kurtzbeschreibung',
+                    '{DEMOPLUGIN|Value_2,}' => 'Optional Meine Kurtzbeschreibung'
                     )
             );
     } // function getInfo
