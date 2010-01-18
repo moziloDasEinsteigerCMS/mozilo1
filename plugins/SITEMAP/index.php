@@ -60,7 +60,8 @@ class SITEMAP extends Plugin {
             // Name des Autors
             "mozilo",
             // Download-URL
-            "http://cms.mozilo.de"
+            "http://cms.mozilo.de",
+            array()
             );
     } // function getInfo
 
