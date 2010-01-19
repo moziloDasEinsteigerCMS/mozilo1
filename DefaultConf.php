@@ -123,7 +123,8 @@ function makeDefaultConf($conf_datei) {
     $downloads = array('_downloadcounterstarttime' => time());
 
     $version = array('cmsversion' => '1.12',
-                        'cmsname' => 'Amalia');
+                        'cmsname' => 'Amalia',
+                        'revision' => '384');
 
     $gallery = array('digit' => array(
                         'maxheight' => '',
