@@ -479,7 +479,7 @@ function home($post) {
     // Zeile "CMS-VERSION"
     ."<tr>"
     .'<td width="50%" class="td_cms_left">'.getLanguageValue("cmsversion_text")."</td>"
-    .'<td width="50%" class="td_cms_left">'.$VERSION_CONF->get("cmsversion").' ("'.$VERSION_CONF->get("cmsname").'")</td>'
+    .'<td width="50%" class="td_cms_left">'.$VERSION_CONF->get("cmsversion").' ("'.$VERSION_CONF->get("cmsname").'") Revision:'.$VERSION_CONF->get("revision").'</td>'
     ."</tr>"
     // Zeile "Gesamtgröße des CMS"
     ."<tr>"
@@ -3443,8 +3443,29 @@ function plugins($post) {
                 $plugin_info = $plugin->getInfo();
                 $pagecontent .= '<tr><td width="100%" class="td_toggle">';
                 $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
-                if(isset($plugin_info[0])) {
-                    $plugin_name = $plugin_info[0];
+                # Plugin Info Prüfen
+                if(isset($plugin_info) and is_array($plugin_info) and count($plugin_info) > 0) {
+                    # Nach Schauen obs Sprachen gibt
+                    if(key($plugin_info) != "0") {
+                        $language = $ADMIN_CONF->get("language");
+                        # Die Eingestelte Sprache gibts also Benutzen
+                        if(isset($plugin_info[$language])) {
+                            $plugin_info = $plugin_info[$language];
+                        # Die Eingestelte Sprache gibts nicht es wird die erste Benutzen
+                        } else {
+                            $plugin_info = $plugin_info[key($plugin_info)];
+                        }
+                    }
+                    # letze Prüfung
+                    if(count($plugin_info) < 6) {
+                        $plugin_error = true;
+                    }
+                } else {
+                    $plugin_error = true;
+                }
+
+                if($plugin_error === false) {
+                    $plugin_name = htmlentities($plugin_info[0],ENT_COMPAT,$CHARSET);
                 } else {
                     $plugin_name = getLanguageValue('plugins_error').' <span style="color:#ff0000">'.$currentelement.'</span>';
                     $plugin_error = true;
