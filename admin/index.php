@@ -3471,7 +3471,7 @@ function plugins($post) {
                     $plugin_error = true;
                 }
                 $pagecontent .= '<tr><td width="70%" class="td_titel" nowrap><span class="text_cat_page">'.$plugin_name.'</span>'.$plugin_error_conf.'</td>';
-                $pagecontent .= '<td width="15%" class="">'.getLanguageValue("plugins_titel_active").'&nbsp;'.buildCheckBox($currentelement.'[active]', ($conf_plugin->get("active") == "true")).'</td>';
+                $pagecontent .= '<td width="15%" class="">'.getLanguageValue("plugins_input_active").'&nbsp;'.buildCheckBox($currentelement.'[active]', ($conf_plugin->get("active") == "true")).'</td>';
                 $pagecontent .= '<td width="15%" class="td_icons">';
                 if(getRequestParam('javascript', true) and $plugin_error === false) {
                     $pagecontent .= '<span id="toggle_'.$toggle_pos.'_linkBild"'.$tooltip_help_edit.'></span>';
@@ -3485,9 +3485,15 @@ function plugins($post) {
                 if($plugin_error === false) {
                     $pagecontent_start_conf = '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
                     # Plugin Infos die reinvolge ist wichtig
-                    $plugins_info_array = array("plugins_titel_version","plugins_titel_description","plugins_titel_author","plugins_titel_web");
+                    $plugins_info_array = array("Plugin_name","plugins_titel_version","plugins_titel_description","plugins_titel_author","plugins_titel_web");
                     foreach($plugins_info_array as $pos => $info) {
-                        if($pos == 3) {
+                        # Plugin Name Brauchen wir hier nicht
+                        if($pos == 0) continue;
+                        if($pos == 2) {
+                            $plugin_info[$pos] = strip_tags($plugin_info[$pos], '<span><br>');
+                            $plugin_info[$pos] = htmlentities($plugin_info[$pos],ENT_NOQUOTES,$CHARSET);
+                            $plugin_info[$pos] = str_replace(array('&amp;#',"&lt;","&gt;"),array('&#',"<",">"),$plugin_info[$pos]);
+                        } elseif($pos == 4) {
                             $plugin_info[$pos] = '<a href="'.$plugin_info[$pos].'" target="_blank">'.$plugin_info[$pos].'</a>';
                         } else {
                             $plugin_info[$pos] = htmlentities($plugin_info[$pos],ENT_COMPAT,$CHARSET);
@@ -3495,7 +3501,7 @@ function plugins($post) {
                         if(isset($plugin_info[$pos])) {
                             $pagecontent_conf .= '<tr><td width="10%" valign="top" class="td_left_title_padding_bottom" nowrap><b class="text_grau">'.getLanguageValue($info).'</b></td><td width="90%" class="td_togglen_padding_bottom">'.$plugin_info[$pos].'</td></tr>';
                         }
-                        if($pos == 3) {
+                        if($pos == 4) {
                             # Das getInfo() array hat mehr wie 4 einträge wir brauchen hier aber nur die 4
                             break;
                         }
