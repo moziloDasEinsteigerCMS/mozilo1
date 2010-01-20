@@ -12,7 +12,6 @@
 class Galerie {
 
     function getPluginContent($value) {
-#     function getContent($value) {
         $values = explode(",", $value);
 
         global $URL_BASE;
@@ -28,7 +27,8 @@ class Galerie {
         // ------------------------------------------------------------------------------
         // Galeriemenü erzeugen
         // ------------------------------------------------------------------------------
-        $getGalleryMenu = function ($picarray,$linkprefix,$gal_request,$index,$first,$previous,$next,$last) {
+if(!function_exists('getGalleryMenu')) {
+        function getGalleryMenu($picarray,$linkprefix,$gal_request,$index,$first,$previous,$next,$last) {
             global $language;
         
             // Keine Bilder im Galerieverzeichnis?
@@ -55,12 +55,12 @@ class Galerie {
             $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$linkprefix."gal=".$gal_request."&amp;index=".$last."\" class=\"$linkclass\">".$language->getLanguageValue0("message_lastimage_0")."</a></li>";
             // Rückgabe des Menüs
             return $gallerymenu."</ul>";
-        };
+        }
             
         // ------------------------------------------------------------------------------
         // Nummernmenü erzeugen
         // ------------------------------------------------------------------------------
-        $getNumberMenu = function ($picarray,$linkprefix,$index,$gal_request,$first,$last) {
+        function getNumberMenu($picarray,$linkprefix,$index,$gal_request,$first,$last) {
         
             // Keine Bilder im Galerieverzeichnis?
             if (count($picarray) == 0)
@@ -76,12 +76,12 @@ class Galerie {
             // Rückgabe des Menüs
             $numbermenu .= "</ul>";
             return $numbermenu;
-        };
+        }
     
         // ------------------------------------------------------------------------------
         // Nummernmenü erzeugen
         // ------------------------------------------------------------------------------
-        $getThumbnails = function ($picarray,$dir_thumbs_src,$dir_gallery_src,$alldescriptions,$getCurrentDescription) {
+        function getThumbnails($picarray,$dir_thumbs_src,$dir_gallery_src,$alldescriptions) {
             global $GALLERY_CONF;
             global $specialchars;
             global $language;
@@ -94,7 +94,7 @@ class Galerie {
             $i = 0;
             for ($i=0; $i<count($picarray); $i++) {
                 // Bildbeschreibung holen
-                $description = $getCurrentDescription($picarray[$i],$picarray,$alldescriptions);
+                $description = getCurrentDescription($picarray[$i],$picarray,$alldescriptions);
                 if ($description == "")
                     $description = "&nbsp;";
                 // Neue Tabellenzeile aller picsperrow Zeichen
@@ -114,12 +114,12 @@ class Galerie {
             $thumbs .= "</tr></table>";
             // Rückgabe der Thumbnails
             return $thumbs;
-        };
+        }
         
         // ------------------------------------------------------------------------------
         // Aktuelles Bild anzeigen
         // ------------------------------------------------------------------------------
-        $getCurrentPic = function ($picarray,$dir_gallery_src,$dir_gallery,$index) {
+        function getCurrentPic($picarray,$dir_gallery_src,$dir_gallery,$index) {
             global $specialchars;
             global $language;
         
@@ -135,12 +135,12 @@ class Galerie {
             $currentpic .= "</a>";
             // Rückgabe des Bildes
             return $currentpic;
-        };
+        }
     
         // ------------------------------------------------------------------------------
         // Beschreibung zum aktuellen Bild anzeigen
         // ------------------------------------------------------------------------------
-        $getCurrentDescription = function ($picname,$picarray,$alldescriptions) {
+        function getCurrentDescription($picname,$picarray,$alldescriptions) {
             global $specialchars;
             
             // Keine Bilder im Galerieverzeichnis?
@@ -153,25 +153,25 @@ class Galerie {
             } else {
                 return "&nbsp;";
             }
-        };
+        }
 
 
         // ------------------------------------------------------------------------------
         // Position in der Galerie anzeigen
         // ------------------------------------------------------------------------------
-        $getXoutofY = function ($picarray,$index,$last) {
+        function getXoutofY($picarray,$index,$last) {
             global $language;
         
             // Keine Bilder im Galerieverzeichnis?
             if (count($picarray) == 0)
             return "&nbsp;";
             return $language->getLanguageValue2("message_gallery_xoutofy_2", $index, $last);
-        };
+        }
     
         // ------------------------------------------------------------------------------
         // Auslesen des übergebenen Galerieverzeichnisses, Rückgabe als Array
         // ------------------------------------------------------------------------------
-        $getPicsAsArray = function ($dir, $filetypes) {
+        function getPicsAsArray($dir, $filetypes) {
             $picarray = array();
             $currentdir = opendir($dir);
             // Alle Dateien des übergebenen Verzeichnisses einlesen...
@@ -184,12 +184,12 @@ class Galerie {
             closedir($currentdir);
             sort($picarray);
             return $picarray;
-        };
+        }
     
         // ------------------------------------------------------------------------------
         // Hilfsfunktion: Extrahiert das Embedded-Template aus dem Gesamt-Template
         // ------------------------------------------------------------------------------
-        $extractEmbeddedTemplate = function ($template) {
+        function extractEmbeddedTemplate($template) {
             global $GALLERY_CONF;
             preg_match("/\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_START\}[\s|\t]*--\>(.*)\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_END\}[\s|\t]*--\>/Umsi", $template, $matches);
             if (sizeof($matches) > 1) {
@@ -198,24 +198,25 @@ class Galerie {
             else {
                 return false;
             }
-        };
+        }
         // ------------------------------------------------------------------------------
         // Hilfsfunktion: "title"-Attribut zusammenbauen (oder nicht, wenn nicht konfiguriert)
         // ------------------------------------------------------------------------------
-        $getTitleAttribute = function ($value) {
+/*
+        function getTitleAttribute($value) {
             global $CMS_CONF;
             if ($CMS_CONF->get("showsyntaxtooltips") == "true") {
                 return " title=\"".$value."\"";
             }
             return "";
-        };
+        }*/
         // ------------------------------------------------------------------------------
         // Hilfsfunktion: Deadlink erstellen
         // ------------------------------------------------------------------------------
-        $createDeadlink = function ($content, $title, $getTitleAttribute) {
-            return "<span class=\"deadlink\"".$getTitleAttribute($title).">$content</span>";
-        };
-
+        function createDeadlink($content, $title) {
+            return "<span class=\"deadlink\"".getTitleAttribute($title).">$content</span>";
+        }
+}
         $embedded = $GALLERY_CONF->get("target");
 
         $linkprefix = "index.php?cat=$CAT_REQUEST&amp;page=$PAGE_REQUEST&amp;";
@@ -262,9 +263,9 @@ class Galerie {
         # keine Galerie angegeben oder Galerie gibts nicht
         if (($gal_request == "") || (!file_exists($dir_gallery))) {
             if($gal_request == "") {
-                return $createDeadlink($language->getLanguageValue0("message_gallerydir_error_0"),$language->getLanguageValue0("message_gallerydir_error_0"), $getTitleAttribute);
+                return createDeadlink($language->getLanguageValue0("message_gallerydir_error_0"),$language->getLanguageValue0("message_gallerydir_error_0"));
             } else {
-                return $createDeadlink($specialchars->rebuildSpecialChars($gal_request, false, true), $language->getLanguageValue1("message_gallerydir_error_1", $specialchars->rebuildSpecialChars($gal_request, false, true)), $getTitleAttribute);
+                return createDeadlink($specialchars->rebuildSpecialChars($gal_request, false, true), $language->getLanguageValue1("message_gallerydir_error_1", $specialchars->rebuildSpecialChars($gal_request, false, true)));
             }
         }
 
@@ -273,7 +274,7 @@ class Galerie {
             $alldescriptions = new Properties($dir_gallery."texte.conf");
 
             // Galerieverzeichnis einlesen
-            $picarray = $getPicsAsArray($dir_gallery, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
+            $picarray = getPicsAsArray($dir_gallery, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
             $allindexes = array();
             for ($i=1; $i<=count($picarray); $i++) {
                 array_push($allindexes, $i);
@@ -301,7 +302,7 @@ class Galerie {
                 die($language->getLanguageValue1("message_template_error_1", $gallery_template));
             $template = fread($file, filesize($gallery_template));
             fclose($file);
-            $template = $extractEmbeddedTemplate($template);
+            $template = extractEmbeddedTemplate($template);
             if ($template == false) {
                 return false;
             }
@@ -313,20 +314,20 @@ class Galerie {
             }
             if ($usethumbs) {
                 $html = preg_replace('/{GALLERYMENU}/', "&nbsp;", $html);
-                $html = preg_replace('/{NUMBERMENU}/', $getThumbnails($picarray,$dir_thumbs_src,$dir_gallery_src,$alldescriptions,$getCurrentDescription), $html);
+                $html = preg_replace('/{NUMBERMENU}/', getThumbnails($picarray,$dir_thumbs_src,$dir_gallery_src,$alldescriptions), $html);
                 $html = preg_replace('/{CURRENTPIC}/', "&nbsp;", $html);
                 $html = preg_replace('/{CURRENTDESCRIPTION}/', "&nbsp;", $html);
                 $html = preg_replace('/{XOUTOFY}/', "&nbsp;", $html);
                 } else {
-                $html = preg_replace('/{GALLERYMENU}/', $getGalleryMenu($picarray,$linkprefix,$gal_request,$index,$first,$previous,$next,$last), $html);
-                $html = preg_replace('/{NUMBERMENU}/', $getNumberMenu($picarray,$linkprefix,$index,$gal_request,$first,$last), $html);
-                $html = preg_replace('/{CURRENTPIC}/', $getCurrentPic($picarray,$dir_gallery_src,$dir_gallery,$index), $html);
+                $html = preg_replace('/{GALLERYMENU}/', getGalleryMenu($picarray,$linkprefix,$gal_request,$index,$first,$previous,$next,$last), $html);
+                $html = preg_replace('/{NUMBERMENU}/', getNumberMenu($picarray,$linkprefix,$index,$gal_request,$first,$last), $html);
+                $html = preg_replace('/{CURRENTPIC}/', getCurrentPic($picarray,$dir_gallery_src,$dir_gallery,$index), $html);
                 if (count($picarray) > 0) {
-                    $html = preg_replace('/{CURRENTDESCRIPTION}/', $getCurrentDescription($picarray[$index-1],$picarray,$alldescriptions), $html);
+                    $html = preg_replace('/{CURRENTDESCRIPTION}/', getCurrentDescription($picarray[$index-1],$picarray,$alldescriptions), $html);
                 } else {
                     $html = preg_replace('/{CURRENTDESCRIPTION}/', "", $html);
                 }
-                $html = preg_replace('/{XOUTOFY}/', $getXoutofY($picarray,$index,$last), $html);
+                $html = preg_replace('/{XOUTOFY}/', getXoutofY($picarray,$index,$last), $html);
                 $html = preg_replace('/{CURRENT_INDEX}/', $index, $html);
                 $html = preg_replace('/{PREVIOUS_INDEX}/', $previous, $html);
                 $html = preg_replace('/{NEXT_INDEX}/', $next, $html);
@@ -345,7 +346,7 @@ class Galerie {
                 closedir($handle);
             } else {
                 // Galerie nicht vorhanden
-                return $createDeadlink($specialchars->rebuildSpecialChars($values[0], false, true), $language->getLanguageValue1("tooltip_link_gallery_error_1", $specialchars->rebuildSpecialChars($values[0], false, true)), $getTitleAttribute);
+                return createDeadlink($specialchars->rebuildSpecialChars($values[0], false, true), $language->getLanguageValue1("tooltip_link_gallery_error_1", $specialchars->rebuildSpecialChars($values[0], false, true)));
             }
             $gal_name = NULL;
             if(isset($values[0])) {
@@ -354,7 +355,7 @@ class Galerie {
             if(isset($values[1])) {
                 $gal_name = $specialchars->rebuildSpecialChars($values[1], false, true);
             }
-            return "<a class=\"gallery\" href=\"".$linkprefix."gal=".$gal_request."&amp;plugin=Galerie\" ".$getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $specialchars->rebuildSpecialChars($values[0], false, true), $j))."target=\"".$GALLERY_CONF->get("target")."\">".$gal_name."</a>";
+            return "<a class=\"gallery\" href=\"".$linkprefix."gal=".$gal_request."&amp;plugin=Galerie\" ".getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $specialchars->rebuildSpecialChars($values[0], false, true), $j))."target=\"".$GALLERY_CONF->get("target")."\">".$gal_name."</a>";
         }
     }
 }
