@@ -27,7 +27,8 @@ class Mail {
     // Sendet eine Mail an die konfigurierte Kontakt-Adresse oder eine Kopie an die Usermail-Adresse
     function sendMail($subject, $content, $from, $to) {
         global $CHARSET;
-        @mail(html_entity_decode($to,ENT_COMPAT,$CHARSET), html_entity_decode($subject), html_entity_decode($content), $this->getHeader(html_entity_decode($to), html_entity_decode($from)));
+        global $specialchars;
+        @mail($specialchars->getHtmlEntityDecode($to), $specialchars->getHtmlEntityDecode($subject), $specialchars->getHtmlEntityDecode($content), $this->getHeader($specialchars->getHtmlEntityDecode($to), $specialchars->getHtmlEntityDecode($from)));
     }
 
     // Baut den Mail-Header zusammen

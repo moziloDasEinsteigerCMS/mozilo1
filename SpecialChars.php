@@ -16,12 +16,32 @@ class SpecialChars {
     function SpecialChars(){
     }
 
+    function getHtmlEntityDecode($string) {
+        global $CHARSET;
+
+        $replace = array_keys(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
+        # get_html_translation_table liefert die Zeichen im ISO-8859-1 Format wir brauchen UTF-8
+        $replace = implode(",",$replace);
+        if(function_exists("utf8_encode")) {
+            $replace = utf8_encode($replace);
+        } elseif(function_exists("mb_convert_encoding")) {
+            $replace = mb_convert_encoding($replace, $CHARSET);
+        } elseif(function_exists("iconv")) {
+            $replace = iconv('ISO-8859-1', $CHARSET.'//IGNORE',$replace);
+        }
+        $replace = explode(",",$replace);
+        $string = str_replace(array_values(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)), $replace, $string);
+        return $string;
+    }
+
 // ------------------------------------------------------------------------------    
 // Erlaubte Sonderzeichen als RegEx zurückgeben
 // ------------------------------------------------------------------------------
     function getSpecialCharsRegex() {
         global $CHARSET;
-        $regex = "/^[a-zA-Z0-9_\%\-\s\?\!\@\.€".addslashes(html_entity_decode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)),ENT_COMPAT,$CHARSET))."]+$/";
+
+#        $regex = "/^[a-zA-Z0-9_\%\-\s\?\!\@\.€".addslashes(html_entity_decode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)),ENT_COMPAT,$CHARSET))."]+$/";
+        $regex = "/^[a-zA-Z0-9_\%\-\s\?\!\@\.€".addslashes($this->getHtmlEntityDecode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES))))."]+$/";
         $regex = preg_replace("/&#39;/", "\'", $regex);
         return $regex;
     }
@@ -48,7 +68,8 @@ class SpecialChars {
         $text = rawurldecode($text);
         if($html) {
             $test = htmlentities($text,ENT_COMPAT,$CHARSET);
-            if(empty($test)) {
+# hier muss noch geschraubt werden iconv gibts auf manchen systemen nicht!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(empty($test) and function_exists("iconv")) {
                 # htmlentities gibt einen lehren sring zurück wenn im string ein unbekantes zeichen ist
                 # iconv entfernt es einfach
                 $test = htmlentities(@iconv($CHARSET,$CHARSET.'//IGNORE',$text),ENT_COMPAT,$CHARSET);

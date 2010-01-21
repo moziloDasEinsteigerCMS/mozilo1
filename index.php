@@ -612,7 +612,7 @@ $CHARSET = 'UTF-8';
             $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=sitemap\" class=\"".$cssprefix."active\">".$language->getLanguageValue0("message_sitemap_0")."</a></li>";
         // Suchergebnis
         elseif (($ACTION_REQUEST == "search") && ($CMS_CONF->get("usesubmenu") == 0))
-            $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=search&amp;query=".$specialchars->replaceSpecialChars($QUERY_REQUEST, true)."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", html_entity_decode($QUERY_REQUEST,ENT_COMPAT,$CHARSET))."</a></li>";
+            $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=search&amp;query=".$specialchars->replaceSpecialChars($QUERY_REQUEST, true)."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", $specialchars->getHtmlEntityDecode($QUERY_REQUEST))."</a></li>";
         // Entwurfsansicht
         elseif (($ACTION_REQUEST == "draft") && ($CMS_CONF->get("usesubmenu") == 0))
             $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?cat=$cat&amp;page=$PAGE_REQUEST&amp;action=draft\" class=\"".$cssprefix."active\">".pageToName($PAGE_REQUEST.$EXT_DRAFT, false)." (".$language->getLanguageValue0("message_draft_0").")</a></li>";
@@ -935,7 +935,7 @@ $CHARSET = 'UTF-8';
                 $valuearray = explode(":", $matches[1][$i]);
                 // Inhaltsseite in aktueller Kategorie
                 if (count($valuearray) == 1) {
-                    $includedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($matches[1][$i],ENT_COMPAT,$CHARSET),false), $cat);
+                    $includedpage = nameToPage($specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($matches[1][$i]),false), $cat);
                     // verhindern, daß in der includierten Seite includierte Seiten auch noch durchsucht werden
                     if ($firstrecursion) {
                         // includierte Seite durchsuchen!
@@ -946,8 +946,8 @@ $CHARSET = 'UTF-8';
                 }
                 // Inhaltsseite in anderer Kategorie
                 else {
-                    $includedpagescat = nameToCategory($specialchars->replaceSpecialChars(html_entity_decode($valuearray[0],ENT_COMPAT,$CHARSET),false));
-                    $includedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($valuearray[1],ENT_COMPAT,$CHARSET),false), $includedpagescat);
+                    $includedpagescat = nameToCategory($specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($valuearray[0]),false));
+                    $includedpage = nameToPage($specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($valuearray[1]),false), $includedpagescat);
                     // verhindern, daß in der includierten Seite includierte Seiten auch noch durchsucht werden
                     if ($firstrecursion) {
                         // includierte Seite durchsuchen!
@@ -972,7 +972,7 @@ $CHARSET = 'UTF-8';
             // ...der aktuelle Suchbegriff im Seitennamen...
             (substr_count(strtolower(pageToName($page, false)), strtolower($query)) > 0)
             // ...oder im eigentlichen Seiteninhalt vorkommt (überprüft werden nur Seiten, die nicht leer sind), ...
-            || ((filesize($filepath) > 0) && (substr_count(strtolower($content), strtolower(html_entity_decode($query,ENT_COMPAT,$CHARSET))) > 0))
+            || ((filesize($filepath) > 0) && (substr_count(strtolower($content), strtolower($specialchars->getHtmlEntityDecode($query))) > 0))
             ) {
             // ...dann setze das Treffer-Flag
             $ismatch = true;
@@ -1262,7 +1262,7 @@ $CHARSET = 'UTF-8';
                 if ($config_message[1] == "true") {
                     $mailcontent .= "\r\n".$language->getLanguageValue0("contactform_message_0").":\r\n".$message."\r\n";
                 }
-                $mailsubject = $language->getLanguageValue1("contactform_mailsubject_1", html_entity_decode($WEBSITE_NAME,ENT_COMPAT,$CHARSET));
+                $mailsubject = $language->getLanguageValue1("contactform_mailsubject_1", $specialchars->getHtmlEntityDecode($WEBSITE_NAME));
                 // Wenn Mail-Adresse gesetzt ist: erhält der Absender eine copy
                 if ($mail <> "") {
                     $mailfunctions->sendMail($mailsubject, $mailcontent, $contactformconfig->get("formularmail"), $mail);

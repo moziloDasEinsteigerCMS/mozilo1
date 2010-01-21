@@ -161,7 +161,7 @@ class Syntax {
                 if(substr($attribute,0,10) == "kategorie=") {
                     $link_text = substr($attribute, 10, strlen($attribute)-10);
                 }
-                $requestedcat = nameToCategory($specialchars->replaceSpecialChars(html_entity_decode($value,ENT_COMPAT,$CHARSET),false));
+                $requestedcat = nameToCategory($specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($value),false));
                 $url = "index.php?cat=$requestedcat";
                 if($CMS_CONF->get("modrewrite") == "true") {
                     $url = $URL_BASE.$requestedcat.".html";
@@ -177,7 +177,7 @@ class Syntax {
             // Link auf Inhaltsseite in aktueller oder anderer Kategorie (�berpr�fen, ob Inhaltsseite existiert)
             // Link auf Inhaltsseite in aktueller oder anderer Kategorie mit beliebigem Text
             elseif ($attribute == "seite" or substr($attribute,0,6) == "seite=") {
-                $seite = html_entity_decode($value,ENT_COMPAT,$CHARSET);
+                $seite = $specialchars->getHtmlEntityDecode($value);
                 $valuearray = explode(":", $seite);
                 $link_text = "";
                 if(substr($attribute,0,6) == "seite=") {
@@ -256,7 +256,7 @@ class Syntax {
             // Datei aus dem Dateiverzeichnis (�berpr�fen, ob Datei existiert)
             // Datei aus dem Dateiverzeichnis mit beliebigem Text
             elseif ($attribute == "datei" or substr($attribute,0,6) == "datei=") {
-                $datei = html_entity_decode($value,ENT_COMPAT,$CHARSET);
+                $datei = $specialchars->getHtmlEntityDecode($value);
                 $valuearray = explode(":", $datei);
                 $link_text = "";
                 if(substr($attribute,0,6) == "datei=") {
@@ -339,7 +339,7 @@ class Syntax {
                 $imgsrc = "";
                 $error = false;
 
-                $value = html_entity_decode($value,ENT_COMPAT,$CHARSET);
+                $value = $specialchars->getHtmlEntityDecode($value);
                 // Bei externen Bildern: $value NICHT nach ":" aufsplitten!
                 if (preg_match($this->LINK_REGEX, $value)) {
                     $valuearray = $specialchars->replaceSpecialChars($value,false);
@@ -513,7 +513,7 @@ class Syntax {
             // HTML
             elseif ($attribute == "html"){
                 $nobrvalue = preg_replace('/(\r\n|\r|\n)/m', '{newline_in_html_tag}', $value);
-                $content = str_replace ("$match", html_entity_decode($nobrvalue,ENT_COMPAT,$CHARSET), $content);
+                $content = str_replace ("$match", $specialchars->getHtmlEntityDecode($nobrvalue), $content);
             }
 
 /* 
@@ -528,7 +528,7 @@ verwendet werden sollte!
                 $value = preg_replace("/&#(\d*);/Umsie", "''.chr('\\1').''", $value);
                 $value = preg_replace("/&#092;/Umsi", "&amp;#092;", $value);
                 $value = preg_replace("/&#036;/Umsi", "&amp;#036;", $value);
-                $value = html_entity_decode($value,ENT_COMPAT,$CHARSET);
+                $value = $specialchars->getHtmlEntityDecode($value);
                 ob_start();
                 $value = eval($value);
                 $value = ob_get_contents();
@@ -576,7 +576,7 @@ verwendet werden sollte!
                 $valuearray = explode(":", $value);
                 // Inhaltsseite in aktueller Kategorie
                 if (count($valuearray) == 1) {
-                    $requestedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($value,ENT_COMPAT,$CHARSET),false), $cat);
+                    $requestedpage = nameToPage($specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($value),false), $cat);
                     if ((!$requestedpage=="") && (file_exists("./$CONTENT_DIR_REL/$cat/$requestedpage"))) {
                         // Seite darf sich nicht selbst includen!
                         if (substr($requestedpage, 0, strlen($requestedpage)-strlen($EXT_PAGE)) == $PAGE_REQUEST) {
@@ -604,9 +604,9 @@ verwendet werden sollte!
                 }
                 // Inhaltsseite in anderer Kategorie
                 else {
-                    $requestedcat = nameToCategory($specialchars->replaceSpecialChars(html_entity_decode($valuearray[0],ENT_COMPAT,$CHARSET),false));
+                    $requestedcat = nameToCategory($specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($valuearray[0]),false));
                     if ((!$requestedcat=="") && (file_exists("./$CONTENT_DIR_REL/$requestedcat"))) {
-                        $requestedpage = nameToPage($specialchars->replaceSpecialChars(html_entity_decode($valuearray[1],ENT_COMPAT,$CHARSET),false), $requestedcat);
+                        $requestedpage = nameToPage($specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($valuearray[1]),false), $requestedcat);
                         if ((!$requestedpage=="") && (file_exists("./$CONTENT_DIR_REL/$requestedcat/$requestedpage")))
                             // Seite darf sich nicht selbst includen!
                             if (($requestedcat == $cat) && (substr($requestedpage, 0, strlen($requestedpage)-strlen($EXT_PAGE)) == $PAGE_REQUEST)) {

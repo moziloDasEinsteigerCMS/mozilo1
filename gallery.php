@@ -246,7 +246,7 @@ if(!function_exists('getGalleryMenu')) {
             $usethumbs = false;
 
         // Übergebene Parameter überprüfen
-        $gal_request = $specialchars->replacespecialchars(html_entity_decode($values[0],ENT_COMPAT,$CHARSET),false);
+        $gal_request = $specialchars->replacespecialchars($specialchars->getHtmlEntityDecode($values[0]),false);
         if (getRequestParam("gal", true))
             $gal_request = $specialchars->replacespecialchars(getRequestParam("gal", true),false);
         $dir_gallery        = "galerien/".$gal_request."/";
