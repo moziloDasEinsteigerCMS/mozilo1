@@ -35,8 +35,29 @@ class Plugin {
     * Konstruktor
     */
     function Plugin(){
+        $plugin_str = 'Plugin';
+        $plugin_class = get_class($this);
+        $plugin_class_dir = $plugin_class;
+        $base_dir = str_replace("/admin","",getcwd());
+        if((version_compare( phpversion(), '5.0' ) < 0)) {
+            # php4
+            $plugin_str = strtolower($plugin_str);
+            $declared_classes = get_declared_classes();
+            if ($handle = opendir($base_dir."/plugins/")) {
+                while (false !== ($plugin_dir = readdir($handle))) {
+                    $key = array_search(strtolower($plugin_dir), $declared_classes);
+                    if(isset($declared_classes[$key]) and $key > 0) {
+                        $plugin_class = $declared_classes[$key];
+                        $plugin_class_dir = $plugin_dir;
+                        break;
+                    }
+                }
+                closedir($handle);
+            }
+        }
         // diese (abstrakte) Klasse darf nicht direkt instanziiert werden!
-        if (get_class($this) == 'Plugin' || !is_subclass_of ($this, 'Plugin')){
+        if ($plugin_class == $plugin_str || !is_subclass_of($this, $plugin_str)){
+#        if (get_class($this) == 'Plugin' || !is_subclass_of ($this, 'Plugin')){
             trigger_error('This class is abstract; it cannot be instantiated.', E_USER_ERROR);
         }
 
@@ -47,8 +68,11 @@ class Plugin {
         $this->checkForMethod("getInfo");
         
         // Settings-Variable als Properties-Objekt der plugin.conf instanziieren
-        if (file_exists("plugins/".get_class($this)."/plugin.conf")) {
-            $this->settings = new Properties("plugins/".get_class($this)."/plugin.conf");
+#        if (file_exists("plugins/".get_class($this)."/plugin.conf")) {
+#            $this->settings = new Properties("plugins/".get_class($this)."/plugin.conf");
+#        }
+        if (file_exists($base_dir."/plugins/".$plugin_class_dir."/plugin.conf")) {
+            $this->settings = new Properties($base_dir."/plugins/".$plugin_class_dir."/plugin.conf");
         }
         // Wenn plugin.conf nicht vorhanden ist, wird die Fehlervariable gefüllt
         else {
@@ -60,7 +84,7 @@ class Plugin {
             }
         }
     }
-    
+
     /*
     * Gibt den Inhalt des Plugins zurück
     */
