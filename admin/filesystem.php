@@ -120,7 +120,10 @@ function createCategory($new_cat) {
 
     @mkdir ("../kategorien/".$new_cat);
     $line_error = __LINE__ - 1;
-    $last_error = @error_get_last();
+    $last_error['line'] = NULL;
+    if(function_exists("error_get_last")) {
+        $last_error = @error_get_last();
+    }
     if($last_error['line'] == $line_error) {
         $error['php_error'][] = $last_error['message'];
     } elseif(!is_dir("../kategorien/".$new_cat)) {
@@ -130,7 +133,10 @@ function createCategory($new_cat) {
     if(!preg_match('/-_blank-|-_self-/', $new_cat)) {
         @mkdir ("../kategorien/".$new_cat."/dateien");
         $line_error = __LINE__ - 1;
-        $last_error = @error_get_last();
+        $last_error['line'] = NULL;
+        if(function_exists("error_get_last")) {
+            $last_error = @error_get_last();
+        }
         if($last_error['line'] == $line_error) {
             $error['php_error'][] = $last_error['message'];
         } elseif(!is_dir("../kategorien/".$new_cat."/dateien")) {
@@ -311,10 +317,10 @@ function updateReferencesInText($currentPagesContent, $currentPagesCategory, $mo
     # ein Hack weil in Inhaltsete ein ^ vor [ und ] ist im Dateinamen aber nicht
     $hack_eckigeklamern = str_replace(array("[","]"),array("&#94;[","&#94;]"),array($pos_oldCategory,$pos_oldPage,$pos_newCategory,$pos_newPage));
 
-    $oldCategory    = html_entity_decode(substr($hack_eckigeklamern[0],3),ENT_COMPAT,$CHARSET);
-    $oldPage    = html_entity_decode(substr($hack_eckigeklamern[1],3,-4),ENT_COMPAT,$CHARSET);
-    $newCategory     = html_entity_decode(substr($hack_eckigeklamern[2],3),ENT_COMPAT,$CHARSET);
-    $newPage     = html_entity_decode(substr($hack_eckigeklamern[3],3,-4),ENT_COMPAT,$CHARSET);
+    $oldCategory    = $specialchars->getHtmlEntityDecode(substr($hack_eckigeklamern[0],3));
+    $oldPage    = $specialchars->getHtmlEntityDecode(substr($hack_eckigeklamern[1],3,-4));
+    $newCategory     = $specialchars->getHtmlEntityDecode(substr($hack_eckigeklamern[2],3));
+    $newPage     = $specialchars->getHtmlEntityDecode(substr($hack_eckigeklamern[3],3,-4));
 
     # ein Hack weil dieses preg_match_all nicht mit ^, [ und ] im attribut umgehen kann
     $currentPagesContentmatches = str_replace(array("^[","^]"),array("&#94;&#091;","&#94;&#093;"),$currentPagesContent);
@@ -440,7 +446,10 @@ function changeChmod($file) {
     }
     @chmod($file, getChmod($dir));
     $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-    $last_error = @error_get_last();
+    $last_error['line'] = NULL;
+    if(function_exists("error_get_last")) {
+        $last_error = @error_get_last();
+    }
     # clearstatcache() damit fileperms() sauber Arbeitet
     clearstatcache();
     if($last_error['line'] == $line_error) {

@@ -15,7 +15,7 @@ $ADMIN_TITLE = "moziloAdmin";
 #$CHARSET = 'ISO-8859-1';
 $CHARSET = 'UTF-8';
 
-$debug = "nein"; # ja oder nein
+$debug = "ja"; # ja oder nein
  // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 if($debug != "ja")
     @ini_set("display_errors", 0);
@@ -764,7 +764,10 @@ function editCategory($post) {
         foreach ($newname as $pos => $tmp) {
             @rename("$CONTENT_DIR_REL/".$orgname[$pos], "$CONTENT_DIR_REL/".$newname[$pos]);
             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-            $last_error = @error_get_last();
+            $last_error['line'] = NULL;
+            if(function_exists("error_get_last")) {
+                $last_error = @error_get_last();
+            }
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
                 $post['display']['cat']['error_html']['display'][$pos] = 'style="display:block;" ';
@@ -1124,7 +1127,10 @@ function editSite($post) {
         if($new_page != $post['action_data']['editsite'][$cat]) {
             @rename($CONTENT_DIR_REL."/".$cat."/".$page,$CONTENT_DIR_REL."/".$cat."/".$new_page);
             $line_error = __LINE__ - 1;
-            $last_error = @error_get_last();
+            $last_error['line'] = NULL;
+            if(function_exists("error_get_last")) {
+                $last_error = @error_get_last();
+            }
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
             } elseif(!is_file("$CONTENT_DIR_REL/$cat/$new_page")) {
@@ -1315,7 +1321,10 @@ function copymoveSite($post) {
             foreach($rename_newname[$cat] as $z => $tmp) {
                 @rename($CONTENT_DIR_REL."/".$cat."/".$rename_orgname[$cat][$z],$CONTENT_DIR_REL."/".$cat."/".$rename_newname[$cat][$z]);
                 $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-                $last_error = @error_get_last();
+                $last_error['line'] = NULL;
+                if(function_exists("error_get_last")) {
+                    $last_error = @error_get_last();
+                }
                 if($last_error['line'] == $line_error) {
                     $post['error_messages']['php_error'][] = $last_error['message'];
                     if(substr($rename_orgname[$cat][$z],3) != substr($rename_newname[$cat][$z],3)) {
@@ -1358,7 +1367,10 @@ function copymoveSite($post) {
                 # Einfach mal Kopieren
                 @copy($CONTENT_DIR_REL."/".$move_orgname[$cat][$z],$CONTENT_DIR_REL."/".$move_newname[$cat][$z]);
                 $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-                $last_error = @error_get_last();
+                $last_error['line'] = NULL;
+                if(function_exists("error_get_last")) {
+                    $last_error = @error_get_last();
+                }
                 if($last_error['line'] == $line_error) {
                     $post['error_messages']['php_error'][] = $last_error['message'];
                     $error = true;
@@ -1370,7 +1382,10 @@ function copymoveSite($post) {
                 if(isset($move_move[$cat][$z]) and is_file($CONTENT_DIR_REL."/".$move_newname[$cat][$z])) {
                     @unlink($CONTENT_DIR_REL."/".$move_orgname[$cat][$z]);
                     $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-                    $last_error = @error_get_last();
+                    $last_error['line'] = NULL;
+                    if(function_exists("error_get_last")) {
+                        $last_error = @error_get_last();
+                    }
                     if($last_error['line'] == $line_error) {
                         $post['error_messages']['php_error'][] = $last_error['message'];
                         $error = true;
@@ -1458,7 +1473,10 @@ function deleteSite($post) {
         if($_POST['confirm'] == "true") {
             @unlink("$CONTENT_DIR_REL/".$del_page);
             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-            $last_error = @error_get_last();
+            $last_error['line'] = NULL;
+            if(function_exists("error_get_last")) {
+                $last_error = @error_get_last();
+            }
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
             } elseif(file_exists("$CONTENT_DIR_REL/".$del_page)) {
@@ -1543,7 +1561,10 @@ function gallery($post) {
             } else {
                 @rename($GALLERIES_DIR_REL."/".$currentgalerien,$GALLERIES_DIR_REL."/".$test_galerie);
                 $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-                $last_error = @error_get_last();
+                $last_error['line'] = NULL;
+                if(function_exists("error_get_last")) {
+                    $last_error = @error_get_last();
+                }
                 if($last_error['line'] == $line_error) {
                     $post['error_messages']['php_error'][] = $last_error['message'];
                     # die Galerie aus dem array nehmen der fehler muss mit ftp behoben werden
@@ -1561,15 +1582,19 @@ function gallery($post) {
                 }
             }
         }
+/*
         $error = changeChmod($GALLERIES_DIR_REL."/".$currentgalerien);
         if(is_array($error)) {
             $post['error_messages'][key($error)][] = $error[key($error)];
-        }
+        }*/
 
         if(!is_dir($GALLERIES_DIR_REL.'/'.$currentgalerien.'/'.$PREVIEW_DIR_NAME)) {
             @mkdir($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME);
             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-            $last_error = @error_get_last();
+            $last_error['line'] = NULL;
+            if(function_exists("error_get_last")) {
+                $last_error = @error_get_last();
+            }
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
             } elseif(!is_dir($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME)) {
@@ -1578,12 +1603,13 @@ function gallery($post) {
                 $post['messages']['gallery_message_ftp_preview'][] =  $test_galerie;
             }
         }
+/*
         if(is_dir($GALLERIES_DIR_REL.'/'.$currentgalerien.'/'.$PREVIEW_DIR_NAME)) {
             $error = changeChmod($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME);
             if(is_array($error)) {
                 $post['error_messages'][key($error)][] = $error[key($error)];
             }
-        }
+        }*/
         $gallerypics[$currentgalerien] = getFiles($GALLERIES_DIR_REL.'/'.$currentgalerien,"");
         $count_preview_pic = 0;
         foreach($gallerypics[$currentgalerien] as $pos => $file) {
@@ -1592,15 +1618,17 @@ function gallery($post) {
                 unset($gallerypics[$currentgalerien][$pos]);
                 continue;
             }
+/*
             $error = changeChmod($GALLERIES_DIR_REL."/".$currentgalerien."/".$file);
             if(is_array($error)) {
                 $post['error_messages'][key($error)][] = $error[key($error)];
-            }
+            }*/
             if(is_file($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file)) {
+/*
                 $error = changeChmod($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file);
                 if(is_array($error)) {
                     $post['error_messages'][key($error)][] = $error[key($error)];
-                }
+                }*/
                 $count_preview_pic++;
             }
             $test_pic = $specialchars->replaceSpecialChars($specialchars->rebuildSpecialChars($file, false, false),false);
@@ -1612,7 +1640,10 @@ function gallery($post) {
                 } else {
                     @rename($GALLERIES_DIR_REL."/".$currentgalerien."/".$file,$GALLERIES_DIR_REL."/".$currentgalerien."/".$test_pic);
                     $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-                    $last_error = @error_get_last();
+                    $last_error['line'] = NULL;
+                    if(function_exists("error_get_last")) {
+                        $last_error = @error_get_last();
+                    }
                     if($last_error['line'] == $line_error) {
                         $post['error_messages']['php_error'][] = $last_error['message'];
                         # das Bild aus dem array nehmen der fehler muss mit ftp behoben werden
@@ -1625,7 +1656,10 @@ function gallery($post) {
                         if($GALLERY_CONF->get("usethumbs") == "true" and is_file($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file)) {
                             @rename($GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file,$GALLERIES_DIR_REL."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic);
                             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-                            $last_error = @error_get_last();
+                            $last_error['line'] = NULL;
+                            if(function_exists("error_get_last")) {
+                                $last_error = @error_get_last();
+                            }
                             if($last_error['line'] == $line_error) {
                                 $post['error_messages']['php_error'][] = $last_error['message'];
                             } elseif(!is_file($GALLERIES_DIR_REL."/".$currentgalerien."/".$test_pic)) {
@@ -1972,7 +2006,10 @@ function newGallery($post) {
             if(!file_exists("$GALLERIES_DIR_REL/".$galleryname)) {
                 @mkdir($GALLERIES_DIR_REL."/".$galleryname);
                 $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-                $last_error = @error_get_last();
+                $last_error['line'] = NULL;
+                if(function_exists("error_get_last")) {
+                    $last_error = @error_get_last();
+                }
                 if($last_error['line'] == $line_error) {
                     $post['error_messages']['php_error'][] = $last_error['message'];
                 } elseif(!is_dir($GALLERIES_DIR_REL."/".$galleryname)) {
@@ -1980,7 +2017,10 @@ function newGallery($post) {
                 } else {
                     @mkdir($GALLERIES_DIR_REL."/".$galleryname."/".$PREVIEW_DIR_NAME);
                     $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-                    $last_error = @error_get_last();
+                    $last_error['line'] = NULL;
+                    if(function_exists("error_get_last")) {
+                        $last_error = @error_get_last();
+                    }
                     if($last_error['line'] == $line_error) {
                         $post['error_messages']['php_error'][] = $last_error['message'];
                     } elseif(!is_dir($GALLERIES_DIR_REL."/".$galleryname."/".$PREVIEW_DIR_NAME)) {
@@ -1988,7 +2028,10 @@ function newGallery($post) {
                     } else {
                         @touch($GALLERIES_DIR_REL."/".$galleryname."/texte.conf");
                         $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-                        $last_error = @error_get_last();
+                        $last_error['line'] = NULL;
+                        if(function_exists("error_get_last")) {
+                            $last_error = @error_get_last();
+                        }
                         if($last_error['line'] == $line_error) {
                             $post['error_messages']['php_error'][] = $last_error['message'];
                         } elseif(!is_file($GALLERIES_DIR_REL."/".$galleryname."/texte.conf")) {
@@ -2100,7 +2143,10 @@ function editGallery($post) {
             } else {
                 @rename($GALLERIES_DIR_REL."/".$gallery,$GALLERIES_DIR_REL."/".$newname);
                 $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-                $last_error = @error_get_last();
+                $last_error['line'] = NULL;
+                if(function_exists("error_get_last")) {
+                    $last_error = @error_get_last();
+                }
                 if($last_error['line'] == $line_error) {
                     $post['error_messages']['php_error'][] = $last_error['message'];
                 } elseif(!is_dir($GALLERIES_DIR_REL."/".$newname)) {
@@ -2188,7 +2234,10 @@ function deleteGalleryImg($post) {
         if(file_exists($GALLERIES_DIR_REL."/".$gallery."/".$del_file)) {
             @unlink($GALLERIES_DIR_REL."/".$gallery."/".$del_file);
             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-            $last_error = @error_get_last();
+            $last_error['line'] = NULL;
+            if(function_exists("error_get_last")) {
+                $last_error = @error_get_last();
+            }
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
             } elseif(is_file("$GALLERIES_DIR_REL/".$gallery."/".$del_file)) {
@@ -2197,7 +2246,10 @@ function deleteGalleryImg($post) {
                 if(file_exists($GALLERIES_DIR_REL."/".$gallery."/".$PREVIEW_DIR_NAME."/".$del_file)) {
                     @unlink($GALLERIES_DIR_REL."/".$gallery."/".$PREVIEW_DIR_NAME."/".$del_file);
                     $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-                    $last_error = @error_get_last();
+                    $last_error['line'] = NULL;
+                    if(function_exists("error_get_last")) {
+                        $last_error = @error_get_last();
+                    }
                     if($last_error['line'] == $line_error) {
                         $post['error_messages']['php_error'][] = $last_error['message'];
                     } elseif(is_file("$GALLERIES_DIR_REL/".$gallery."/".$del_file)) {
@@ -2290,7 +2342,10 @@ function files($post) {
             $post['error_messages']['files_error_dateien'][] = $CONTENT_DIR_REL."/".$file."/dateien";
             @mkdir ($CONTENT_DIR_REL."/".$file."/dateien");
             $line_error = __LINE__ - 1;
-            $last_error = @error_get_last();
+            $last_error['line'] = NULL;
+            if(function_exists("error_get_last")) {
+                $last_error = @error_get_last();
+            }
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
             } elseif(!is_dir($CONTENT_DIR_REL."/".$file."/dateien")) {
@@ -2504,7 +2559,10 @@ function deleteFile($post) {
         if(file_exists("$CONTENT_DIR_REL/".$cat."/dateien/".$del_file)) {
             @unlink("$CONTENT_DIR_REL/".$cat."/dateien/".$del_file);
             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
-            $last_error = @error_get_last();
+            $last_error['line'] = NULL;
+            if(function_exists("error_get_last")) {
+                $last_error = @error_get_last();
+            }
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
             } elseif(is_file("$CONTENT_DIR_REL/".$cat."/dateien/".$del_file)) {
@@ -3748,7 +3806,10 @@ function saveContentToPage($content, $page) {
 
     $handle = @fopen($page, "a+");
     $line_error = __LINE__ - 1;
-    $last_error = @error_get_last();
+    $last_error['line'] = NULL;
+    if(function_exists("error_get_last")) {
+        $last_error = @error_get_last();
+    }
     fclose($handle);
     if($last_error['line'] == $line_error) {
         $error['php_error'][] = $last_error['message'];
@@ -3795,7 +3856,10 @@ function deleteDir($path) {
         } else {
             $success = @unlink($path."/".$currentelement);
             $line_error = __LINE__ - 1;
-            $last_error = @error_get_last();
+            $last_error['line'] = NULL;
+            if(function_exists("error_get_last")) {
+                $last_error = @error_get_last();
+            }
             if($last_error['line'] == $line_error) {
                 $error['php_error'][] = $last_error['message'];
                 # wenns hier schonn ne meldung gibt dann gleich Raus
@@ -3810,7 +3874,10 @@ function deleteDir($path) {
     // Verzeichnis löschen
     $success = @rmdir($path);
     $line_error = __LINE__ - 1;
-    $last_error = @error_get_last();
+    $last_error['line'] = NULL;
+    if(function_exists("error_get_last")) {
+        $last_error = @error_get_last();
+    }
     if($last_error['line'] == $line_error) {
         $error['php_error'][] = $last_error['message'];
         # wenns hier schonn ne meldung gibt dann gleich Raus
