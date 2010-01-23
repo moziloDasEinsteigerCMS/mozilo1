@@ -166,8 +166,6 @@ $CHARSET = 'UTF-8';
 // ------------------------------------------------------------------------------
 // HTML-Template einlesen und verarbeiten
 // ------------------------------------------------------------------------------
-    # wird später gebraucht um deactivierte Plugin Platzhalter zu Löschen
-    $deactiv_plugins = array();
     function readTemplate() {
         global $CSS_FILE;
         global $HTML;
@@ -189,7 +187,6 @@ $CHARSET = 'UTF-8';
         global $CHARSET;
         global $GALLERY_CONF;
         global $GALLERIES_DIR;
-        global $deactiv_plugins;
 
     if (!$file = @fopen($TEMPLATE_FILE, "r"))
         die($language->getLanguageValue1("message_template_error_1", $TEMPLATE_FILE));
@@ -340,9 +337,6 @@ $CHARSET = 'UTF-8';
         }
     }
 
-    # deactivierte Plugin Platzhalter Löschen
-    $HTML = str_replace($deactiv_plugins,"",$HTML);
-    
     }
     
 // ------------------------------------------------------------------------------
@@ -1486,8 +1480,39 @@ $CHARSET = 'UTF-8';
         $_SESSION['contactform_message'] = time()-rand(40, 50);
         $_SESSION['contactform_calculation'] = time()-rand(50, 60);
     }
-    
 
+    # die geschweiften PluginPlatzhalter klammern ersetzen
+    function replacePluginsCurly($matches,$content,$availableplugins) {
+        foreach($matches[0] as $pos => $inhalt) {
+            $plugin = explode("|", $matches[1][$pos]);
+            $currentplugin = $matches[1][$pos];
+            if (sizeof($plugin) > 1) {
+                $currentplugin = $plugin[0];
+            }
+            # Platzhalter werden alle mit ersetzt ~platz-, -platzend~
+            if(!in_array($currentplugin, $availableplugins)) {
+                $string_search = $matches[0][$pos];
+                $string_new = str_replace(array('{','}'),array('~platz-','-platzend~'),$matches[0][$pos]);
+            # alle {PluginPlatzhalter} nicht Verschachtelt
+            } elseif(strrpos($matches[0][$pos],'{',1) == 0) {
+                $string_search = $matches[0][$pos];
+                $string_new = str_replace(array('{','}'),array('~start-','-end~'),$string_search);
+            # alle Verschachtelte {PluginPlatzhalter|variable{PluginPlatzhalter|variable}}
+            } elseif(strrpos($matches[0][$pos],'{',1) > 0) {
+                $string_search = substr($matches[0][$pos],strrpos($matches[0][$pos],'{',1));
+                $string_new = str_replace(array('{','}'),array('~start_in-','-end_in~'),$string_search);
+            }
+            # die geschweiften PluginPlatzhalter klammern ersetzen
+            $content = str_replace($string_search,$string_new,$content);
+        }
+        # noch mal suchen
+        preg_match_all("/\{(.+)\}/Umsi", $content, $matches);
+        # solange suchen bis keine mehr vorhanden
+        if(count($matches[0]) > 0) {
+            $content = replacePluginsCurly($matches,$content,$availableplugins);
+        }
+        return $content;
+    }
 // ------------------------------------------------------------------------------
 // Hilfsfunktion: Plugin-Variablen ersetzen
 // ------------------------------------------------------------------------------    
@@ -1496,96 +1521,108 @@ $CHARSET = 'UTF-8';
         global $syntax;
         global $language;
         global $GALLERY_CONF;
-        global $deactiv_plugins;
 
         $availableplugins = array();
-        
         // alle Plugins einlesen
         $dircontent = getDirContentAsArray(getcwd()."/$PLUGIN_DIR", false, false);
         # Plugin Galerie gipts nicht manuel hinzufügen
-        if(!is_dir(getcwd()."/$PLUGIN_DIR/Galerie")) {
+/*        if(!is_dir(getcwd()."/$PLUGIN_DIR/Galerie")) {
             $availableplugins[] = "Galerie";
-        }
+        }*/
         foreach ($dircontent as $currentelement) {
+            # alle Plugins suchen
             if (file_exists(getcwd()."/$PLUGIN_DIR/".$currentelement."/index.php")) {
                 $availableplugins[] = $currentelement;
             }
+            # wens die gallery.php ist gibts keine plugin.conf
+/*            if($currentelement == "Galerie" and !is_dir(getcwd()."/$PLUGIN_DIR/".$currentelement)) {
+                continue;
+            }*/
+            $deactiv_plugins = array();
+            # nach schauen ob das Plugin active ist
+            if(file_exists(getcwd()."/$PLUGIN_DIR/".$currentelement."/plugin.conf")) {
+                $conf_plugin = new Properties(getcwd()."/$PLUGIN_DIR/".$currentelement."/plugin.conf",true);
+                if($conf_plugin->get("active") == "false") {
+                    # array fühlen mit deactivierte Plugin Platzhalter
+                    $deactiv_plugins[] = $currentelement;
+                    unset($conf_plugin);
+                }
+            }
         }
+
         // Alle Variablen aus dem Inhalt heraussuchen
         preg_match_all("/\{(.+)\}/Umsi", $content, $matches);
+        # Alle Platzhalter die keine Plugins sind ersetze {, } mit ~platz-, -platzend~
+        # und jetzt noch die Verschachtelten und die {, } ersetzen mit ~start-, -end~,
+        # inerhalb eines Plugins und ~start_in-, -end_in~
+        $content = replacePluginsCurly($matches,$content,$availableplugins);
 
-        # nur zur abwärts kompatiebelen Galerie solte irgendwann raus
-        # Plugin Platzhalter kommt über die Url nur bei Galerie blank
-        if ($GALLERY_CONF->get("target") == "_blank"
-                and getRequestParam("gal", false)
-                and getRequestParam("plugin", false)
-                and getRequestParam("plugin", true) == "Galerie"
-                and !strstr($content,"{Galerie")
-            ) {
-            $matches[1][] = getRequestParam("plugin", true);
-        }
+        $notexit = 0;
         // Für jeden Treffer...
-        foreach ($matches[1] as $i => $match) {
+        while ((strpos($content,'~start-') > 0)
+                or (strpos($content,'~start_in-') > 0)
+            ) {
+            # alle PluginPlatzhalter die in einem Plugin sind zuerst ersetzen
+            if(strpos($content,'~start_in-') > 0) {
+                $match_start = strrpos($content,'~start_in-');
+                $match_len = strpos($content,'-end_in~',$match_start) - $match_start + 8;
+                $match = substr($content,$match_start,$match_len);
+                $match_plugin = substr($match,10,strlen($match) - 18);
+            # dann alle anderen
+            } elseif(strpos($content,'~start-') > 0) {
+                $match_start = strpos($content,'~start-');
+                $match_len = strpos($content,'-end~',$match_start) - $match_start + 5;
+                $match = substr($content,$match_start,$match_len);
+                # bei PluginPlatzhalter die neben einander in einem Plugin stehen
+                if(strpos($match,'~start-',7) > 0) {
+                    $match = substr($match,strrpos($match,'~start-'));
+                }
+                $match_plugin = substr($match,7,strlen($match) - 12);
+            }
             // ...erstmal schauen, ob ein Wert dabeisteht, z.B. {VARIABLE|wert}
-            $valuearray = explode("|", $matches[1][$i]);
+            $valuearray = explode("|", $match_plugin);
             if (sizeof($valuearray) > 1) {
                 $currentvariable = $valuearray[0];
                 $currentvalue = $valuearray[1];
             }
             // Sonst den Wert leer vorbelegen
             else {
-                $currentvariable = $matches[1][$i];
+                $currentvariable = $match_plugin;
                 $currentvalue = "";
             }
-            
             // ...überprüfen, ob es eine zugehörige Plugin-PHP-Datei gibt
             if (in_array($currentvariable, $availableplugins)) {
                 $replacement = "";
-                # Plugin Galerie gibts nicht dann brauchen wir auch geine plugin.conf
-                if($currentvariable == "Galerie" and !is_dir(getcwd()."/$PLUGIN_DIR/".$currentvariable)) {
+                # Plugin Galerie gibts nicht dann gallery.php benutzen
+/*                if($currentvariable == "Galerie" and !is_dir(getcwd()."/$PLUGIN_DIR/".$currentvariable)) {
                     # Plugin-Code includieren aus der gallery.php
                     require_once(getcwd()."/gallery.php");
-                } else {
-                   if(file_exists(getcwd()."/$PLUGIN_DIR/".$currentvariable."/plugin.conf")) {
-                        $conf_plugin = new Properties(getcwd()."/$PLUGIN_DIR/".$currentvariable."/plugin.conf",true);
-                        if($conf_plugin->get("active") == "false") {
-                            # array fühlen mit deactivierte Plugin Platzhalter wird oben dann ersetzt mit NULL
-                            $deactiv_plugins[] = '{'.$matches[1][$i].'}';
-                            unset($conf_plugin);
-                            continue;
-                        }
-                    }
+                } else {*/
+                if (file_exists(getcwd()."/$PLUGIN_DIR/".$currentvariable."/index.php")) {
                     // Plugin-Code includieren
                     require_once(getcwd()."/$PLUGIN_DIR/".$currentvariable."/index.php");
                 }
                 // Enthält der Code eine Klasse mit dem Namen des Plugins?
                 if (class_exists($currentvariable)) {
-                    // Objekt instanziieren und Inhalt holen!
-                    $currentpluginobject = new $currentvariable();
-                    $replacement = $currentpluginobject->getPluginContent($currentvalue);
+                    if(!in_array($currentvariable, $deactiv_plugins)) {
+                        // Objekt instanziieren und Inhalt holen!
+                        $currentpluginobject = new $currentvariable();
+                        $replacement = $currentpluginobject->getPluginContent($currentvalue);
+                    }
                 }
                 else {
-                    $replacement = $syntax->createDeadlink('{'.$matches[1][$i].'}', $language->getLanguageValue1("plugin_error_1", $currentvariable));
+                    $replacement = $syntax->createDeadlink($match, $language->getLanguageValue1("plugin_error_1", $currentvariable));
                 }
-                # nur zur abwärts kompatiebelen Galerie solte irgendwann raus
-                # nur wens gallery und blank und get=plugin und kein Platzhalter $matches[1][$i] ist
-                # und {EMBEDDED_TEMPLATE_START} enthalten ist
-                if ($GALLERY_CONF->get("target") == "_blank"
-                    and getRequestParam("gal", false)
-                    and getRequestParam("plugin", false)
-                    and getRequestParam("plugin", true) == "Galerie"
-                    and strstr($content,"{EMBEDDED_TEMPLATE_START}")
-                    ) {
-                    preg_match("/\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_START\}[\s|\t]*--\>(.*)\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_END\}[\s|\t]*--\>/Umsi", $content, $galmatches);
-                    if (sizeof($galmatches) > 1) {
-                        $content = str_replace($galmatches[1], $replacement, $content);
-                    }
-                } else {
                 // Variable durch Plugin-Inhalt (oder Fehlermeldung) ersetzen
-                $content = preg_replace('/{'.preg_quote($matches[1][$i], '/').'}/Um', $replacement, $content);
-                }
+                $content = preg_replace('/'.preg_quote($match, '/').'/Um', $replacement, $content);
             }
+            $notexit++;
+            # nach spätestens 100 durchläufe die while schleife verlassen nicht das das
+            # zur endlosschleife wird
+            if($notexit > 100) break;
         }
+        # Platzhalter wieder herstellen
+        $content = str_replace(array('~platz-','-platzend~'),array('{','}'),$content);
         return $content;
     }
 
