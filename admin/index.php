@@ -2712,9 +2712,9 @@ function config($post) {
                     $CONTACT_CONF->set($syntax_name, $checkbox);
                 }
                 continue;
-            }
-            if($syntax_name == "formularmail" and $post[$syntax_name] != "") {
-                 if(!preg_match("/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/",$post[$syntax_name])) {
+            }#
+            if($syntax_name == "formularmail") {
+                 if($post[$syntax_name] != "" and !preg_match("/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/",$post[$syntax_name])) {
                     $post['error_messages']['config_error_formularmail']['color'] = "#FF7029";
                     $error_color['formularmail'] = ' style="background-color:#FF7029;"';
                     $error_messages = $syntax_name;
@@ -2927,28 +2927,7 @@ function config($post) {
     }
     $pagecontent .= "</select></td>";
     $pagecontent .= "</tr>";
-    // Zeile "MENU2"
-/*    $pagecontent .= "<tr><td class=\"td_cms_left\">".getLanguageValue("config_text_menu2")."</td>";
-    $pagecontent .= "<td class=\"td_cms_left\">";
-    $pagecontent .= "<select name=\"menu2\" class=\"input_cms_select\"".$error_color['menu2'].">";
-    $selected = NULL;
-    if($CMS_CONF->get("menu2") == "") {
-        $selected = "selected ";
-    }
-    $pagecontent .= '<option '.$selected.'value="no_menu2">'.getLanguageValue("config_select_menu2").'</option>';
-    foreach($cat_array as $element) {
-        if (count(getFiles("$CONTENT_DIR_REL/".$element, "")) == 0) {
-            continue;
-        }
-        $selected = NULL;
-        if ($element == $CMS_CONF->get("menu2")) {
-            $selected = "selected ";
-        }
-        $pagecontent .= "<option ".$selected."value=\"".$element."\">".$specialchars->rebuildSpecialChars($element, true, true)."</option>";
-    }
-    $pagecontent .= "</select></td>";
-    $pagecontent .= "</tr>";
-*/
+
     if($ADMIN_CONF->get('showexpert') == "true") {
         // Zeile "NUTZE SUBMENÜ"
         $checked0 = "";
