@@ -15,7 +15,7 @@
     @ini_set("display_errors", 0);
 
     $ERRORMESSAGE = "Fehlerhafter Parameter Übergeben.";    
-    $DOWNLOADS = new Properties("conf/downloads.conf".true);
+    $DOWNLOADS = new Properties("conf/downloads.conf",true);
 
     $CAT     = preg_replace('/(\/|\\\)/', "", rawurlencode($_REQUEST['cat']));
     $FILE = preg_replace('/(\/|\\\)/', "", rawurlencode($_REQUEST['file']));
