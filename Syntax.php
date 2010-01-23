@@ -297,20 +297,36 @@ class Syntax {
                 }
             }
 
-            // Galerie auf Plugin umleiten
+            // Galerie
             elseif (($attribute == "galerie") || (substr($attribute,0,8) == "galerie=")) {
-                if (file_exists($PLUGIN_DIR."/Galerie/index.php") or file_exists("gallery.php")) {
-                    $link_text = "";
-                    if(substr($attribute,0,8) == "galerie=") {
-                        $link_text = ','.substr($attribute, 8, strlen($attribute)-8);
-                    } else {
-                        $link_text = ','.$value;
-                    }
-                    $content = str_replace ($match, '{Galerie|'.$value.$link_text.'}', $content);
+                $cleanedvalue = $specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($value),false);
+                $link_text = "";
+                if(substr($attribute,0,8) == "galerie=") {
+                    $link_text = substr($attribute, 8, strlen($attribute)-8);
                 }
-                // Galerie Plugin nicht vorhanden
                 else {
-                    $content = str_replace ($match, $this->createDeadlink($value, $language->getLanguageValue1("plugin_error_1", $value)), $content);
+                    $link_text = $value;
+                }
+                
+                if (file_exists("./$GALLERIES_DIR/$cleanedvalue")) {
+                    $handle = opendir("./$GALLERIES_DIR/$cleanedvalue");
+                    $j=0;
+                    while ($file = readdir($handle)) {
+                        if (is_file("./$GALLERIES_DIR/$cleanedvalue/".$file) && ($file <> "texte.conf")) {
+                            $j++;
+                        }
+                    }
+                    closedir($handle);
+                    $modrewrite_dumy = NULL;
+#                    if($CMS_CONF->get("modrewrite") == "true") {
+#                        $modrewrite_dumy = ".html";
+#                    }
+                    $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE."gallery.php$modrewrite_dumy?gal=$cleanedvalue\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"_blank\">$link_text</a>", $content);
+#                    $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">$link_text</a>", $content);
+                }
+                // Galerie nicht vorhanden
+                else {
+                    $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_link_gallery_error_1", $value)), $content);
                 }
             }
 
