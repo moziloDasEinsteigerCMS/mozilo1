@@ -211,6 +211,7 @@ if(!function_exists('getGalleryMenu')) {
         // ------------------------------------------------------------------------------
         // Hilfsfunktion: Extrahiert das Embedded-Template aus dem Gesamt-Template
         // ------------------------------------------------------------------------------
+/*
         function extractEmbeddedTemplate($template) {
             global $GALLERY_CONF;
             preg_match("/\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_START\}[\s|\t]*--\>(.*)\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_END\}[\s|\t]*--\>/Umsi", $template, $matches);
@@ -220,7 +221,7 @@ if(!function_exists('getGalleryMenu')) {
             else {
                 return false;
             }
-        }
+        }*/
         // ------------------------------------------------------------------------------
         // Hilfsfunktion: "title"-Attribut zusammenbauen (oder nicht, wenn nicht konfiguriert)
         // ------------------------------------------------------------------------------
@@ -328,15 +329,7 @@ if(!function_exists('getGalleryMenu')) {
                     $template = $this->settings->get("gallerytemplate");
                 }
             } else { 
-                $gallery_template = $LAYOUT_DIR."/gallerytemplate.html";
-                if (!$file = @fopen($gallery_template, "r"))
-                    die($language->getLanguageValue1("message_template_error_1", $gallery_template));
-                $template = fread($file, filesize($gallery_template));
-                fclose($file);
-                $template = extractEmbeddedTemplate($template);
-                if ($template == false) {
-                    return false;
-                }
+                $template = "{GALLERYMENU}{NUMBERMENU}\n{CURRENTPIC}\n{CURRENTDESCRIPTION}";
             }
             $html = $template;
 
