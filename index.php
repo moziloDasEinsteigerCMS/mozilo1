@@ -1623,6 +1623,8 @@ $CHARSET = 'UTF-8';
         }
         # Platzhalter wieder herstellen
         $content = str_replace(array('~platz-','-platzend~'),array('{','}'),$content);
+        # fals doch noch was übrig geblieben sein solte
+        $content = str_replace(array('~start_in-','-end_in~','~start-','-end~'),array('{','}','{','}'),$content);
         return $content;
     }
 
