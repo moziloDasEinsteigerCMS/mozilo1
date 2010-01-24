@@ -345,12 +345,19 @@ $CHARSET = 'UTF-8';
     function getPasswordForm() {
         global $language;
         global $CMS_CONF;
+        global $CAT_REQUEST;
+        global $PAGE_REQUEST;
+        global $URL_BASE;
         $mod_rewrite = NULL;
         if($CMS_CONF->get("modrewrite") == "true") {
             $mod_rewrite = ".html";
         }
+        $url = "index.php?cat=".$CAT_REQUEST."&amp;page=".$PAGE_REQUEST;
+        if($CMS_CONF->get("modrewrite") == "true") {
+            $url = $URL_BASE.$CAT_REQUEST."/".$PAGE_REQUEST.".html";
+        }
         // TODO: sollte auch wahlweise über ein Template gehen
-        return '<form action="index.php'.$mod_rewrite.'?'.$_SERVER['QUERY_STRING'].'" method="post">
+        return '<form action="'.$url.'" method="post">
         '.$language->getLanguageValue0("passwordform_pagepasswordplease_0").' 
         <input type="password" name="password" />
         <input type="submit" value="'.$language->getLanguageValue0("passwordform_send_0").'" />
@@ -1580,10 +1587,15 @@ $CHARSET = 'UTF-8';
                 $match_plugin = substr($match,7,strlen($match) - 12);
             }
             // ...erstmal schauen, ob ein Wert dabeisteht, z.B. {VARIABLE|wert}
-            $valuearray = explode("|", $match_plugin);
+#            $valuearray = explode("|", $match_plugin);
+            if(substr($match_plugin,0,strpos($match_plugin,'|'))) {
+
+                $currentvariable = substr($match_plugin,0,strpos($match_plugin,'|'));
+                $currentvalue = substr($match_plugin,strpos($match_plugin,'|') + 1);
+/*
             if (sizeof($valuearray) > 1) {
                 $currentvariable = $valuearray[0];
-                $currentvalue = $valuearray[1];
+                $currentvalue = $valuearray[1];*/
             }
             // Sonst den Wert leer vorbelegen
             else {
@@ -1614,7 +1626,8 @@ $CHARSET = 'UTF-8';
                     $replacement = $syntax->createDeadlink($match, $language->getLanguageValue1("plugin_error_1", $currentvariable));
                 }
                 // Variable durch Plugin-Inhalt (oder Fehlermeldung) ersetzen
-                $content = preg_replace('/'.preg_quote($match, '/').'/Um', $replacement, $content);
+#                $content = preg_replace('/'.preg_quote($match, '/').'/Um', $replacement, $content);
+                $content = str_replace($match,$replacement,$content);
             }
             $notexit++;
             # nach spätestens 100 durchläufe die while schleife verlassen nicht das das
