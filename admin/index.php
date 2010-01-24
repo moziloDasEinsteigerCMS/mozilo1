@@ -110,6 +110,12 @@ $LOGINCONF = new Properties("conf/logindata.conf",true);
 if(isset($LOGINCONF->properties['error'])) {
     die($LOGINCONF->properties['error']);
 }
+
+$PASSWORDS = new Properties("../conf/passwords.conf",true);
+# die muss schreiben geöffnet werden können
+if(isset($PASSWORDS->properties['error'])) {
+    die($PASSWORDS->properties['error']);
+}
 // Login ueberpruefen
 if (!isset($_SESSION['login_okay']) or !$_SESSION['login_okay']) {
     header("location:login.php?logout=true");
@@ -874,6 +880,7 @@ function page($post) {
     global $EXT_HIDDEN;
     global $EXT_LINK;
     global $ADMIN_CONF;
+    global $PASSWORDS;
 
     $icon_size = "24x24";
     $max_cat_page = 100;
@@ -936,7 +943,7 @@ function page($post) {
 
 
     # Die getLanguageValue() und createTooltipWZ() erzeugen
-    $array_getLanguageValue = array("pages","position","name","new_name","url_adress","url_new_adress","url_adress_description","page_button_edit","page_move","page_status","page_saveasdraft","page_saveasnormal","page_saveashidden","page_copy","page_button_edit","page_button_delete");
+    $array_getLanguageValue = array("pages","position","name","new_name","url_adress","url_new_adress","url_adress_description","page_button_edit","page_move","page_status","page_saveasdraft","page_saveasnormal","page_saveashidden","page_copy","page_button_edit","page_button_delete","page_password","page_password_del");
 
     # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getLanguageValue as $language) {
@@ -945,7 +952,7 @@ function page($post) {
 
     $array_getTooltipValue = array("help_new_url","help_target_blank","help_target_self","help_target","help_url",
         "page_help_edit","page_help_position","page_help_new_position","page_help_name","page_help_new_name",
-        "page_help_move","page_help_editieren","page_help_delete","page_help_copy");
+        "page_help_move","page_help_editieren","page_help_delete","page_help_copy","page_help_password","page_help_password_del");
 
     # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getTooltipValue as $language) {
@@ -1091,8 +1098,15 @@ function page($post) {
                 $pagecontent .= '<td width="6%" class="td_center_title"><input type="radio" name="categories['.$cat.'][new_target]['.$pos.']" value="-_self-"'.$post['categories'][$cat]['checked_selv'][$pos].''.$tooltip_help_target_self.'><input type="hidden" name="categories['.$cat.'][target]['.$pos.']" value="'.$post['categories'][$cat]['target'][$pos].'"></td><td>&nbsp;</td>';
                 $pagecontent .= '</tr></table>';
             } else {
-                $pagecontent .= '<table width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0"><tr><td width="30%" class="td_left_title" nowrap><b>'.$text_new_name.'</b></td><td class="td_left_title">&nbsp;</td></tr>';
-                $pagecontent .= '<tr><td width="30%" class="td_left_title" nowrap><input type="text" '.$post['categories'][$cat]['error_html']['new_name'][$pos].' class="input_text" name="categories['.$cat.'][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_name'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_name.'></td><td>&nbsp;</td>';
+                $pagecontent .= '<table width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0"><tr><td width="30%" class="td_left_title" nowrap><b>'.$text_new_name.'</b></td><td width="6%" class="td_left_title">&nbsp;</td><td width="30%" class="td_left_title"><b>'.$text_page_password.'</b></td><td class="td_left_title">&nbsp;</td></tr>';
+                $pagecontent .= '<tr><td width="30%" class="td_left_title" nowrap><input type="text" '.$post['categories'][$cat]['error_html']['new_name'][$pos].' class="input_text" name="categories['.$cat.'][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_name'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_name.'></td><td width="6%">&nbsp;</td><td width="30%" class="td_left_title"><input type="text" '.$post['categories'][$cat]['error_html']['password'][$pos].' class="input_text" name="categories['.$cat.'][password]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['password'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_password.'></td><td class="td_left_title">';
+
+                if($PASSWORDS->get($cat."/".$post['categories'][$cat]['position'][$pos]."_".$post['categories'][$cat]['name'][$pos])) {
+                    $pagecontent .= '<b>'.$text_page_password_del.'</b>&nbsp;<input class="input_check" type="checkbox" name="categories['.$cat.'][password_del]['.$pos.']" value="yes"'.$tooltip_page_help_password_del.'>';
+                } else {
+                    $pagecontent .= '&nbsp;';
+                }
+                $pagecontent .= '</td>';
                 $pagecontent .= '</tr></table>';
             }
 
@@ -1171,8 +1185,11 @@ function copymoveSite($post) {
     global $CONTENT_DIR_REL;
     global $EXT_LINK;
     global $EXT_PAGE;
+    global $PASSWORDS;
     $max_cat_page = 100;
 
+    require_once("Crypt.php");
+    $pwcrypt = new Crypt();
     # wenn Verschoben wird unset die Position der Inhaltseite aus anderer Kategorie
     # damit bei position_move() die Positionen frei sind
     if(isset($post['move_copy'])) {
@@ -1195,6 +1212,34 @@ function copymoveSite($post) {
             # Neue Inhaltseite nicht hier
             if($pos == $max_cat_page) {
                 continue;
+            }
+            # Inhaltseiten Paswort Schutz sachen
+            $tmp_page = $post['categories'][$cat]['position'][$pos]."_".$post['categories'][$cat]['name'][$pos];
+            if($PASSWORDS->get($cat."/".$tmp_page)
+                    and !empty($post['categories'][$cat]['password_del'][$pos]))
+            {
+                $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
+                $post['messages']['del_password'][] = $tmp_page;
+                $PASSWORDS->delete($cat."/".$tmp_page);
+            }
+            if(!$PASSWORDS->get($cat."/".$tmp_page)
+                    and !empty($post['categories'][$cat]['password'][$pos])
+                    and empty($post['categories'][$cat]['password_del'][$pos]))
+            {
+                $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
+                $post['display'][$cat]['error_html']['display'][$pos] = 'style="display:block;" ';
+                $post['messages']['new_password'][] = $tmp_page;
+                $PASSWORDS->set($cat."/".$tmp_page,$pwcrypt->encrypt($post['categories'][$cat]['password'][$pos]));
+                $post['categories'][$cat]['password'][$pos] = NULL;
+            } elseif($PASSWORDS->get($cat."/".$tmp_page) != $pwcrypt->encrypt($post['categories'][$cat]['password'][$pos])
+                    and !empty($post['categories'][$cat]['password'][$pos])
+                    and empty($post['categories'][$cat]['password_del'][$pos]))
+            {
+                $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
+                $post['display'][$cat]['error_html']['display'][$pos] = 'style="display:block;" ';
+                $post['messages']['change_password'][] = $tmp_page;
+                $PASSWORDS->set($cat."/".$tmp_page,$pwcrypt->encrypt($post['categories'][$cat]['password'][$pos]));
+                $post['categories'][$cat]['password'][$pos] = NULL;
             }
             # Neue Position nicht hier
             if($post['categories'][$cat]['position'][$pos] != $post['categories'][$cat]['new_position'][$pos]) {
@@ -1341,6 +1386,11 @@ function copymoveSite($post) {
                     $post['makepara'] = "no"; # kein makePostCatPageReturnVariable()
                 # Alles gut
                 } else {
+                    if($PASSWORDS->get($cat."/".substr($rename_orgname[$cat][$z],0,-(strlen($EXT_LINK))))) {
+                        $tmp_pas = $PASSWORDS->get($cat."/".substr($rename_orgname[$cat][$z],0,-(strlen($EXT_LINK))));
+                        $PASSWORDS->delete($cat."/".substr($rename_orgname[$cat][$z],0,-(strlen($EXT_LINK))));
+                        $PASSWORDS->set($cat."/".substr($rename_newname[$cat][$z],0,-(strlen($EXT_LINK))),$tmp_pas);
+                    }
                     $post['messages']['page_message_rename'][] = $cat."/".$rename_orgname[$cat][$z]." <b>></b> ".$cat."/".$rename_newname[$cat][$z];
                     $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" '; # letzte cat ausklappen
                     $post['makepara'] = "yes"; # makePostCatPageReturnVariable()
@@ -1411,7 +1461,12 @@ function copymoveSite($post) {
                     $post['display'][dirname($move_orgname[$cat][$z])]['error_html']['display_cat'] = 'style="display:block;" ';
                     unset($error);
                 } else {
-                # Erfogs meldungen
+                    if($PASSWORDS->get(substr($move_orgname[$cat][$z],0,-(strlen($EXT_LINK))))) {
+                        $tmp_pas = $PASSWORDS->get(substr($move_orgname[$cat][$z],0,-(strlen($EXT_LINK))));
+                        $PASSWORDS->delete(substr($move_orgname[$cat][$z],0,-(strlen($EXT_LINK))));
+                        $PASSWORDS->set(substr($move_newname[$cat][$z],0,-(strlen($EXT_LINK))),$tmp_pas);
+                    }
+                    # Erfogs meldungen
                     $post['messages']['page_message_copy_move'][] = $move_orgname[$cat][$z]." <b>></b> ".$move_newname[$cat][$z];
                     $post['display'][dirname($move_orgname[$cat][$z])]['error_html']['display_cat'] = 'style="display:block;" ';
                     $post['makepara'] = "yes"; # makePostCatPageReturnVariable()
@@ -1457,7 +1512,8 @@ function copymoveSite($post) {
 function deleteSite($post) {
     global $specialchars;
     global $CONTENT_DIR_REL;
-
+    global $EXT_LINK;
+    global $PASSWORDS;
     $icon_size = '24x24';
     $cat = key($post['action_data']['deletesite']);
     $del_page = $cat."/".$post['action_data']['deletesite'][$cat];
@@ -1488,6 +1544,9 @@ function deleteSite($post) {
                 $post['messages']['page_message_delete'][] = $post['action_data']['deletesite'][$cat];
                 $post['makepara'] = "yes"; # makePostCatPageReturnVariable()
                 $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
+                if($PASSWORDS->get(substr($del_page,0,-(strlen($EXT_LINK))))) {
+                    $PASSWORDS->delete(substr($del_page,0,-(strlen($EXT_LINK))));
+                }
                 return $post;
             }
         } else {
@@ -3527,6 +3586,7 @@ function plugins($post) {
                         # Plugin Name Brauchen wir hier nicht
                         if($pos == 0) continue;
                         if($pos == 2) {
+                            $plugin_info[$pos] = str_replace(array("&lt;","&gt;"),array("<",">"),$plugin_info[$pos]);
                             $plugin_info[$pos] = strip_tags($plugin_info[$pos], '<span><br>');
                             $plugin_info[$pos] = htmlentities($plugin_info[$pos],ENT_NOQUOTES,$CHARSET);
                             $plugin_info[$pos] = str_replace(array('&amp;#',"&lt;","&gt;"),array('&#',"<",">"),$plugin_info[$pos]);

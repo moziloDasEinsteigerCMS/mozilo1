@@ -94,6 +94,8 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
             $post[$cat]['error_html']['display'][$pos] = NULL;
             $post[$cat]['error_html']['new_position'][$pos] = NULL;
             $post[$cat]['error_html']['new_name'][$pos] = NULL;
+            $post[$cat]['error_html']['password'][$pos] = NULL;
+            $post[$cat]['password'][$pos] = NULL;
             $post[$cat]['position'][$pos] = $position;
             $post[$cat]['new_position'][$pos] = $post[$cat]['position'][$pos];
             $post[$cat]['new_name'][$pos] = NULL;
@@ -174,6 +176,7 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
     global $specialchars;
     global $ALLOWED_SPECIALCHARS_REGEX;
     global $error_color;
+    global $PASSWORDS;
 
     $max_cat_page = 100;
 
@@ -293,6 +296,18 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
                 $post[$cat]['name'][$pos] = $_POST['categories'][$cat]['name'][$pos];
                 $name_len = strlen($post[$cat]['name'][$pos]);
             }
+
+
+            $post[$cat]['error_html']['password'][$pos] = NULL;
+            $post[$cat]['password'][$pos] = NULL;
+            if(isset($_POST['categories'][$cat]['password_del'][$pos])) {
+                $post[$cat]['password_del'][$pos] = "true";
+            }
+# Paswort prüfen noch hier!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if(!empty($_POST['categories'][$cat]['password'][$pos])) {
+                $post[$cat]['password'][$pos] = $_POST['categories'][$cat]['password'][$pos];
+            }
+
             if(!isset($post[$cat]['error_html']['new_name'][$pos])) {
                  $post[$cat]['error_html']['new_name'][$pos] = NULL;
             }
