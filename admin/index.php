@@ -1225,9 +1225,9 @@ function copymoveSite($post) {
     # Alle Kategorien durch gehen
     foreach($post['categories'] as $cat => $tmp) {
         # Kategorien die keine Inhaltseiten haben und auch keine neue = continue
-        if(count($post['categories'][$cat]['position']) <= 1 and empty($post['categories'][$cat]['new_position'][$max_cat_page])) {
-            continue;
-        }
+//         if(count($post['categories'][$cat]['position']) <= 1 and empty($post['categories'][$cat]['new_position'][$max_cat_page])) {
+//             continue;
+//         }
 
         # rename bauen wenn die position sich nicht geändert hat aber was anderes
         foreach($post['categories'][$cat]['position'] as $pos => $tmp) {
