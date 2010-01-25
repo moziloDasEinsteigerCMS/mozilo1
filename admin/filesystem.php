@@ -27,7 +27,7 @@ function getLanguageValue($confpara)
 
     $text = htmlentities($BASIC_LANGUAGE->get($confpara),ENT_COMPAT,$CHARSET);
     if(empty($text)) {
-        return '<b style="color:#ff0000;">'.$confpara."</b> ".$BASIC_LANGUAGE->get('languagefile_error');
+        return "FEHLER = ".$confpara;
     }
     $text = str_replace(array("&lt;","&gt;"),array("<",">"), $text);
     return $text;
