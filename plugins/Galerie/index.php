@@ -399,7 +399,7 @@ if(!function_exists('getGalleryMenu')) {
             "type" => "textarea",                       // Pflicht:  Eingabetyp 
             "cols" => "50",                             // Pflicht:  Spaltenanzahl 
             "rows" => "7",                              // Pflicht:  Zeilenanzahl
-            "description" => "Hier kann aus den Platzhaltern ein Galerietemplate erstelt werden. Einfach nur die Platzhalter in die Gewünschte Reihenfolge anordnen. Zeilenumbrüche sind erlaubt",     // Pflicht:  Beschreibung
+            "description" => "Die Platzhalter in die Gewünschte Reihenfolge anordnen. Zeilenumbrüche sind erlaubt",     // Pflicht:  Beschreibung
         );
         // Nicht vergessen: Das gesamte Array zurückgeben
         return $config;
@@ -425,7 +425,13 @@ if(!function_exists('getGalleryMenu')) {
             // Plugin-Version
             "1.12",
             // Kurzbeschreibung
-            'Erzeugt die moziloCMS Galerie.<br /> Platzhalter = {Galerie} für die gallerytemplate.html im Layout Verzeichnis und für dir Inhaltseite {Galerie|Meine Galerie, Optinal Text für Link Galerie blank}. Erzeugt wird das Ausehen über die gallerytemplate.html im Layout Verzeichnis oder man Fühlt unten das Textfeld mit diesen Platzhaltern {GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION} optinal noch {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}.',
+            'Erzeugt die moziloCMS Standart Galerie embedded fähig.<br />
+            Platzhalter:<br>
+            <SPAN style="font-weight:bold;">{Galerie|Meine Galerie}</SPAN> für dir Inhaltseite.<br>
+            Bei Target <SPAN style="font-weight:bold;">blank</SPAN>:<br>
+            Optional ein Link Text am Ende mit <SPAN style="color:red;">Komma</SPAN> getränt z.B. <SPAN style="font-weight:bold;">{Galerie|Meine Galerie , Link Text}</SPAN><br>
+            <SPAN style="font-weight:bold;">{Galerie}</SPAN> in der <SPAN style="color:red;">gallerytemplate.html</SPAN> des Layouts. <br>
+            Erzeugt wird das Ausehen durch Anordnen dieser Platzhaltern <SPAN style="font-weight:bold;">{GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION}, {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}</SPAN> im Textfeld.<br>',
             // Name des Autors
            "mozilo",
             // Download-URL
