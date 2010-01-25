@@ -82,7 +82,7 @@ class moziloPayPal extends Plugin {
             // Plugin-Version
             "1.12",
             // Kurzbeschreibung
-            "Erzeugt den PayPal Spenden Button. Patzhalter {moziloPayPal} mit Überschrieft {moziloPayPal|<h1>Spenden</h1>}",
+            'Erzeugt den PayPal Spenden Button. <br>Patzhalter: <br><SPAN style="font-weight:bold;">{moziloPayPal}</SPAN> <br> <span style="font-weight:bold;">{moziloPayPal|Spenden}</span> mit Überschrieft',
             // Name des Autors
             "mozilo",
             // Download-URL
