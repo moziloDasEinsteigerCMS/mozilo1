@@ -724,6 +724,7 @@ function editCategory($post) {
     global $ALLOWED_SPECIALCHARS_REGEX;
     global $EXT_LINK;
     global $CMS_CONF;
+    global $PASSWORDS;
     $max_cat_page = 100;
 
     $new_move_cat_page = false;
@@ -799,6 +800,17 @@ function editCategory($post) {
                         $post['messages']['category_message_defaultcat'][] = $newname[$pos];
                     }
                 }
+                # CatPage vom Password ändern
+                if(is_array($PASSWORDS->properties)) {
+                    foreach($PASSWORDS->properties as $catpage => $pass) {
+                        $pas_cat = explode("/",$catpage);
+                        if($pas_cat[0] == $orgname[$pos]) {
+                            $tmp_pas = $PASSWORDS->get($catpage);
+                            $PASSWORDS->delete($catpage);
+                            $PASSWORDS->set($newname[$pos].'/'.$pas_cat[1],$tmp_pas);
+                        }
+                    }
+                }
                 $post['messages']['category_message_rename'][] = $orgname[$pos]." <b>></b> ".$newname[$pos];
                 $post['makepara'] = "yes";
             }
@@ -837,6 +849,7 @@ function deleteCategory($post) {
     global $specialchars;
     global $CONTENT_DIR_REL;
     global $CMS_CONF;
+    global $PASSWORDS;
 
     $icon_size = '24x24';
     # Nachfragen wirklich Löschen
@@ -859,6 +872,15 @@ function deleteCategory($post) {
                 $tmp_array = getDirs($CONTENT_DIR_REL,true,true);
                 $CMS_CONF->set('defaultcat',$tmp_array[0]);
                 $post['messages']['category_message_defaultcat'][] = $tmp_array[0];
+            }
+            # CatPage vom Password ändern
+            if(is_array($PASSWORDS->properties)) {
+                foreach($PASSWORDS->properties as $catpage => $pass) {
+                    $pas_cat = explode("/",$catpage);
+                    if($pas_cat[0] == $_POST['del_cat']) {
+                        $PASSWORDS->delete($catpage);
+                    }
+                }
             }
             return $post;
         } else {
