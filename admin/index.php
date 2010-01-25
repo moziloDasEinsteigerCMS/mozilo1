@@ -3583,12 +3583,12 @@ function plugins($post) {
                 }
 
                 if($plugin_error === false) {
-                    $plugin_name = htmlentities($plugin_info[0],ENT_COMPAT,$CHARSET);
-                } else {
+                    $plugin_name = str_replace(array("&lt;","&gt;"),array("<",">"),htmlentities(strip_tags($plugin_info[0], '<b>'),ENT_COMPAT,$CHARSET),$plugin_info[0]);
+                } else {#str_replace(array("&lt;","&gt;"),array("<",">"),$plugin_info[$pos]);
                     $plugin_name = getLanguageValue('plugins_error').' <span style="color:#ff0000">'.$currentelement.'</span>';
                     $plugin_error = true;
                 }
-                $pagecontent .= '<tr><td width="70%" class="td_titel" nowrap><span class="text_cat_page">'.$plugin_name.'</span>'.$plugin_error_conf.'</td>';
+                $pagecontent .= '<tr><td width="70%" class="td_titel" nowrap>'.$plugin_name.$plugin_error_conf.'</td>';
                 $pagecontent .= '<td width="15%" class="">'.getLanguageValue("plugins_input_active").'&nbsp;'.buildCheckBox($currentelement.'[active]', ($conf_plugin->get("active") == "true")).'</td>';
                 $pagecontent .= '<td width="15%" class="td_icons">';
                 if(getRequestParam('javascript', true) and $plugin_error === false) {
