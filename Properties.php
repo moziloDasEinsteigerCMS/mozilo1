@@ -75,7 +75,9 @@ class Properties {
     function Properties($file = null, $is_admin = false) {
         global $BASIC_LANGUAGE;
         if(isset($BASIC_LANGUAGE->properties['_translator'])) {
-            $error_input = $BASIC_LANGUAGE->properties['properties_noinput'];
+            if(isset($BASIC_LANGUAGE->properties['properties_noinput']))
+                $error_input = $BASIC_LANGUAGE->properties['properties_noinput'];
+            else $error_input = "properties_noinput";
         } else {
             $error_input = "Keine Datei angegeben!";
         }
@@ -111,17 +113,19 @@ class Properties {
      */
     function loadProperties() {
         global $BASIC_LANGUAGE;
-        if(isset($BASIC_LANGUAGE->properties['_translator'])) {
+
+        $error_nofile = "die Datei Existiert nicht: ";
+        if(isset($BASIC_LANGUAGE->properties['properties_nofile']))
             $error_nofile = $BASIC_LANGUAGE->properties['properties_nofile'];
+        $error_readonly = "kann die Datei nur lesend öffnen (Dateirechte prüfen): ";
+        if(isset($BASIC_LANGUAGE->properties['properties_readonly']))
             $error_readonly = $BASIC_LANGUAGE->properties['properties_readonly'];
+        $error_write = "kann die Datei nicht schreibend öffnen (Dateirechte prüfen): ";
+        if(isset($BASIC_LANGUAGE->properties['properties_write']))
             $error_write = $BASIC_LANGUAGE->properties['properties_write'];
+        $error_read = "kann die Datei nicht Lesend oder schreibend öffnen (Dateirechte prüfen): ";
+        if(isset($BASIC_LANGUAGE->properties['properties_read']))
             $error_read = $BASIC_LANGUAGE->properties['properties_read'];
-        } else {
-            $error_nofile = "die Datei Existiert nicht: ";
-            $error_readonly = "kann die Datei nur lesend öffnen (Dateirechte prüfen): ";
-            $error_write = "kann die Datei nicht schreibend öffnen (Dateirechte prüfen): ";
-            $error_read = "kann die Datei nicht Lesend oder schreibend öffnen (Dateirechte prüfen): ";
-        }
 
         if (!file_exists($this->file)) {
             return $this->properties['error'] = $error_nofile.$this->file;
@@ -159,17 +163,20 @@ class Properties {
      */
     function saveProperties() {
         global $BASIC_LANGUAGE;
-        if(isset($BASIC_LANGUAGE->properties['_translator'])) {
+
+        $error_lock_existed = "kann setings nicht schreiben es existiert eine Sperdatei: ";
+        if(isset($BASIC_LANGUAGE->properties['properties_lock_existed']))
             $error_lock_existed = $BASIC_LANGUAGE->properties['properties_lock_existed'];
+        $error_lock_touch = "kann Sperdatei Datei nicht anlegen (Dateirechte prüfen): ";
+        if(isset($BASIC_LANGUAGE->properties['properties_lock_touch']))
             $error_lock_touch = $BASIC_LANGUAGE->properties['properties_lock_touch'];
+        $error_lock_del = "kann Sperdatei Datei nicht löschen (Dateirechte prüfen): ";
+        if(isset($BASIC_LANGUAGE->properties['properties_lock_del']))
             $error_lock_del = $BASIC_LANGUAGE->properties['properties_lock_del'];
+        $error_write = "kann die Datei nicht schreibend öffnen (Dateirechte prüfen): ";
+        if(isset($BASIC_LANGUAGE->properties['properties_write']))
             $error_write = $BASIC_LANGUAGE->properties['properties_write'];
-        } else {
-            $error_lock_existed = "kann setings nicht schreiben es existiert eine Sperdatei: ";
-            $error_lock_touch = "kann Sperdatei Datei nicht anlegen (Dateirechte prüfen): ";
-            $error_lock_del = "kann Sperdatei Datei nicht löschen (Dateirechte prüfen): ";
-            $error_write = "kann die Datei nicht schreibend öffnen (Dateirechte prüfen): ";
-        }
+
         // Vorm Schreiben erst auf eine mögliche Sperre überprüfen (Schutz vor konkurrierenden Schreibzugriffen)
         $islocked = true;
         // für die aktuelle Properties-Datei existiert eine Sperrdatei, sie ist also bereits geöffnet!
