@@ -78,7 +78,7 @@ class moziloPayPal extends Plugin {
     function getInfo() {
         return array(
             // Plugin-Name
-            "mozilo PayPal",
+            "mozilo PayPal Spenden 0.1",
             // Plugin-Version
             "1.12",
             // Kurzbeschreibung
