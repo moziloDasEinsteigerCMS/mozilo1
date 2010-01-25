@@ -52,7 +52,7 @@ class SITEMAP extends Plugin {
     function getInfo() {
         return array(
             // Plugin-Name
-            "Sitemap",
+            "<b>Sitemap</b>",
             // Plugin-Version
             "1.0",
             // Kurzbeschreibung

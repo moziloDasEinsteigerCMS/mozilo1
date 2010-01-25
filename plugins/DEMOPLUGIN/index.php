@@ -341,7 +341,7 @@ class DEMOPLUGIN extends Plugin {
         # mehr sprachig wenn Sprache nicht vorhanden wird die erste genommen
         return array('deDE' => array(
             // Plugin-Name + Version
-            "Plugin-Demo",
+            "<b>Plugin-Demo</b>",
             // moziloCMS-Version
             "1.12",
             // Kurzbeschreibung nur <span> und <br> sind erlaubt

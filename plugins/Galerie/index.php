@@ -421,7 +421,7 @@ if(!function_exists('getGalleryMenu')) {
     function getInfo() {
         return array(
             // Plugin-Name
-            "mozilioCMS Standart Galerie 0.1",
+            "mozilioCMS Standart <b>Galerie</b> 0.1",
             // Plugin-Version
             "1.12",
             // Kurzbeschreibung
