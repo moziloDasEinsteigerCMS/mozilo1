@@ -79,8 +79,8 @@ $CHARSET = 'UTF-8';
         $USE_CMS_SYNTAX = false;
         
     // Request-Parameter einlesen und dabei absichern
-    $CAT_REQUEST = $specialchars->replaceSpecialChars(getRequestParam('cat', true),false);
-    $PAGE_REQUEST = $specialchars->replaceSpecialChars(getRequestParam('page', true),false);
+    $CAT_REQUEST_URL = $specialchars->replaceSpecialChars(getRequestParam('cat', true),false);
+    $PAGE_REQUEST_URL = $specialchars->replaceSpecialChars(getRequestParam('page', true),false);
     $ACTION_REQUEST = getRequestParam('action', true);
     $QUERY_REQUEST = getRequestParam('query', true);
     $HIGHLIGHT_REQUEST = getRequestParam('highlight', false);
@@ -91,6 +91,9 @@ $CHARSET = 'UTF-8';
     $GALLERIES_DIR          = "galerien";
     $PLUGIN_DIR             = "plugins";
     $HTML                   = "";
+
+    $CAT_REQUEST = nameToCategory($CAT_REQUEST_URL);
+    $PAGE_REQUEST = nameToPage($PAGE_REQUEST_URL, $CAT_REQUEST,false);
 
     $DEFAULT_CATEGORY = $CMS_CONF->get("defaultcat");
     // Überprüfen: Ist die Startkategorie vorhanden? Wenn nicht, nimm einfach die allererste als Standardkategorie
@@ -316,7 +319,7 @@ $CHARSET = 'UTF-8';
         $HTML = preg_replace('/{LASTCHANGE}/', $language->getLanguageValue0("message_lastchange_0")." ".$lastchangeinfo[1]." (".$lastchangeinfo[2].")", $HTML); 
     }
     // Sitemap-Link
-    $HTML = preg_replace('/{SITEMAPLINK}/', "<a href=\"index.php?action=sitemap\" id=\"sitemaplink\"".getTitleAttribute($language->getLanguageValue0("tooltip_showsitemap_0")).">".$language->getLanguageValue0("message_sitemap_0")."</a>", $HTML);
+    $HTML = preg_replace('/{SITEMAPLINK}/', "<a href=\"".$URL_BASE."index.php?action=sitemap\" id=\"sitemaplink\"".getTitleAttribute($language->getLanguageValue0("tooltip_showsitemap_0")).">".$language->getLanguageValue0("message_sitemap_0")."</a>", $HTML);
     
     // CMS-Info-Link
     if(strpos($HTML,'{CMSINFO}') !== false)
@@ -389,7 +392,7 @@ $CHARSET = 'UTF-8';
 // Zu einer Inhaltsseite passende Datei suchen und zurückgeben
 // Müllers Kuh => 00_M-uuml-llers-nbsp-Kuh.txt
 // ------------------------------------------------------------------------------
-    function nameToPage($pagename, $currentcat) {
+    function nameToPage($pagename, $currentcat, $ext = true) {
         global $CONTENT_DIR_ABS;
         global $EXT_DRAFT;
         global $EXT_HIDDEN;
@@ -405,8 +408,13 @@ $CHARSET = 'UTF-8';
                 || (substr($currentelement, 3, strlen($currentelement) - 3 - strlen($EXT_HIDDEN)) == $pagename)
                 || (substr($currentelement, 3, strlen($currentelement) - 3 - strlen($EXT_DRAFT)) == $pagename)
                 ) {
-                // ...den vollen Seitennamen zurückgeben
-                return $currentelement;
+                // ...den vollen Seitennamen zurückgeben mit extension
+                if($ext) {
+                    return $currentelement;
+                } else {
+                // ...den vollen Seitennamen zurückgeben ohne extension
+                    return substr($currentelement, 0, strlen($currentelement) - strlen($EXT_PAGE));
+                }
             }
         }
         // Wenn keine Datei paßt: Leerstring zurückgeben
@@ -545,9 +553,9 @@ $CHARSET = 'UTF-8';
         // Jedes Element des Arrays ans Menü anhängen
         foreach ($categoriesarray as $currentcategory) {
             # Mod Rewrite
-            $url = "index.php?cat=".$currentcategory;
+            $url = "index.php?cat=".substr($currentcategory,3);
             if($CMS_CONF->get("modrewrite") == "true") {
-                $url = $URL_BASE.$currentcategory.".html";
+                $url = $URL_BASE.substr($currentcategory,3).".html";
             }
             if(substr($currentcategory,-(strlen($EXT_LINK))) == $EXT_LINK) {
                $mainmenu .= '<li class="mainmenu">'.menuLink($currentcategory,"menu")."</li>";
@@ -607,16 +615,23 @@ $CHARSET = 'UTF-8';
         else
             $cssprefix = "detailmenu";
 
+        # Mod Rewrite
+        $url_draft = "index.php?cat=".substr($cat,3)."&amp;page=".substr($PAGE_REQUEST, 3)."&amp;";
+        $modrewrite_dumy = NULL;
+        if($CMS_CONF->get("modrewrite") == "true") {
+            $url_draft = $URL_BASE.substr($cat,3)."/".substr($PAGE_REQUEST, 3).".html?";
+            $modrewrite_dumy = ".html";
+        }
         $detailmenu = "<ul class=\"detailmenu\">";
         // Sitemap
         if (($ACTION_REQUEST == "sitemap") && ($CMS_CONF->get("usesubmenu") == 0))
-            $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=sitemap\" class=\"".$cssprefix."active\">".$language->getLanguageValue0("message_sitemap_0")."</a></li>";
+            $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$URL_BASE."index.php".$modrewrite_dumy."?action=sitemap\" class=\"".$cssprefix."active\">".$language->getLanguageValue0("message_sitemap_0")."</a></li>";
         // Suchergebnis
         elseif (($ACTION_REQUEST == "search") && ($CMS_CONF->get("usesubmenu") == 0))
-            $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?action=search&amp;query=".$specialchars->replaceSpecialChars($QUERY_REQUEST, true)."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", $specialchars->getHtmlEntityDecode($QUERY_REQUEST))."</a></li>";
+            $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$URL_BASE."index.php".$modrewrite_dumy."?action=search&amp;query=".$specialchars->replaceSpecialChars($QUERY_REQUEST, true)."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", $specialchars->getHtmlEntityDecode($QUERY_REQUEST))."</a></li>";
         // Entwurfsansicht
         elseif (($ACTION_REQUEST == "draft") && ($CMS_CONF->get("usesubmenu") == 0))
-            $detailmenu .= "<li class=\"detailmenu\"><a href=\"index.php?cat=$cat&amp;page=$PAGE_REQUEST&amp;action=draft\" class=\"".$cssprefix."active\">".pageToName($PAGE_REQUEST.$EXT_DRAFT, false)." (".$language->getLanguageValue0("message_draft_0").")</a></li>";
+            $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$url_draft."action=draft\" class=\"".$cssprefix."active\">".pageToName($PAGE_REQUEST.$EXT_DRAFT, false)." (".$language->getLanguageValue0("message_draft_0").")</a></li>";
         // "ganz normales" Detailmenü einer Kategorie
         else {
             // Content-Verzeichnis der aktuellen Kategorie einlesen
@@ -644,9 +659,9 @@ $CHARSET = 'UTF-8';
                     }
                 }
                 # Mod Rewrite
-                $url = "index.php?cat=".$cat."&amp;page=".substr($currentcontent, 0, strlen($currentcontent) - 4);
+                $url = "index.php?cat=".substr($cat,3)."&amp;page=".substr($currentcontent, 3, strlen($currentcontent) - 7);
                 if($CMS_CONF->get("modrewrite") == "true") {
-                    $url = $URL_BASE.$cat."/".substr($currentcontent, 0, strlen($currentcontent) - 4).".html";
+                    $url = $URL_BASE.substr($cat,3)."/".substr($currentcontent, 3, strlen($currentcontent) - 7).".html";
                 }
                 // Aktuelle Inhaltsseite als aktiven Menüpunkt anzeigen...
                 if (
@@ -803,9 +818,9 @@ $CHARSET = 'UTF-8';
                 if(substr($currentcontent,-(strlen($EXT_LINK))) == $EXT_LINK) {
                     continue;
                 }
-                $url = "index.php?cat=$currentcategory&amp;page=".substr($currentcontent, 0, strlen($currentcontent) - 4);
+                $url = "index.php?cat=".substr($currentcategory,3)."&amp;page=".substr($currentcontent, 3, strlen($currentcontent) - 7);
                 if($CMS_CONF->get("modrewrite") == "true") {
-                    $url = $URL_BASE.$currentcategory."/".substr($currentcontent, 0, strlen($currentcontent) - 4).".html";
+                    $url = $URL_BASE.substr($currentcategory,3)."/".substr($currentcontent, 3, strlen($currentcontent) - 7).".html";
                 }
                 $sitemap .= "<li><a href=\"$url\"".getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", pageToName($currentcontent, false), catToName($currentcategory, false))).">".
                                                     pageToName($currentcontent, false).
@@ -883,9 +898,9 @@ $CHARSET = 'UTF-8';
                     $categoryname = catToName($currentcategory, false);
                     $searchresults .= "<h2>$categoryname</h2><ul>";
                     foreach ($matchingpages as $matchingpage) {
-                        $url = "index.php?cat=$currentcategory&amp;page=".substr($matchingpage, 0, strlen($matchingpage) - 4)."&amp;";
+                        $url = "index.php?cat=".substr($currentcategory,3)."&amp;page=".substr($matchingpage, 3, strlen($matchingpage) - 7)."&amp;";
                         if($CMS_CONF->get("modrewrite") == "true") {
-                            $url = $URL_BASE.$currentcategory."/".substr($matchingpage, 0, strlen($matchingpage) - 4).".html?";
+                            $url = $URL_BASE.substr($currentcategory,3)."/".substr($matchingpage, 3, strlen($matchingpage) - 7).".html?";
                         }
                         $pagename = pageToName($matchingpage, false);
                         $filepath = $CONTENT_DIR_REL."/".$currentcategory."/".$matchingpage;
@@ -1630,9 +1645,9 @@ $CHARSET = 'UTF-8';
                 $content = str_replace($match,$replacement,$content);
             }
             $notexit++;
-            # nach spätestens 100 durchläufe die while schleife verlassen nicht das das
+            # nach spätestens 500 durchläufe die while schleife verlassen nicht das das
             # zur endlosschleife wird
-            if($notexit > 100) break;
+            if($notexit > 500) break;
         }
         # Platzhalter wieder herstellen
         $content = str_replace(array('~platz-','-platzend~'),array('{','}'),$content);
