@@ -274,8 +274,17 @@ function updateReferencesInAllContentPages($oldCategory, $oldPage, $newCategory,
                     $pagecontent = @fread($pagehandle, @filesize($CONTENT_DIR_REL."/".$currentcategory."/".$currentpage));
                     // Datei schließen
                     @fclose($pagehandle);
+                    # um diese Attribute geht es
+                    $allowed_attributes = array("seite","kategorie","datei","bild","bildlinks","bildrechts","include");
+                    # kommt eins von den Attributen im Content vor
+                    # Suche nach [Attribut|
+                    preg_match("/(\[".implode('=|\[',$allowed_attributes)."=).*/Umis",$pagecontent,$matches_1);
+                    # Suche nach [Attribut=
+                    preg_match("/(\[".implode('\||\[',$allowed_attributes)."\|).*/Umis",$pagecontent,$matches_2);
+                    # nichts gefunden nächste seite
+                    if(count($matches_1) == 0 and count($matches_2) == 0) continue;
                     // Referenzen im Inhalt ersetzen
-                    $result = updateReferencesInText($pagecontent, $currentcategory, $currentpage, $oldCategory, $oldPage, $newCategory, $newPage);
+                    $result = updateReferencesInText($pagecontent, $currentcategory, $currentpage, $oldCategory, $oldPage, $newCategory, $newPage, $allowed_attributes);
                     // Ersetzung nur vornehmen, wenn überhaupt Referenzen auftauchen
                     if ($result[0]) {
                         // Inhaltsseite speichern
@@ -300,7 +309,7 @@ function updateReferencesInAllContentPages($oldCategory, $oldPage, $newCategory,
 // ------------------------------------------------------------------------------
 // Ändert Referenzen auf eine Inhaltsseite in einem übergebenen Text
 // ------------------------------------------------------------------------------
-function updateReferencesInText($currentPagesContent, $currentPagesCategory, $movedPage, $oldCategory, $oldPage, $newCategory, $newPage) {
+function updateReferencesInText($currentPagesContent, $currentPagesCategory, $movedPage, $oldCategory, $oldPage, $newCategory, $newPage, $allowed_attributes) {
     global $specialchars;
     global $CONTENT_DIR_REL;
     global $CHARSET;
@@ -326,13 +335,12 @@ function updateReferencesInText($currentPagesContent, $currentPagesCategory, $mo
     $currentPagesContentmatches = str_replace(array("^[","^]"),array("&#94;&#091;","&#94;&#093;"),$currentPagesContent);
     // Nach Texten in eckigen Klammern suchen
     preg_match_all("/\[([^\[\]]+)\|([^\[\]]*)\]/Um", $currentPagesContentmatches, $matches);
-    $i = 0;
 
-    $allowed_attributes = array("seite","kategorie","datei","bild","bildlinks","bildrechts","include");
+#    $allowed_attributes = array("seite","kategorie","datei","bild","bildlinks","bildrechts","include");
 
     // Für jeden Treffer...
-$debug = false;
-    foreach ($matches[0] as $match) {
+$debug = fase;
+    foreach ($matches[0] as $i => $match) {
 if($debug) echo "alle matches = $match -----------<br>\n";
         # ein Hack weil dieses preg_match_all nicht mit ^, [ und ] im attribut umgehen kann
         $match = str_replace(array("&#94;&#091;","&#94;&#093;"),array("^[","^]"),$match);
@@ -341,7 +349,6 @@ if($debug) echo "alle matches = $match -----------<br>\n";
         $replace_match = "";
         if(strstr($attribute,"=")) {
             $allowed_test = substr($attribute,0,strpos($attribute,"="));
-
         } else {
             $allowed_test = $attribute;
         }
@@ -410,7 +417,6 @@ if($debug) echo "diff == match = ".$matches[0][$i]." | replace_match = $replace_
             }
 if($debug) echo "<br>\n";
         }    
-    $i++;
     }
     // Konvertierten Seiteninhalt zurückgeben
     return array($changesmade, $currentPagesContent);
