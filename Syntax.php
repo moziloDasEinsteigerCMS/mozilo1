@@ -533,27 +533,6 @@ class Syntax {
                 $content = str_replace ("$match", $specialchars->getHtmlEntityDecode($nobrvalue), $content);
             }
 
-/* 
-Sie sollten diese Auskommentierung nur entfernen, wenn Sie wirklich sicher wissen, was 
-sie tun. mozilo weist mit Nachdruck darauf hin, da� die verwendete PHP-Funktion "eval()" 
-ein erhebliches Sicherheitsrisiko darstellen kann und deswegen nicht leichtfertig 
-verwendet werden sollte!
-
-            // Ausf�hrung von PHP-Code
-            elseif ($attribute == "php") {
-                // Formatierungen r�ckg�ngig machen, um den reinen PHP-Code zu erhalten!
-                $value = preg_replace("/&#(\d*);/Umsie", "''.chr('\\1').''", $value);
-                $value = preg_replace("/&#092;/Umsi", "&amp;#092;", $value);
-                $value = preg_replace("/&#036;/Umsi", "&amp;#036;", $value);
-                $value = $specialchars->getHtmlEntityDecode($value);
-                ob_start();
-                $value = eval($value);
-                $value = ob_get_contents();
-                ob_end_clean();
-                $content = str_replace ("$match", "$value", $content); 
-            }
-*/
-
             // Tabellen
             elseif ($attribute == "tabelle") {
                 // Tabelleninhalt aufbauen
