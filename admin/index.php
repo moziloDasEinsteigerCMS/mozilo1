@@ -1225,6 +1225,7 @@ function copymoveSite($post) {
     # Alle Kategorien durch gehen
     foreach($post['categories'] as $cat => $tmp) {
         # Kategorien die keine Inhaltseiten haben und auch keine neue = continue
+# kommentiert weil Inhaltseite in Lehre copy move nach cat nicht ging
 //         if(count($post['categories'][$cat]['position']) <= 1 and empty($post['categories'][$cat]['new_position'][$max_cat_page])) {
 //             continue;
 //         }
