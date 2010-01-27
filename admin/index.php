@@ -3990,6 +3990,7 @@ function returnUserSyntaxSelectbox() {
     $content = "<select class=\"usersyntaxselectbox\" name=\"usersyntax\" onchange=\"insertTagAndResetSelectbox(this);\">"
     ."<option class=\"noaction\" value=\"\">".getLanguageValue("toolbar_usersyntax")."</option>";
     foreach ($usersyntaxarray as $key => $value) {
+        if($key == "readonly") continue;
         $content .= "<option value=\"".$key."\">[".$key."|...]</option>";
     }
     $content .= "</select>";
