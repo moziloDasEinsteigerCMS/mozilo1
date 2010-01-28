@@ -595,11 +595,11 @@ function categoriesMessages($post) {
                 $error_array = $post[$message_art][$error_language][key($post[$message_art][$error_language])];
             }
             $error_inhalt = NULL;
-            foreach($error_array as $inhalt) {
+            foreach($error_array as $key => $inhalt) {
                 if(empty($inhalt)) {
                     continue;
                 }
-                if(isset($post[$message_art][$error_language]['color'])) {
+                if($key == 'color' and isset($post[$message_art][$error_language]['color'])) {
                     if(!empty($post[$message_art][$error_language]['color'])) {
                         $error_titel .= ' <span style="background-color:'.$inhalt.';">&nbsp;&nbsp;&nbsp;&nbsp;</span>';
                         continue;
