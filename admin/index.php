@@ -447,9 +447,9 @@ function home($post) {
     }
 
     $test_mail_adress = NULL;
-    if($ADMIN_CONF->get("adminmail") != "") {
+/*    if($ADMIN_CONF->get("adminmail") != "") {
         $test_mail_adress = $ADMIN_CONF->get("adminmail");
-    }
+    }*/
     if(getRequestParam('test_mail_adresse', true) != "") {
         $test_mail_adress = getRequestParam('test_mail_adresse', true);
     }
@@ -2794,7 +2794,7 @@ function config($post) {
                     $CONTACT_CONF->set($syntax_name, $checkbox);
                 }
                 continue;
-            }#
+            }
             if($syntax_name == "formularmail") {
                  if($post[$syntax_name] != "" and !preg_match("/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/",$post[$syntax_name])) {
                     $post['error_messages']['config_error_formularmail']['color'] = "#FF7029";
@@ -2833,7 +2833,7 @@ function config($post) {
                         $search_tmp = substr($zeile,0,strpos($zeile," =") + strlen(" = "));
                         # Dopelte einträge suchen
                         foreach($usersyntax_array as $zeile) {
-                            if(strstr($zeile," =") !== false and strpos($zeile,$search_tmp) !== false) {
+                            if(substr($zeile,0,strpos($zeile," =") + strlen(" = ")) == $search_tmp) {
                                 $count++;
                             }
                             if($count > 1) {
