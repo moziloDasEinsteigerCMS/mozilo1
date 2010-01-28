@@ -306,9 +306,10 @@ class DEMOPLUGIN extends Plugin {
     * 
     ***************************************************************/
     function getInfo() {
-        # nur eine Sprache
-#        return array(
-        $deactiviert = array(
+        global $ADMIN_CONF;
+        $language = $ADMIN_CONF->get("language");
+        # nur eine Sprache ---------------------------------
+        $info = array(
             // Plugin-Name + Version
             "Plugin-Demo",
             // moziloCMS-Version
@@ -326,6 +327,10 @@ class DEMOPLUGIN extends Plugin {
                     '{DEMOPLUGIN|Value_2,}' => 'Optional Meine Kurtzbeschreibung'
                     )
             );
+#        return $info;
+        # mehr Sprachig ---------------------------------
+
+
             # Beispiel:
             #        Platzhalter => Kurtzbeschreibung
             # array('{Platzhalter|}' => 'Meine Platzhalter, Optinal Text für Link Platzhalter blank')
@@ -339,7 +344,7 @@ class DEMOPLUGIN extends Plugin {
             # array('{Platzhalter_1}' => 'Optional Kurtzbeschreibung_1', '{Platzhalter_2}' => 'Optional Kurtzbeschreibung_2')
 
         # mehr sprachig wenn Sprache nicht vorhanden wird die erste genommen
-        return array('deDE' => array(
+        $info['deDE'] = array(
             // Plugin-Name + Version
             "<b>Plugin-Demo</b>",
             // moziloCMS-Version
@@ -356,8 +361,8 @@ class DEMOPLUGIN extends Plugin {
                     '{DEMOPLUGIN|Value_1,}' => 'Optional Meine Kurtzbeschreibung',
                     '{DEMOPLUGIN|Value_2,}' => 'Optional Meine Kurtzbeschreibung'
                     )
-                ),
-        'enEN' => array(
+                );
+        $info['enEN'] = array(
             // Plugin-Name + Version
             "Plugin-Demo Englisch",
             // moziloCMS-Version
@@ -374,8 +379,13 @@ class DEMOPLUGIN extends Plugin {
                     '{DEMOPLUGIN|Value_1,}' => 'Optional Meine Kurtzbeschreibung',
                     '{DEMOPLUGIN|Value_2,}' => 'Optional Meine Kurtzbeschreibung'
                     )
-                )
-            );
+                );
+        if(isset($info[$language])) {
+            return $info[$language];
+        } else {
+            return $info['deDE'];
+        }
+
     } // function getInfo
 
 } // class DEMOPLUGIN
