@@ -150,6 +150,8 @@ class DEMOPLUGIN extends Plugin {
     * 
     ***************************************************************/
     function getConfig() {
+        global $ADMIN_CONF;
+        $language = $ADMIN_CONF->get("language");
 
         /***************************************************************
         * 
@@ -179,6 +181,7 @@ class DEMOPLUGIN extends Plugin {
         // Das muß auf jeden Fall geschehen!
         $config = array();
         
+        # nur eine Sprache ---------------------------------
         
         /***************************************************************
         * Beispiel: Normales Textfeld, beliebige Eingaben
@@ -290,6 +293,38 @@ class DEMOPLUGIN extends Plugin {
         
         // Nicht vergessen: Das gesamte Array zurückgeben
         return $config;
+        
+        # mehr sprachig wenn Sprache nicht vorhanden wird deDE benutzt ---------------
+        $config['deDE']['janeinoption'] = array(
+            "type" => "checkbox",                       // Pflicht:  Eingabetyp 
+            "description" => "Ja oder nein?"            // Pflicht:  Beschreibung
+            );
+        $config['deDE']['texteingabe']  = array(
+            "type" => "text",                           // Pflicht:  Eingabetyp
+            "description" => "Bitte Wert eingeben",     // Pflicht:  Beschreibung
+            "maxlength" => "100",                       // optional: maximale Länge
+            "size" => "30",                             // optional: dargestellte Zeichen
+            "regex" => "/^[a-z]{3}$/",                   // optional: Erlaubte Werte als regulärer Ausdruck (hier: drei kleine Buchstaben; wird beim Speichern der Einstellungen überprüft)
+            "regex_error" => "Die Eingabe muss genau 3 kleine Buchstaben enthalten." // optional: Fehlermeldung für die RegEx-Überprüfung
+            );
+        
+        $config['enEN']['janeinoption'] = array(
+            "type" => "checkbox",                       // Pflicht:  Eingabetyp 
+            "description" => "Ja oder nein?"            // Pflicht:  Beschreibung
+            );
+        $config['enEN']['texteingabe']  = array(
+            "type" => "text",                           // Pflicht:  Eingabetyp
+            "description" => "Bitte Wert eingeben",     // Pflicht:  Beschreibung
+            "maxlength" => "100",                       // optional: maximale Länge
+            "size" => "30",                             // optional: dargestellte Zeichen
+            "regex" => "/^[a-z]{3}$/",                   // optional: Erlaubte Werte als regulärer Ausdruck (hier: drei kleine Buchstaben; wird beim Speichern der Einstellungen überprüft)
+            "regex_error" => "Die Eingabe muss genau 3 kleine Buchstaben enthalten." // optional: Fehlermeldung für die RegEx-Überprüfung
+            );
+        if(isset($config[$language])) {
+            return $config[$language];
+        } else {
+            return $config['deDE'];
+        }
     } // function getConfig    
     
     
@@ -328,7 +363,8 @@ class DEMOPLUGIN extends Plugin {
                     )
             );
 #        return $info;
-        # mehr Sprachig ---------------------------------
+
+        # mehr sprachig wenn Sprache nicht vorhanden wird deDE benutzt ---------------
 
 
             # Beispiel:
@@ -343,7 +379,6 @@ class DEMOPLUGIN extends Plugin {
             # und mit mehreren die alle in der Selectbox erscheint
             # array('{Platzhalter_1}' => 'Optional Kurtzbeschreibung_1', '{Platzhalter_2}' => 'Optional Kurtzbeschreibung_2')
 
-        # mehr sprachig wenn Sprache nicht vorhanden wird die erste genommen
         $info['deDE'] = array(
             // Plugin-Name + Version
             "<b>Plugin-Demo</b>",
