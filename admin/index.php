@@ -3563,29 +3563,9 @@ function plugins($post) {
                 $pagecontent .= '<tr><td width="100%" class="td_toggle">';
                 $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
                 # Plugin Info Prüfen
-                if(isset($plugin_info) and is_array($plugin_info) and count($plugin_info) > 0) {
-                    # Nach Schauen obs Sprachen gibt
-                    if(key($plugin_info) != "0") {
-                        $language = $ADMIN_CONF->get("language");
-                        # Die Eingestelte Sprache gibts also Benutzen
-                        if(isset($plugin_info[$language])) {
-                            $plugin_info = $plugin_info[$language];
-                        # Die Eingestelte Sprache gibts nicht es wird die erste Benutzen
-                        } else {
-                            $plugin_info = $plugin_info[key($plugin_info)];
-                        }
-                    }
-                    # letze Prüfung
-                    if(count($plugin_info) < 6) {
-                        $plugin_error = true;
-                    }
-                } else {
-                    $plugin_error = true;
-                }
-
-                if($plugin_error === false) {
+                if(isset($plugin_info) and count($plugin_info) > 0) {
                     $plugin_name = str_replace(array("&lt;","&gt;"),array("<",">"),htmlentities(strip_tags($plugin_info[0], '<b>'),ENT_COMPAT,$CHARSET),$plugin_info[0]);
-                } else {#str_replace(array("&lt;","&gt;"),array("<",">"),$plugin_info[$pos]);
+                } else {
                     $plugin_name = getLanguageValue('plugins_error').' <span style="color:#ff0000">'.$currentelement.'</span>';
                     $plugin_error = true;
                 }
