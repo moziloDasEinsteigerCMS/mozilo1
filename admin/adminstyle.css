@@ -78,7 +78,7 @@ p /* Text miteilung*/
     margin-top:10px;
     margin-right:10%;
     margin-bottom:10px;
-    background:#F8F8F8;
+    background-color:#F8F8F8;
     border:none;
 }
 
@@ -98,7 +98,7 @@ p /* Text miteilung*/
 
 #td_title
 {
-    background: #C9D7EB;
+    background-color: #C9D7EB;
     text-align:left;
     vertical-align:middle;
     border:none;
@@ -115,7 +115,7 @@ p /* Text miteilung*/
     color: #5E8AB4;
     font-weight: bold;
     text-align:left;
-    background:#C9D7EB;
+    background-color:#C9D7EB;
     vertical-align:middle;
     border:none;
 }
@@ -123,7 +123,7 @@ p /* Text miteilung*/
 #td_table_titel_logout
 {
     text-align:right;
-    background:#C9D7EB;
+    background-color:#C9D7EB;
     vertical-align:middle;
     border:none;
 }
@@ -208,8 +208,8 @@ p /* Text miteilung*/
     padding-top:10px;
     margin:0;
     border:none;
-    /*background: #F8F8F8;
-    background: #ffffff;*/
+    /*background-color: #F8F8F8;
+    background-color: #ffffff;*/
 }
 
 #td_content
@@ -293,7 +293,7 @@ span {
 }
 .td_toggle_new
 {
-    background:#fff0f0;
+    background-color:#fff0f0;
     padding-left:10px;
     padding-top:10px;
     padding-bottom:10px;
@@ -429,6 +429,18 @@ span {
     border-bottom:1px solid #C0C0C0;
 }
 
+.td_cms_submit_top
+{
+    padding-top:10px;
+    padding-bottom:10px;
+    /*padding:10px 0px;*/
+    /*font-size:14px;*/
+    font-weight:bolder;
+    text-align:left;
+    border-top:1px solid #C0C0C0;
+    border-bottom:1px solid #C0C0C0;
+}
+
 .td_cms_submit
 {
     padding-top:10px;
@@ -495,7 +507,7 @@ td
     /*border:0;*/
     border:1px solid #C0C0C0;
     width:100%;
-    background:#F8F8F8;
+    background-color:#F8F8F8;
 }
 
 .input_text
@@ -667,10 +679,12 @@ td
 {
     vertical-align:middle;
     margin:0px;
-    padding:0px;
-    height:18px;
-    background:#F8F8F8;
+    padding:0 4px;
+    height:26px;
+    font-weight: bold;
+    /*background:#F8F8F8;*/
     border: 1px solid #C0C0C0;
+    background-color:#C9D7EB;
 }
 
 
@@ -846,7 +860,6 @@ td
     margin-top: 10px;
     margin-bottom: 10px;
     background-color:#ffffff;
-    
 }
 .login_input
 {

@@ -2029,6 +2029,11 @@ $tooltip_help_edit = NULL;
         $pagecontent .= '</td></tr>';
         $toggle_pos++;
     }
+
+    $pagecontent .= '<tr><td class="td_toggle">';
+    $pagecontent .= '<input type="submit" name="action_data[gallery]" value="'.getLanguageValue("gallery_button_change").'" class="input_submit">';
+    $pagecontent .= '</td></tr>';
+
     $pagecontent .= '</table>';
     return array(getLanguageValue("gallery_button"), $pagecontent);
 }
@@ -2474,7 +2479,7 @@ function files($post) {
     if($ADMIN_CONF->get("overwriteuploadfiles") == "true") {
             $overwrite = ' checked="checked"';
     }
-    $pagecontent .= '&nbsp;&nbsp;<input class="input_check_copy" type="checkbox" name="overwrite" value="on"'.$tooltip_files_help_overwrite.$overwrite.'>&nbsp;<span'.$tooltip_files_help_overwrite.$overwrite.'>'.getLanguageValue("files_button_overwrite").'</span>';
+    $pagecontent .= '&nbsp;&nbsp;<input class="input_check_copy" type="checkbox" name="overwrite" value="on"'.$tooltip_files_help_overwrite.$overwrite.'>&nbsp;<span class="td_left_title"'.$tooltip_files_help_overwrite.$overwrite.'><b>'.getLanguageValue("files_button_overwrite").'</b></span>';
     $pagecontent .= '</td></tr>';
 
     foreach ($post['categories']['cat']['position'] as $pos => $position) {
@@ -2593,7 +2598,7 @@ function files($post) {
     }
     $pagecontent .= '<tr><td class="td_toggle">';
     $pagecontent .= '<input type="submit" name="action_data[newfile]" value="Dateien Hochladen" class="input_submit">';
-    $pagecontent .= '&nbsp;&nbsp;<input class="input_check_copy" type="checkbox" name="overwrite" value="on"'.$tooltip_files_help_overwrite.$overwrite.'>&nbsp;<span'.$tooltip_files_help_overwrite.$overwrite.'>'.getLanguageValue("files_button_overwrite").'</span>';
+#    $pagecontent .= '&nbsp;&nbsp;<input class="input_check_copy" type="checkbox" name="overwrite" value="on"'.$tooltip_files_help_overwrite.$overwrite.'>&nbsp;<span'.$tooltip_files_help_overwrite.$overwrite.'>'.getLanguageValue("files_button_overwrite").'</span>';
     $pagecontent .= '</td></tr></table>';
 
     return array(getLanguageValue("files_button"), $pagecontent);
@@ -2913,6 +2918,12 @@ function config($post) {
     $pagecontent .= "<p>".getLanguageValue("config_text")."</p>";
     // ALLGEMEINE EINSTELLUNGEN
     $pagecontent .= "<table width=\"100%\" cellspacing=\"0\" border=\"0\" cellpadding=\"0\" class=\"table_data\">";
+    // Zeile "ÜBERNEHMEN"
+    # Save Buttom nur Anzeigen wenn Properties auch Speichen kann
+    if(!isset($CMS_CONF->properties['error']) or !isset($CONTACT_CONF->properties['error'])) {
+        $pagecontent .= '<tr><td class="td_cms_submit_top" colspan="2">';
+        $pagecontent .= '<input type="submit" name="apply" class="input_submit" value="'.getLanguageValue("config_submit").'" />';
+    }
     $pagecontent .= "<tr>";
     $pagecontent .= "<td class=\"td_cms_titel\" colspan=\"2\">".getLanguageValue("config_titel_cmsglobal");
     $pagecontent .= "</td></tr>";
@@ -3370,9 +3381,17 @@ function admin($post) {
 
 
     $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
-    $pagecontent .= "<tr>";
+    // Zeile "ÜBERNEHMEN"
+    if(!isset($ADMIN_CONF->properties['error'])) {
+        $pagecontent .= '<tr><td class="td_cms_submit_top" colspan="2"><input type="submit" name="apply" class="input_submit" value="'.getLanguageValue("admin_submit").'">';
+        if($LOGINCONF->get("initialsetup") == "true") {
+            $pagecontent .= '&nbsp;&nbsp;&nbsp;<input type="submit" name="default_pw" class="input_submit" value="'.getLanguageValue("admin_submit_default_pw").'">';
+        }
+        $pagecontent .= '</td></tr>';
+    }
+/*    $pagecontent .= "<tr>";
     $pagecontent .= '<td class="td_cms_titel" colspan="2">'.getLanguageValue("admin_text").'</td>';
-    $pagecontent .= "</tr>";
+    $pagecontent .= "</tr>";*/
     if($LOGINCONF->get("initialsetup") == "false") {
         // Zeile "ZEIGE EXPERT" 
         $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("admin_text_showexpert")."</td>";
@@ -3639,7 +3658,7 @@ function plugins($post) {
                                             if($conf_plugin->get("active") == "true" and $conf_plugin->get($name) != $conf_inhalt) {
                                                 $conf_plugin->set($name,$conf_inhalt);
                                                 $display_toggle = ' style="display:block;"';
-                                                $messages = returnMessage(true, $regex_error);
+                                                $messages = returnMessage(true, getLanguageValue("plugins_messages_input"));
                                             }
                                         } else {
                                             $error = ' style="background-color:#FF0000;"';
@@ -3651,7 +3670,7 @@ function plugins($post) {
                                         if($conf_plugin->get("active") == "true" and $conf_plugin->get($name) != $conf_inhalt and $config[$name]['type'] != "password") {
                                             $conf_plugin->set($name,$conf_inhalt);
                                             $display_toggle = ' style="display:block;"';
-                                            $messages = returnMessage(true, $regex_error);
+                                            $messages = returnMessage(true, getLanguageValue("plugins_messages_input"));
                                         }
                                    }
                                 # checkbox
@@ -3775,6 +3794,7 @@ function plugins($post) {
         }
         $toggle_pos++;
     }
+    $pagecontent .= '<tr><td width="100%" class="td_toggle"><input type="submit" class="input_submit" name="apply" value="'.getLanguageValue("plugins_submit").'"/></td></tr>';
     $pagecontent .= '</table>';
     return array(getLanguageValue("plugins_button"), $pagecontent);
 }
