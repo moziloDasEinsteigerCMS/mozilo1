@@ -740,7 +740,7 @@ $CHARSET = 'UTF-8';
                     $latestchanged['file'] = $latestofdir['file'];
                     $latestchanged['time'] = $latestofdir['time'];
                 }
-        }
+            }
         }
         closedir($currentdir);
         
@@ -974,12 +974,39 @@ $CHARSET = 'UTF-8';
                 }
             }
 
+            // alle horizontalen Linien ("[----]") von der Suche ausschließen
+            $content = preg_replace("/\[----\]/U", " ", $content);
+            # alle geschützten [] entfernen
+            $content = str_replace(array("^[","^]")," ",$content);
+            # alle html tags entfernen
+            $content = strip_tags($content);
+            $notexit = 0;
+            # tmp damit wenn als erstes im string [ ist keine 0 zurück kommt
+             while((strpos("tmp".$content,'[') > 0)) {
+                $start = strrpos($content,'[');
+                $lengt = strpos($content,']',$start) - $start + 1; # 1 weil ] brauceh wir auch
+                $syntax = substr($content,$start,$lengt);
+                if(strpos(substr($syntax,1,-1),'[') == 0 and strpos($syntax,'=') == 0) {
+                    $match = substr($syntax,strpos($syntax,'|') + 1,-1);
+                    $content = str_replace($syntax,$match,$content);
+                } 
+                if(strpos(substr($syntax,1,-1),'[') == 0 and strpos($syntax,'=') > 0) {
+                    $match = substr($syntax,strpos($syntax,'=') + 1,strpos($syntax,'|') - strpos($syntax,'=') - 1);
+                    $content = str_replace($syntax,$match,$content);
+                }
+                $notexit++;
+                if($notexit > 500) break;
+            }
+            // Auch Emoticons in Doppelpunkten (z.B. ":lach:") sollen nicht berücksichtigt werden
+            $content = preg_replace("/:[^\s]+:/U", " ", $content);
+/*
             // ...und alle Syntax-Tags entfernen. Gesucht werden soll nur im reinen Text
             $content = preg_replace("/\[[^\[\]]+\|([^\[\]]*)\]/U", "$1", $content);
             // Auch Emoticons in Doppelpunkten (z.B. ":lach:") sollen nicht berücksichtigt werden
             $content = preg_replace("/:[^\s]+:/U", "", $content);
             // Zum Schluß noch die horizontalen Linien ("[----]") von der Suche ausschließen
             $content = preg_replace("/\[----\]/U", "", $content);
+*/
         }
         if ($query == "")
             continue;
