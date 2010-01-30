@@ -879,16 +879,11 @@ $CHARSET = 'UTF-8';
                     if(substr($currentcontent,-(strlen($EXT_LINK))) == $EXT_LINK) {
                         continue;
                     }
-                    // Jedes Suchwort
-                    foreach($queryarray as $query) {
-                        if ($query == "")
-                            continue;
-                        // Treffer in der aktuellen Seite?
-                        if (pageContainsWord($currentcategory, $currentcontent, $query, true)) {
-                            // wenn noch nicht im Treffer-Array: hinzufügen
-                            if (!in_array($currentcontent, $matchingpages))
-                                $matchingpages[] = $currentcontent;
-                        }
+                    // Treffer in der aktuellen Seite?
+                    if (pageContainsWord($currentcategory, $currentcontent, $queryarray, true)) {
+                        // wenn noch nicht im Treffer-Array: hinzufügen
+                        if (!in_array($currentcontent, $matchingpages))
+                            $matchingpages[] = $currentcontent;
                     }
                 }
 
@@ -929,7 +924,7 @@ $CHARSET = 'UTF-8';
 // ------------------------------------------------------------------------------
 // Inhaltsseite durchsuchen
 // ------------------------------------------------------------------------------
-    function pageContainsWord($cat, $page, $query, $firstrecursion) {
+    function pageContainsWord($cat, $page, $queryarray, $firstrecursion) {
         global $CONTENT_DIR_REL;
         global $specialchars;
         global $CHARSET;
@@ -955,7 +950,7 @@ $CHARSET = 'UTF-8';
                     // verhindern, daß in der includierten Seite includierte Seiten auch noch durchsucht werden
                     if ($firstrecursion) {
                         // includierte Seite durchsuchen!
-                        if (pageContainsWord($cat, $includedpage, $query,false)) {
+                        if (pageContainsWord($cat, $includedpage, $queryarray,false)) {
                             return true;
                         }
                     }
@@ -967,7 +962,7 @@ $CHARSET = 'UTF-8';
                     // verhindern, daß in der includierten Seite includierte Seiten auch noch durchsucht werden
                     if ($firstrecursion) {
                         // includierte Seite durchsuchen!
-                        if (pageContainsWord($includedpagescat, $includedpage, $query, false)) {
+                        if (pageContainsWord($includedpagescat, $includedpage, $queryarray, false)) {
                             return true;
                         }
                     }
@@ -999,26 +994,23 @@ $CHARSET = 'UTF-8';
             }
             // Auch Emoticons in Doppelpunkten (z.B. ":lach:") sollen nicht berücksichtigt werden
             $content = preg_replace("/:[^\s]+:/U", " ", $content);
-/*
-            // ...und alle Syntax-Tags entfernen. Gesucht werden soll nur im reinen Text
-            $content = preg_replace("/\[[^\[\]]+\|([^\[\]]*)\]/U", "$1", $content);
-            // Auch Emoticons in Doppelpunkten (z.B. ":lach:") sollen nicht berücksichtigt werden
-            $content = preg_replace("/:[^\s]+:/U", "", $content);
-            // Zum Schluß noch die horizontalen Linien ("[----]") von der Suche ausschließen
-            $content = preg_replace("/\[----\]/U", "", $content);
-*/
         }
-        if ($query == "")
-            continue;
-        // Wenn...
-        if (
-            // ...der aktuelle Suchbegriff im Seitennamen...
-            (substr_count(strtolower(pageToName($page, false)), strtolower($query)) > 0)
-            // ...oder im eigentlichen Seiteninhalt vorkommt (überprüft werden nur Seiten, die nicht leer sind), ...
-            || ((filesize($filepath) > 0) && (substr_count(strtolower($content), strtolower($specialchars->getHtmlEntityDecode($query))) > 0))
-            ) {
-            // ...dann setze das Treffer-Flag
-            $ismatch = true;
+        # nach alle Suchbegrieffe suchen
+        foreach($queryarray as $query) {
+            if ($query == "")
+                continue;
+            // Wenn...
+            if (
+                // ...der aktuelle Suchbegriff im Seitennamen...
+                (substr_count(strtolower(pageToName($page, false)), strtolower($query)) > 0)
+                // ...oder im eigentlichen Seiteninhalt vorkommt (überprüft werden nur Seiten, die nicht leer sind), ...
+                || ((filesize($filepath) > 0) && (substr_count(strtolower($content), strtolower($specialchars->getHtmlEntityDecode($query))) > 0))
+                ) {
+                // ...dann setze das Treffer-Flag
+                $ismatch = true;
+                # und abbrechen da einer von den suchbegrieffen gefunden
+                break;
+            }
         }
         // Ergebnis zurückgeben
         return $ismatch;
