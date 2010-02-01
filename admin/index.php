@@ -3614,9 +3614,9 @@ function plugins($post) {
                             $plugin_info[$pos] = htmlentities($plugin_info[$pos],ENT_NOQUOTES,$CHARSET);
                             $plugin_info[$pos] = str_replace(array('&amp;#',"&lt;","&gt;"),array('&#',"<",">"),$plugin_info[$pos]);
                         } elseif($pos == 4) {
-                            $plugin_info[$pos] = '<a href="'.$plugin_info[$pos].'" target="_blank">'.$plugin_info[$pos].'</a>';
+                            $plugin_info[$pos] = '<a href="'.strip_tags($plugin_info[$pos]).'" target="_blank">'.strip_tags($plugin_info[$pos]).'</a>';
                         } else {
-                            $plugin_info[$pos] = htmlentities($plugin_info[$pos],ENT_COMPAT,$CHARSET);
+                            $plugin_info[$pos] = htmlentities(strip_tags($plugin_info[$pos]),ENT_COMPAT,$CHARSET);
                         }
                         if(isset($plugin_info[$pos])) {
                             $pagecontent_conf .= '<tr><td width="10%" valign="top" class="td_left_title_padding_bottom" nowrap><b class="text_grau">'.getLanguageValue($info).'</b></td><td width="90%" class="td_togglen_padding_bottom">'.$plugin_info[$pos].'</td></tr>';
