@@ -358,9 +358,9 @@ $CHARSET = 'UTF-8';
         if($CMS_CONF->get("modrewrite") == "true") {
             $mod_rewrite = ".html";
         }
-        $url = "index.php?cat=".$CAT_REQUEST."&amp;page=".$PAGE_REQUEST;
+        $url = "index.php?cat=".substr($CAT_REQUEST,3)."&amp;page=".substr($PAGE_REQUEST,3);
         if($CMS_CONF->get("modrewrite") == "true") {
-            $url = $URL_BASE.$CAT_REQUEST."/".$PAGE_REQUEST.".html";
+            $url = $URL_BASE.substr($CAT_REQUEST,3)."/".substr($PAGE_REQUEST,3).".html";
         }
         // TODO: sollte auch wahlweise ueber ein Template gehen
         return '<form action="'.$url.'" method="post">
@@ -1218,6 +1218,7 @@ $CHARSET = 'UTF-8';
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $CHARSET;
+        global $specialchars;
         
         // existiert eine Mailadresse? Wenn nicht: Das Kontaktformular gar nicht anzeigen!
         if (strlen($contactformconfig->get("formularmail")) < 1) {
@@ -1326,11 +1327,11 @@ $CHARSET = 'UTF-8';
         $_SESSION['contactform_loadtime'] = time();
         $action_para = "index.php";
         if($CMS_CONF->get("modrewrite") == "true") {
-            $action_para = $PAGE_REQUEST.".html";
+            $action_para = substr($PAGE_REQUEST,3).".html";
         }
         $form .= "<form accept-charset=\"$CHARSET\" method=\"post\" action=\"$action_para\" name=\"contact_form\" id=\"contact_form\">"
-        ."<input type=\"hidden\" name=\"cat\" value=\"".$CAT_REQUEST."\" />"
-        ."<input type=\"hidden\" name=\"page\" value=\"".$PAGE_REQUEST."\" />"
+        ."<input type=\"hidden\" name=\"cat\" value=\"".substr($CAT_REQUEST,3)."\" />"
+        ."<input type=\"hidden\" name=\"page\" value=\"".substr($PAGE_REQUEST,3)."\" />"
         ."<table id=\"contact_table\" summary=\"contact form table\">";
         if ($config_name[1] == "true") {
             // Bezeichner aus formular.conf nutzen, wenn gesetzt
