@@ -58,7 +58,7 @@ $MAX_IMG_HEIGHT         = $GALLERY_CONF->get("maxheight");
 if ($MAX_IMG_HEIGHT == "")
     $MAX_IMG_HEIGHT = 350;
 
-$WEBSITE_TITLE            = $CMS_CONF->get("websitetitle");
+$WEBSITE_TITLE            = $specialchars->rebuildSpecialChars($CMS_CONF->get("websitetitle"),false,true);
 if ($WEBSITE_TITLE == "")
     $WEBSITE_TITLE = "Titel der Website";
 /*
