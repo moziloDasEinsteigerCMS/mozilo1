@@ -653,7 +653,11 @@ function position_move($org_position,$new_position,$new_move_cat_page = false) {
     $max_cat_page = 100;
     $array_return['move'] = false;
 
-    $array_sorce_desti = array_combine($org_position,$new_position);
+#    $array_sorce_desti = array_combine($org_position,$new_position);
+    $array_sorce_desti = array();
+    foreach($org_position as $pos => $inhalt) {
+        $array_sorce_desti[$org_position[$pos]] = $new_position[$pos];
+    }
     # nur die geänderten positionen ins array
     foreach($array_sorce_desti as $key => $value) {
         if(empty($key)) unset($array_sorce_desti[$key]);
