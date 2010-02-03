@@ -1,0 +1,59 @@
+CREDITS
+
+Human-O2 IconsSet:
+*Oliver Scholtz (GNU / GPL)
+
+Debian-Installer:
+(* M.J.)
+* Ubuntuxer
+
+menu.sh -Script:
+* Mario >>Keba<< Fuest (GPL)
+
+Human-Theme:
+* The Human-Team (GPL)
+
+
+hydroxygen iconset - developed by deviantdark [www.deviantdark.com]: (LGPL)
+
+Credits go to:
+* everaldo [crystal project - www.everaldo.com/crystal]
+* chrispy [oxygen-refit - www.nanolx.org]
+* rad-e8 [minium icons - www.rad-e8.com]
+* iconfactory [agua icons - www.apple.com/downloads/macosx/icons_screensavers/agualeopardfoldericons.html]
+* jaziel [misc icons - www.jaziel.deviantart.com]
+* miguel cruz [drive icons - igancuhz.blogspot.com]
+* jonas rask [maji folders icons - www.jonasraskdesign.com]
+* and others
+
+
+
+Von nach Liste
+
+actions/dialog-apply.png                -> accept.png
+actions/document-edit.png               -> page-edit.png
+actions/document-properties.png         -> info.png
+actions/new-go-home.png                 -> home.png
+actions/process-stop.png                -> cancel.png
+
+apps/frostwire.png                      -> website.png
+apps/galternatives.png                  -> admin.png
+apps/glade-3.png                        -> plugins.png
+apps/gnome-shutdown.png                 -> logout.png
+apps/gphoto.png                         -> gallery.png
+apps/help-browser.png                   -> help.png
+apps/seahorse.png                       -> pw.png
+
+categories/applications-accessories.png -> edit.png
+categories/preferences-desktop.png      -> config.png
+
+devices/media-floppy.png                -> files.png
+
+places/humanfolder.png                  -> category.png
+places/mac-user-trash.png               -> delete.png
+
+status/dialog-error.png                 -> error.png
+status/dialog-information.png           -> information.png
+status/dialog-warning.png               -> warning.png
+
+stock/stock_new-text.png                -> page.png
