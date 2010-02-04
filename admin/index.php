@@ -172,6 +172,8 @@ $EXT_HIDDEN     = ".hid";
 $EXT_DRAFT     = ".tmp";
 $EXT_LINK     = ".lnk";
 
+$icon_size = "24x24"; # 16x16 22x22 24x24 32x32 48x48
+
 $post = NULL;
 # getRequestParam() ferarbeitet nur $_POST sachen deshalb hier eine ausname
 if(isset($_REQUEST['javascript']) and $_REQUEST['javascript'] == "ja") $_POST['javascript'] = "ja";
@@ -274,8 +276,6 @@ $html .= '<script type="text/javascript" src="js_color_picker_v2/js_color_picker
 $html .= "</head>";
 $html .= "<body>";
 $html .= '<script type="text/javascript" src="wz_tooltip.js"></script>';
-
-$icon_size = "24x24";
 
 
 if($ADMIN_CONF->get("showTooltips") == "true") {
@@ -543,7 +543,7 @@ function category($post) {
     global $CONTENT_DIR_REL;
     global $EXT_LINK;
     global $ADMIN_CONF;
-    $icon_size = "24x24";
+    global $icon_size;
     $max_cat_page = 100;
     $max_strlen = 255;
 
@@ -851,8 +851,8 @@ function deleteCategory($post) {
     global $CONTENT_DIR_REL;
     global $CMS_CONF;
     global $PASSWORDS;
+    global $icon_size;
 
-    $icon_size = '24x24';
     # Nachfragen wirklich Löschen
     if(!isset($_POST['confirm'])) {
         $del_cat = key($post['action_data']['deletecategory']);
@@ -904,8 +904,8 @@ function page($post) {
     global $EXT_LINK;
     global $ADMIN_CONF;
     global $PASSWORDS;
+    global $icon_size;
 
-    $icon_size = "24x24";
     $max_cat_page = 100;
     $max_strlen = 255;
     $pagecontent = '<input type="hidden" name="action_activ" value="'.getLanguageValue("page_button").'">';
@@ -1098,7 +1098,7 @@ function page($post) {
                 $pagecontent .= '<input type="image" class="input_img_button" name="action_data[editsite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_edit.'"  src="gfx/icons/'.$icon_size.'/page-edit.png" title="'.$text_page_button_edit.'"'.$tooltip_page_help_editieren.'>';
                 $pagecontent .= '<input type="image" class="input_img_button_last" name="action_data[deletesite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$text_page_button_delete.'"'.$tooltip_page_help_delete.'>';
             } else {
-                $pagecontent .= '<input type="image" class="input_nobefor_img_button_last" name="action_data[deletesite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['target'][$pos].$post['categories'][$cat]['url'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$text_page_button_delete.'"'.$tooltip_page_help_delete.'>';
+                $pagecontent .= '<IMG class="input_img_button" src="gfx/clear.gif" alt=" " width="'.substr($icon_size,0,2).'" height="'.substr($icon_size,0,2).'" hspace="0" vspace="0" border="0"><input type="image" class="input_img_button_last" name="action_data[deletesite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['target'][$pos].$post['categories'][$cat]['url'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$text_page_button_delete.'"'.$tooltip_page_help_delete.'>';
             }
             $pagecontent .= '</td></tr></table>';
             $pagecontent .= '</td></tr>';
@@ -1538,7 +1538,8 @@ function deleteSite($post) {
     global $CONTENT_DIR_REL;
     global $EXT_LINK;
     global $PASSWORDS;
-    $icon_size = '24x24';
+    global $icon_size;
+
     $cat = key($post['action_data']['deletesite']);
     $del_page = $cat."/".$post['action_data']['deletesite'][$cat];
     # Nachfragen wirklich Löschen
@@ -1587,7 +1588,7 @@ function gallery($post) {
     global $GALLERIES_DIR_REL;
     global $PREVIEW_DIR_NAME;
     global $GALLERY_CONF;
-    $icon_size = "24x24";
+    global $icon_size;
     $max_strlen = 255;
 
     $pagecontent = '<input type="hidden" name="action_activ" value="'.getLanguageValue("gallery_button").'">';
@@ -2313,7 +2314,7 @@ function deleteGalleryImg($post) {
     global $specialchars;
     global $GALLERIES_DIR_REL;
     global $PREVIEW_DIR_NAME;
-    $icon_size = "24x24";
+    global $icon_size;
 
     $gallery = key($post['action_data']['deletegalleryimg']);
     $del_file = $post['action_data']['deletegalleryimg'][$gallery];
@@ -2365,8 +2366,8 @@ function deleteGallery($post) {
     global $specialchars;
     global $GALLERIES_DIR_REL;
     global $PREVIEW_DIR_NAME;
+    global $icon_size;
 
-    $icon_size = '24x24';
     # Nachfragen wirklich Löschen
     if(!isset($_POST['confirm'])) {
         $del_gallery = key($post['action_data']['deletegallery']);
@@ -2393,6 +2394,8 @@ function files($post) {
     global $EXT_LINK;
     global $DOWNLOAD_COUNTS;
     global $ADMIN_CONF;
+    global $icon_size;
+
     $max_cat_page = 100;
 
     $pagecontent = '<input type="hidden" name="action_activ" value="'.getLanguageValue("files_button").'">';
@@ -2406,7 +2409,6 @@ function files($post) {
             $post = deleteFile($post);
         }
     }
-    $icon_size = "24x24";
     if(isset($post['ask'])) {
         $pagecontent .= returnMessage(true, $post['ask']);
     }
@@ -2638,8 +2640,8 @@ function deleteFile($post) {
     global $specialchars;
     global $CONTENT_DIR_REL;
     global $DOWNLOAD_COUNTS;
+    global $icon_size;
 
-    $icon_size = "24x24";
     $cat = key($post['action_data']['deletefile']);
     $del_file = $post['action_data']['deletefile'][$cat];
 
@@ -2679,8 +2681,7 @@ function config($post) {
     global $USER_SYNTAX_FILE;
     global $CONTACT_CONF;
     global $ADMIN_CONF;
-
-    $icon_size = "24x24";
+    global $icon_size;
 
     $main = makeDefaultConf("main");
 
@@ -3161,8 +3162,7 @@ function admin($post) {
     global $CMS_CONF;
     global $MAILFUNCTIONS;
     global $specialchars;
-    $icon_size = "24x24";
-
+    global $icon_size;
 
     $basic = makeDefaultConf("basic");
 
@@ -3527,8 +3527,7 @@ function plugins($post) {
     global $ADMIN_CONF;
     global $CHARSET;
     global $PLUGIN_DIR;
-
-    $icon_size = "24x24";
+    global $icon_size;
 
     require_once("../Plugin.php");
 
@@ -3962,10 +3961,11 @@ function fileHasExtension($filename, $extensions) {
 
 // Gib Erfolgs- oder Fehlermeldung zurück
 function returnMessage($success, $message) {
+    global $icon_size;
     if ($success === true) {
-        return '<span class="message_erfolg">'.$message.'</span>';
+        return '<span class="message_erfolg" style="background-image:url(gfx/icons/'.$icon_size.'/information.png);padding-left:'.(substr($icon_size,0,2) + 10).'px;">'.$message.'</span>';
     } else {
-        return '<span class="message_fehler">'.$message.'</span>';
+        return '<span class="message_fehler" style="background-image:url(gfx/icons/'.$icon_size.'/error.png);padding-left:'.(substr($icon_size,0,2) + 10).'px;">'.$message.'</span>';
     }
 }
 

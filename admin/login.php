@@ -78,12 +78,13 @@ elseif  (isset($_POST['login'])) {
     $logindataconf->set("falselogincounttemp", $falselogincounttemp); // Z�hler f�r die aktuelle Sperrzeit
     $falselogincount = ($logindataconf->get("falselogincount"))+1;
     $logindataconf->set("falselogincount", $falselogincount); // Gesamtz�hler
+    $icon_size = "24x24";
     $HTML .= "<head>"
         ."<link rel=\"stylesheet\" href=\"adminstyle.css\" type=\"text/css\" />"
         ."<title>".getLanguageValue("incorrect_login")."</title>"
         ."</head>"
         ."<body onLoad=\"document.loginform.username.focus();document.loginform.username.select()\" >"
-        ."<div class=\"message_fehler\">".getLanguageValue("incorrect_login")."</div>";
+        .'<div class="message_fehler" style="background-image:url(gfx/icons/'.$icon_size.'/error.png);padding-left:'.(substr($icon_size,0,2) + 10).'px;">'.getLanguageValue("incorrect_login")."</div>";
     // maximale Anzahl falscher Logins erreicht?
     if ($falselogincounttemp >= $FALSELOGINLIMIT) {
         // Sperrzeit starten

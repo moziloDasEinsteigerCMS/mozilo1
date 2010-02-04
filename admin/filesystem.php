@@ -339,7 +339,7 @@ function updateReferencesInText($currentPagesContent, $currentPagesCategory, $mo
 #    $allowed_attributes = array("seite","kategorie","datei","bild","bildlinks","bildrechts","include");
 
     // Für jeden Treffer...
-$debug = fase;
+$debug = false; # true false
     foreach ($matches[0] as $i => $match) {
 if($debug) echo "alle matches = $match -----------<br>\n";
         # ein Hack weil dieses preg_match_all nicht mit ^, [ und ] im attribut umgehen kann

@@ -230,11 +230,8 @@ p /* Text miteilung*/
     color:#00aa00;
     border:1px solid #00aa00;
     padding:8px;
-    padding-left:35px;
     font-weight:bolder;
-    /*font-size:12px;*/
     background-color:#DDFFDD;
-    background-image:url(gfx/icons/24x24/information.png);
     background-position:5px 5px;
     background-repeat:no-repeat;
 }
@@ -246,40 +243,20 @@ p /* Text miteilung*/
     color:#aa0000;
     border:1px solid #aa0000;
     padding:8px;
-    padding-left:35px;
     font-weight:bolder;
-    /*font-size:12px;*/
     background-color:#FFDDDD;
-    background-image:url(gfx/icons/24x24/error.png);
     background-position:5px 5px;
     background-repeat:no-repeat;
-    /*width:70%;*/
 }
-
-/*  Das "span" nicht l�schen !!!
-    ist wichtig f�r toggle der tabelen zellen beim firefox3.5 andere nicht getestet stimt sonst die breite nicht
-    keine anung warum ist aber so
-
-span {
-}*/
 
 .table_toggle
 {
-    /*text-align:left;
-    vertical-align:middle;*/
     margin:0;
     padding:0;
 }
 
-/** html .table_togglew {*/  /* nur fuer Internet Explorer */
- /* table-layout:fixed; */    /* Version 5.x */
- /* t\able-layout:fixed; */   /* Version 6 */
-/*}*/
-
 .table_data
 {
-    /*text-align:left;
-    vertical-align:middle;*/
     margin:0;
     padding:0;
     border-collapse:collapse;
@@ -593,16 +570,6 @@ td
     color:#686868;
 }
 
-
-.input_nobefor_img_button_last
-{
-    vertical-align:middle;
-    font-weight:bold;
-    padding:0px;
-    margin:0px;
-    margin-left:34px;
-    border:none;
-}
 .input_img_button_last
 {
     vertical-align:middle;
