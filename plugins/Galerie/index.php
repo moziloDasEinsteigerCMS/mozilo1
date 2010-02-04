@@ -392,17 +392,25 @@ if(!function_exists('getGalleryMenu')) {
     * 
     ***************************************************************/
     function getConfig() {
+        global $ADMIN_CONF;
+        $language = $ADMIN_CONF->get("language");
+
         // Rückgabe-Array initialisieren
         // Das muß auf jeden Fall geschehen!
-        $config = array();
-        $config['gallerytemplate'] = array(
+        $config['deDE'] = array();
+        $config['deDE']['gallerytemplate'] = array(
             "type" => "textarea",                       // Pflicht:  Eingabetyp 
             "cols" => "50",                             // Pflicht:  Spaltenanzahl 
             "rows" => "7",                              // Pflicht:  Zeilenanzahl
             "description" => "Die Platzhalter in die Gewünschte Reihenfolge anordnen. Zeilenumbrüche sind erlaubt",     // Pflicht:  Beschreibung
         );
         // Nicht vergessen: Das gesamte Array zurückgeben
-        return $config;
+
+        if(isset($config[$language])) {
+            return $config[$language];
+        } else {
+            return $config['deDE'];
+        }
     } // function getConfig    
     
     
@@ -419,7 +427,10 @@ if(!function_exists('getGalleryMenu')) {
     * 
     ***************************************************************/
     function getInfo() {
-        return array(
+        global $ADMIN_CONF;
+        $language = $ADMIN_CONF->get("language");
+
+        $info['deDE'] = array(
             // Plugin-Name
             "mozilioCMS Standart <b>Galerie</b> 0.1",
             // Plugin-Version
@@ -439,6 +450,12 @@ if(!function_exists('getGalleryMenu')) {
             # Platzhalter => Kurtzbeschreibung
             array('{Galerie|}' => 'Meine Galerie, Optinal Text für Link Galerie blank')
             );
+
+        if(isset($info[$language])) {
+            return $info[$language];
+        } else {
+            return $info['deDE'];
+        }
     } // function getInfo
 
 }
