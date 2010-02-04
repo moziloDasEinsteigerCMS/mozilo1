@@ -57,3 +57,9 @@ status/dialog-information.png           -> information.png
 status/dialog-warning.png               -> warning.png
 
 stock/stock_new-text.png                -> page.png
+
+
+edit-hide.png
+mit Gimp Farbton / Helligkeit / Sättigung
+Helligkeit 90
+Sättigung -90
