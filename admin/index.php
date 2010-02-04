@@ -3784,7 +3784,7 @@ function plugins($post) {
                         $pagecontent_conf .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$toggle_pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\'info_button\');</script>';
                     }
                     if(!empty($messages)) {
-                        $messages = '<td colspan="2" align="left">'.$messages.'</td></tr>';
+                        $messages = '<tr><td colspan="2" align="left">'.$messages.'</td></tr>';
                     }
                     $pagecontent_toggle = '<tr><td width="100%" id="toggle_'.$toggle_pos.'" align="right" class="td_togglen_padding_bottom"'.$display_toggle.'>';
                     $pagecontent .= $pagecontent_toggle.$pagecontent_start_conf.$messages.$pagecontent_conf.'</td></tr>';
