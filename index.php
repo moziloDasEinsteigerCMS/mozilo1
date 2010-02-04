@@ -310,16 +310,8 @@ $CHARSET = 'UTF-8';
         $HTML = preg_replace('/{SEARCH}/', getSearchForm(), $HTML);
 
     // Letzte Aenderung
-    if(strpos($HTML,'{LASTCHANGE') !== false) {
+    if(strpos($HTML,'{LASTCHANGE}') !== false) {
         $lastchangeinfo = getLastChangedContentPageAndDate();
-        // - Name der zuletzt geaenderten Inhaltsseite
-        // - kompletter Link auf diese Inhaltsseite  
-        // - formatiertes Datum der letzten Aenderung
-        $HTML = preg_replace('/{LASTCHANGEDTEXT}/', $language->getLanguageValue0("message_lastchange_0"), $HTML);
-        $HTML = preg_replace('/{LASTCHANGEDPAGE}/', $lastchangeinfo[0], $HTML);
-        $HTML = preg_replace('/{LASTCHANGEDPAGELINK}/', $lastchangeinfo[1], $HTML);
-        $HTML = preg_replace('/{LASTCHANGEDATE}/', $lastchangeinfo[2], $HTML);
-        // Platzhalter {LASTCHANGE} ist obsolet seit 1.12! Wird nur aus Gruenden der Abwaertskompatibilitaet noch ersetzt 
         $HTML = preg_replace('/{LASTCHANGE}/', $language->getLanguageValue0("message_lastchange_0")." ".$lastchangeinfo[1]." (".$lastchangeinfo[2].")", $HTML); 
     }
     // Sitemap-Link
@@ -739,6 +731,8 @@ $CHARSET = 'UTF-8';
         global $CONTENT_DIR_REL;
         global $language;
         global $specialchars;
+        global $CMS_CONF;
+        global $URL_BASE;
 
         $latestchanged = array("cat" => "catname", "file" => "filename", "time" => 0);
         $currentdir = opendir($CONTENT_DIR_REL);
@@ -755,7 +749,14 @@ $CHARSET = 'UTF-8';
         closedir($currentdir);
         
         $lastchangedpage = $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true);
-        $linktolastchangedpage = "<a href=\"index.php?cat=".$latestchanged['cat']."&amp;page=".substr($latestchanged['file'], 0, strlen($latestchanged['file'])-4)."\"".getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true), $specialchars->rebuildSpecialChars(substr($latestchanged['cat'], 3, strlen($latestchanged['cat'])-3), true, true)))." id=\"lastchangelink\">".$lastchangedpage."</a>";
+        # Mod Rewrite
+        $url = "index.php?cat=".substr($latestchanged['cat'],3)."&amp;page=".substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7);
+        if($CMS_CONF->get("modrewrite") == "true") {
+            $url = $URL_BASE.substr($latestchanged['cat'],3)."/".substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7).".html";
+        }
+        $linktolastchangedpage = "<a href=\"".$url."\"".getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true), $specialchars->rebuildSpecialChars(substr($latestchanged['cat'], 3, strlen($latestchanged['cat'])-3), true, true)))." id=\"lastchangelink\">".$lastchangedpage."</a>";
+
+
         $lastchangedate = @strftime($language->getLanguageValue0("_dateformat_0"), date($latestchanged['time']));
 
         return array($lastchangedpage, $linktolastchangedpage,$lastchangedate);
