@@ -49,6 +49,7 @@ $CHARSET = 'UTF-8';
     }
 
     // Dateiendungen fuer Inhaltsseiten
+    # Achtung die endungen muessen alle gleich lang sein
     $EXT_PAGE       = ".txt";
     $EXT_HIDDEN     = ".hid";
     $EXT_DRAFT      = ".tmp";
@@ -384,6 +385,9 @@ $CHARSET = 'UTF-8';
             if (substr($currentelement, 3, strlen($currentelement)-3) == $catname) {
                 // ...den vollen Kategorienamen zurueckgeben
                 return $currentelement;
+            # bei alten links ist die Position noch dabei
+            } elseif($currentelement == $catname) {
+                return $currentelement;
             }
         }
         // Wenn kein Verzeichnis paßt: Leerstring zurueckgeben
@@ -397,8 +401,6 @@ $CHARSET = 'UTF-8';
 // ------------------------------------------------------------------------------
     function nameToPage($pagename, $currentcat, $ext = true) {
         global $CONTENT_DIR_ABS;
-        global $EXT_DRAFT;
-        global $EXT_HIDDEN;
         global $EXT_PAGE;
 
         // Kategorie-Verzeichnis einlesen
@@ -406,11 +408,16 @@ $CHARSET = 'UTF-8';
         // alle vorhandenen Inhaltsdateien durchgehen...
         foreach ($dircontent as $currentelement) {
             // ...und wenn eine auf den Namen paßt...
-            if (
-                (substr($currentelement, 3, strlen($currentelement) - 3 - strlen($EXT_PAGE)) == $pagename)
-                || (substr($currentelement, 3, strlen($currentelement) - 3 - strlen($EXT_HIDDEN)) == $pagename)
-                || (substr($currentelement, 3, strlen($currentelement) - 3 - strlen($EXT_DRAFT)) == $pagename)
-                ) {
+            if (substr($currentelement, 3, strlen($currentelement) - 3 - strlen($EXT_PAGE)) == $pagename) {
+                // ...den vollen Seitennamen zurueckgeben mit extension
+                if($ext) {
+                    return $currentelement;
+                } else {
+                // ...den vollen Seitennamen zurueckgeben ohne extension
+                    return substr($currentelement, 0, strlen($currentelement) - strlen($EXT_PAGE));
+                }
+            # bei alten links ist die Positon noch im Namen
+            } elseif (substr($currentelement, 0, strlen($currentelement) - strlen($EXT_PAGE)) == $pagename) {
                 // ...den vollen Seitennamen zurueckgeben mit extension
                 if($ext) {
                     return $currentelement;
