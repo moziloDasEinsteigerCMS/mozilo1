@@ -11,9 +11,15 @@
 #$CHARSET = 'ISO-8859-1';
 $CHARSET = 'UTF-8';
 
-require_once("Crypt.php");
-require_once("../Mail.php");
-require_once("filesystem.php");
+if(!isset($BASE_DIR)) {
+    $BASE_DIR = str_replace("/admin","/",getcwd());
+    $BASE_DIR_ADMIN = $BASE_DIR."admin/";
+    $CMS_DIR_NAME = "cms";
+    $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
+}
+require_once($BASE_DIR_ADMIN."Crypt.php");
+require_once($BASE_DIR_CMS."Mail.php");
+require_once($BASE_DIR_ADMIN."filesystem.php");
 
 // Session starten!
 session_start();
@@ -22,15 +28,15 @@ session_start();
 @ini_set("display_errors", 0);
 
 // Initialisierungen
-$logindataconf = new Properties("conf/logindata.conf");
+$logindataconf = new Properties($BASE_DIR_ADMIN."conf/logindata.conf");
 if(!isset($logindataconf->properties['readonly'])) {
     die($logindataconf->properties['error']);
 }
 
-$basicconf = new Properties("conf/basic.conf");
+$basicconf = new Properties($BASE_DIR_ADMIN."conf/basic.conf");
 $pwcrypt = new Crypt();
 $mailfunctions = new Mail();
-$BASIC_LANGUAGE = new Properties("sprachen/language_".$basicconf->get("language").".conf");
+$BASIC_LANGUAGE = new Properties($BASE_DIR_ADMIN."sprachen/language_".$basicconf->get("language").".conf");
 
 // MAXIMALE ANZAHL FALSCHER LOGINS
 $FALSELOGINLIMIT = 3;

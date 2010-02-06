@@ -9,11 +9,10 @@
 */
 
 
-
-require_once("../SpecialChars.php");
+require_once($BASE_DIR_CMS."SpecialChars.php");
 
 $specialchars = new SpecialChars();
-require_once("../Properties.php");
+require_once($BASE_DIR_CMS."Properties.php");
 /* Variablen */
 
 /**--------------------------------------------------------------------------------
@@ -265,13 +264,13 @@ function updateReferencesInAllContentPages($oldCategory, $oldPage, $newCategory,
     while($currentcategory = readdir($contentdirhandle)) {
         if(isValidDirOrFile($currentcategory)) {
             // Alle Inhaltseiten der aktuellen Kategorie einlesen 
-            $cathandle = opendir($CONTENT_DIR_REL."/".$currentcategory);
+            $cathandle = opendir($CONTENT_DIR_REL.$currentcategory);
             while($currentpage = readdir($cathandle)) {
-                if(isValidDirOrFile($currentpage) && is_file($CONTENT_DIR_REL."/".$currentcategory."/".$currentpage)) {
+                if(isValidDirOrFile($currentpage) && is_file($CONTENT_DIR_REL.$currentcategory."/".$currentpage)) {
                     // Datei öffnen
-                    $pagehandle = @fopen($CONTENT_DIR_REL."/".$currentcategory."/".$currentpage, "r");
+                    $pagehandle = @fopen($CONTENT_DIR_REL.$currentcategory."/".$currentpage, "r");
                     // Inhalt auslesen
-                    $pagecontent = @fread($pagehandle, @filesize($CONTENT_DIR_REL."/".$currentcategory."/".$currentpage));
+                    $pagecontent = @fread($pagehandle, @filesize($CONTENT_DIR_REL.$currentcategory."/".$currentpage));
                     // Datei schließen
                     @fclose($pagehandle);
                     # um diese Attribute geht es
@@ -288,7 +287,7 @@ function updateReferencesInAllContentPages($oldCategory, $oldPage, $newCategory,
                     // Ersetzung nur vornehmen, wenn überhaupt Referenzen auftauchen
                     if ($result[0]) {
                         // Inhaltsseite speichern
-                        $error_tmp = saveContentToPage($result[1], $CONTENT_DIR_REL."/".$currentcategory."/".$currentpage);
+                        $error_tmp = saveContentToPage($result[1], $CONTENT_DIR_REL.$currentcategory."/".$currentpage);
                         if(!empty($error_tmp)) {
                             if(is_array($error)) {
                                 $error = array_merge_recursive($error,$error_tmp);

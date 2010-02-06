@@ -66,7 +66,7 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
             if(substr($cat,-(strlen($EXT_LINK))) == $EXT_LINK) {
                 continue;
             }
-            $page_array = getFiles("$CONTENT_DIR_REL/".$cat, "");
+            $page_array = getFiles($CONTENT_DIR_REL.$cat, "");
             if(!isset($post[$cat]['error_html']['cat_name'])) {
                 $post[$cat]['error_html']['cat_name'] = NULL;
             }
