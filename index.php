@@ -15,29 +15,31 @@ echo "<pre style=\"position:fixed;background-color:#000;color:#0f0;padding:5px;f
 print_r($_REQUEST);
 echo "</pre>";
 */
-
-    require_once("DefaultConf.php");
-    require_once("SpecialChars.php");
-    require_once("Properties.php");
+$BASE_DIR = getcwd()."/";
+$CMS_DIR_NAME = "cms";
+$BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
+    require_once($BASE_DIR_CMS."DefaultConf.php");
+    require_once($BASE_DIR_CMS."SpecialChars.php");
+    require_once($BASE_DIR_CMS."Properties.php");
     
     // Initial: Fehlerausgabe unterdruecken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 #    @ini_set("display_errors", 0);
 
     $specialchars   = new SpecialChars();
-    $CMS_CONF     = new Properties("conf/main.conf",true);
-    $VERSION_CONF  = new Properties("conf/version.conf",true);
-    $GALLERY_CONF  = new Properties("conf/gallery.conf",true);
-    $USER_SYNTAX  = new Properties("conf/syntax.conf",true);
-    require_once("Language.php");
+    $CMS_CONF     = new Properties($BASE_DIR_CMS."conf/main.conf",true);
+    $VERSION_CONF  = new Properties($BASE_DIR_CMS."conf/version.conf",true);
+    $GALLERY_CONF  = new Properties($BASE_DIR_CMS."conf/gallery.conf",true);
+    $USER_SYNTAX  = new Properties($BASE_DIR_CMS."conf/syntax.conf",true);
+    require_once($BASE_DIR_CMS."Language.php");
     $language       = new Language();
-    require_once("Syntax.php");
-    require_once("Smileys.php");
-    require_once("Mail.php");
+    require_once($BASE_DIR_CMS."Syntax.php");
+    require_once($BASE_DIR_CMS."Smileys.php");
+    require_once($BASE_DIR_CMS."Mail.php");
     $syntax         = new Syntax();
-    $smileys        = new Smileys("smileys");
+    $smileys        = new Smileys($BASE_DIR_CMS."smileys");
     $mailfunctions  = new Mail();
 
-    require_once("Plugin.php");
+    require_once($BASE_DIR_CMS."Plugin.php");
 
 
 #$CHARSET = 'ISO-8859-1';
@@ -67,8 +69,8 @@ $CHARSET = 'UTF-8';
     $CSS_FILE       = $LAYOUT_DIR_URL."/css/style.css";
     $FAVICON_FILE   = $LAYOUT_DIR_URL."/favicon.ico";
     // Einstellungen fuer Kontaktformular
-    $contactformconfig  = new Properties("formular/formular.conf",true);
-    $contactformcalcs   = new Properties("formular/aufgaben.conf",true);
+    $contactformconfig  = new Properties($BASE_DIR_CMS."formular/formular.conf",true);
+    $contactformcalcs   = new Properties($BASE_DIR_CMS."formular/aufgaben.conf",true);
 
 
     $WEBSITE_NAME = $specialchars->rebuildSpecialChars($CMS_CONF->get("websitetitle"),false,true);
@@ -86,16 +88,18 @@ $CHARSET = 'UTF-8';
     $QUERY_REQUEST = getRequestParam('query', true);
     $HIGHLIGHT_REQUEST = getRequestParam('highlight', false);
 
-    $CONTENT_DIR_REL        = "kategorien";
-    $CONTENT_DIR_ABS        = getcwd() . "/$CONTENT_DIR_REL";
-    $CONTENT_FILES_DIR      = "dateien";
-    $GALLERIES_DIR          = "galerien";
-    $PLUGIN_DIR             = "plugins";
+#    $CONTENT_DIR_REL        = "kategorien";
+    $CONTENT_DIR_NAME        = "kategorien";
+    $CONTENT_DIR_REL        = $BASE_DIR.$CONTENT_DIR_NAME."/";
+    $CONTENT_FILES_DIR_NAME      = "dateien";
+    $GALLERIES_DIR_NAME          = "galerien";
+    $PLUGIN_DIR_NAME         = "plugins";
+    $PLUGIN_DIR_REL         = $BASE_DIR.$PLUGIN_DIR_NAME."/";
     $HTML                   = "";
 
     $DEFAULT_CATEGORY = $CMS_CONF->get("defaultcat");
     // Ueberpruefen: Ist die Startkategorie vorhanden? Wenn nicht, nimm einfach die allererste als Standardkategorie
-    if (!file_exists("$CONTENT_DIR_REL/$DEFAULT_CATEGORY")) {
+    if (!file_exists($CONTENT_DIR_REL.$DEFAULT_CATEGORY)) {
         $contentdir = opendir($CONTENT_DIR_REL);
         while ($cat = readdir($contentdir)) {
             if (isValidDirOrFile($cat)) {
@@ -127,7 +131,7 @@ $CHARSET = 'UTF-8';
 // Parameter auf Korrektheit pruefen
 // ------------------------------------------------------------------------------
     function checkParameters() {
-        global $CONTENT_DIR_ABS;
+        global $CONTENT_DIR_REL;
         global $DEFAULT_CATEGORY;
         global $ACTION_REQUEST;
         global $CAT_REQUEST;
@@ -142,21 +146,21 @@ $CHARSET = 'UTF-8';
                 // Wenn keine Kategorie uebergeben wurde...
                 ($CAT_REQUEST == "")
                 // ...oder eine nicht existente Kategorie...
-                || (!file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST"))
+                || (!file_exists($CONTENT_DIR_REL.$CAT_REQUEST))
                 // ...oder eine Kategorie ohne Contentseiten...
-                || (getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST", true, true) == "")
+                || (getDirContentAsArray($CONTENT_DIR_REL.$CAT_REQUEST, true, true) == "")
             )
             // ...dann verwende die Standardkategorie
             $CAT_REQUEST = $DEFAULT_CATEGORY;
 
 
         // Kategorie-Verzeichnis einlesen
-        $pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true, $CMS_CONF->get("showhiddenpagesasdefaultpage") == "true");
+        $pagesarray = getDirContentAsArray($CONTENT_DIR_REL.$CAT_REQUEST, true, $CMS_CONF->get("showhiddenpagesasdefaultpage") == "true");
 
         // Wenn Contentseite nicht explizit angefordert wurde oder nicht vorhanden ist...
         if (
             ($PAGE_REQUEST == "")
-            || (!file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_PAGE") && !file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_HIDDEN") && !file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_DRAFT"))
+            || (!file_exists($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_PAGE) && !file_exists($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_HIDDEN) && !file_exists($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_DRAFT))
             ) {
             //...erste Contentseite der Kategorie setzen
             $PAGE_REQUEST = substr($pagesarray[0], 0, strlen($pagesarray[0]) - 4);
@@ -192,8 +196,7 @@ $CHARSET = 'UTF-8';
         global $specialchars;
         global $URL_BASE;
         global $CHARSET;
-        global $GALLERY_CONF;
-        global $GALLERIES_DIR;
+        global $BASE_DIR_CMS;
 
     if (!$file = @fopen($TEMPLATE_FILE, "r"))
         die($language->getLanguageValue1("message_template_error_1", $TEMPLATE_FILE));
@@ -225,8 +228,8 @@ $CHARSET = 'UTF-8';
     else { 
         // zunaechst Passwort als gesetzt und nicht eingegeben annehmen
         $passwordok = false;
-        if (file_exists("conf/passwords.conf")) {
-            $passwords = new Properties("conf/passwords.conf", true); // alle Passwörter laden
+        if (file_exists($BASE_DIR_CMS."conf/passwords.conf")) {
+            $passwords = new Properties($BASE_DIR_CMS."conf/passwords.conf", true); // alle Passwörter laden
             if ($passwords->keyExists($CAT_REQUEST.'/'.$PAGE_REQUEST)) { // nach Passwort fuer diese Seite suchen
                 $cattitle    = catToName($CAT_REQUEST, true);
                 $pagetitle   = $language->getLanguageValue0("passwordform_title_0");
@@ -368,9 +371,9 @@ $CHARSET = 'UTF-8';
 // Alle Kuehe => 00_Alle-nbsp-K-uuml-he
 // ------------------------------------------------------------------------------
     function nameToCategory($catname) {
-        global $CONTENT_DIR_ABS;
+        global $CONTENT_DIR_REL;
         // Content-Verzeichnis einlesen
-        $dircontent = getDirContentAsArray("$CONTENT_DIR_ABS", false, false);
+        $dircontent = getDirContentAsArray($CONTENT_DIR_REL, false, false);
         // alle vorhandenen Kategorien durchgehen...
         foreach ($dircontent as $currentelement) {
             // ...und wenn eine auf den Namen paßt...
@@ -392,11 +395,11 @@ $CHARSET = 'UTF-8';
 // Muellers Kuh => 00_M-uuml-llers-nbsp-Kuh.txt
 // ------------------------------------------------------------------------------
     function nameToPage($pagename, $currentcat, $ext = true) {
-        global $CONTENT_DIR_ABS;
+        global $CONTENT_DIR_REL;
         global $EXT_PAGE;
 
         // Kategorie-Verzeichnis einlesen
-        $dircontent = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcat", true, true);
+        $dircontent = getDirContentAsArray($CONTENT_DIR_REL.$currentcat, true, true);
         // alle vorhandenen Inhaltsdateien durchgehen...
         foreach ($dircontent as $currentelement) {
             // ...und wenn eine auf den Namen paßt...
@@ -448,7 +451,7 @@ $CHARSET = 'UTF-8';
 // Inhalt einer Content-Datei einlesen, Rueckgabe als String
 // ------------------------------------------------------------------------------
     function getContent() {
-        global $CONTENT_DIR_ABS;
+        global $CONTENT_DIR_REL;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $EXT_HIDDEN;
@@ -461,29 +464,29 @@ $CHARSET = 'UTF-8';
         // Entwurf
         if (
                 ($ACTION_REQUEST == "draft") &&
-                (file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_DRAFT"))
+                (file_exists($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_DRAFT))
             ) {
             $PAGE_FILE = $PAGE_REQUEST.$EXT_HIDDEN;
             return array (
-                                        implode("", file("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_DRAFT")),
+                                        implode("", file($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_DRAFT)),
                                         catToName($CAT_REQUEST, true),
                                         pageToName($PAGE_REQUEST.$EXT_DRAFT, true)
                                         );
         }
         // normale Inhaltsseite
-        elseif (file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_PAGE")) {
+        elseif (file_exists($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_PAGE)) {
             $PAGE_FILE = $PAGE_REQUEST.$EXT_PAGE;
             return array (
-                                        implode("", file("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_PAGE")),
+                                        implode("", file($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_PAGE)),
                                         catToName($CAT_REQUEST, true),
                                         pageToName($PAGE_REQUEST.$EXT_PAGE, true)
                                         );
         }
         // Versteckte Inhaltsseite
-        elseif (file_exists("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_HIDDEN")) {
+        elseif (file_exists($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_HIDDEN)) {
             $PAGE_FILE = $PAGE_REQUEST.$EXT_HIDDEN;
             return array (
-                                        implode("", file("$CONTENT_DIR_ABS/$CAT_REQUEST/$PAGE_REQUEST$EXT_HIDDEN")),
+                                        implode("", file($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_HIDDEN)),
                                         catToName($CAT_REQUEST, true),
                                         pageToName($PAGE_REQUEST.$EXT_HIDDEN, true)
                                         );
@@ -498,7 +501,7 @@ $CHARSET = 'UTF-8';
 // des auszuschließenden File-Verzeichnisses, Rueckgabe als Array
 // ------------------------------------------------------------------------------
     function getDirContentAsArray($dir, $iscatdir, $showhidden) {
-        global $CONTENT_FILES_DIR;
+        global $CONTENT_FILES_DIR_NAME;
         global $EXT_DRAFT;
         global $EXT_HIDDEN;
         global $EXT_PAGE;
@@ -518,8 +521,8 @@ $CHARSET = 'UTF-8';
                         || (substr($file, strlen($file)-4, strlen($file)) == $EXT_LINK)
                         || ($showhidden && (substr($file, strlen($file)-4, strlen($file)) == $EXT_HIDDEN))
                     )
-                    // ...und nicht $CONTENT_FILES_DIR
-                    && (($file <> $CONTENT_FILES_DIR) || (!$iscatdir))
+                    // ...und nicht $CONTENT_FILES_DIR_NAME
+                    && (($file <> $CONTENT_FILES_DIR_NAME) || (!$iscatdir))
                     // nicht "." und ".."
                     && isValidDirOrFile($file)
                     ) {
@@ -539,7 +542,7 @@ $CHARSET = 'UTF-8';
 // Aufbau des Hauptmenues, Rueckgabe als String
 // ------------------------------------------------------------------------------
     function getMainMenu() {
-        global $CONTENT_DIR_ABS;
+        global $CONTENT_DIR_REL;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $specialchars;
@@ -551,7 +554,7 @@ $CHARSET = 'UTF-8';
 
         $mainmenu = "<ul class=\"mainmenu\">";
         // Kategorien-Verzeichnis einlesen
-        $categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false, false);
+        $categoriesarray = getDirContentAsArray($CONTENT_DIR_REL, false, false);
         // Jedes Element des Arrays ans Menue anhaengen
         foreach ($categoriesarray as $currentcategory) {
             # Mod Rewrite
@@ -563,7 +566,7 @@ $CHARSET = 'UTF-8';
                $mainmenu .= '<li class="mainmenu">'.menuLink($currentcategory,"menu")."</li>";
             }
             // Wenn die Kategorie keine Contentseiten hat, zeige sie nicht an
-            elseif (getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true, false) == "") {
+            elseif (getDirContentAsArray($CONTENT_DIR_REL.$currentcategory, true, false) == "") {
                 $mainmenu .= "";
             }
             // Aktuelle Kategorie als aktiven Menuepunkt anzeigen...
@@ -600,7 +603,7 @@ $CHARSET = 'UTF-8';
     function getDetailMenu($cat){
         global $ACTION_REQUEST;
         global $QUERY_REQUEST;
-        global $CONTENT_DIR_ABS;
+        global $CONTENT_DIR_REL;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $EXT_DRAFT;
@@ -637,7 +640,7 @@ $CHARSET = 'UTF-8';
         // "ganz normales" Detailmenue einer Kategorie
         else {
             // Content-Verzeichnis der aktuellen Kategorie einlesen
-            $contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$cat", true, false);
+            $contentarray = getDirContentAsArray($CONTENT_DIR_REL.$cat, true, false);
 
             // Kategorie, die nur versteckte Seiten enthaelt: kein Detailmenue zeigen
             if ($contentarray == "") {
@@ -738,7 +741,7 @@ $CHARSET = 'UTF-8';
         $currentdir = opendir($CONTENT_DIR_REL);
         while ($file = readdir($currentdir)) {
             if (isValidDirOrFile($file)) {
-                $latestofdir = getLastChangeOfCat($CONTENT_DIR_REL."/".$file);
+                $latestofdir = getLastChangeOfCat($CONTENT_DIR_REL.$file);
                 if ($latestofdir['time'] > $latestchanged['time']) {
                     $latestchanged['cat'] = $file;
                     $latestchanged['file'] = $latestofdir['file'];
@@ -801,7 +804,7 @@ $CHARSET = 'UTF-8';
 // Erzeugung einer Sitemap
 // ------------------------------------------------------------------------------
     function getSiteMap() {
-        global $CONTENT_DIR_ABS;
+        global $CONTENT_DIR_REL;
         global $language;
         global $specialchars;
         global $CMS_CONF;
@@ -813,11 +816,11 @@ $CHARSET = 'UTF-8';
         $sitemap = "<h1>".$language->getLanguageValue0("message_sitemap_0")."</h1>"
         ."<div class=\"sitemap\">";
         // Kategorien-Verzeichnis einlesen
-        $categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false, false);
+        $categoriesarray = getDirContentAsArray($CONTENT_DIR_REL, false, false);
         // Jedes Element des Arrays an die Sitemap anhaengen
         foreach ($categoriesarray as $currentcategory) {
             // Wenn die Kategorie keine Contentseiten hat, zeige sie nicht an
-            $contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true, $showhiddenpages);
+            $contentarray = getDirContentAsArray($CONTENT_DIR_REL.$currentcategory, true, $showhiddenpages);
             if ($contentarray == "")
                 continue;
 
@@ -849,7 +852,6 @@ $CHARSET = 'UTF-8';
 // Anzeige der Suchergebnisse
 // ------------------------------------------------------------------------------
     function getSearchResult() {
-        global $CONTENT_DIR_ABS;
         global $CONTENT_DIR_REL;
         global $USE_CMS_SYNTAX;
         global $QUERY_REQUEST;
@@ -871,13 +873,13 @@ $CHARSET = 'UTF-8';
             ."<div class=\"searchresults\">";
 
             // Kategorien-Verzeichnis einlesen
-            $categoriesarray = getDirContentAsArray($CONTENT_DIR_ABS, false, false);
+            $categoriesarray = getDirContentAsArray($CONTENT_DIR_REL, false, false);
 
             // Alle Kategorien durchsuchen
             foreach ($categoriesarray as $currentcategory) {
 
                 // Wenn die Kategorie keine Contentseiten hat, direkt zur naechsten springen
-                $contentarray = getDirContentAsArray("$CONTENT_DIR_ABS/$currentcategory", true, $showhiddenpages);
+                $contentarray = getDirContentAsArray($CONTENT_DIR_REL.$currentcategory, true, $showhiddenpages);
                 if ($contentarray == "") {
                     continue;
                 }
@@ -909,7 +911,7 @@ $CHARSET = 'UTF-8';
                             $url = $URL_BASE.substr($currentcategory,3)."/".substr($matchingpage, 3, strlen($matchingpage) - 7).".html?";
                         }
                         $pagename = pageToName($matchingpage, false);
-                        $filepath = $CONTENT_DIR_REL."/".$currentcategory."/".$matchingpage;
+                        $filepath = $CONTENT_DIR_REL.$currentcategory."/".$matchingpage;
                         $searchresults .= "<li>".
                             "<a href=\"".$url.
                             "highlight=".$specialchars->replaceSpecialChars($highlightparameter,false)."\"".
@@ -940,7 +942,7 @@ $CHARSET = 'UTF-8';
         global $specialchars;
         global $CHARSET;
         
-        $filepath = $CONTENT_DIR_REL."/".$cat."/".$page;
+        $filepath = $CONTENT_DIR_REL.$cat."/".$page;
         $ismatch = false;
         $content = "";
         
@@ -1481,7 +1483,7 @@ $CHARSET = 'UTF-8';
 // Rueckgabe der Dateinamen der vorigen und naechsten Seite
 // ------------------------------------------------------------------------------
     function getNeighbourPages($page) {
-        global $CONTENT_DIR_ABS;
+        global $CONTENT_DIR_REL;
         global $CAT_REQUEST;
         global $CMS_CONF;
         global $EXT_LINK;
@@ -1489,7 +1491,7 @@ $CHARSET = 'UTF-8';
         // leer initialisieren
         $neighbourPages = array("", "");
         // aktuelle Kategorie einlesen
-        $pagesarray = getDirContentAsArray("$CONTENT_DIR_ABS/$CAT_REQUEST/", true, $CMS_CONF->get("showhiddenpagesincmsvariables") == "true");
+        $pagesarray = getDirContentAsArray($CONTENT_DIR_REL.$CAT_REQUEST, true, $CMS_CONF->get("showhiddenpagesincmsvariables") == "true");
         // Schleife ueber alle Seiten
         for ($i = 0; $i < count($pagesarray); $i++) {
             if(substr($pagesarray[$i], -(strlen($EXT_LINK))) == $EXT_LINK)
@@ -1570,31 +1572,31 @@ $CHARSET = 'UTF-8';
 // Hilfsfunktion: Plugin-Variablen ersetzen
 // ------------------------------------------------------------------------------    
     function replacePluginVariables($content) {
-        global $PLUGIN_DIR;
+        global $PLUGIN_DIR_REL;
         global $syntax;
         global $language;
-        global $GALLERY_CONF;
+#        global $GALLERY_CONF;
 
         $availableplugins = array();
+        $deactiv_plugins = array();
         // alle Plugins einlesen
-        $dircontent = getDirContentAsArray(getcwd()."/$PLUGIN_DIR", false, false);
+        $dircontent = getDirContentAsArray($PLUGIN_DIR_REL, false, false);
         # Plugin Galerie gipts nicht manuel hinzufuegen
 /*        if(!is_dir(getcwd()."/$PLUGIN_DIR/Galerie")) {
             $availableplugins[] = "Galerie";
         }*/
         foreach ($dircontent as $currentelement) {
             # alle Plugins suchen
-            if (file_exists(getcwd()."/$PLUGIN_DIR/".$currentelement."/index.php")) {
+            if (file_exists($PLUGIN_DIR_REL.$currentelement."/index.php")) {
                 $availableplugins[] = $currentelement;
             }
             # wens die gallery.php ist gibts keine plugin.conf
 /*            if($currentelement == "Galerie" and !is_dir(getcwd()."/$PLUGIN_DIR/".$currentelement)) {
                 continue;
             }*/
-            $deactiv_plugins = array();
             # nach schauen ob das Plugin active ist
-            if(file_exists(getcwd()."/$PLUGIN_DIR/".$currentelement."/plugin.conf")) {
-                $conf_plugin = new Properties(getcwd()."/$PLUGIN_DIR/".$currentelement."/plugin.conf",true);
+            if(file_exists($PLUGIN_DIR_REL.$currentelement."/plugin.conf")) {
+                $conf_plugin = new Properties($PLUGIN_DIR_REL.$currentelement."/plugin.conf",true);
                 if($conf_plugin->get("active") == "false") {
                     # array fuehlen mit deactivierte Plugin Platzhalter
                     $deactiv_plugins[] = $currentelement;
@@ -1602,7 +1604,6 @@ $CHARSET = 'UTF-8';
                 }
             }
         }
-
         // Alle Variablen aus dem Inhalt heraussuchen
         preg_match_all("/\{(.+)\}/Umsi", $content, $matches);
         # Alle Platzhalter die keine Plugins sind ersetze {, } mit ~platz-, -platzend~
@@ -1642,9 +1643,8 @@ $CHARSET = 'UTF-8';
             if (sizeof($valuearray) > 1) {
                 $currentvariable = $valuearray[0];
                 $currentvalue = $valuearray[1];*/
-            }
             // Sonst den Wert leer vorbelegen
-            else {
+            } else {
                 $currentvariable = $match_plugin;
                 $currentvalue = "";
             }
@@ -1656,9 +1656,9 @@ $CHARSET = 'UTF-8';
                     # Plugin-Code includieren aus der gallery.php
                     require_once(getcwd()."/gallery.php");
                 } else {*/
-                if (file_exists(getcwd()."/$PLUGIN_DIR/".$currentvariable."/index.php")) {
+                if (file_exists($PLUGIN_DIR_REL.$currentvariable."/index.php")) {
                     // Plugin-Code includieren
-                    require_once(getcwd()."/$PLUGIN_DIR/".$currentvariable."/index.php");
+                    require_once($PLUGIN_DIR_REL.$currentvariable."/index.php");
                 }
                 // Enthaelt der Code eine Klasse mit dem Namen des Plugins?
                 if (class_exists($currentvariable)) {
@@ -1667,8 +1667,7 @@ $CHARSET = 'UTF-8';
                         $currentpluginobject = new $currentvariable();
                         $replacement = $currentpluginobject->getPluginContent($currentvalue);
                     }
-                }
-                else {
+                } else {
                     $replacement = $syntax->createDeadlink($match, $language->getLanguageValue1("plugin_error_1", $currentvariable));
                 }
                 // Variable durch Plugin-Inhalt (oder Fehlermeldung) ersetzen
