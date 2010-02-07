@@ -283,17 +283,19 @@ $html .= '<script type="text/javascript" src="wz_tooltip.js"></script>';
 
 
 if($ADMIN_CONF->get("showTooltips") == "true") {
-    $tooltip_button_home_logout = createTooltipWZ("button_home_logout","",",WIDTH,200,CLICKCLOSE,true");
+    $tooltip_help_logout_button = createTooltipWZ("help_logout_button","",",WIDTH,200,CLICKCLOSE,true");
+    $tooltip_help_website_button = createTooltipWZ("help_website_button","",",WIDTH,200,CLICKCLOSE,true");
 } else {
-    $tooltip_button_home_logout = NULL;
+    $tooltip_help_logout_button = NULL;
+    $tooltip_help_website_button = NULL;
 }
-
+$width_height = substr($icon_size,0,2);
 $html .= '<table width="90%" cellspacing="0" border="0" cellpadding="0" id="table_admin">';
 $html .= '<tr><td width="100%" id="td_title">';
 $html .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" id="table_titel">';
 $html .= '<tr><td id="td_table_titel_text">'.$ADMIN_TITLE.' - '.$pagetitle.'</td>';
-$html .= '<td width="24" height="24"><a href="../index.php" title="'.getLanguageValue("website_button").'" target="_blank"><img class="tab_img" src="gfx/icons/'.$icon_size.'/website.png" alt="" hspace="0" vspace="0" border="0"></a></td>';
-$html .= '<td width="24" height="24" id="td_table_titel_logout"><form class="form" accept-charset="'.$CHARSET.'" action="login.php" method="post"><input id="design_logout" class="input_button" type="image" name="logout" value="'.getLanguageValue("logout_button").'&nbsp;" accesskey="x" src="gfx/icons/'.$icon_size.'/logout.png" title="'.getLanguageValue("logout_button").'"'.$tooltip_button_home_logout.'></form></td></tr>';
+$html .= '<td width="'.$width_height.'" height="'.$width_height.'"'.$tooltip_help_website_button.' nowrap><form class="form" accept-charset="'.$CHARSET.'" action="../index.php" method="post" target="_blank"><input class="input_img_button" type="image" value="'.getLanguageValue("website_button").'" src="gfx/icons/'.$icon_size.'/website.png" title="'.getLanguageValue("help_website_button").'"'.$tooltip_help_website_button.'></form></td>';
+$html .= '<td width="'.$width_height.'" height="'.$width_height.'" id="td_table_titel_logout" nowrap><form class="form" accept-charset="'.$CHARSET.'" action="login.php" method="post"><input id="design_logout" class="input_img_button" type="image" name="logout" value="'.getLanguageValue("logout_button").'&nbsp;" accesskey="x" src="gfx/icons/'.$icon_size.'/logout.png" title="'.getLanguageValue("help_logout_button").'"'.$tooltip_help_logout_button.'></form></td></tr>';
 $html .= '</table>';
 
 $html .= "</td></tr>";
@@ -330,7 +332,6 @@ foreach($array_tabs as $position => $language) {
     } else {
         $tooltip = NULL;
     }
-
     if($action == $language) $activ = "_activ"; else $activ = NULL;
     $html .= '<td align="left" valign="bottom" width="2%" class="td_button'.$activ.'" nowrap'.$tooltip.'>';
     $html .= '<a id="tab_'.$position.'" href="index.php?action_'.$position.'='.$language.'" title="'.getLanguageValue($language."_button").'"><img class="tab_img" src="gfx/icons/'.$icon_size.'/'.$language.'.png" alt="" hspace="0" vspace="0" border="0">'.getLanguageValue($language."_button").'</a>';
@@ -595,7 +596,7 @@ function category($post) {
     # Die getLanguageValue() und createTooltipWZ() erzeugen
     $array_getLanguageValue = array("pages","files","url","position","name","new_name",
         "url_adress","url_new_adress","url_adress_description","contents","category_button_change",
-        "category_button_edit","category_button_delete","target");
+        "category_button_delete","target","toggle_show","toggle_hide");
 
     # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getLanguageValue as $language) {
@@ -711,7 +712,7 @@ function category($post) {
             $pagecontent .= '<table width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0"><tr><td colspan="2" class="td_left_title" align="left" valign="bottom" ><b>'.$text_new_name.'</b></td></tr><tr><td width="30%" class="td_left_title"><input type="text" '.$post['categories']['cat']['error_html']['new_name'][$pos].'class="input_text" name="categories[cat][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['new_name'][$pos], true, true).'"'.$tooltip_category_help_name.'></td><td>&nbsp;</td></tr></table>';
 
         if(getRequestParam('javascript', true)) {
-            $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.$text_category_button_edit.'\');</script>';
+            $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.$text_toggle_show.'\',\''.$text_toggle_hide.'\');</script>';
         }
         $pagecontent .= '</td></tr>';
     }
@@ -970,7 +971,7 @@ function page($post) {
 
 
     # Die getLanguageValue() und createTooltipWZ() erzeugen
-    $array_getLanguageValue = array("pages","position","name","new_name","url_adress","url_new_adress","url_adress_description","page_button_edit","page_move","page_status","page_saveasdraft","page_saveasnormal","page_saveashidden","page_copy","page_button_edit","page_button_delete","page_password","page_password_del","target");
+    $array_getLanguageValue = array("pages","position","name","new_name","url_adress","url_new_adress","url_adress_description","page_button_edit","page_move","page_status","page_saveasdraft","page_saveasnormal","page_saveashidden","page_copy","page_button_edit","page_button_delete","page_password","page_password_del","target","toggle_show","toggle_hide");
 
     # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getLanguageValue as $language) {
@@ -1020,7 +1021,7 @@ function page($post) {
         $pagecontent .= '<tr><td width="100%" '.$post['categories'][$cat]['error_html']['display_cat'].'class="td_togglen" align="right" id="toggle_'.substr($cat,0,2).'">';# align="right"
         if(getRequestParam('javascript', true)) {
 
-            $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.substr($cat,0,2).'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.$text_page_button_edit.'\');</script>';
+            $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.substr($cat,0,2).'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.$text_toggle_show.'\',\''.$text_toggle_hide.'\');</script>';
         }
         $pagecontent .= '<table width="98%" cellspacing="0" cellpadding="0" border="0"><tr><td width="100%">';
 
@@ -1101,8 +1102,8 @@ function page($post) {
             if(!isset($post['categories'][$cat]['url'][$pos])) {
                 $pagecontent .= '<input type="image" class="input_img_button" name="action_data[editsite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_edit.'"  src="gfx/icons/'.$icon_size.'/page-edit.png" title="'.$text_page_button_edit.'"'.$tooltip_page_help_editieren.'>';
                 $pagecontent .= '<input type="image" class="input_img_button_last" name="action_data[deletesite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$text_page_button_delete.'"'.$tooltip_page_help_delete.'>';
-            } else {
-                $pagecontent .= '<IMG class="input_img_button" src="gfx/clear.gif" alt=" " width="'.substr($icon_size,0,2).'" height="'.substr($icon_size,0,2).'" hspace="0" vspace="0" border="0"><input type="image" class="input_img_button_last" name="action_data[deletesite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['target'][$pos].$post['categories'][$cat]['url'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$text_page_button_delete.'"'.$tooltip_page_help_delete.'>';
+            } else {#'.substr($icon_size,0,2).'
+                $pagecontent .= '<IMG class="input_img_button" src="gfx/clear.gif" alt=" " width="'.substr($icon_size,0,2).'" height="1" hspace="0" vspace="0" border="0"><input type="image" class="input_img_button_last" name="action_data[deletesite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['target'][$pos].$post['categories'][$cat]['url'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$text_page_button_delete.'"'.$tooltip_page_help_delete.'>';
             }
             $pagecontent .= '</td></tr></table>';
             $pagecontent .= '</td></tr>';
@@ -1138,7 +1139,7 @@ function page($post) {
             }
 
             if(getRequestParam('javascript', true)) {
-                $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.substr($cat,0,2).'_'.$pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.$text_page_button_edit.'\');</script>';
+                $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.substr($cat,0,2).'_'.$pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.$text_toggle_show.'\',\''.$text_toggle_hide.'\');</script>';
             }
             $pagecontent .= '</td></tr>';
         } # foreach page
@@ -1803,7 +1804,7 @@ function gallery($post) {
     } else {
         $tooltip_gallery_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration&amp;page=30_Kategorien" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
     }
-$tooltip_help_edit = NULL;
+
     $pagecontent .= '<span class="titel">'.getLanguageValue("gallery_button").'</span>';
     $pagecontent .= $tooltip_gallery_help;
     $pagecontent .= "<p>".getLanguageValue("gallery_text")."</p>";
@@ -1811,7 +1812,7 @@ $tooltip_help_edit = NULL;
     $array_getLanguageValue = array("gallery_scale","gallery_scale_thumbs",
         "gallery_picsperrow","gallery_usethumbs","gallery_target","gallery_scaleimages",
         "gallery_rebuildthumbs","gallery_size","gallery_subtitle","gallery_button_cut","gallery_newname",
-        "gallery_button_img_delete","gallery_button_gallery_delete","gallery_usedfgallery","target");
+        "gallery_button_img_delete","gallery_button_gallery_delete","gallery_usedfgallery","target","toggle_show","toggle_hide");
 
     # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getLanguageValue as $language) {
@@ -1821,7 +1822,7 @@ $tooltip_help_edit = NULL;
     $array_getTooltipValue = array("help_target_blank","help_target_self","help_target","gallery_help_scale","gallery_help_scale_thumbs","gallery_help_input_scale",
         "gallery_help_picsperrow","gallery_help_input_picsperrow","gallery_help_use_thumbs","gallery_help_all_picture_scale",
         "gallery_help_all_thumbs_new","gallery_help_size","gallery_help_picture","gallery_help_subtitle","gallery_help_name",
-        "gallery_help_del","gallery_help_target","gallery_help_conf","gallery_help_edit","gallery_help_newname","gallery_help_usedfgallery");
+        "gallery_help_del","gallery_help_target","gallery_help_conf","gallery_help_edit","gallery_help_newname","gallery_help_usedfgallery","gallery_help_overwrite");
 
 
     # Variable erzeugen z.B. pages = $text_pages
@@ -1838,14 +1839,12 @@ $tooltip_help_edit = NULL;
     }
 
     $pagecontent .= '<table width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
-$tooltip_file_help_overwrite = NULL;
-$overwrite = NULL;
-$tooltip_help_edit = NULL;
+    $overwrite = NULL;
     $pagecontent .= '<tr><td class="td_toggle">';
     $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
 
     $pagecontent .= '<tr><td width="85%" class="td_left_title"><input type="submit" name="action_data[gallery]" value="'.getLanguageValue("gallery_button_change").'" class="input_submit">';
-    $pagecontent .= '&nbsp;&nbsp;<input class="input_check_copy" type="checkbox" name="overwrite" value="on"'.$tooltip_file_help_overwrite.$overwrite.'>&nbsp;<span'.$tooltip_file_help_overwrite.'><b>'.getLanguageValue("files_button_overwrite").'</b></span></td>';
+    $pagecontent .= '&nbsp;&nbsp;<input class="input_check_copy" type="checkbox" name="overwrite" value="on"'.$tooltip_gallery_help_overwrite.$overwrite.'>&nbsp;<span'.$tooltip_gallery_help_overwrite.'><b>'.getLanguageValue("files_button_overwrite").'</b></span></td>';
 
     $pagecontent .= '<td width="15%" class="td_icons">';
     if(getRequestParam('javascript', true)) {
@@ -1909,7 +1908,7 @@ $tooltip_help_edit = NULL;
     $pagecontent .= '</table>';
 
     if(getRequestParam('javascript', true)) {
-        $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_settings_conf\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\'info_button\');</script>';
+        $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_settings_conf\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.$text_toggle_show.'\',\''.$text_toggle_hide.'\');</script>';
     }
     $pagecontent .= '</td></tr>';
     # setings end
@@ -1939,7 +1938,7 @@ $tooltip_help_edit = NULL;
         $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
 
         $pagecontent .= '<tr><td width="85%" class="td_titel"><span class="text_cat_page">'.$specialchars->rebuildSpecialChars($currentgalerien, true, true).'</span></td>';
-        $pagecontent .= '<td width="15%" class="td_icons">';
+        $pagecontent .= '<td width="15%" class="td_icons" nowrap>';
         if(getRequestParam('javascript', true)) {
             $pagecontent .= '<span id="toggle_'.$toggle_pos.'_linkBild"'.$tooltip_gallery_help_edit.'></span>';
         }
@@ -2035,7 +2034,7 @@ $tooltip_help_edit = NULL;
         }
         $pagecontent .= '</table>';
         if(getRequestParam('javascript', true)) {
-            $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$toggle_pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\'info_button\');</script>';
+            $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$toggle_pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.$text_toggle_show.'\',\''.$text_toggle_hide.'\');</script>';
         }
         $pagecontent .= '</td></tr>';
         $toggle_pos++;
@@ -2606,7 +2605,7 @@ function files($post) {
         }
 
         if(getRequestParam('javascript', true)) {
-            $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.getLanguageValue("files_button_edit").'\');</script>';
+            $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.getLanguageValue("toggle_show").'\',\''.getLanguageValue("toggle_hide").'\');</script>';
         }
         $pagecontent .= '</td></tr>';
     }
@@ -3554,10 +3553,10 @@ function plugins($post) {
 
     if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
         $tooltip_plugins_help = '<img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"'.createTooltipWZ("","plugins_help",",WIDTH,400,CLICKCLOSE,true").'>';
-        $tooltip_help_edit = createTooltipWZ("","plugins_help_edit",",WIDTH,200,CLICKCLOSE,true");
+        $tooltip_plugins_help_edit = createTooltipWZ("","plugins_help_edit",",WIDTH,200,CLICKCLOSE,true");
     } else {
         $tooltip_plugins_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
-        $tooltip_help_edit = NULL;
+        $tooltip_plugins_help_edit = NULL;
     }
  
     $pagecontent .= '<span class="titel">'.getLanguageValue("plugins_titel").'</span>';
@@ -3607,7 +3606,7 @@ function plugins($post) {
                 $pagecontent .= '<td width="15%" class="">'.getLanguageValue("plugins_input_active").'&nbsp;'.buildCheckBox($currentelement.'[active]', ($conf_plugin->get("active") == "true")).'</td>';
                 $pagecontent .= '<td width="15%" class="td_icons">';
                 if(getRequestParam('javascript', true) and $plugin_error === false) {
-                    $pagecontent .= '<span id="toggle_'.$toggle_pos.'_linkBild"'.$tooltip_help_edit.'></span>';
+                    $pagecontent .= '<span id="toggle_'.$toggle_pos.'_linkBild"'.$tooltip_plugins_help_edit.'></span>';
                 }
                 $pagecontent .= '&nbsp;</td></tr></table>';
                 $pagecontent .= '</td></tr>';
@@ -3796,7 +3795,7 @@ function plugins($post) {
 
 
                     if(getRequestParam('javascript', true)) {
-                        $pagecontent_conf .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$toggle_pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\'info_button\');</script>';
+                        $pagecontent_conf .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$toggle_pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.getLanguageValue("toggle_show").'\',\''.getLanguageValue("toggle_hide").'\');</script>';
                     }
                     if(!empty($messages)) {
                         $messages = '<tr><td colspan="2" align="left">'.$messages.'</td></tr>';
