@@ -14,10 +14,11 @@ $ADMIN_TITLE = "moziloAdmin";
 
 #$CHARSET = 'ISO-8859-1';
 $CHARSET = 'UTF-8';
-$BASE_DIR = str_replace("/admin","/",getcwd());
+$ADMIN_DIR_NAME = "admin";
+$BASE_DIR = str_replace("/".$ADMIN_DIR_NAME,"/",getcwd());
 $CMS_DIR_NAME = "cms";
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
-$BASE_DIR_ADMIN = $BASE_DIR."admin/";
+$BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
 $debug = "ja"; # ja oder nein
  // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 if($debug != "ja")
