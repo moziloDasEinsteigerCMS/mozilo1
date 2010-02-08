@@ -18,6 +18,11 @@ echo "</pre>";
 $BASE_DIR = getcwd()."/";
 $CMS_DIR_NAME = "cms";
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
+
+
+#$CHARSET = 'ISO-8859-1';
+$CHARSET = 'UTF-8';
+
     require_once($BASE_DIR_CMS."DefaultConf.php");
     require_once($BASE_DIR_CMS."SpecialChars.php");
     require_once($BASE_DIR_CMS."Properties.php");
@@ -30,6 +35,10 @@ $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
     $VERSION_CONF  = new Properties($BASE_DIR_CMS."conf/version.conf",true);
     $GALLERY_CONF  = new Properties($BASE_DIR_CMS."conf/gallery.conf",true);
     $USER_SYNTAX  = new Properties($BASE_DIR_CMS."conf/syntax.conf",true);
+    $URL_BASE = NULL;
+    if($CMS_CONF->get("modrewrite") == "true") {
+        $URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("index.php")));
+    }
     require_once($BASE_DIR_CMS."Language.php");
     $language       = new Language();
     require_once($BASE_DIR_CMS."Syntax.php");
@@ -40,15 +49,6 @@ $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
     $mailfunctions  = new Mail();
 
     require_once($BASE_DIR_CMS."Plugin.php");
-
-
-#$CHARSET = 'ISO-8859-1';
-$CHARSET = 'UTF-8';
-
-    $URL_BASE = NULL;
-    if($CMS_CONF->get("modrewrite") == "true") {
-        $URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("index.php")));
-    }
 
     // Dateiendungen fuer Inhaltsseiten
     # Achtung die endungen muessen alle gleich lang sein
