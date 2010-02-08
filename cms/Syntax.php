@@ -564,7 +564,7 @@ class Syntax {
                     }
                     $j++;
                 }
-                $content = str_replace ("$match", "<table class=\"contenttable\" summary=\"\">$tablecontent</table>", $content);
+                $content = str_replace ("$match", "<table class=\"contenttable\" cellspacing=\"0\" border=\"0\" cellpadding=\"0\" summary=\"\">$tablecontent</table>", $content);
             }
 
             // Includes
