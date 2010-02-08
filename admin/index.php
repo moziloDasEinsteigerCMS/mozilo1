@@ -19,6 +19,9 @@ $BASE_DIR = str_replace("/".$ADMIN_DIR_NAME,"/",getcwd());
 $CMS_DIR_NAME = "cms";
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
 $BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
+$URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("admin/index.php")));
+
+
 $debug = "ja"; # ja oder nein
  // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 if($debug != "ja")
@@ -167,7 +170,6 @@ $GALLERIES_DIR_NAME    = "galerien";
 $GALLERIES_DIR_REL    = $BASE_DIR.$GALLERIES_DIR_NAME."/";
 $PREVIEW_DIR_NAME        = "vorschau";
 $PLUGIN_DIR_REL = $BASE_DIR."plugins/";
-$URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("admin/index.php")));
 
 $ALLOWED_SPECIALCHARS_REGEX = $specialchars->getSpecialCharsRegex();
 
@@ -3988,13 +3990,14 @@ function returnMessage($success, $message) {
 function returnSmileyBar() {
     global $BASE_DIR_CMS;
     global $URL_BASE;
+    global $CMS_DIR_NAME;
     $smileys = new Smileys($BASE_DIR_CMS."smileys");
     $content = "";
     foreach($smileys->getSmileysArray() as $icon => $emoticon) {
         if($icon == "readonly" or $icon == "error") {
             continue;
         }
-        $content .= "<img class=\"jss\" title=\":$icon:\" alt=\"$emoticon\" src=\"".$URL_BASE_CMS."smileys/$icon.gif\" onClick=\"insert(' :$icon: ', '', false)\" />";
+        $content .= "<img class=\"jss\" title=\":$icon:\" alt=\"$emoticon\" src=\"".$URL_BASE.$CMS_DIR_NAME."/smileys/$icon.gif\" onClick=\"insert(' :$icon: ', '', false)\" />";
     }
     return $content;
 }
