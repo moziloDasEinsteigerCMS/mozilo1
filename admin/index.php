@@ -494,7 +494,7 @@ function home($post) {
     // Zeile "CMS-VERSION"
     ."<tr>"
     .'<td width="50%" class="td_cms_left">'.getLanguageValue("cmsversion_text")."</td>"
-    .'<td width="50%" class="td_cms_left">'.$VERSION_CONF->get("cmsversion").' ("'.$VERSION_CONF->get("cmsname").'") Revision:'.$VERSION_CONF->get("revision").'</td>'
+    .'<td width="50%" class="td_cms_left">'.$VERSION_CONF->get("cmsversion").' ("'.$VERSION_CONF->get("cmsname").'")<br />'.getLanguageValue("cmsrevision_text").' '.$VERSION_CONF->get("revision").'</td>'
     ."</tr>"
     // Zeile "Gesamtgröße des CMS"
     ."<tr>"
