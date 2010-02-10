@@ -621,9 +621,6 @@ function category($post) {
 
     $pagecontent .= '<table width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
     foreach ($post['categories']['cat']['position'] as $pos => $position) {
-        if($pos == $max_cat_page) {
-            continue;
-        }
         if(isset($post['displays']['cat']['error_html']['display'][$pos])) {
             $post['categories']['cat']['error_html']['display'][$pos] = $post['displays']['cat']['error_html']['display'][$pos];
         }
@@ -650,7 +647,9 @@ function category($post) {
             }
             $display_new_cat = true;
         }
-
+        if($pos == $max_cat_page) {
+            continue;
+        }
         if (!isset($post['categories']['cat']['url'][$pos])) {
             $file = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
             // Anzahl Inhaltsseiten auslesen
