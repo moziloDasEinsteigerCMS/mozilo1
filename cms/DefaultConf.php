@@ -2,24 +2,28 @@
 
 # Alle Platzhalter als array mit Beschreibung
 function makePlatzhalter() {
-    $platzhalter = array('{CATEGORY}',
+    $platzhalter = array(
                         '{CATEGORY_NAME}',
-                        '{PAGE}',
+                        '{CATEGORY}',
                         '{PAGE_NAME}',
                         '{PAGE_FILE}',
-                        '{PREVIOUS_PAGE}',
+                        '{PAGE}',
                         '{PREVIOUS_PAGE_NAME}',
                         '{PREVIOUS_PAGE_FILE}',
-                        '{NEXT_PAGE}',
+                        '{PREVIOUS_PAGE}',
                         '{NEXT_PAGE_NAME}',
                         '{NEXT_PAGE_FILE}',
+                        '{NEXT_PAGE}',
                         '{SEARCH}',
-                        '{LASTCHANGE}',
+                        '{LASTCHANGEDTEXT}',
+                        '{LASTCHANGEDPAGE}',
+                        '{LASTCHANGEDPAGELINK}',
+                        '{LASTCHANGEDATE}',
                         '{SITEMAPLINK}',
                         '{CMSINFO}',
                         '{CONTACT}',
-                        '{TABLEOFCONTENTS}',
-                        '{CURRENTGALLERY}');
+                        '{TABLEOFCONTENTS}'
+    );
 
     return $platzhalter;
 }
