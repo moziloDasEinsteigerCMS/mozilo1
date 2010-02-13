@@ -22,7 +22,7 @@ $BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
 $URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen($ADMIN_DIR_NAME."/index.php")));
 
 
-$debug = "ja"; # ja oder nein
+$debug = "nein"; # ja oder nein
  // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 if($debug != "ja")
     @ini_set("display_errors", 0);
