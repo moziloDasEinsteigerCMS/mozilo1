@@ -1675,7 +1675,9 @@ $CHARSET = 'UTF-8';
                 // Variable durch Plugin-Inhalt (oder Fehlermeldung) ersetzen
 #                $content = preg_replace('/'.preg_quote($match, '/').'/Um', $replacement, $content);
                 $content = str_replace($match,$replacement,$content);
-                if (!in_array($currentvariable, $deactiv_plugins) and file_exists($PLUGIN_DIR_REL.$currentvariable."/plugin.css")) {
+                if (!in_array($currentvariable, $deactiv_plugins)
+                    and file_exists($PLUGIN_DIR_REL.$currentvariable."/plugin.css")
+                    and strpos($content,$URL_BASE.$PLUGIN_DIR_NAME.'/'.$currentvariable.'/plugin.css') < 1) {
                     $css = '<style type="text/css"> @import "'.$URL_BASE.$PLUGIN_DIR_NAME.'/'.$currentvariable.'/plugin.css"; </style></head>';
                     $content = str_replace(array("</head>","</HEAD>"),$css,$content);
                 }
