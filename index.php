@@ -109,7 +109,7 @@ $CHARSET = 'UTF-8';
         }
         closedir($contentdir);
     }
-    
+   
     $CAT_REQUEST = nameToCategory($CAT_REQUEST_URL);
     if ($CAT_REQUEST == "") {
     	$CAT_REQUEST = $DEFAULT_CATEGORY;
@@ -1430,6 +1430,7 @@ $CHARSET = 'UTF-8';
             $request = NULL;
             if($param == "cat") {
                 $url_get = str_replace($URL_BASE,"",$_SERVER['REQUEST_URI']);
+                $url_get = str_replace("?".$_SERVER['QUERY_STRING'],"",$url_get);
                 $url_para = explode("/",$url_get);
                 if(count($url_para) > 1) {
                     $request = $url_para[0];
