@@ -110,7 +110,7 @@ function makeDefaultConf($conf_datei) {
                         'mail' => ',true,true',
                         'message' => ',true,true',
                         'name' => ',true,true',
-                        'website' => ',true,true');
+                        'website' => ',true,false');
 
     $logindata = array('falselogincount' => '0',
                         'falselogincounttemp' => '0',
