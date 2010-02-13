@@ -14,7 +14,7 @@
     // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
     @ini_set("display_errors", 0);
 
-    $ERRORMESSAGE = "Fehlerhafter Parameter Übergeben.";    
+    $ERRORMESSAGE = "Fehlerhafter Parameter übergeben.";    
     $DOWNLOADS = new Properties("conf/downloads.conf",true);
 
     $CAT     = preg_replace('/(\/|\\\)/', "", rawurlencode($_REQUEST['cat']));
@@ -46,7 +46,7 @@
         $file_extension = strtolower(substr(strrchr($filename,"."),1));
         
         
-        // abhängig von der Extension; Content-Type setzen
+        // abhängig von der Extension: Content-Type setzen
         switch( $file_extension ) {
               case "pdf": $ctype="application/pdf"; break;
               case "exe": $ctype="application/octet-stream"; break;
@@ -88,7 +88,7 @@
         // Datei direkt im Browser anzeigen (inline); Dateinamen setzen
         $header="Content-Disposition: inline; filename=".$filename.";";
         // Mit "Content-Disposition: attachment" wird der Download über ein Downloadfenster erzwungen:
-        /*    $header="Content-Disposition: attachment; filename=".$filename.";";*/
+        //    $header="Content-Disposition: attachment; filename=".$filename.";";
         header($header );
         header("Content-Transfer-Encoding: binary");
         header("Content-Length: ".$len);

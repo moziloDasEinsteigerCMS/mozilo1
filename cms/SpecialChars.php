@@ -20,7 +20,7 @@ class SpecialChars {
         global $CHARSET;
 
         $replace = array_keys(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
-        # get_html_translation_table liefert die Zeichen im ISO-8859-1 Format wir brauchen UTF-8
+        # get_html_translation_table liefert die Zeichen im ISO-8859-1 Format - wir brauchen UTF-8
         $replace = implode(",",$replace);
         if(function_exists("utf8_encode")) {
             $replace = utf8_encode($replace);
@@ -40,7 +40,6 @@ class SpecialChars {
     function getSpecialCharsRegex() {
         global $CHARSET;
 
-#        $regex = "/^[a-zA-Z0-9_\%\-\s\?\!\@\.€".addslashes(html_entity_decode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)),ENT_COMPAT,$CHARSET))."]+$/";
         $regex = "/^[a-zA-Z0-9_\%\-\s\?\!\@\.€".addslashes($this->getHtmlEntityDecode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES))))."]+$/";
         $regex = preg_replace("/&#39;/", "\'", $regex);
         return $regex;
@@ -70,7 +69,7 @@ class SpecialChars {
             $test = htmlentities($text,ENT_COMPAT,$CHARSET);
 # hier muss noch geschraubt werden iconv gibts auf manchen systemen nicht!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             if(empty($test) and function_exists("iconv")) {
-                # htmlentities gibt einen lehren sring zurück wenn im string ein unbekantes zeichen ist
+                # htmlentities gibt einen leeren sring zurück wenn im string ein unbekantes zeichen ist
                 # iconv entfernt es einfach
                 $test = htmlentities(@iconv($CHARSET,$CHARSET.'//IGNORE',$text),ENT_COMPAT,$CHARSET);
             }

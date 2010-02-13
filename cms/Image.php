@@ -39,7 +39,7 @@ class Thumbnail {
     // Thumbnail anlegen
     // ------------------------------------------------------------------------------
     function scaleImage($pic, $dir_origin, $dir_target, $maxWidth, $maxHeight, $make_thumbs = false) {
-        # nichts machen $maxWidth und $maxHeight sind lehr
+        # nichts machen $maxWidth und $maxHeight sind leer
         if(empty($maxHeight) and empty($maxWidth)) return;
         if(!extension_loaded("gd")) return;
         // --------------------------------------------------------------------
@@ -78,7 +78,7 @@ class Thumbnail {
 
 
         // --------------------------------------------------------------------
-        // Die Seitenverhöltnisse von Breite zu Höhe und Höhe zu Breite ermitteln,
+        // Die Seitenverhältnisse von Breite zu Höhe und Höhe zu Breite ermitteln,
         // und dann die Breite und Höhe für das Vorschaubild ermitteln,
         // aber nur, wenn das Originalbild größer als das Zielbild ist
         // --------------------------------------------------------------------

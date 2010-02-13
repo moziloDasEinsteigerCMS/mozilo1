@@ -15,7 +15,7 @@
 INHALT
 ######
         
-        Projekt "Flatfile-basiertes CMS f�r Einsteiger"
+        Projekt "Flatfile-basiertes CMS für Einsteiger"
         Sprachunterst�tzung
         Klasse ITF04-1
         Industrieschule Chemnitz
@@ -57,7 +57,7 @@ class Language {
 
 
 // ------------------------------------------------------------------------------
-// Sprachelement mit einem zus�tzlichen Parameter aus Sprachdatei holen
+// Sprachelement mit einem zusätzlichen Parameter aus Sprachdatei holen
 // ------------------------------------------------------------------------------
     function getLanguageValue1($phrase, $param1) {
         global $CHARSET;
@@ -68,7 +68,7 @@ class Language {
 
 
 // ------------------------------------------------------------------------------
-// Sprachelement mit zwei zus�tzlichen Parametern aus Sprachdatei holen
+// Sprachelement mit zwei zusätzlichen Parametern aus Sprachdatei holen
 // ------------------------------------------------------------------------------
     function getLanguageValue2($phrase, $param1, $param2) {
         global $CHARSET;

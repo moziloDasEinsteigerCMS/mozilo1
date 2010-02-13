@@ -93,10 +93,10 @@ class Properties {
                     fputs($handle, $content);
                     fclose($handle);
                 } else {
-                    die("Properties: Kann die $file Datei nicht Anlegen!");
+                    die("Properties: Kann die Datei \"$file\" nicht anlegen!");
                 }
             } else {
-                die("Properties: Darf die $file Datei nicht Anlegen rufen sie denn moziloCMS Admin auf!");
+                die("Properties: Darf die Datei \"$file\" nicht anlegen. Bitte rufen Sie moziloAdmin auf.");
             }
         }
 
@@ -114,16 +114,16 @@ class Properties {
     function loadProperties() {
         global $BASIC_LANGUAGE;
 
-        $error_nofile = "die Datei Existiert nicht: ";
+        $error_nofile = "Die Datei existiert nicht: ";
         if(isset($BASIC_LANGUAGE->properties['properties_nofile']))
             $error_nofile = $BASIC_LANGUAGE->properties['properties_nofile'];
-        $error_readonly = "kann die Datei nur lesend öffnen (Dateirechte prüfen): ";
+        $error_readonly = "Kann die Datei nur lesend öffnen (bitte Dateirechte prüfen): ";
         if(isset($BASIC_LANGUAGE->properties['properties_readonly']))
             $error_readonly = $BASIC_LANGUAGE->properties['properties_readonly'];
-        $error_write = "kann die Datei nicht schreibend öffnen (Dateirechte prüfen): ";
+        $error_write = "Kann die Datei nicht schreibend öffnen (bitte Dateirechte prüfen): ";
         if(isset($BASIC_LANGUAGE->properties['properties_write']))
             $error_write = $BASIC_LANGUAGE->properties['properties_write'];
-        $error_read = "kann die Datei nicht Lesend oder schreibend öffnen (Dateirechte prüfen): ";
+        $error_read = "Kann die Datei nicht lesend oder schreibend öffnen (bitte Dateirechte prüfen): ";
         if(isset($BASIC_LANGUAGE->properties['properties_read']))
             $error_read = $BASIC_LANGUAGE->properties['properties_read'];
 
@@ -164,16 +164,16 @@ class Properties {
     function saveProperties() {
         global $BASIC_LANGUAGE;
 
-        $error_lock_existed = "kann setings nicht schreiben es existiert eine Sperdatei: ";
+        $error_lock_existed = "Kann Einstellungen nicht schreiben. Es existiert eine Sperrdatei: ";
         if(isset($BASIC_LANGUAGE->properties['properties_lock_existed']))
             $error_lock_existed = $BASIC_LANGUAGE->properties['properties_lock_existed'];
-        $error_lock_touch = "kann Sperdatei Datei nicht anlegen (Dateirechte prüfen): ";
+        $error_lock_touch = "Kann Sperrdatei nicht anlegen (bitte Dateirechte prüfen): ";
         if(isset($BASIC_LANGUAGE->properties['properties_lock_touch']))
             $error_lock_touch = $BASIC_LANGUAGE->properties['properties_lock_touch'];
-        $error_lock_del = "kann Sperdatei Datei nicht löschen (Dateirechte prüfen): ";
+        $error_lock_del = "Kann Sperrdatei nicht löschen (bitte Dateirechte prüfen): ";
         if(isset($BASIC_LANGUAGE->properties['properties_lock_del']))
             $error_lock_del = $BASIC_LANGUAGE->properties['properties_lock_del'];
-        $error_write = "kann die Datei nicht schreibend öffnen (Dateirechte prüfen): ";
+        $error_write = "Kann die Datei nicht schreibend öffnen (bitte Dateirechte prüfen): ";
         if(isset($BASIC_LANGUAGE->properties['properties_write']))
             $error_write = $BASIC_LANGUAGE->properties['properties_write'];
 

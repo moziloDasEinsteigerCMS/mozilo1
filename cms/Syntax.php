@@ -10,13 +10,10 @@
 
 class Syntax {
     
-#    var $CMS_CONF;
     var $LANG;
     var $LINK_REGEX;
     var $MAIL_REGEX;
-#    var $USER_SYNTAX;
     var $TARGETBLANK_LINK;
-#    var $TARGETBLANK_GALLERY;
     var $TARGETBLANK_DOWNLOAD;
     var $anchorcounter;
     var $headlineinfos;
@@ -27,8 +24,8 @@ class Syntax {
 // ------------------------------------------------------------------------------
     function Syntax(){
         global $CMS_CONF;
-        // Regul�rer Audruck zur �berpr�fung von Links
-        // �berpr�fung auf Validit�t >> protokoll :// (username:password@) [(sub.)server.tld|ip-adresse] (:port) (subdirs|files)
+        // Regulärer Audruck zur überprüfung von Links
+        // überprüfung auf Validität >> protokoll :// (username:password@) [(sub.)server.tld|ip-adresse] (:port) (subdirs|files)
                     // protokoll                (https?|t?ftps?|gopher|telnets?|mms|imaps?|irc|pop3s?|rdp|smb|smtps?|sql|ssh):\/\/
                     // username:password@       (\w)+\:(\w)+\@
                     // (sub.)server.tld         ((\w)+\.)?(\w)+\.[a-zA-Z]{2,4}
@@ -38,14 +35,14 @@ class Syntax {
         $this->LINK_REGEX   = "/^(https?|t?ftps?|gopher|telnets?|mms|imaps?|irc|pop3s?|rdp|smb|smtps?|sql|ssh|svn)\:\/\/((\w)+\:(\w)+\@)?[((\w)+\.)?(\w)+\.[a-zA-Z]{2,4}|([\d]{1,3}\.){3}[\d]{1,3}](\:[\d]{1,5})?((\w)+)?$/";
         $this->MAIL_REGEX   = "/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/";
         
-        // Externe Links in neuem Fenster �ffnen?
+        // Externe Links in neuem Fenster öffnen?
         if ($CMS_CONF->get("targetblank_link") == "true") {
             $this->TARGETBLANK_LINK = " target=\"_blank\"";
         }
         else {
             $this->TARGETBLANK_LINK = "";
         }
-        // Download-Links in neuem Fenster �ffnen?
+        // Download-Links in neuem Fenster öffnen?
         if ($CMS_CONF->get("targetblank_download") == "true") {
             $this->TARGETBLANK_DOWNLOAD = " target=\"_blank\"";
         }
@@ -57,7 +54,7 @@ class Syntax {
     
 
 // ------------------------------------------------------------------------------
-// Umsetzung der �bergebenen CMS-Syntax in HTML, R�ckgabe als String
+// Umsetzung der übergebenen CMS-Syntax in HTML, Rückgabe als String
 // ------------------------------------------------------------------------------
     function convertContent($content, $cat, $firstrecursion) {
         global $CONTENT_DIR_NAME;
@@ -80,14 +77,14 @@ class Syntax {
 
         if ($firstrecursion) {
             $content = $this->prepareContent($content);
-            // �berschriften einlesen
+            // Überschriften einlesen
             $this->headlineinfos = $this->getHeadlineInfos($content);
         }
 
         // Nach Texten in eckigen Klammern suchen
         preg_match_all("/\[([^\[\]]+)\|([^\[\]]*)\]/Um", $content, $matches);
         $i = 0;
-        // F�r jeden Treffer...
+        // Für jeden Treffer...
         foreach ($matches[0] as $match) {
             // ...Auswertung und Verarbeitung der Informationen
             $attribute = $matches[1][$i];
@@ -105,7 +102,7 @@ class Syntax {
                         case 2: { 
                             if (substr($value, 0, 11) == "http://www.")
                                 $shortenendlink = substr($value, 11, strlen($value)-11);
-                            // zus�tzlich: mit "http://" beginnende Links ohne das "http://" anzeigen
+                            // zusätzlich: mit "http://" beginnende Links ohne das "http://" anzeigen
                             elseif (substr($value, 0, 7) == "http://")
                                 $shortenendlink = substr($value, 7, strlen($value)-7);
                             break;
@@ -128,7 +125,7 @@ class Syntax {
 
             // externer Link mit eigenem Text
             elseif (substr($attribute,0,5) == "link=") {
-                // �berpr�fung auf korrekten Link
+                // überprüfung auf korrekten Link
                 if (preg_match($this->LINK_REGEX, $value)) {
                     $content = str_replace ($match, "<a class=\"link\" href=\"$value\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", $value)).$this->TARGETBLANK_LINK.">".substr($attribute, 5, strlen($attribute)-5)."</a>", $content);
                 }
@@ -139,7 +136,7 @@ class Syntax {
 
             // Mail-Link mit eigenem Text
             elseif (substr($attribute,0,5) == "mail=") {
-                // �berpr�fung auf korrekten Link
+                // überprüfung auf korrekten Link
                 if (preg_match($this->MAIL_REGEX, $value)) {
                     $content = str_replace ($match, "<a class=\"mail\" href=\"".obfuscateAdress("mailto:$value", 3)."\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", obfuscateAdress("$value", 3))).">".substr($attribute, 5, strlen($attribute)-5)."</a>", $content);
                 }
@@ -148,14 +145,14 @@ class Syntax {
                 }
             }
             elseif ($attribute == "mail"){
-                // �berpr�fung auf Validit�t
+                // Überprüfung auf Validität
                 if (preg_match($this->MAIL_REGEX, $value))
                     $content = str_replace ($match, "<a class=\"mail\" href=\"".obfuscateAdress("mailto:$value", 3)."\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", obfuscateAdress("$value", 3))).">".obfuscateAdress("$value", 3)."</a>", $content);
                 else
                     $content = str_replace ($match, $this->createDeadlink($value, $language->getLanguageValue1("tooltip_link_mail_error_1", $value)), $content);
             }
 
-            // Kategorie-Link (�berpr�fen, ob Kategorie existiert)
+            // Kategorie-Link (überprüfen, ob Kategorie existiert)
             // Kategorie-Link mit eigenem Text
             elseif ($attribute == "kategorie" or substr($attribute,0,10) == "kategorie=") {
                 $link_text = $value;
@@ -176,7 +173,7 @@ class Syntax {
                 }
             }
 
-            // Link auf Inhaltsseite in aktueller oder anderer Kategorie (�berpr�fen, ob Inhaltsseite existiert)
+            // Link auf Inhaltsseite in aktueller oder anderer Kategorie (überprüfen, ob Inhaltsseite existiert)
             // Link auf Inhaltsseite in aktueller oder anderer Kategorie mit beliebigem Text
             elseif ($attribute == "seite" or substr($attribute,0,6) == "seite=") {
                 $seite = $specialchars->getHtmlEntityDecode($value);
@@ -229,7 +226,7 @@ class Syntax {
                 }
             }
 
-            // Verweise auf Abs�tze innerhalb der Inhaltsseite
+            // Verweise auf Absätze innerhalb der Inhaltsseite
             elseif (($attribute == "absatz") || (substr($attribute,0,7) == "absatz=")) {
                 // Beschreibungstext extrahieren
                 if(substr($attribute,0,7) == "absatz=") {
@@ -240,7 +237,7 @@ class Syntax {
                 } 
                 $pos = 0;
                 foreach ($this->headlineinfos as $headline_info) {
-                    // $headline_info besteht aus �berschriftstyp (1/2/3) und Wert
+                    // $headline_info besteht aus Überschriftstyp (1/2/3) und Wert
                     if ($headline_info[1] == $value) {
                         // "Nach oben"-Verweis
                         if ($pos == 0)
@@ -255,7 +252,7 @@ class Syntax {
             }
             
 
-            // Datei aus dem Dateiverzeichnis (�berpr�fen, ob Datei existiert)
+            // Datei aus dem Dateiverzeichnis (überprüfen, ob Datei existiert)
             // Datei aus dem Dateiverzeichnis mit beliebigem Text
             elseif ($attribute == "datei" or substr($attribute,0,6) == "datei=") {
                 $datei = $specialchars->getHtmlEntityDecode($value);
@@ -319,11 +316,7 @@ class Syntax {
                     }
                     closedir($handle);
                     $modrewrite_dumy = NULL;
-#                    if($CMS_CONF->get("modrewrite") == "true") {
-#                        $modrewrite_dumy = ".html";
-#                    }
                     $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE.$CMS_DIR_NAME."/gallery.php$modrewrite_dumy?gal=$cleanedvalue\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"_blank\">$link_text</a>", $content);
-#                    $content = str_replace ($match, "<a class=\"gallery\" href=\"gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($this->LANG->getLanguageValue2("tooltip_link_gallery_2", $value, $j)).$this->TARGETBLANK_GALLERY.">$link_text</a>", $content);
                 }
                 // Galerie nicht vorhanden
                 else {
@@ -438,7 +431,7 @@ class Syntax {
                 }
             }
 
-            // linksb�ndiger Text
+            // linksbündiger Text
             if ($attribute == "links"){
                 $content = str_replace ("$match", "<p class=\"alignleft\">".$value."</p>", $content);
             }
@@ -453,7 +446,7 @@ class Syntax {
                 $content = str_replace ("$match", "<p class=\"alignjustify\">".$value."</p>", $content);
             }
 
-            // rechtsb�ndiger Text
+            // rechtsbündiger Text
             elseif ($attribute == "rechts"){
                 $content = str_replace ("$match", "<p class=\"alignright\">".$value."</p>", $content);
             }
@@ -469,7 +462,7 @@ class Syntax {
             }
 
             // Text fettkursiv 
-            // (VERALTET seit Version 1.7 - nur aus Gr�nden der Abw�rtskompatibilit�t noch mitgef�hrt)
+            // (VERALTET seit Version 1.7 - nur aus Gründen der Abwärtskompatibilität noch mitgeführt)
             elseif ($attribute == "fettkursiv") {
                 $content = str_replace ($match, "<b class=\"contentbold\"><i class=\"contentitalic\">$value</i></b>", $content);
             }
@@ -484,17 +477,17 @@ class Syntax {
                 $content = str_replace ($match, "<s class=\"contentstrikethrough \">$value</s>", $content);
             }
 
-            // �berschrift gro�
+            // Überschrift groß
             elseif ($attribute == "ueber1"){
                 $content = preg_replace("/".preg_quote($match, '/')."/", "<h1 id=\"a".$this->anchorcounter++."\">$value</h1>", $content,1);
             }
 
-            // �berschrift mittel
+            // Überschrift mittel
             elseif ($attribute == "ueber2"){
                 $content = preg_replace("/".preg_quote($match, '/')."/", "<h2 id=\"a".$this->anchorcounter++."\">$value</h2>", $content,1);
             }
 
-            // �berschrift normal
+            // Überschrift normal
             elseif ($attribute == "ueber3"){
                 $content = preg_replace("/".preg_quote($match, '/')."/", "<h3 id=\"a".$this->anchorcounter++."\">$value</h3>", $content,1);
             }
@@ -509,20 +502,20 @@ class Syntax {
                 $content = str_replace ("$match", "<ol><li>$value</li></ol>", $content);
             }
 
-            // Liste, einfache Einr�ckung
-            // (VERALTET seit Version 1.10 - nur aus Gr�nden der Abw�rtskompatibilit�t noch mitgef�hrt)
+            // Liste, einfache Einrückung
+            // (VERALTET seit Version 1.10 - nur aus Gründen der Abwärtskompatibilität noch mitgeführt)
             elseif ($attribute == "liste1"){
                 $content = str_replace ("$match", "<ul><li>$value</li></ul>", $content);
             }
 
-            // Liste, doppelte Einr�ckung
-            // (VERALTET seit Version 1.10 - nur aus Gr�nden der Abw�rtskompatibilit�t noch mitgef�hrt)
+            // Liste, doppelte Einrückung
+            // (VERALTET seit Version 1.10 - nur aus Gründen der Abwärtskompatibilität noch mitgeführt)
             elseif ($attribute == "liste2"){
                 $content = str_replace ("$match", "<ul><ul><li>$value</li></ul></ul>", $content);
             }
 
-            // Liste, dreifache Einr�ckung
-            // (VERALTET seit Version 1.10 - nur aus Gr�nden der Abw�rtskompatibilit�t noch mitgef�hrt)
+            // Liste, dreifache Einrückung
+            // (VERALTET seit Version 1.10 - nur aus Gründen der Abwärtskompatibilität noch mitgeführt)
             elseif ($attribute == "liste3"){
                 $content = str_replace ("$match", "<ul><ul><ul><li>$value</li></ul></ul></ul>", $content);
             }
@@ -539,8 +532,6 @@ class Syntax {
                 $tablecontent = "";
                 $j = 0;
                 // Tabellenzeilen
-                // preg_match_all("/&lt;([^&gt;]*)&gt;/Um", $value, $tablelines);
-                // preg_match_all("/(&lt;|&lt;&lt;)([^&gt;]*)(&gt;|&gt;&gt;)/Um", $value, $tablelines);
                 preg_match_all("/(&lt;|&lt;&lt;)(.*)(&gt;|&gt;&gt;)/Umsie", $value, $tablelines);
                 foreach ($tablelines[0] as $tablematch) {
                     // Kopfzeilen
@@ -636,7 +627,7 @@ class Syntax {
 
             // Farbige Elemente
             elseif (substr($attribute,0,6) == "farbe=") {
-                // �berpr�fung auf korrekten Hexadezimalwert
+                // Überprüfung auf korrekten Hexadezimalwert
                 if (preg_match("/^([a-f]|\d){6}$/i", substr($attribute, 6, strlen($attribute)-6))) {
                     $content = str_replace ("$match", "<span style=\"color:#".substr($attribute, 6, strlen($attribute)-6).";\">".$value."</span>", $content);
                 }
@@ -645,7 +636,7 @@ class Syntax {
                 }
             }
 
-            // Attribute, die nicht zugeordnet werden k�nnen
+            // Attribute, die nicht zugeordnet werden können
             else {
                 // Attribut am "=" aufsplitten und Attributnamen herausfiltern
                 $equalpos = strpos($attribute, "=");
@@ -664,13 +655,13 @@ class Syntax {
                 if ($USER_SYNTAX->keyExists($attribute)) {
                     // Platzhalter {VALUE} im definierten Syntaxelement ersetzen
                     $replacetext = str_replace("{VALUE}", $value, replacePlaceholders($USER_SYNTAX->get($attribute),"", ""));
-                    /* 
-                    //Einfach Kommentarzeichen entfernen, wenn folgende Funktionalit�t gew�nscht ist:
-                    // Platzhalter {DESCRIPTION} wird durch $value ersetzt, wenn $description selbst leer ist
-                    if ($description == "")
-                        $replacetext = str_replace("{DESCRIPTION}", $value, $replacetext);
-                    else
-                    */
+	                    /* 
+	                    //Einfach Kommentarzeichen entfernen, wenn folgende Funktionalität gewünscht ist:
+	                    // Platzhalter {DESCRIPTION} wird durch $value ersetzt, wenn $description selbst leer ist
+	                    if ($description == "")
+	                        $replacetext = str_replace("{DESCRIPTION}", $value, $replacetext);
+	                    else
+	                    */
                         // Platzhalter {DESCRIPTION} im definierten Syntaxelement durch die Beschreibung ersetzen
                         $replacetext = str_replace("{DESCRIPTION}", $description, $replacetext);
 
@@ -696,14 +687,14 @@ class Syntax {
             $content = preg_replace('/(\r\n|\r|\n)/', '$1<br />', $content);
             // Zeilenwechsel nach Blockelementen entfernen
             // Tag-Beginn                                       <
-            // optional: Slash bei schlie�enden Tags            (\/?)
+            // optional: Slash bei schließenden Tags            (\/?)
             // Blockelemente                                    (address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)
             // optional: sonstige Zeichen (z.B. Attribute)      ([^>]*)
             // Tag-Ende                                         >
             // optional: Zeilenwechsel                          (\r\n|\r|\n)?
-            // <br /> mit oder ohne Slash (das, was raus mu�!)  <br \/? >
+            // <br /> mit oder ohne Slash (das, was raus muß!)  <br \/? >
             $content = preg_replace('/<(\/?)(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)([^>]*)>(\r\n|\r|\n)?<br \/?>/', "<$1$2$3>$4",$content);
-            // direkt aufeinanderfolgende Listen zusammenf�hren
+            // direkt aufeinanderfolgende Listen zusammenführen
             $content = preg_replace('/<\/ul>(\r\n|\r|\n)?<ul>/', '', $content);
             // direkt aufeinanderfolgende numerierte Listen zusammenf�hren
             $content = preg_replace('/<\/ol>(\r\n|\r|\n)?<ol>/', '', $content);
@@ -714,8 +705,8 @@ class Syntax {
         // Zeilenwechsel in HTML-Tags wiederherstellen    
         $content = preg_replace('/{newline_in_html_tag}/', "\n", $content);
 
-        // Konvertierten Seiteninhalt zur�ckgeben
-    return $content;
+        // Konvertierten Seiteninhalt zurückgeben
+        return $content;
     }
 
     
@@ -732,14 +723,14 @@ class Syntax {
     
 
 // ------------------------------------------------------------------------------
-// Inhaltsverzeichnis aus den �bergebenen �berschrift-Infos aufbauen
+// Inhaltsverzeichnis aus den übergebenen Überschrift-Infos aufbauen
 // ------------------------------------------------------------------------------
     function getToC($pagerequest) {
         global $language;
         $tableofcontents = "<div class=\"tableofcontents\">";
         if (count($this->headlineinfos) > 1) {
             $tableofcontents .= "<ul>";
-            // Schleife �ber �berschriften-Array (0 ist der Seitenanfang - auslassen)
+            // Schleife über Überschriften-Array (0 ist der Seitenanfang - auslassen)
             for ($toc_counter=1; $toc_counter < count($this->headlineinfos); $toc_counter++) {
                 $link = "<a class=\"page\" href=\"#a$toc_counter\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_anchor_goto_1", $this->headlineinfos[$toc_counter][1])).">".$this->headlineinfos[$toc_counter][1]."</a>";
                 if ($this->headlineinfos[$toc_counter][0] >= "2") {
@@ -763,24 +754,23 @@ class Syntax {
     }
 
 // ------------------------------------------------------------------------------
-// Hilfsfunktion: �berschrift-Infos einlesen
+// Hilfsfunktion: Überschrift-Infos einlesen
 // ------------------------------------------------------------------------------
     function getHeadlineInfos($content) {
         global $language;
-        // "absatz"-Links vorbereiten: Alle �berschriften einlesen
+        // "absatz"-Links vorbereiten: Alle Überschriften einlesen
         preg_match_all("/\[(ueber([\d]))\|([^\[\]]+)\]/", $content, $matches);
-        // $headlines besteht aus Arrays, die zwei Werte beinhalten: �berschriftstyp (1/2/3) und Wert
+        // $headlines besteht aus Arrays, die zwei Werte beinhalten: Überschriftstyp (1/2/3) und Wert
         $headlines = array();
         $headlines[0] = array("0", $language->getLanguageValue0("anchor_top_0"));
 
         $i = 0;
         foreach ($matches[0] as $match) {
-            // gefundene �berschriften im Array $headlines merken
+            // gefundene Überschriften im Array $headlines merken
             $headlines[$i+1] = (array($matches[2][$i], $matches[3][$i]));
             //echo ($i+1) ." >>> ". $matches[2][$i].", ".$matches[3][$i]."<hr>";
             $i++;
         }
-        
         return $headlines;
     }
 
@@ -798,7 +788,7 @@ class Syntax {
         $content = preg_replace("/&amp;#092;/Umsi", "&#092;", $content);
         $content = preg_replace("/\^(.)/Umsie", "'&#'.ord('\\1').';'", $content);
         $content = $specialchars->numeric_entities_decode($content); 
-        // F�r Einr�ckungen
+        // Für Einrückungen
         $content = str_replace("  ","&nbsp;&nbsp;",$content);
 
         // Platzhalter ersetzen
