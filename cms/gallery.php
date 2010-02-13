@@ -13,7 +13,7 @@
 INHALT
 ######
         
-        Projekt "Flatfile-basiertes CMS fï¿½r Einsteiger"
+        Projekt "Flatfile-basiertes CMS für Einsteiger"
         Mai 2006
         Klasse ITF04-1
         Industrieschule Chemnitz
@@ -23,7 +23,7 @@ INHALT
         Oliver Lorenz
         www.mozilo.de
 
-        Dieses Dokument ist die Galeriefunktion fï¿½r
+        Dieses Dokument ist die Galeriefunktion für
         moziloCMS.
         
 ######
@@ -31,7 +31,7 @@ INHALT
 
 if(!isset($BASE_DIR)) {
     $CMS_DIR_NAME = "cms";
-    $BASE_DIR = str_replace("/".$CMS_DIR_NAME,"/",getcwd());
+    $BASE_DIR = getcwd()."/../";
     $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
 }
 $CHARSET = 'UTF-8';
@@ -42,7 +42,7 @@ $GALLERY_CONF = new Properties($BASE_DIR_CMS."conf/gallery.conf");
 $VERSION_CONF = new Properties($BASE_DIR_CMS."conf/version.conf");
 $specialchars = new SpecialChars();
 
-// Initial: Fehlerausgabe unterdrï¿½cken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
+// Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 @ini_set("display_errors", 0);
 
 require_once($BASE_DIR_CMS."Language.php");
@@ -79,7 +79,7 @@ if ($WEBSITE_TITLE == "")
     $CSS_FILE       = $LAYOUT_DIR_URL."/css/style.css";
     $FAVICON_FILE   = $LAYOUT_DIR_URL."/favicon.ico";
 
-// ï¿½bergebene Parameter ï¿½berprï¿½fen
+// Übergebene Parameter überprüfen
 #$GAL_REQUEST = htmlentities($_GET['gal'],ENT_COMPAT,'ISO-8859-1');
 $GAL_REQUEST = $specialchars->replaceSpecialChars($_GET['gal'],false);
 $DIR_GALLERY = "galerien/".$GAL_REQUEST."/";
@@ -153,7 +153,7 @@ echo $HTML;
         $template = fread($file, filesize($TEMPLATE_FILE));
         fclose($file);
         
-        // Platzhalter des Templates mit Inhalt fï¿½llen
+        // Platzhalter des Templates mit Inhalt füllen
         $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $template);
         $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
         $HTML = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR_URL, $HTML);
@@ -185,7 +185,7 @@ echo $HTML;
     
     
 // ------------------------------------------------------------------------------
-// Galeriemenï¿½ erzeugen
+// Galeriemenü erzeugen
 // ------------------------------------------------------------------------------
     function getGalleryMenu() {
         global $ALLINDEXES;
@@ -211,7 +211,7 @@ echo $HTML;
         $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$FIRST\" class=\"$linkclass\">".$language->getLanguageValue0("message_firstimage_0")."</a></li>";
         // Link "Voriges Bild"
         $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$BEFORE\" class=\"detailmenu\">".$language->getLanguageValue0("message_previousimage_0")."</a></li>";
-        // Link "Nï¿½chstes Bild"
+        // Link "Nächstes Bild"
         $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$NEXT\" class=\"detailmenu\">".$language->getLanguageValue0("message_nextimage_0")."</a></li>";
         // Link "Letztes Bild"
         if ($INDEX == $LAST)
@@ -219,13 +219,13 @@ echo $HTML;
         else
             $linkclass = "gallerymenu";
         $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"gallery.php?gal=$GAL_REQUEST&amp;index=$LAST\" class=\"$linkclass\">".$language->getLanguageValue0("message_lastimage_0")."</a></li>";
-        // Rï¿½ckgabe des Menï¿½s
+        // Rückgabe des Menüs
         return $gallerymenu."</ul>";
     }
     
     
 // ------------------------------------------------------------------------------
-// Nummernmenï¿½ erzeugen
+// Nummernmenü erzeugen
 // ------------------------------------------------------------------------------
     function getNumberMenu() {
         global $CMS_CONF;
@@ -246,13 +246,13 @@ echo $HTML;
             else
                     $numbermenu .= "<a href=\"gallery.php?gal=".$GAL_REQUEST."&amp;index=".$i."\">".$i."</a> | ";
         }
-        // Rï¿½ckgabe des Menï¿½s
+        // Rückgabe des Menüs
         return substr($numbermenu, 0, strlen($numbermenu)-2);
     }
     
 
 // ------------------------------------------------------------------------------
-// Nummernmenï¿½ erzeugen
+// Nummernmenü erzeugen
 // ------------------------------------------------------------------------------
     function getThumbnails() {
         global $DIR_GALLERY;
@@ -291,7 +291,7 @@ echo $HTML;
             $i++;
         }
         $thumbs .= "</tr></table>";
-        // Rï¿½ckgabe der Thumbnails
+        // Rückgabe der Thumbnails
         return $thumbs;
     }
     
@@ -310,9 +310,9 @@ echo $HTML;
         // Keine Bilder im Galerieverzeichnis?
         if (count($PICARRAY) == 0)
             return "&nbsp;";
-        // Link zur Vollbildansicht ï¿½ffnen
+        // Link zur Vollbildansicht öffnen
         $currentpic = "<a href=\"".$URL_BASE.$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $PICARRAY[$INDEX-1])."\">";
-        // Bilder fï¿½r die Anzeige skalieren
+        // Bilder für die Anzeige skalieren
         if (extension_loaded('gd')) {
             $size = getimagesize("../".$DIR_GALLERY.$PICARRAY[$INDEX-1]);
             $w = $size[0];
@@ -322,7 +322,7 @@ echo $HTML;
                 $w=$MAX_IMG_WIDTH;
                 $h=round(($MAX_IMG_WIDTH*$size[1])/$size[0]);
             }
-            // Hï¿½he skalieren
+            // Höhe skalieren
             if ($h > $MAX_IMG_HEIGHT){
                 $h=$MAX_IMG_HEIGHT;
                 $w=round(($MAX_IMG_HEIGHT*$size[0])/$size[1]);
@@ -331,9 +331,9 @@ echo $HTML;
         }
         else
             $currentpic .= "<img src=\"".$URL_BASE.$DIR_GALLERY.$PICARRAY[$INDEX-1]."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $PICARRAY[$INDEX-1])."\"  style=\"max-width:".$MAX_IMG_WIDTH."px;max-height:".$MAX_IMG_HEIGHT."px;\" />";
-            // Link zur Vollbildansicht schlieï¿½en
+            // Link zur Vollbildansicht schließen
             $currentpic .= "</a>";
-        // Rï¿½ckgabe des Bildes
+        // Rückgabe des Bildes
         return $currentpic;
     }
     
@@ -375,16 +375,16 @@ echo $HTML;
     
     
 // ------------------------------------------------------------------------------
-// Auslesen des ï¿½bergebenen Galerieverzeichnisses, Rï¿½ckgabe als Array
+// Auslesen des übergebenen Galerieverzeichnisses, Rückgabe als Array
 // ------------------------------------------------------------------------------
 function getPicsAsArray($dir, $filetypes) {
     $picarray = array();
     $currentdir = opendir($dir);
-    // Alle Dateien des ï¿½bergebenen Verzeichnisses einlesen...
+    // Alle Dateien des übergebenen Verzeichnisses einlesen...
     while ($file = readdir($currentdir)){
-        // ...ï¿½berprï¿½fen, ob die aktuelle Datei weder "." noch ".." ist und eine erlaubte Endung besitzt (Array "$filetypes")
+        // ...überprüfen, ob die aktuelle Datei weder "." noch ".." ist und eine erlaubte Endung besitzt (Array "$filetypes")
         if (($file <> ".") && ($file <> "..") && (in_array(strtolower(substr(strrchr($file, "."), 1, strlen(strrchr($file, "."))-1)), $filetypes))) {
-            // ...wenn alles paï¿½t, ans Bilder-Array anhï¿½ngen
+            // ...wenn alles paßt, ans Bilder-Array anhängen
             array_push($picarray, $file);
         }
     }
@@ -395,7 +395,7 @@ function getPicsAsArray($dir, $filetypes) {
 
 
 // ------------------------------------------------------------------------------
-// Rï¿½ckgabe des Website-Titels
+// Rückgabe des Website-Titels
 // ------------------------------------------------------------------------------
     function getWebsiteTitle($websitetitle, $cattitle, $pagetitle) {
         global $CMS_CONF;
