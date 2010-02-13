@@ -68,7 +68,7 @@ function getDirs($dir,$complet = false,$exclude_link = false)
  --------------------------------------------------------------------------------*/
 function getFiles($dir, $excludeextension)
 {
-    $dir = stripslashes($dir);
+    //$dir = stripslashes($dir);
     $files = array();
     $handle = opendir($dir);
     while($file = readdir($handle)) {

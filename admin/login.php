@@ -13,7 +13,7 @@ $CHARSET = 'UTF-8';
 
 if(!isset($BASE_DIR)) {
     $ADMIN_DIR_NAME = "admin";
-    $BASE_DIR = str_replace("/".$ADMIN_DIR_NAME,"/",getcwd());
+    $BASE_DIR = getcwd().'/../';
     $BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
     $CMS_DIR_NAME = "cms";
     $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
@@ -25,7 +25,7 @@ require_once($BASE_DIR_ADMIN."filesystem.php");
 // Session starten!
 session_start();
 
-// Initial: Fehlerausgabe unterdr�cken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
+// Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 @ini_set("display_errors", 0);
 
 // Initialisierungen
@@ -45,7 +45,7 @@ $FALSELOGINLIMIT = 3;
 $LOGINLOCKTIME = 10;
 
 
-// �berpr�fen: Existiert ein Benutzer? Wenn nicht: admin:install anlegen
+// Überprüfen: Existiert ein Benutzer? Wenn nicht: admin:install anlegen
 if (($logindataconf->get("name") == "") || ($logindataconf->get("pw") == "")) {
     $logindataconf->set("name", "admin");
     $logindataconf->set("pw", $pwcrypt->encrypt("install"));
@@ -55,14 +55,14 @@ if (($logindataconf->get("name") == "") || ($logindataconf->get("pw") == "")) {
 $HTML = "<!doctype html public \"-//W3C//DTD HTML 4.0 //EN\"><html>";
 // User hat sich ausgeloggt
 if (isset($_POST['logout'])) {
-    // Session beenden und die Sessiondaten l�schen
+    // Session beenden und die Sessiondaten löschen
     session_destroy();
     unset($_SESSION);
 }
 
 // Wurde das Anmeldeformular verschickt?
 if  (isset($_POST['login'])) {
-    // Zugangsdaten pr�fen
+    // Zugangsdaten prüfen
         if (checkLoginData($_POST['username'], $_POST['password'])) {
             // Daten in der Session merken
       $_SESSION['username'] = $_POST['username'];
@@ -72,7 +72,7 @@ if  (isset($_POST['login'])) {
 
 // Anmeldung erfolgreich
 if (isset($_SESSION['login_okay']) and $_SESSION['login_okay']) {
-    // Counter f�r falsche Logins innerhalb der Sperrzeit zur�cksetzen
+    // Counter für falsche Logins innerhalb der Sperrzeit zurücksetzen
     $logindataconf->set("falselogincounttemp", 0);
     // ...ab in den Admin!
     header("location:index.php");
@@ -80,11 +80,11 @@ if (isset($_SESSION['login_okay']) and $_SESSION['login_okay']) {
 
 // Anmeldung fehlerhaft
 elseif  (isset($_POST['login'])) {
-    // Counter hochz�hlen
+    // Counter hochzählen
     $falselogincounttemp = ($logindataconf->get("falselogincounttemp"))+1;
-    $logindataconf->set("falselogincounttemp", $falselogincounttemp); // Z�hler f�r die aktuelle Sperrzeit
+    $logindataconf->set("falselogincounttemp", $falselogincounttemp); // Zähler für die aktuelle Sperrzeit
     $falselogincount = ($logindataconf->get("falselogincount"))+1;
-    $logindataconf->set("falselogincount", $falselogincount); // Gesamtz�hler
+    $logindataconf->set("falselogincount", $falselogincount); // Gesamtzähler
     $icon_size = "24x24";
     $HTML .= "<head>"
         ."<link rel=\"stylesheet\" href=\"adminstyle.css\" type=\"text/css\" />"
@@ -103,7 +103,7 @@ elseif  (isset($_POST['login'])) {
                 .$_SERVER['REMOTE_ADDR']." / ".gethostbyaddr($_SERVER['REMOTE_ADDR'])."\r\n"
                 .getLanguageValue("username").": ".$_POST['username'];
                 
-                // Pr�fen ob die Mail-Funktion vorhanden ist
+                // Prüfen, ob die Mail-Funktion vorhanden ist
                 if($mailfunctions->isMailAvailable())
                 {
                     $mailfunctions->sendMailToAdmin(getLanguageValue("loginlocked_mailsubject"), $mailcontent);
@@ -131,7 +131,7 @@ else {
             // gesperrtes Formular anzeigen
             $HTML .= login_formular(false);
         } else {
-            // Z�hler zur�cksetzen
+            // Zähler zurücksetzen
             $logindataconf->set("falselogincounttemp", 0);
             // normales Formular anzeigen
             $HTML .= login_formular(true);
@@ -192,7 +192,7 @@ function login_formular($enabled) {
     return $form;
 }
 
-// Logindaten �berpr�fen
+// Logindaten überprüfen
 function checkLoginData($user, $pass)
 {
     global $logindataconf;

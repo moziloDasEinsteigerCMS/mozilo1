@@ -15,11 +15,11 @@ $ADMIN_TITLE = "moziloAdmin";
 #$CHARSET = 'ISO-8859-1';
 $CHARSET = 'UTF-8';
 $ADMIN_DIR_NAME = "admin";
-$BASE_DIR = str_replace("/".$ADMIN_DIR_NAME,"/",getcwd());
+$BASE_DIR = getcwd().'/../';
 $CMS_DIR_NAME = "cms";
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
 $BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
-$URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("admin/index.php")));
+$URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen($ADMIN_DIR_NAME."/index.php")));
 
 
 $debug = "ja"; # ja oder nein
