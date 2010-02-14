@@ -439,9 +439,9 @@ function home($post) {
     
     $pagecontent = NULL;
     if(isset($_REQUEST['link']) and $_REQUEST['link'] == "rewrite") {
-        $modrewrite = '<span style="color:#00ff00;font-weight:bold;">'.getLanguageValue("home_messages_mod_rewrite").'</span>';
+        $modrewrite = getLanguageValue("home_messages_mod_rewrite");
     } else {
-        $modrewrite = '<span style="color:#ff0000;font-weight:bold;">'.getLanguageValue("home_error_mod_rewrite").'</span>';
+        $modrewrite = getLanguageValue("home_error_mod_rewrite");
     }
     $safemode = getLanguageValue("no");
     if(ini_get('safe_mode')) {
