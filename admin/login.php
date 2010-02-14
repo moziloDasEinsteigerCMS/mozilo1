@@ -13,7 +13,7 @@ $CHARSET = 'UTF-8';
 
 if(!isset($BASE_DIR)) {
     $ADMIN_DIR_NAME = "admin";
-    $BASE_DIR = getcwd().'/../';
+    $BASE_DIR = str_replace("/".$ADMIN_DIR_NAME,"/",getcwd());
     $BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
     $CMS_DIR_NAME = "cms";
     $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
