@@ -82,8 +82,8 @@ $CHARSET = 'UTF-8';
         $USE_CMS_SYNTAX = false;
         
     // Request-Parameter einlesen und dabei absichern
-    $CAT_REQUEST_URL = $specialchars->replaceSpecialChars(getRequestParam('cat', true),false);
-    $PAGE_REQUEST_URL = $specialchars->replaceSpecialChars(getRequestParam('page', true),false);
+    $CAT_REQUEST_URL = $specialchars->replaceSpecialChars(getRequestParam('cat', false),false);
+    $PAGE_REQUEST_URL = $specialchars->replaceSpecialChars(getRequestParam('page', false),false);
     $ACTION_REQUEST = getRequestParam('action', true);
     $QUERY_REQUEST = getRequestParam('query', true);
     $HIGHLIGHT_REQUEST = getRequestParam('highlight', false);
