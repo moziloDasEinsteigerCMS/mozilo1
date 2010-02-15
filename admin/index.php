@@ -3356,11 +3356,9 @@ function admin($post) {
             # Allles gut Speichen
             } else {
                 # initialsetub sachen speichern
-                if($LOGINCONF->get("initialsetup") == "true") {
-                    $LOGINCONF->set("initialsetup", "false");
-                    $LOGINCONF->set("initialpw", "false");
-                    $ADMIN_CONF->set('lastbackup', time());
-                }
+                $LOGINCONF->set("initialsetup", "false");
+                $LOGINCONF->set("initialpw", "false");
+                $ADMIN_CONF->set('lastbackup', time());
                 $LOGINCONF->set("name", $post['newname']);
                 $LOGINCONF->set("pw", $pwcrypt->encrypt($post['newpw']));
                 $post['messages']['pw_messages_changes'][] = NULL;
