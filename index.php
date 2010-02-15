@@ -312,28 +312,10 @@ $CHARSET = 'UTF-8';
     if(strpos($HTML,'{SEARCH}') !== false)
         $HTML = preg_replace('/{SEARCH}/', getSearchForm(), $HTML);
 
-    $lastchangeinfo = getLastChangedContentPageAndDate();
     // Letzte Aenderung (obsolet seit 1.12 - nur aus Gründen der Abwärtskompatibilität noch dabei) 
     if(strpos($HTML,'{LASTCHANGE}') !== false) {
         $HTML = preg_replace('/{LASTCHANGE}/', $language->getLanguageValue0("message_lastchange_0")." ".$lastchangeinfo[1]." (".$lastchangeinfo[2].")", $HTML); 
     }
-    // Text "Zuletzt geändert"
-    if(strpos($HTML,'{LASTCHANGEDTEXT}') !== false) {
-        $HTML = preg_replace('/{LASTCHANGEDTEXT}/', $language->getLanguageValue0("message_lastchange_0"), $HTML);
-    }
-    // Zuletzt geänderte Seite
-    if(strpos($HTML,'{LASTCHANGEDPAGE}') !== false) {
-        $HTML = preg_replace('/{LASTCHANGEDPAGE}/', $lastchangeinfo[0], $HTML);
-    }
-    // Kompletter Link auf die zuletzt geänderte Seite
-    if(strpos($HTML,'{LASTCHANGEDPAGELINK}') !== false) {
-        $HTML = preg_replace('/{LASTCHANGEDPAGELINK}/', $lastchangeinfo[1], $HTML);
-    }
-    // Datum der letzten Änderung
-    if(strpos($HTML,'{LASTCHANGEDATE}') !== false) {
-        $HTML = preg_replace('/{LASTCHANGEDATE}/', $lastchangeinfo[2], $HTML);
-    }
-    
     
     // Sitemap-Link
     $HTML = preg_replace('/{SITEMAPLINK}/', "<a href=\"".$URL_BASE."index.php?action=sitemap\" id=\"sitemaplink\"".getTitleAttribute($language->getLanguageValue0("tooltip_showsitemap_0")).">".$language->getLanguageValue0("message_sitemap_0")."</a>", $HTML);
