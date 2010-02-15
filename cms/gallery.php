@@ -31,7 +31,7 @@ INHALT
 
 if(!isset($BASE_DIR)) {
     $CMS_DIR_NAME = "cms";
-    $BASE_DIR = getcwd()."/../";
+    $BASE_DIR = str_replace($CMS_DIR_NAME,"",getcwd());
     $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
 }
 $CHARSET = 'UTF-8';
@@ -68,7 +68,7 @@ $WEBSITE_TITLE            = $specialchars->rebuildSpecialChars($CMS_CONF->get("w
 if ($WEBSITE_TITLE == "")
     $WEBSITE_TITLE = "Titel der Website";
 
-    $URL_BASE = NULL;
+    $URL_BASE = "../";
     if($CMS_CONF->get("modrewrite") == "true") {
         $URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen($CMS_DIR_NAME."/gallery.php")));
     }
