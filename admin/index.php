@@ -3227,6 +3227,9 @@ function admin($post) {
 
     if($LOGINCONF->get("initialsetup") == "true") {
         $post['messages']['initialsetup'][] = NULL;
+        if(strpos("tmp".$_SERVER['QUERY_STRING'],"action") > 0) {
+            $post['error_messages']['initialsetup_error'][] = NULL;
+        }
     }
 
     // Auswertung des Formulars
