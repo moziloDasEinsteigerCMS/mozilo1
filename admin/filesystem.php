@@ -19,11 +19,13 @@ require_once($BASE_DIR_CMS."Properties.php");
  @author: Oliver Lorenz
  Liest aus dem Language-File eine Bistimmte Variable    aus.
  --------------------------------------------------------------------------------*/
-function getLanguageValue($confpara)
+function getLanguageValue($confpara,$title = false)
 {
     global $BASIC_LANGUAGE;
     global $CHARSET;
-
+    if(isset($_REQUEST['javascript']) and $title) {
+        return NULL;
+    }
     $text = htmlentities($BASIC_LANGUAGE->get($confpara),ENT_COMPAT,$CHARSET);
     if(empty($text)) {
         return "FEHLER = ".$confpara;

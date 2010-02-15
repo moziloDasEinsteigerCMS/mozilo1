@@ -297,8 +297,8 @@ $html .= '<table width="90%" cellspacing="0" border="0" cellpadding="0" id="tabl
 $html .= '<tr><td width="100%" id="td_title">';
 $html .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" id="table_titel">';
 $html .= '<tr><td id="td_table_titel_text">'.$ADMIN_TITLE.' - '.$pagetitle.'</td>';
-$html .= '<td width="'.$width_height.'" height="'.$width_height.'"'.$tooltip_help_website_button.' nowrap><form class="form" accept-charset="'.$CHARSET.'" action="../index.php" method="post" target="_blank"><input class="input_img_button" type="image" value="'.getLanguageValue("website_button").'" src="gfx/icons/'.$icon_size.'/website.png" title="'.getLanguageValue("help_website_button").'"'.$tooltip_help_website_button.'></form></td>';
-$html .= '<td width="'.$width_height.'" height="'.$width_height.'" id="td_table_titel_logout" nowrap><form class="form" accept-charset="'.$CHARSET.'" action="login.php" method="post"><input id="design_logout" class="input_img_button" type="image" name="logout" value="'.getLanguageValue("logout_button").'&nbsp;" accesskey="x" src="gfx/icons/'.$icon_size.'/logout.png" title="'.getLanguageValue("help_logout_button").'"'.$tooltip_help_logout_button.'></form></td></tr>';
+$html .= '<td width="'.$width_height.'" height="'.$width_height.'"'.$tooltip_help_website_button.' nowrap><form class="form" accept-charset="'.$CHARSET.'" action="../index.php" method="post" target="_blank"><input class="input_img_button" type="image" value="'.getLanguageValue("website_button").'" src="gfx/icons/'.$icon_size.'/website.png" title="'.getLanguageValue("help_website_button",true).'"'.$tooltip_help_website_button.'></form></td>';
+$html .= '<td width="'.$width_height.'" height="'.$width_height.'" id="td_table_titel_logout" nowrap><form class="form" accept-charset="'.$CHARSET.'" action="login.php" method="post"><input id="design_logout" class="input_img_button" type="image" name="logout" value="'.getLanguageValue("logout_button").'&nbsp;" accesskey="x" src="gfx/icons/'.$icon_size.'/logout.png" title="'.getLanguageValue("help_logout_button",true).'"'.$tooltip_help_logout_button.'></form></td></tr>';
 $html .= '</table>';
 
 $html .= "</td></tr>";
@@ -306,27 +306,6 @@ $html .= '<tr><td width="100%" id="td_tabs">';
 
 $html .= '<table width="100%" id="table_buttons" cellspacing="0" cellpadding="0" border="0">';
 $html .= '<tr>';
-/*
-# Menue Tabs erzeugen
-foreach($array_tabs as $position => $language) {
-    if($ADMIN_CONF->get("showTooltips") == "true") {
-        $tooltip = createTooltipWZ($language."_button",$language."_text",",WIDTH,400");
-    } else {
-        $tooltip = NULL;
-    }
-
-    # IE button bug deshalb name=action_1 ...
-    if($action == $language) $activ = "_activ"; else $activ = NULL;
-    $html .= '<td width="2%" class="td_button'.$activ.'" nowrap>';
-    $html .= '<form class="form" accept-charset="'.$CHARSET.'" action="index.php" method="post">';
-#    $html .= '<script type="text/javascript">document.write(\'<input type="hidden" name="javascript" value="ja">\');</script>';
-    $html .= '<button class="button_tab'.$activ.'" type="submit" name="action_'.$position.'" value="'.getLanguageValue($language."_button").'" title="'.getLanguageValue($language."_button").'"'.$tooltip.'>';
-    $html .= '<table width="50%" class="button_tab_inhalt'.$activ.'" cellspacing="0" cellpadding="0" border="0"><tr><td width="2%" class="button_tab_icon"><img src="gfx/icons/'.$icon_size.'/'.$language.'.png" alt="" width="24" height="24" hspace="0" vspace="0" border="0"></td><td width="98%" class="button_tab_text">'.getLanguageValue($language."_button").'</td></tr></table>';
-    $html .= '</button>';
-    $html .= '</form>';
-    $html .= '</td>';
-
-}*/
 
 # Menue Tabs erzeugen
 foreach($array_tabs as $position => $language) {
@@ -337,7 +316,7 @@ foreach($array_tabs as $position => $language) {
     }
     if($action == $language) $activ = "_activ"; else $activ = NULL;
     $html .= '<td align="left" valign="bottom" width="2%" class="td_button'.$activ.'" nowrap'.$tooltip.'>';
-    $html .= '<a id="tab_'.$position.'" href="index.php?action_'.$position.'='.$language.'" title="'.getLanguageValue($language."_button").'"><img class="tab_img" src="gfx/icons/'.$icon_size.'/'.$language.'.png" alt="" hspace="0" vspace="0" border="0">'.getLanguageValue($language."_button").'</a>';
+    $html .= '<a id="tab_'.$position.'" href="index.php?action_'.$position.'='.$language.'" title="'.getLanguageValue($language."_button",true).'"><img class="tab_img" src="gfx/icons/'.$icon_size.'/'.$language.'.png" alt="" hspace="0" vspace="0" border="0">'.getLanguageValue($language."_button").'</a>';
     $html .= '<script type="text/javascript">document.getElementById("tab_'.$position.'").href="index.php?action_'.$position.'='.$language.'&javascript=ja";</script>';
     $html .= '</td>';
 # width="24" height="24"
@@ -605,6 +584,7 @@ function category($post) {
     foreach($array_getLanguageValue as $language) {
         ${"text_".$language} = getLanguageValue($language);
     }
+    $title_category_button_delete = getLanguageValue('category_button_delete',true);
 
     $array_getTooltipValue = array("help_new_url","help_target_blank","help_target_self","help_target","help_url",
         "category_help_new_position","category_help_new_name","category_help_position","category_help_delete",
@@ -692,7 +672,7 @@ function category($post) {
         if(isset($post['categories']['cat']['url'][$pos])) {
             $del_dir = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos].$post['categories']['cat']['target'][$pos].$post['categories']['cat']['url'][$pos].$EXT_LINK;
         }
-        $pagecontent .= '<input type="image" class="input_img_button_last" name="action_data[deletecategory]['.$del_dir.']" value="'.$text_category_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$text_category_button_delete.'"'.$tooltip_category_help_delete.'>';
+        $pagecontent .= '<input type="image" class="input_img_button_last" name="action_data[deletecategory]['.$del_dir.']" value="'.$text_category_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$title_category_button_delete.'"'.$tooltip_category_help_delete.'>';
         $pagecontent .= '</td></tr></table></td></tr>';
         $pagecontent .= '<tr>';
         $pagecontent .= '<td width="100%" '.$post['categories']['cat']['error_html']['display'][$pos].'id="toggle_'.$pos.'" align="right" class="td_togglen_padding_bottom">';
@@ -979,6 +959,8 @@ function page($post) {
     foreach($array_getLanguageValue as $language) {
         ${"text_".$language} = getLanguageValue($language);
     }
+    $title_page_button_edit = getLanguageValue('page_button_edit',true);
+    $title_page_button_delete = getLanguageValue('page_button_delete',true);
 
     $array_getTooltipValue = array("help_new_url","help_target_blank","help_target_self","help_target","help_url",
         "page_help_edit","page_help_position","page_help_new_position","page_help_name","page_help_new_name",
@@ -1102,10 +1084,10 @@ function page($post) {
                 $pagecontent .= '<span id="toggle_'.substr($cat,0,2).'_'.$pos.'_linkBild"'.$tooltip_page_help_edit.'></span>';
             }
             if(!isset($post['categories'][$cat]['url'][$pos])) {
-                $pagecontent .= '<input type="image" class="input_img_button" name="action_data[editsite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_edit.'"  src="gfx/icons/'.$icon_size.'/page-edit.png" title="'.$text_page_button_edit.'"'.$tooltip_page_help_editieren.'>';
-                $pagecontent .= '<input type="image" class="input_img_button_last" name="action_data[deletesite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$text_page_button_delete.'"'.$tooltip_page_help_delete.'>';
+                $pagecontent .= '<input type="image" class="input_img_button" name="action_data[editsite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_edit.'"  src="gfx/icons/'.$icon_size.'/page-edit.png" title="'.$title_page_button_edit.'"'.$tooltip_page_help_editieren.'>';
+                $pagecontent .= '<input type="image" class="input_img_button_last" name="action_data[deletesite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$title_page_button_delete.'"'.$tooltip_page_help_delete.'>';
             } else {#'.substr($icon_size,0,2).'
-                $pagecontent .= '<IMG class="input_img_button" src="gfx/clear.gif" alt=" " width="'.substr($icon_size,0,2).'" height="1" hspace="0" vspace="0" border="0"><input type="image" class="input_img_button_last" name="action_data[deletesite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['target'][$pos].$post['categories'][$cat]['url'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$text_page_button_delete.'"'.$tooltip_page_help_delete.'>';
+                $pagecontent .= '<IMG class="input_img_button" src="gfx/clear.gif" alt=" " width="'.substr($icon_size,0,2).'" height="1" hspace="0" vspace="0" border="0"><input type="image" class="input_img_button_last" name="action_data[deletesite]['.$cat.']['.$post['categories'][$cat]['position'][$pos].'_'.$post['categories'][$cat]['name'][$pos].$post['categories'][$cat]['target'][$pos].$post['categories'][$cat]['url'][$pos].$post['categories'][$cat]['ext'][$pos].']" value="'.$text_page_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$title_page_button_delete.'"'.$tooltip_page_help_delete.'>';
             }
             $pagecontent .= '</td></tr></table>';
             $pagecontent .= '</td></tr>';
@@ -2474,7 +2456,7 @@ function files($post) {
     foreach($array_getLanguageValue as $language) {
         ${"text_".$language} = getLanguageValue($language);
     }
-
+    $title_files_button_delete = getLanguageValue('files_button_delete',true);
     $array_getTooltipValue = array("files_help_edit","files_help_delete","files_help_show","files_help_upload",
                             "files_help_downloads","files_help_overwrite");
 
@@ -2595,7 +2577,7 @@ function files($post) {
                 .'<td class="td_left_title_padding_bottom" nowrap><span class="text_info">'.@strftime(getLanguageValue("_dateformat"), $uploadtime).'</span></td>'
                 .'<td class="td_center_title_padding_bottom" nowrap><span class="text_info">'.$downloads." ".$downloadsperdaytext.'</span></td>';
                 $pagecontent .= '<td class="td_left_title_padding_bottom" nowrap>';
-                $pagecontent .= '<input type="image" class="input_img_button_last" name="action_data[deletefile]['.$post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos].']['.$subfile.']" value="'.$text_files_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$text_files_button_delete.'"'.$tooltip_files_help_delete.'>';
+                $pagecontent .= '<input type="image" class="input_img_button_last" name="action_data[deletefile]['.$post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos].']['.$subfile.']" value="'.$text_files_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$title_files_button_delete.'"'.$tooltip_files_help_delete.'>';
                 $pagecontent .= '</td></tr>';
 
                 $hasdata = true;
