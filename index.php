@@ -1425,9 +1425,17 @@ $CHARSET = 'UTF-8';
     function getRequestParam($param, $clean) {
         global $URL_BASE;
         global $CMS_CONF;
+        // Nullbytes abfangen!
+        if (strpos($_SERVER['REQUEST_URI'], "\x00") > 0) {
+            die();
+        }
 
         if(($CMS_CONF->get("modrewrite") == "true") and ($param == "cat" or $param == "page")) {
             $request = NULL;
+            # ein hack für alte links
+            if (isset($_REQUEST[$param])) {
+                return rawurldecode($_REQUEST[$param]);
+            }
             if($param == "cat") {
                 $url_get = str_replace($URL_BASE,"",$_SERVER['REQUEST_URI']);
                 $url_get = str_replace("?".$_SERVER['QUERY_STRING'],"",$url_get);
@@ -1450,10 +1458,6 @@ $CHARSET = 'UTF-8';
             return $request;
         }
         if (isset($_REQUEST[$param])) {
-          // Nullbytes abfangen!
-            if (strpos($_REQUEST[$param], "\x00") > 0) {
-              die();
-          }
             if ($clean) {
                 return cleanInput(rawurldecode($_REQUEST[$param]));
             }
