@@ -907,7 +907,7 @@ function page($post) {
                 $pagecontent .= categoriesMessages($post);
                 $cat = key($post['action_data']['editsite']);
                 $page = $post['action_data']['editsite'][$cat];
-                $pagecontent .= '<span class="titel">'.getLanguageValue("page_edit").' -&gt; </span>'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen($EXT_PAGE))), true, true);
+                $pagecontent .= '<span class="titel">'.getLanguageValue("page_edit").' -&gt; </span>'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen($EXT_PAGE))), true, true).'<br><br>';
                 $pagecontent .= $post['content'];
                 $pagecontent .= '<input type="hidden" name="checkpara" value="no">';
                 return array(getLanguageValue("page_button"), $pagecontent);
@@ -3836,7 +3836,7 @@ function showEditPageForm($cat, $page, $newsite)    {
         $height = 350;
         $ADMIN_CONF->set("textareaheight", $height);
     }
-    $content .= '<textarea cols="96" rows="24" style="height:'.$height.';" name="pagecontent">'.$pagecontent.'</textarea><br />';
+    $content .= '<textarea cols="96" rows="24" style="width:99%;height:'.$height.';" name="pagecontent">'.$pagecontent.'</textarea><br />';
     $content .= '<input type="hidden" name="action_data['.$action.']['.$cat.']['.$page.']" value="'.$action.'" />';
     $content .= '<input type="submit" name="cancel" value="'.getLanguageValue("button_cancel").'" accesskey="a" /> ';
     // Zwischenspeichern-Button nicht beim Neuanlegen einer Inhaltsseite anzeigen
@@ -4005,7 +4005,7 @@ function returnPlatzhalterSelectbox() {
     global $specialchars;
 
     $platzhalter_array = makePlatzhalter();
-    $selectbox = '<select class="usersyntaxselectbox" name="platzhalter" onchange="insertAndResetSelectbox(this);">'
+    $selectbox = '<select class="overviewselect" name="platzhalter" onchange="insertAndResetSelectbox(this);">'
     .'<option class="noaction" value="">'.getLanguageValue("toolbar_platzhalter").'</option>';
     foreach ($platzhalter_array as $value) {
         $language = str_replace(array('{','}'),'',$value);
@@ -4024,7 +4024,7 @@ function returnPluginSelectbox() {
 
     require_once($BASE_DIR_CMS."Plugin.php");
     $plugins = getDirContentAsArray($PLUGIN_DIR_REL, false);
-    $selectbox = '<select class="usersyntaxselectbox" name="plugins" onchange="insertPluginAndResetSelectbox(this);">'
+    $selectbox = '<select class="overviewselect" name="plugins" onchange="insertPluginAndResetSelectbox(this);">'
     .'<option class="noaction" value="">'.getLanguageValue("toolbar_plugins").'</option>';
     foreach ($plugins as $currentplugins) {
         if (file_exists($PLUGIN_DIR_REL.$currentplugins."/index.php")) {
@@ -4053,27 +4053,26 @@ function returnFormatToolbar($currentcat) {
     global $CMS_CONF;
     global $USER_SYNTAX;
 
-    $content = "<div style=\"padding:0px 0px;\">"
     // Information zeigen, wenn JavaScript nicht aktiviert
-    ."<noscript><span class=\"fehler\">".getLanguageValue("toolbar_nojs_text")."</span></noscript>"
-    ."<table>"
+    $content = "<noscript>".returnMessage(false,getLanguageValue("toolbar_nojs_text"))."</noscript>"
+    ."<table width=\"99%\" cellspacing=\"2\" border=\"0\" cellpadding=\"0\">"
     ."<tr>"
     // Überschrift Syntaxelemente
-    ."<td style=\"padding-right:10px;\">"
+    ."<td width=\"59%\" nowrap>"
     .getLanguageValue("toolbar_syntaxelements")
     ."</td>"
     // Überschrift Textformatierung
-    ."<td style=\"padding-left:22px;\">"
+    ."<td width=\"29%\" nowrap>"
     .getLanguageValue("toolbar_textformatting")
     ."</td>"
     // Überschrift Farben
-    ."<td style=\"padding-left:22px;\">"
+    ."<td width=\"11%\" nowrap>"
     .getLanguageValue("toolbar_textcoloring")
     ."</td>"
     ."</tr>"
     ."<tr>"
     // Syntaxelemente
-    ."<td style=\"padding-right:0px;\">"
+    ."<td nowrap>"
     .returnFormatToolbarIcon("link")
     .returnFormatToolbarIcon("mail")
     .returnFormatToolbarIcon("seite")
@@ -4095,7 +4094,7 @@ function returnFormatToolbar($currentcat) {
     .returnFormatToolbarIcon("include")
     ."</td>"
     // Textformatierung
-    ."<td style=\"padding-left:22px;\">"
+    ."<td nowrap>"
     .returnFormatToolbarIcon("links")
     .returnFormatToolbarIcon("zentriert")
     .returnFormatToolbarIcon("block")
@@ -4106,10 +4105,10 @@ function returnFormatToolbar($currentcat) {
     .returnFormatToolbarIcon("durch")
     ."</td>"
     // Farben
-    ."<td style=\"padding-left:22px;\">"
-    ."<table><tr><td>"
+    ."<td nowrap>"
+    ."<table cellspacing=\"0\" border=\"0\" cellpadding=\"0\"><tr><td>"
     ."<img class=\"js\" style=\"background-color:#AA0000\" alt=\"Farbe\" id=\"farbicon\" title=\"[farbe=RRGGBB| ... ] - ".getLanguageValue("toolbar_desc_farbe")."\" src=\"gfx/jsToolbar/farbe.png\" onClick=\"insert('[farbe=' + document.getElementById('farbcode').value + '|', ']', true)\">"
-    ."</td><td>"
+    ."</td><td nowrap>"
     ."<div class=\"colordiv\">"
     ."<input type=\"text\" readonly=\"readonly\" maxlength=\"6\" value=\"AA0000\" class=\"colorinput\" id=\"farbcode\" size=\"0\">"
     ."<img class=\"colorimage\" src=\"js_color_picker_v2/images/select_arrow.gif\" onmouseover=\"this.src='js_color_picker_v2/images/select_arrow_over.gif'\" onmouseout=\"this.src='js_color_picker_v2/images/select_arrow.gif'\" onclick=\"showColorPicker(this,document.getElementById('farbcode'))\" alt=\"...\" title=\"Farbauswahl\" />"
@@ -4118,35 +4117,31 @@ function returnFormatToolbar($currentcat) {
     ."</td>"
     ."</tr>"
     ."</table>"
-    ."<table>"
+    ."<table width=\"99%\" cellspacing=\"2\" border=\"0\" cellpadding=\"0\">"
     ."<tr>";
 
     // Benutzerdefinierte Syntaxelemente vorbereiten
     $usersyntaxarray = $USER_SYNTAX->toArray();
 
     // Überschrift Inhalte
-    $content .=    "<td>"
+    $content .=    "<td width=\"66%\" colspan=\"3\">"
     .getLanguageValue("toolbar_contents")
     ."</td>";
     // Überschrift Benutzerdefinierte Syntaxelemente
     if (count($usersyntaxarray) > 0) {
-        $content .=    "<td style=\"padding-left:22px;\">"
+        $content .=    "<td width=\"33%\">"
         .getLanguageValue("toolbar_usersyntax")
         ."</td>";
     }
     $content .= "</tr>"
     ."<tr>"
     // Inhalte
-    ."<td>"
-    .returnOverviewSelectbox(1, $currentcat)
-    ."&nbsp;"
-    .returnOverviewSelectbox(2, $currentcat)
-    ."&nbsp;"
-    .returnOverviewSelectbox(3, $currentcat)
-    ."</td>";
+    ."<td width=\"22%\">".returnOverviewSelectbox(1, $currentcat)."</td>"
+    ."<td width=\"22%\">".returnOverviewSelectbox(2, $currentcat)."</td>"
+    ."<td width=\"22%\">".returnOverviewSelectbox(3, $currentcat)."</td>";
     // Benutzerdefinierte Syntaxelemente
     if (count($usersyntaxarray) > 0) {
-        $content .=    "<td style=\"padding-left:22px;\">"
+        $content .=    "<td>"
         .returnUserSyntaxSelectbox()
         ."</td>";
     }
@@ -4155,12 +4150,15 @@ function returnFormatToolbar($currentcat) {
 
     // Smileys
     if ($CMS_CONF->get("replaceemoticons") == "true") {
-        $content .= "<table><tr><td>".returnSmileyBar()."</td></tr></table>";
+        $content .= "<table width=\"33%\" cellspacing=\"2\" border=\"0\" cellpadding=\"0\"><tr><td nowrap>".returnSmileyBar()."</td></tr></table>";
     }
     # Plugins
-    $content .= "<table><tr><td>".returnPluginSelectbox().'</td><td style="padding-left:22px;">'.returnPlatzhalterSelectbox()."</td></tr></table>";
+    $content .= '<table width="66%" cellspacing="2" border="0" cellpadding="0">'
+                .'<tr><td width="66%" colspan="2">'.getLanguageValue("toolbar_platzhalter").'</td></tr>'
+                .'<tr><td width="33%">'.returnPluginSelectbox().'</td>'
+                .'<td width="33%">'.returnPlatzhalterSelectbox().'</td>'
+                .'</tr></table>';
 
-    $content .= "</div>";
     return $content;
 }
 

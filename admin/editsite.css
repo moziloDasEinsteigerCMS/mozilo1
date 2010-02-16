@@ -71,23 +71,10 @@ select.overviewselect, select.usersyntaxselectbox {
 	border:1px solid #C0C0C0;
     height:18px;
     font-size:0.9em;
-    max-width:150px;
+    width:90%;
 } 
-select.usersyntaxselectbox {
-    max-width:200px;
-}
 
-.fehler
-{
-	display:block;
-	margin:10px;
-	color:#aa0000;
-	border: 1px solid;
-	padding: 5px;
-	padding-left:30px;
-	font-weight: bolder;
-	background-color:#FFDDDD;
-	background-image:url('gfx/msg_error.png');
-	background-position:5px 5px;
-	background-repeat:no-repeat;
-}
+select.usersyntaxselectbox {
+    width:100%;
+} 
+
