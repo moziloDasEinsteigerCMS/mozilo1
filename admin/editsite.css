@@ -65,10 +65,9 @@ option.noaction {
 option.hasaction {
 }
 select.overviewselect, select.usersyntaxselectbox {
-    margin-top: -2px;
     margin-bottom: 0px;
-	font-size:12px;
-	border:1px solid #C0C0C0;
+	  font-size:12px;
+	  border:1px solid #C0C0C0;
     height:18px;
     font-size:0.9em;
     width:90%;
