@@ -417,11 +417,11 @@ function home($post) {
     global $MAILFUNCTIONS;
     
     $pagecontent = NULL;
+    $modrewrite = getLanguageValue("home_error_mod_rewrite");
     if(isset($_REQUEST['link']) and $_REQUEST['link'] == "rewrite") {
         $modrewrite = getLanguageValue("home_messages_mod_rewrite");
-    } else {
-        $modrewrite = getLanguageValue("home_error_mod_rewrite");
     }
+
     $safemode = getLanguageValue("no");
     if(ini_get('safe_mode')) {
         $post['error_messages']['home_error_safe_mode'][] = NULL;
