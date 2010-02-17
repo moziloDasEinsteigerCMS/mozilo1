@@ -315,8 +315,7 @@ class Syntax {
                         }
                     }
                     closedir($handle);
-                    $modrewrite_dumy = NULL;
-                    $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE.$CMS_DIR_NAME."/gallery.php$modrewrite_dumy?gal=$cleanedvalue\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"_blank\">$link_text</a>", $content);
+                    $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE.$CMS_DIR_NAME."/gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"_blank\">$link_text</a>", $content);
                 }
                 // Galerie nicht vorhanden
                 else {
