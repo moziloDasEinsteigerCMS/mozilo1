@@ -350,10 +350,7 @@ $CHARSET = 'UTF-8';
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $URL_BASE;
-        $mod_rewrite = NULL;
-        if($CMS_CONF->get("modrewrite") == "true") {
-            $mod_rewrite = ".html";
-        }
+
         $url = "index.php?cat=".substr($CAT_REQUEST,3)."&amp;page=".substr($PAGE_REQUEST,3);
         if($CMS_CONF->get("modrewrite") == "true") {
             $url = $URL_BASE.substr($CAT_REQUEST,3)."/".substr($PAGE_REQUEST,3).".html";
