@@ -1,4 +1,4 @@
-<IfModule mod_rewrite.c>
+<IfModule rewrite_module>
 RewriteEngine On
 RewriteRule admin/index.php$ admin/index.php [QSA,L]
 RewriteRule .html$ index.php [QSA,L]
