@@ -1,5 +1,3 @@
-<IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteRule login.php$ login.php [QSA,L]
 RewriteRule index.php$ index.php?link=rewrite [QSA,L]
-</IfModule>
