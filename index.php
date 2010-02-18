@@ -1434,7 +1434,8 @@ $CHARSET = 'UTF-8';
                 return rawurldecode($_REQUEST[$param]);
             }
             if($param == "cat") {
-                $url_get = str_replace($URL_BASE,"",$_SERVER['REQUEST_URI']);
+                # ein tmp dafor weil wenn $URL_BASE = / ist werden alle / ersetzt durch nichts
+                $url_get = str_replace("tmp".$URL_BASE,"","tmp".$_SERVER['REQUEST_URI']);
                 $url_get = str_replace("?".$_SERVER['QUERY_STRING'],"",$url_get);
                 $url_para = explode("/",$url_get);
                 if(count($url_para) > 1) {
@@ -1443,7 +1444,8 @@ $CHARSET = 'UTF-8';
                     $request = substr($url_get,0,-5);
                 }
             } elseif($param == "page") {
-                $url_get = str_replace($URL_BASE,"",$_SERVER['REQUEST_URI']);
+                # ein tmp dafor weil wenn $URL_BASE = / ist werden alle / ersetzt durch nichts
+                $url_get = str_replace("tmp".$URL_BASE,"","tmp".$_SERVER['REQUEST_URI']);
                 $url_get = str_replace("?".$_SERVER['QUERY_STRING'],"",$url_get);
                 $url_para = explode("/",$url_get);
                 if(count($url_para) > 1) {
