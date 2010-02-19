@@ -26,7 +26,7 @@ vertical-align:top;
 
 input, select
 {
-    -moz-border-radius:2x;
+    -moz-border-radius:2px;
 }
 
 .titel /* Titel */
@@ -649,11 +649,13 @@ td
     margin-top: 10px;
     margin-bottom: 10px;
     background-color:#ffffff;
+    -moz-border-radius:2px;
 }
 .login_input
 {
     border: 1px solid #C0C0C0;
     width:100%;
+    -moz-border-radius:2px;
 }
 #table_loginform
 {
@@ -670,6 +672,7 @@ div#loginform_maindiv
     position: absolute;
     border: 1px solid #C0C0C0;
     background-color: white;
+    -moz-border-radius:5px;
 }
 div#loginform_maindiv_disabled
 {
@@ -684,6 +687,7 @@ div#loginform_maindiv_disabled
     border: 1px solid #C0C0C0;
     background-color: #e0e0e0;
     color:#777777;
+    -moz-border-radius:5px;
 }
 div#loginform_maindiv_disabled .login_input, div#loginform_maindiv_disabled .login_submit {
     background-color: #e0e0e0;
@@ -701,6 +705,7 @@ div#loginform_shadowdiv
     left: 50%;
     position: absolute;
     background-color: #DCDCDC;
+    -moz-border-radius:5px;
 }
 
 div.message_fehler
