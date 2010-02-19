@@ -1803,7 +1803,7 @@ function gallery($post) {
     $array_getLanguageValue = array("gallery_scale","gallery_scale_thumbs",
         "gallery_picsperrow","gallery_usethumbs","gallery_target","gallery_scaleimages",
         "gallery_rebuildthumbs","gallery_size","gallery_subtitle","gallery_button_cut","gallery_newname",
-        "gallery_button_img_delete","gallery_button_gallery_delete","gallery_usedfgallery","target","toggle_show","toggle_hide");
+        "gallery_button_img_delete","gallery_button_gallery_delete","target","toggle_show","toggle_hide");
 
     # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getLanguageValue as $language) {
@@ -1885,16 +1885,7 @@ function gallery($post) {
         $pagecontent .= '</tr><tr>';
         $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_picsperrow.'><b>'.$text_gallery_picsperrow.'</b></td>';
         $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="2" name="gallery[setings][gallerypicsperrow]" value="'.$GALLERY_CONF->get("gallerypicsperrow").'"'.$post['gallery']['error_html']['gallerypicsperrow'].$tooltip_gallery_help_input_picsperrow.' /></td>';
-/*        $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_usedfgallery.'><b>'.$text_gallery_usedfgallery.'</b></td>';
-        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><span'.$tooltip_gallery_help_usedfgallery.'>'.buildCheckBox("gallery[setings][usedfgallery]", $GALLERY_CONF->get("usedfgallery")).'</span></td>';*/
     }
-/*    $pagecontent .= '</tr><tr>';
-    $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_all_picture_scale.'><b>'.$text_gallery_scaleimages.'</b></td>';
-    $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery[scale_max]" value="true"'.$tooltip_gallery_help_all_picture_scale.'></td>';
-    $pagecontent .= '</tr><tr>';
-    $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_all_thumbs_new.'><b>'.$text_gallery_rebuildthumbs.'</b></td>';
-    $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="checkbox" name="gallery[make_thumbs]" value="true"'.$tooltip_gallery_help_all_thumbs_new.'></td>';*/
     $pagecontent .= '</tr>';
     $pagecontent .= '</table>';
 
@@ -1952,7 +1943,7 @@ function gallery($post) {
         $pagecontent .= '<td width="30%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_newname.'>';#<b>Setings</b>
         $pagecontent .= '<b>'.$text_gallery_newname.'</b>';
         $pagecontent .= '</td>';
-        $pagecontent .= '<td width="70%" align="right" valign="top" class="td_title"><b>Dateien Hochladen</b></td>';
+        $pagecontent .= '<td width="70%" align="right" valign="top" class="td_title"><b>'.getLanguageValue("files_button_upload").'</b></td>';
         $pagecontent .= '</tr><tr>';
         $pagecontent .= '<td width="30%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_newname.'><input type="text" class="input_text" name="gallery['.$currentgalerien.'][newname]" value="" maxlength="'.$max_strlen.'"'.$post['gallery']['error_html']['newname'][$currentgalerien].$tooltip_gallery_help_newname.'></td>';
         $pagecontent .= '<td width="70%" align="right" valign="top" class="td_togglen_padding_bottom">';
@@ -2192,10 +2183,6 @@ function editGallery($post) {
             }
             if($type == 'checkbox') {
                 $syntax_value = "false";
-/*                if($syntax_name == "usedfgallery" and isset($post['gallery']['setings'][$syntax_name]) and $GALLERY_CONF->get("usethumbs") == "false") {
-                    $GALLERY_CONF->set("usethumbs", "true");
-                    $post['error_messages']['gallery_error_usethumbs_true'][] = NULL;
-                }*/
                 if(isset($post['gallery']['setings'][$syntax_name])) {
                     $syntax_value = $post['gallery']['setings'][$syntax_name];
                 }
@@ -2478,7 +2465,7 @@ function files($post) {
 
     $pagecontent .= '<table summary="" width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
     $pagecontent .= '<tr><td class="td_toggle">';
-    $pagecontent .= '<input type="submit" name="action_data[newfile]" value="Dateien Hochladen" class="input_submit">';
+    $pagecontent .= '<input type="submit" name="action_data[newfile]" value="'.getLanguageValue("files_button_upload").'" class="input_submit">';
     $overwrite = NULL;
     if($ADMIN_CONF->get("overwriteuploadfiles") == "true") {
             $overwrite = ' checked="checked"';
@@ -2601,7 +2588,7 @@ function files($post) {
         $pagecontent .= '</td></tr>';
     }
     $pagecontent .= '<tr><td class="td_toggle">';
-    $pagecontent .= '<input type="submit" name="action_data[newfile]" value="Dateien Hochladen" class="input_submit">';
+    $pagecontent .= '<input type="submit" name="action_data[newfile]" value="'.getLanguageValue("files_button_upload").'" class="input_submit">';
 #    $pagecontent .= '&nbsp;&nbsp;<input class="input_check_copy" type="checkbox" name="overwrite" value="on"'.$tooltip_files_help_overwrite.$overwrite.'>&nbsp;<span'.$tooltip_files_help_overwrite.$overwrite.'>'.getLanguageValue("files_button_overwrite").'</span>';
     $pagecontent .= '</td></tr></table>';
 
@@ -3122,9 +3109,9 @@ function config($post) {
     .'<td width="30%" class="td_contact_title" align="left">'.getLanguageValue("config_titel_contact_input").'</td>'
     .'<td width="10%" class="td_contact_title" align="center">'.getLanguageValue("config_titel_contact_show").'</td>'
     .'<td width="10%" class="td_contact_title" align="center">'.getLanguageValue("config_titel_contact_mandatory").'</td></tr>'
+    .'<tr><td>'.getLanguageValue("config_input_contact_name").'</td><td><input type="text" class="input_cms_text" name="titel_name" value="'.$specialchars->rebuildSpecialChars($config_name[0],true,true).'"'.$error_color['titel_name'].' /></td><td align="center">'.buildCheckBox("show_name", ($config_name[1] == "true")).'</td><td align="center">'.buildCheckBox("mandatory_name", ($config_name[2] == "true")).'</td></tr>'
     .'<tr><td>'.getLanguageValue("config_input_contact_mail").'</td><td><input type="text" class="input_cms_text" name="titel_mail" value="'.$specialchars->rebuildSpecialChars($config_mail[0],true,true).'"'.$error_color['titel_mail'].' /></td><td align="center">'.buildCheckBox("show_mail", ($config_mail[1] == "true")).'</td><td align="center">'.buildCheckBox("mandatory_mail", ($config_mail[2] == "true")).'</td></tr>'
-    .'<tr><td>'.getLanguageValue("config_input_contact_text").'</td><td><input type="text" class="input_cms_text" name="titel_name" value="'.$specialchars->rebuildSpecialChars($config_name[0],true,true).'"'.$error_color['titel_name'].' /></td><td align="center">'.buildCheckBox("show_name", ($config_name[1] == "true")).'</td><td align="center">'.buildCheckBox("mandatory_name", ($config_name[2] == "true")).'</td></tr>'
-    .'<tr><td>'.getLanguageValue("config_input_contact_text").'</td><td><input type="text" class="input_cms_text" name="titel_website" value="'.$specialchars->rebuildSpecialChars($config_website[0],true,true).'"'.$error_color['titel_website'].' /></td><td align="center">'.buildCheckBox("show_website", ($config_website[1] == "true")).'</td><td align="center">'.buildCheckBox("mandatory_website", ($config_website[2] == "true")).'</td></tr>'
+    .'<tr><td>'.getLanguageValue("config_input_contact_website").'</td><td><input type="text" class="input_cms_text" name="titel_website" value="'.$specialchars->rebuildSpecialChars($config_website[0],true,true).'"'.$error_color['titel_website'].' /></td><td align="center">'.buildCheckBox("show_website", ($config_website[1] == "true")).'</td><td align="center">'.buildCheckBox("mandatory_website", ($config_website[2] == "true")).'</td></tr>'
     .'<tr><td>'.getLanguageValue("config_input_contact_textarea").'</td><td><input type="text" class="input_cms_text" name="titel_message" value="'.$specialchars->rebuildSpecialChars($config_message[0],true,true).'"'.$error_color['titel_message'].' /></td><td align="center">'.buildCheckBox("show_message", ($config_message[1] == "true")).'</td><td align="center">'.buildCheckBox("mandatory_message", ($config_message[2] == "true")).'</td></tr>'
     ."</table></td>";
     $pagecontent .= "</tr>";
@@ -3133,7 +3120,13 @@ function config($post) {
         $pagecontent .= '<tr><td class="td_cms_titel" colspan="2">'.getLanguageValue("config_titel_expert").'</td></tr>';
         // Zeile "showhiddenpagesin"
         $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_showhiddenpages").'</td>';
-        $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("showhiddenpagesinlastchanged", ($CMS_CONF->get("showhiddenpagesinlastchanged") == "true")).getLanguageValue("config_input_lastchanged").'<br>'.buildCheckBox("showhiddenpagesinsearch", ($CMS_CONF->get("showhiddenpagesinsearch") == "true")).getLanguageValue("config_input_search").'<br>'.buildCheckBox("showhiddenpagesinsitemap", ($CMS_CONF->get("showhiddenpagesinsitemap") == "true")).getLanguageValue("config_input_sitemap").'<br>'.buildCheckBox("showhiddenpagesasdefaultpage", ($CMS_CONF->get("showhiddenpagesasdefaultpage") == "true")).getLanguageValue("config_input_pagesasdefaultpage").'<br>'.buildCheckBox("showhiddenpagesincmsvariables", ($CMS_CONF->get("showhiddenpagesincmsvariables") == "true")).getLanguageValue("config_input_pagesincmsvariables").'</td></tr>';
+        $pagecontent .= '<td class="td_cms_left">'
+            // Obsolet seit 1.12
+            //.buildCheckBox("showhiddenpagesinlastchanged", ($CMS_CONF->get("showhiddenpagesinlastchanged") == "true")).getLanguageValue("config_input_lastchanged").'<br>'
+            .buildCheckBox("showhiddenpagesinsearch", ($CMS_CONF->get("showhiddenpagesinsearch") == "true")).getLanguageValue("config_input_search").'<br>'
+            .buildCheckBox("showhiddenpagesinsitemap", ($CMS_CONF->get("showhiddenpagesinsitemap") == "true")).getLanguageValue("config_input_sitemap").'<br>'
+            .buildCheckBox("showhiddenpagesasdefaultpage", ($CMS_CONF->get("showhiddenpagesasdefaultpage") == "true")).getLanguageValue("config_input_pagesasdefaultpage").'<br>'
+            .buildCheckBox("showhiddenpagesincmsvariables", ($CMS_CONF->get("showhiddenpagesincmsvariables") == "true")).getLanguageValue("config_input_pagesincmsvariables").'</td></tr>';
         // Zeile "Links öffnen self blank"
         $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_target").'</td>';
         $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("targetblank_download", ($CMS_CONF->get("targetblank_download") == "true")).getLanguageValue("config_input_download").'<br>'.buildCheckBox("targetblank_link", ($CMS_CONF->get("targetblank_link") == "true")).getLanguageValue("config_input_link").'</td></tr>';
@@ -3627,7 +3620,7 @@ function plugins($post) {
                             $pagecontent_conf .= '<tr><td width="10%" valign="top" class="td_left_title_padding_bottom" nowrap><b class="text_grau">'.getLanguageValue($info).'</b></td><td width="90%" class="td_togglen_padding_bottom">'.$plugin_info[$pos].'</td></tr>';
                         }
                         if($pos == 4) {
-                            # Das getInfo() array hat mehr wie 4 einträge wir brauchen hier aber nur die 4
+                            # Das getInfo() array hat mehr als 4 einträge wir brauchen hier aber nur die 4
                             break;
                         }
                     }
