@@ -570,7 +570,7 @@ function category($post) {
     if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
         $tooltip_category_help = '<img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"'.createTooltipWZ("","category_help",",WIDTH,400,CLICKCLOSE,true").'>';
     } else {
-        $tooltip_category_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration&amp;page=30_Kategorien" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
+        $tooltip_category_help = '<a href="'.getHelpUrlForSubject("kategorien").'" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
     }
 
     $pagecontent .= '<span class="titel">'.getLanguageValue("category_button").'</span>';
@@ -950,7 +950,7 @@ function page($post) {
     if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
         $tooltip_page_help = '<img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"'.createTooltipWZ("","page_help",",WIDTH,400,CLICKCLOSE,true").'>';
     } else {
-        $tooltip_page_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration&amp;page=40_Inhaltsseiten" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
+        $tooltip_page_help = '<a href="'.getHelpUrlForSubject("inhaltsseiten").'" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
     }
     $pagecontent .= $tooltip_page_help;
     $pagecontent .= "<p>".getLanguageValue("page_text")."</p>";
@@ -1793,7 +1793,7 @@ function gallery($post) {
     if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
         $tooltip_gallery_help = '<img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"'.createTooltipWZ("","gallery_help",",WIDTH,400,CLICKCLOSE,true").'>';
     } else {
-        $tooltip_gallery_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration&amp;page=30_Kategorien" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
+        $tooltip_gallery_help = '<a href="'.getHelpUrlForSubject("galerien").'" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
     }
 
     $pagecontent .= '<span class="titel">'.getLanguageValue("gallery_button").'</span>';
@@ -2421,7 +2421,7 @@ function files($post) {
     if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
         $tooltip_files_help = '<img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"'.createTooltipWZ("","files_help",",WIDTH,400,CLICKCLOSE,true").'>';
     } else {
-        $tooltip_files_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration&amp;&page=50_Dateien" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
+        $tooltip_files_help = '<a href="'.getHelpUrlForSubject("dateien").'" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
     }
     # Prüfen ob der Ordner dateien existiert wenn nicht anlegen
     foreach ($post['categories']['cat']['position'] as $pos => $position) {
@@ -2915,7 +2915,7 @@ function config($post) {
     if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
         $tooltip_config_help = '<img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"'.createTooltipWZ("","config_help",",WIDTH,400,CLICKCLOSE,true").'>';
     } else {
-        $tooltip_config_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration&amp;page=70_Konfiguration" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
+        $tooltip_config_help = '<a href="'.getHelpUrlForSubject("konfiguration").'" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
     }
 
     $pagecontent .= '<span class="titel">'.getLanguageValue("config_button").'</span>';
@@ -3376,7 +3376,7 @@ function admin($post) {
     if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
         $tooltip_admin_help = '<img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"'.createTooltipWZ("","admin_help",",WIDTH,400,CLICKCLOSE,true").'>';
     } else {
-        $tooltip_admin_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration&amp;page=70_Konfiguration" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
+        $tooltip_admin_help = '<a href="'.getHelpUrlForSubject("moziloadmin").'" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
     }
 
 
@@ -3547,7 +3547,7 @@ function plugins($post) {
         $tooltip_plugins_help = '<img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"'.createTooltipWZ("","plugins_help",",WIDTH,400,CLICKCLOSE,true").'>';
         $tooltip_plugins_help_edit = createTooltipWZ("","plugins_help_edit",",WIDTH,200,CLICKCLOSE,true");
     } else {
-        $tooltip_plugins_help = '<a href="http://cms.mozilo.de/index.php?cat=30_Administration" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
+        $tooltip_plugins_help = '<a href="'.getHelpUrlForSubject("plugins").'" target="_blank"><img src="gfx/icons/'.$icon_size.'/help.png" alt="help" hspace="0" vspace="0" align="right" border="0"></a>';
         $tooltip_plugins_help_edit = NULL;
     }
  
@@ -4437,6 +4437,14 @@ function checkBoxChecked($checkboxrequest) {
         else {
             return false;
         }
+    }
+    
+// ------------------------------------------------------------------------------
+// Hilfsfunktion: Baut für das übergebene Thema den URL zur Hilfe zusammen
+// ------------------------------------------------------------------------------
+    function getHelpUrlForSubject($subject) {
+    	// Das könnte später noch mehrsprachig erweitert werden, wenn anderssprachige Dokus existieren
+        return "http://cms.mozilo.de/hilfe/?thema=".$subject;
     }
 
 ?>
