@@ -612,9 +612,14 @@ function category($post) {
             $pagecontent .= '</td></tr>';
             # Neue Kategorie nicht Anzeigen wenn es schonn 100 Kategorien gibt
             if(count($post['categories']['cat']['position']) < $max_cat_page + 1) {
-                $pagecontent .= '<tr><td width="100%" class="td_toggle_new">';
-                $pagecontent .= '<table summary="" width="100%" class="table_new" border="0" cellspacing="0" cellpadding="0">';
-                $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td width="30%" class="td_left_title"><b>'.$text_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_url_adress.'</b> '.$text_url_adress_description.'</td><td width="6%" class="td_center_title">&nbsp;</td><td width="6%" class="td_center_title">blank</td><td width="6%" class="td_center_title">self</td><td>&nbsp;</td></tr>';
+                $pagecontent .= '<tr><td width="100%" class="td_toggle_new">'
+	                .'<table summary="" width="100%" class="table_new" border="0" cellspacing="0" cellpadding="0">'
+	                .'<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td>'
+	                .'<td width="30%" class="td_left_title"><b>'.$text_name.'</b>'
+	                .'</td><td width="30%" class="td_left_title"><b>'.$text_url_adress.'</b> '.$text_url_adress_description.'</td>'
+	                .'<td width="6%" class="td_center_title">&nbsp;</td>'
+	                .'<td width="6%" class="td_center_title">'.getLanguageValue("blank").'</td>'
+	                .'<td width="6%" class="td_center_title">'.getLanguageValue("self").'</td><td>&nbsp;</td></tr>';
                 $pagecontent .= '<tr>';
                 $pagecontent .= '<td width="6%" class="td_left_title"><input type="hidden" name="categories[cat][position]['.$max_cat_page.']" value="'.$post['categories']['cat']['position'][$max_cat_page].'">';
                 $pagecontent .= '<input '.$post['categories']['cat']['error_html']['new_position'][$max_cat_page].'class="input_text" type="text" name="categories[cat][new_position]['.$max_cat_page.']" value="'.$post['categories']['cat']['new_position'][$max_cat_page].'" size="2" maxlength="2"'.$tooltip_category_help_new_position.'></td>';
@@ -684,7 +689,7 @@ function category($post) {
             $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_url_adress.'</b></td>';
             $pagecontent .= '<td width="30%" class="td_left_title">';
             $pagecontent .= '<input type="text" class="input_readonly" name="categories[cat][url]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['url'][$pos], true, true).'" maxlength="'.$max_strlen.'" readonly>';
-            $pagecontent .= '</td><td>&nbsp;</td><td width="6%" valign="bottom" class="td_center_title">blank</td><td width="6%" align="center" valign="bottom" class="td_center_title">self</td><td>&nbsp;</td>';
+            $pagecontent .= '</td><td>&nbsp;</td><td width="6%" valign="bottom" class="td_center_title">'.getLanguageValue("blank").'</td><td width="6%" align="center" valign="bottom" class="td_center_title">'.getLanguageValue("self").'</td><td>&nbsp;</td>';
             $pagecontent .= '</tr><tr>';
             $pagecontent .= '<td width="30%" class="td_left_title"><input type="text" '.$post['categories']['cat']['error_html']['new_name'][$pos].' class="input_text" name="categories[cat][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['new_name'][$pos], true, true).'" maxlength="'.$max_strlen.'"'.$tooltip_category_help_name.'></td>';
             $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_url_new_adress.'</b></td>';
@@ -1020,7 +1025,7 @@ function page($post) {
             if(!isset($display_new_cat)) {
                 $pagecontent .= '<tr><td width="100%" class="td_toggle_new">';
                 $pagecontent .= '<table summary="" width="100%" class="table_data" border="0" cellspacing="0" cellpadding="0">';
-                $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td width="30%" class="td_left_title"><b>'.$text_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_url_adress.'</b> '.$text_url_adress_description.'</td><td width="6%" class="td_center_title">&nbsp;</td><td width="6%" class="td_center_title">blank</td><td width="6%" class="td_center_title">self</td><td>&nbsp;</td></tr>';
+                $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td width="30%" class="td_left_title"><b>'.$text_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_url_adress.'</b> '.$text_url_adress_description.'</td><td width="6%" class="td_center_title">&nbsp;</td><td width="6%" class="td_center_title">'.getLanguageValue("blank").'</td><td width="6%" class="td_center_title">'.getLanguageValue("self").'</td><td>&nbsp;</td></tr>';
                 $pagecontent .= '<tr>';
                 $pagecontent .= '<td width="6%" class="td_left_title"><input type="hidden" name="categories['.$cat.'][position]['.$max_cat_page.']" value="'.$post['categories'][$cat]['position'][$max_cat_page].'">';
                 $pagecontent .= '<input '.$post['categories'][$cat]['error_html']['new_position'][$max_cat_page].'class="input_text" type="text" name="categories['.$cat.'][new_position]['.$max_cat_page.']" value="'.$post['categories'][$cat]['new_position'][$max_cat_page].'" size="2" maxlength="2"'.$tooltip_page_help_new_position.'></td>';
@@ -1102,7 +1107,7 @@ function page($post) {
                 $pagecontent .= '<td width="30%" class="td_left_title">';
                 $pagecontent .= '<input type="text" class="input_readonly" name="categories['.$cat.'][url]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['url'][$pos],true,true).'" maxlength="'.$max_strlen.'" readonly>';
 
-                $pagecontent .= '</td><td width="6%" class="td_center_title">&nbsp;</td><td width="6%" valign="bottom" class="td_center_title">blank</td><td width="6%" valign="bottom" class="td_center_title">self</td><td class="td_left_title">&nbsp;</td>';
+                $pagecontent .= '</td><td width="6%" class="td_center_title">&nbsp;</td><td width="6%" valign="bottom" class="td_center_title">'.getLanguageValue("blank").'</td><td width="6%" valign="bottom" class="td_center_title">'.getLanguageValue("self").'</td><td class="td_left_title">&nbsp;</td>';
                 $pagecontent .= '</tr><tr>';
                 $pagecontent .= '';
                 $pagecontent .= '<td width="30%" class="td_left_title"><input type="text" '.$post['categories'][$cat]['error_html']['new_name'][$pos].' class="input_text" name="categories['.$cat.'][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_name'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_name.'></td>';
@@ -1857,8 +1862,8 @@ function gallery($post) {
     <table summary="" width="100%" cellspacing="0" border="0" cellpadding="0">
     <tr>
     <td width="10%">&nbsp;</td>
-    <td width="10%" class="td_center_title">&nbsp;&nbsp;blank&nbsp;&nbsp;</td>
-    <td width="10%" class="td_center_title">&nbsp;&nbsp;self&nbsp;&nbsp;</td>
+    <td width="10%" class="td_center_title">&nbsp;&nbsp;'.getLanguageValue("blank").'&nbsp;&nbsp;</td>
+    <td width="10%" class="td_center_title">&nbsp;&nbsp;'.getLanguageValue("self").'&nbsp;&nbsp;</td>
     <td width="70%">&nbsp;</td>
     </tr><tr>
     <td class="td_center_title"><b'.$tooltip_help_target.'>'.$text_target.'</b></td>
