@@ -36,8 +36,7 @@ div.colordiv {
 	border:1px solid #7F9DB9;
 	height: 18px;
 	background-color:#FFFFFF;
-
-	margin-top:-4px;
+	margin-top:1px;
 }
 input.colorinput {
 	background-color:#FFFFFF;
