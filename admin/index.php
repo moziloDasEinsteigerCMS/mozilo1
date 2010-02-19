@@ -293,9 +293,9 @@ if($ADMIN_CONF->get("showTooltips") == "true") {
     $tooltip_help_website_button = NULL;
 }
 $width_height = substr($icon_size,0,2);
-$html .= '<table width="90%" cellspacing="0" border="0" cellpadding="0" id="table_admin">';
+$html .= '<table summary="" width="90%" cellspacing="0" border="0" cellpadding="0" id="table_admin">';
 $html .= '<tr><td width="100%" id="td_title">';
-$html .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" id="table_titel">';
+$html .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" id="table_titel">';
 $html .= '<tr><td id="td_table_titel_text">'.$ADMIN_TITLE.' - '.$pagetitle.'</td>';
 $html .= '<td width="'.$width_height.'" height="'.$width_height.'"'.$tooltip_help_website_button.' nowrap><form class="form" accept-charset="'.$CHARSET.'" action="../index.php" method="post" target="_blank"><input class="input_img_button" type="image" value="'.getLanguageValue("website_button").'" src="gfx/icons/'.$icon_size.'/website.png" title="'.getLanguageValue("help_website_button",true).'"'.$tooltip_help_website_button.'></form></td>';
 $html .= '<td width="'.$width_height.'" height="'.$width_height.'" id="td_table_titel_logout" nowrap><form class="form" accept-charset="'.$CHARSET.'" action="login.php" method="post"><input id="design_logout" class="input_img_button" type="image" name="logout" value="'.getLanguageValue("logout_button").'&nbsp;" accesskey="x" src="gfx/icons/'.$icon_size.'/logout.png" title="'.getLanguageValue("help_logout_button",true).'"'.$tooltip_help_logout_button.'></form></td></tr>';
@@ -304,7 +304,7 @@ $html .= '</table>';
 $html .= "</td></tr>";
 $html .= '<tr><td width="100%" id="td_tabs">';
 
-$html .= '<table width="100%" id="table_buttons" cellspacing="0" cellpadding="0" border="0">';
+$html .= '<table summary="" width="100%" id="table_buttons" cellspacing="0" cellpadding="0" border="0">';
 $html .= '<tr>';
 
 # Menue Tabs erzeugen
@@ -428,10 +428,12 @@ function home($post) {
         $safemode = '<span style="color:#ff0000;font-weight:bold;">'.getLanguageValue("yes").'</span>';
     }
 
-    $gdlibinstalled = getLanguageValue("yes");
     if(!extension_loaded("gd")) {
         $post['error_messages']['home_error_gd'][] = NULL;
-        $gdlibinstalled = '<span style="color:#ff0000;font-weight:bold;">'.getLanguageValue("no").'</span>';
+        $gdlibinstalled = getLanguageValue("no");
+    }
+    else {
+    	    $gdlibinstalled = getLanguageValue("yes");
     }
 
     $test_mail_adress = NULL;
@@ -465,7 +467,7 @@ function home($post) {
     $path = dirname(dirname(__FILE__))."/";
 #    $cmssize = convertFileSizeUnit(dirsize(getcwd()."/.."));
     $cmssize = convertFileSizeUnit(dirsize($path));
-    $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">'
+    $pagecontent .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">'
     // CMS-INFOS
     ."<tr>"
     .'<td width="100%" class="td_cms_titel" colspan="2"><b>'.getLanguageValue("cmsinfo").'</b></td>'
@@ -599,7 +601,7 @@ function category($post) {
         }
     }
 
-    $pagecontent .= '<table width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
+    $pagecontent .= '<table summary="" width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
     foreach ($post['categories']['cat']['position'] as $pos => $position) {
         if(isset($post['displays']['cat']['error_html']['display'][$pos])) {
             $post['categories']['cat']['error_html']['display'][$pos] = $post['displays']['cat']['error_html']['display'][$pos];
@@ -611,7 +613,7 @@ function category($post) {
             # Neue Kategorie nicht Anzeigen wenn es schonn 100 Kategorien gibt
             if(count($post['categories']['cat']['position']) < $max_cat_page + 1) {
                 $pagecontent .= '<tr><td width="100%" class="td_toggle_new">';
-                $pagecontent .= '<table width="100%" class="table_new" border="0" cellspacing="0" cellpadding="0">';
+                $pagecontent .= '<table summary="" width="100%" class="table_new" border="0" cellspacing="0" cellpadding="0">';
                 $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td width="30%" class="td_left_title"><b>'.$text_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_url_adress.'</b> '.$text_url_adress_description.'</td><td width="6%" class="td_center_title">&nbsp;</td><td width="6%" class="td_center_title">blank</td><td width="6%" class="td_center_title">self</td><td>&nbsp;</td></tr>';
                 $pagecontent .= '<tr>';
                 $pagecontent .= '<td width="6%" class="td_left_title"><input type="hidden" name="categories[cat][position]['.$max_cat_page.']" value="'.$post['categories']['cat']['position'][$max_cat_page].'">';
@@ -657,7 +659,7 @@ function category($post) {
 
         $pagecontent .= '<tr><td width="100%" class="td_toggle">';
 
-        $pagecontent .= '<table width="100%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
+        $pagecontent .= '<table summary="" width="100%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
        if(!isset($display_new_cat_name)) {
             $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td class="td_left_title"><b>'.$text_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_contents.'</b></td><td width="15%" class="td_icons">&nbsp;</td></tr>';
             $display_new_cat_name = true;
@@ -677,7 +679,7 @@ function category($post) {
         $pagecontent .= '<tr>';
         $pagecontent .= '<td width="100%" '.$post['categories']['cat']['error_html']['display'][$pos].'id="toggle_'.$pos.'" align="right" class="td_togglen_padding_bottom">';
         if(isset($post['categories']['cat']['url'][$pos])) {
-            $pagecontent .= '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
+            $pagecontent .= '<table summary="" width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
             $pagecontent .= '<tr><td width="30%" class="td_left_title" valign="bottom" nowrap><b>'.$text_new_name.'</b></td>';
             $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_url_adress.'</b></td>';
             $pagecontent .= '<td width="30%" class="td_left_title">';
@@ -691,7 +693,7 @@ function category($post) {
             $pagecontent .= '<td width="6%" class="td_center_title"><input type="radio" name="categories[cat][new_target]['.$pos.']" value="-_self-"'.$post['categories']['cat']['checked_selv'][$pos].$tooltip_help_target_self.'><input type="hidden" name="categories[cat][target]['.$pos.']" value="'.$post['categories']['cat']['target'][$pos].'"></td>';
             $pagecontent .= '<td>&nbsp;</td></tr></table>';
         } else
-            $pagecontent .= '<table width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0"><tr><td colspan="2" class="td_left_title" align="left" valign="bottom" ><b>'.$text_new_name.'</b></td></tr><tr><td width="30%" class="td_left_title"><input type="text" '.$post['categories']['cat']['error_html']['new_name'][$pos].'class="input_text" name="categories[cat][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['new_name'][$pos], true, true).'"'.$tooltip_category_help_name.'></td><td>&nbsp;</td></tr></table>';
+            $pagecontent .= '<table summary="" width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0"><tr><td colspan="2" class="td_left_title" align="left" valign="bottom" ><b>'.$text_new_name.'</b></td></tr><tr><td width="30%" class="td_left_title"><input type="text" '.$post['categories']['cat']['error_html']['new_name'][$pos].'class="input_text" name="categories[cat][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['new_name'][$pos], true, true).'"'.$tooltip_category_help_name.'></td><td>&nbsp;</td></tr></table>';
 
         if(getRequestParam('javascript', true)) {
             $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.$pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.$text_toggle_show.'\',\''.$text_toggle_hide.'\');</script>';
@@ -948,7 +950,7 @@ function page($post) {
     $pagecontent .= $tooltip_page_help;
     $pagecontent .= "<p>".getLanguageValue("page_text")."</p>";
 
-    $pagecontent .= '<table width="100%" class="table_toggle" cellspacing="0" cellpadding="0">';# border="0"
+    $pagecontent .= '<table summary="" width="100%" class="table_toggle" cellspacing="0" cellpadding="0">';# border="0"
     $pagecontent .= '<tr><td width="100%" class="td_toggle"><input type="submit" name="action_data[copymovesite]" value="'.getLanguageValue("page_button_change").'" class="input_submit"></td></tr>';
 
 
@@ -982,7 +984,7 @@ function page($post) {
         }
 
         $pagecontent .= '<tr><td width="100%" class="td_toggle">';
-        $pagecontent .= '<table width="100%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
+        $pagecontent .= '<table summary="" width="100%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
         $pagecontent .= '<tr><td class="td_left_title">';
         $pagecontent .= '<span '.$post['categories'][$cat]['error_html']['cat_name'].'class="text_cat_page">'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'</span><input type="hidden" name="categories['.$cat.']" value="'.$cat.'">';
         $pagescount = 0;
@@ -1007,9 +1009,9 @@ function page($post) {
 
             $pagecontent .= '<script type="text/javascript">window.onload = cat_togglen(\'toggle_'.substr($cat,0,2).'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.$text_toggle_show.'\',\''.$text_toggle_hide.'\');</script>';
         }
-        $pagecontent .= '<table width="98%" cellspacing="0" cellpadding="0" border="0"><tr><td width="100%">';
+        $pagecontent .= '<table summary="" width="98%" cellspacing="0" cellpadding="0" border="0"><tr><td width="100%">';
 
-        $pagecontent .= '<table width="100%" class="table_toggle" cellspacing="0" cellpadding="0" border="0">';
+        $pagecontent .= '<table summary="" width="100%" class="table_toggle" cellspacing="0" cellpadding="0" border="0">';
         foreach ($post['categories'][$cat]['position'] as $pos => $tmp) {
             if(isset($post['display'][$cat]['error_html']['display'][$pos])) {
                 $post['categories'][$cat]['error_html']['display'][$pos] = $post['display'][$cat]['error_html']['display'][$pos];
@@ -1017,7 +1019,7 @@ function page($post) {
             # Neue Inhaltseite oder Link
             if(!isset($display_new_cat)) {
                 $pagecontent .= '<tr><td width="100%" class="td_toggle_new">';
-                $pagecontent .= '<table width="100%" class="table_data" border="0" cellspacing="0" cellpadding="0">';
+                $pagecontent .= '<table summary="" width="100%" class="table_data" border="0" cellspacing="0" cellpadding="0">';
                 $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td width="30%" class="td_left_title"><b>'.$text_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_url_adress.'</b> '.$text_url_adress_description.'</td><td width="6%" class="td_center_title">&nbsp;</td><td width="6%" class="td_center_title">blank</td><td width="6%" class="td_center_title">self</td><td>&nbsp;</td></tr>';
                 $pagecontent .= '<tr>';
                 $pagecontent .= '<td width="6%" class="td_left_title"><input type="hidden" name="categories['.$cat.'][position]['.$max_cat_page.']" value="'.$post['categories'][$cat]['position'][$max_cat_page].'">';
@@ -1054,7 +1056,7 @@ function page($post) {
 
             $pagecontent .= '<tr><td width="100%" class="td_toggle_padding">';
 
-            $pagecontent .= '<table width="100%" class="table_data" border="0" cellspacing="0" cellpadding="0">';
+            $pagecontent .= '<table summary="" width="100%" class="table_data" border="0" cellspacing="0" cellpadding="0">';
             if(!isset($display_new_cat_name)) {
                 $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td class="td_left_title"><b>'.$text_name.'</b></td><td width="12%" class="td_left_title"><b>'.$text_page_status.'</b></td><td width="17%" class="td_left_title"><b>'.$text_page_move.'</b></td><td width="12%" class="td_left_title">&nbsp;</td><td width="15%" class="td_icons">&nbsp;</td></tr>';
                 $display_new_cat_name = true;
@@ -1095,7 +1097,7 @@ function page($post) {
             $pagecontent .= '<td width="100%" class="td_togglen_padding_bottom" align="right" '.$post['categories'][$cat]['error_html']['display'][$pos].' id="toggle_'.substr($cat,0,2).'_'.$pos.'">';
 
             if(isset($post['categories'][$cat]['url'][$pos])) {
-                $pagecontent .= '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data"><tr><td width="30%" valign="bottom" nowrap class="td_left_title"><b>'.$text_new_name.'</b></td>';
+                $pagecontent .= '<table summary="" width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data"><tr><td width="30%" valign="bottom" nowrap class="td_left_title"><b>'.$text_new_name.'</b></td>';
                 $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_url_adress.'</b></td>';
                 $pagecontent .= '<td width="30%" class="td_left_title">';
                 $pagecontent .= '<input type="text" class="input_readonly" name="categories['.$cat.'][url]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['url'][$pos],true,true).'" maxlength="'.$max_strlen.'" readonly>';
@@ -1110,7 +1112,7 @@ function page($post) {
                 $pagecontent .= '<td width="6%" class="td_center_title"><input type="radio" name="categories['.$cat.'][new_target]['.$pos.']" value="-_self-"'.$post['categories'][$cat]['checked_selv'][$pos].''.$tooltip_help_target_self.'><input type="hidden" name="categories['.$cat.'][target]['.$pos.']" value="'.$post['categories'][$cat]['target'][$pos].'"></td><td>&nbsp;</td>';
                 $pagecontent .= '</tr></table>';
             } else {
-                $pagecontent .= '<table width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0"><tr><td width="30%" class="td_left_title" nowrap><b>'.$text_new_name.'</b></td><td width="6%" class="td_left_title">&nbsp;</td><td width="30%" class="td_left_title"><b>'.$text_page_password.'</b></td><td class="td_left_title">&nbsp;</td></tr>';
+                $pagecontent .= '<table summary="" width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0"><tr><td width="30%" class="td_left_title" nowrap><b>'.$text_new_name.'</b></td><td width="6%" class="td_left_title">&nbsp;</td><td width="30%" class="td_left_title"><b>'.$text_page_password.'</b></td><td class="td_left_title">&nbsp;</td></tr>';
                 $pagecontent .= '<tr><td width="30%" class="td_left_title" nowrap><input type="text" '.$post['categories'][$cat]['error_html']['new_name'][$pos].' class="input_text" name="categories['.$cat.'][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_name'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_name.'></td><td width="6%">&nbsp;</td><td width="30%" class="td_left_title"><input type="text" '.$post['categories'][$cat]['error_html']['password'][$pos].' class="input_text" name="categories['.$cat.'][password]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['password'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_password.'></td><td class="td_left_title">';
 
                 if($PASSWORDS->get($cat."/".$post['categories'][$cat]['position'][$pos]."_".$post['categories'][$cat]['name'][$pos])) {
@@ -1822,10 +1824,10 @@ function gallery($post) {
         $post['gallery']['error_html']['display_setings'] = NULL;
     }
 
-    $pagecontent .= '<table width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
+    $pagecontent .= '<table summary="" width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
     $overwrite = NULL;
     $pagecontent .= '<tr><td class="td_toggle">';
-    $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
+    $pagecontent .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
 
     $pagecontent .= '<tr><td width="85%" class="td_left_title"><input type="submit" name="action_data[gallery]" value="'.getLanguageValue("gallery_button_change").'" class="input_submit">';
     $pagecontent .= '&nbsp;&nbsp;<input class="input_check_copy" type="checkbox" name="overwrite" value="on"'.$tooltip_gallery_help_overwrite.$overwrite.'>&nbsp;<span'.$tooltip_gallery_help_overwrite.'><b>'.getLanguageValue("files_button_overwrite").'</b></span></td>';
@@ -1838,7 +1840,7 @@ function gallery($post) {
     $pagecontent .= '</td></tr>';
     $pagecontent .= '<tr><td width="100%" align="right" class="td_toggle" id="toggle_settings_conf"'.$post['gallery']['error_html']['display_setings'].'>';
     # setings start
-    $pagecontent .= '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data"><tr>';
+    $pagecontent .= '<table summary="" width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data"><tr>';
     $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_scale.'><b>'.$text_gallery_scale.'</b></td>';
     $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxwidth]" value="'.$GALLERY_CONF->get("maxwidth").'"'.$post['gallery']['error_html']['maxwidth'].$tooltip_gallery_help_input_scale.' />&nbsp;x&nbsp;<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxheight]" value="'.$GALLERY_CONF->get("maxheight").'"'.$post['gallery']['error_html']['maxheight'].$tooltip_gallery_help_input_scale.' />&nbsp;'.getLanguageValue("pixels").'</td>';
 
@@ -1852,7 +1854,7 @@ function gallery($post) {
     $pagecontent .= '</tr><tr>';
     $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_target.'><b>'.$text_gallery_target.'</b></td>';
     $pagecontent .= '<td width="20%" class="td_left_title_padding_bottom">
-    <table width="100%" cellspacing="0" border="0" cellpadding="0">
+    <table summary="" width="100%" cellspacing="0" border="0" cellpadding="0">
     <tr>
     <td width="10%">&nbsp;</td>
     <td width="10%" class="td_center_title">&nbsp;&nbsp;blank&nbsp;&nbsp;</td>
@@ -1899,7 +1901,7 @@ function gallery($post) {
 
     $pagecontent .= '<tr><td width="100%" class="td_toggle_new">';
     # Neue GAllery
-    $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
+    $pagecontent .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
     $pagecontent .= '<tr><td width="30%" class="td_left_title"><b>'.getLanguageValue("gallery_new").'</b></td>';
     $pagecontent .= '<td width="70%" class="td_left_title">&nbsp;</td>';
     $pagecontent .= '</tr><tr>';
@@ -1919,7 +1921,7 @@ function gallery($post) {
         }
 
         $pagecontent .= '<tr><td width="100%" class="td_toggle">';
-        $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
+        $pagecontent .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
 
         $pagecontent .= '<tr><td width="85%" class="td_titel"><span class="text_cat_page">'.$specialchars->rebuildSpecialChars($currentgalerien, true, true).'</span></td>';
         $pagecontent .= '<td width="15%" class="td_icons" nowrap>';
@@ -1930,7 +1932,7 @@ function gallery($post) {
         $pagecontent .= '</td></tr>';
         $pagecontent .= '<tr><td width="100%" id="toggle_'.$toggle_pos.'" align="right" class="td_togglen_padding_bottom"'.$post['gallery']['error_html']['display'][$currentgalerien].'>';
         # gallery setup
-        $pagecontent .= '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data"><tr>';
+        $pagecontent .= '<table summary="" width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data"><tr>';
 
 #    $pagecontent .= '</tr><tr>';
     $pagecontent .= '<td colspan="2" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_all_picture_scale.'><input type="checkbox" name="gallery['.$currentgalerien.'][scale_max]" value="true"'.$tooltip_gallery_help_all_picture_scale.'>&nbsp;&nbsp;&nbsp;<b>'.$text_gallery_scaleimages.'</b>';
@@ -1960,7 +1962,7 @@ function gallery($post) {
         $pagecontent .= '</td>';
         $pagecontent .= '</tr></table>';
         # inhalt gallery
-        $pagecontent .= '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
+        $pagecontent .= '<table summary="" width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
         $subtitle = new Properties($GALLERIES_DIR_REL.$currentgalerien."/texte.conf",true);
         $max_cols = 3;
         $max_cols_check = $max_cols;
@@ -1983,7 +1985,7 @@ function gallery($post) {
                 $new_tr = false;
             }#
             $pagecontent .= '<td width="'.$td_width.'" align="left" valign="top" class="td_gallery_img">';
-            $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_gallery_img">
+            $pagecontent .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_gallery_img">
                             <tr><td rowspan="5" valign="top" width="10%" style="padding-right:10px;"><a href="'.$specialchars->replaceSpecialChars($URL_BASE.$GALLERIES_DIR_NAME."/".$currentgalerien."/".$file,true).'" target="_blank"'.$tooltip_gallery_help_picture.'>';
             $pagecontent .= '<img src="'.$preview.'" alt="'.$specialchars->rebuildSpecialChars($file, true, true).'" style="height:60px;border:none;" />';
             $pagecontent .= '</a></td>
@@ -1993,7 +1995,7 @@ function gallery($post) {
                             <tr><td height="1%"><input type="text" class="input_text" name="gallery['.$currentgalerien.'][subtitle]['.$file.']" value="'.$specialchars->rebuildSpecialChars($subtitle->get($file), true, true).'"'.$tooltip_gallery_help_subtitle.' /></td></tr>
                             <tr><td style="font-size:1px;">&nbsp;</td></tr>
                             <tr><td height="1%" colspan="2">
-                            <table width="100%" cellspacing="0" border="0" cellpadding="0">
+                            <table summary="" width="100%" cellspacing="0" border="0" cellpadding="0">
                             <tr><td width="99%">
                             <input type="text" class="input_readonly" name="gallery['.$currentgalerien.'][image][]" value="'.$specialchars->rebuildSpecialChars($file, true, true).'" maxlength="'.$max_strlen.'" readonly'.$tooltip_gallery_help_name.'></td>
                             <td width="1%" nowrap>&nbsp;&nbsp;<input type="image" class="input_img_button_last" name="action_data[deletegalleryimg]['.$currentgalerien.']['.$file.']" value="'.$text_gallery_button_img_delete.'" src="gfx/icons/'.$icon_size.'/delete.png" title="löschen"'.$tooltip_gallery_help_del.'>
@@ -2469,7 +2471,7 @@ function files($post) {
         }
     }
 
-    $pagecontent .= '<table width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
+    $pagecontent .= '<table summary="" width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
     $pagecontent .= '<tr><td class="td_toggle">';
     $pagecontent .= '<input type="submit" name="action_data[newfile]" value="Dateien Hochladen" class="input_submit">';
     $overwrite = NULL;
@@ -2500,7 +2502,7 @@ function files($post) {
 
         $pagecontent .= '<tr><td class="td_toggle">';
 
-        $pagecontent .= '<table width="100%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
+        $pagecontent .= '<table summary="" width="100%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
         if(!isset($display_titel)) {# Position:          
             $pagecontent .= '<tr><td width="30%" class="td_left_title"><b>'.$text_category.'</b></td><td>&nbsp;</td><td width="30%" class="td_left_title"><b>'.$text_contents.'</b></td><td width="15%" class="td_icons">&nbsp;</td></tr>';
             $display_titel = true;
@@ -2520,7 +2522,7 @@ function files($post) {
         $file = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
         if (isValidDirOrFile($file) && ($subhandle = @opendir($CONTENT_DIR_REL.$file."/dateien"))) {
             $hasdata = false;
-            $pagecontent .= '<table width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
+            $pagecontent .= '<table summary="" width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
             $pagecontent .= '<tr><td class="td_left_title_padding_bottom" colspan="1">'.$text_files_text_upload.'</td><td colspan="4" class="td_right_title_padding_bottom"'.$tooltip_files_help_upload.'><input type="file" id="uploadfileinput_'.$pos.'" name="uploadfile" class="uploadfileinput"></td></tr><tr><td colspan="5" class="td_right_title_padding_bottom"><div id="files_list_'.$pos.'" class="text_cat_page"></div>';
             $pagecontent .= '<script type="text/javascript">
             <!-- Create an instance of the multiSelector class, pass it the output target and the max number of files -->
@@ -2915,7 +2917,7 @@ function config($post) {
     $pagecontent .= $tooltip_config_help;
     $pagecontent .= "<p>".getLanguageValue("config_text")."</p>";
     // ALLGEMEINE EINSTELLUNGEN
-    $pagecontent .= "<table width=\"100%\" cellspacing=\"0\" border=\"0\" cellpadding=\"0\" class=\"table_data\">";
+    $pagecontent .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
     // Zeile "ÜBERNEHMEN"
     # Save Buttom nur Anzeigen wenn Properties auch Speichen kann
     if(!isset($CMS_CONF->properties['error']) or !isset($CONTACT_CONF->properties['error'])) {
@@ -3110,7 +3112,7 @@ function config($post) {
     $config_message = explode(",", ($CONTACT_CONF->get("message")));
     $pagecontent .= '<tr><td class="td_cms_left" colspan="2">'.getLanguageValue("config_text_contact").'</td></tr>'
     .'<tr><td class="td_cms_left" colspan="2">'
-    .'<table width="90%" cellspacing="0" border="0" cellpadding="0" align="right" class="table_contact">'
+    .'<table summary="" width="90%" cellspacing="0" border="0" cellpadding="0" align="right" class="table_contact">'
     .'<tr><td width="40%" class="td_contact_title" align="left">'.getLanguageValue("config_titel_contact_help").'</td>'
     .'<td width="30%" class="td_contact_title" align="left">'.getLanguageValue("config_titel_contact_input").'</td>'
     .'<td width="10%" class="td_contact_title" align="center">'.getLanguageValue("config_titel_contact_show").'</td>'
@@ -3379,7 +3381,7 @@ function admin($post) {
 
 
 
-    $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
+    $pagecontent .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
     // Zeile "ÜBERNEHMEN"
     if(!isset($ADMIN_CONF->properties['error'])) {
         $pagecontent .= '<tr><td class="td_cms_submit_top" colspan="2"><input type="submit" name="apply" class="input_submit" value="'.getLanguageValue("admin_submit").'">';
@@ -3547,7 +3549,7 @@ function plugins($post) {
     $pagecontent .= '<span class="titel">'.getLanguageValue("plugins_titel").'</span>';
     $pagecontent .= $tooltip_plugins_help;
     $pagecontent .= "<p>".getLanguageValue("plugins_text")."</p>";
-    $pagecontent .= '<table width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
+    $pagecontent .= '<table summary="" width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
     $pagecontent .= '<tr><td width="100%" class="td_toggle"><input type="submit" class="input_submit" name="apply" value="'.getLanguageValue("plugins_submit").'"/></td></tr>';
 
     $dircontent = getDirs($PLUGIN_DIR_REL, true);
@@ -3579,7 +3581,7 @@ function plugins($post) {
             if (class_exists($currentelement)) {
                 $plugin_info = $plugin->getInfo();
                 $pagecontent .= '<tr><td width="100%" class="td_toggle">';
-                $pagecontent .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
+                $pagecontent .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
                 # Plugin Info Prüfen
                 if(isset($plugin_info) and count($plugin_info) > 0) {
                     $plugin_name = str_replace(array("&lt;","&gt;"),array("<",">"),htmlentities(strip_tags($plugin_info[0], '<b>'),ENT_COMPAT,$CHARSET),$plugin_info[0]);
@@ -3600,7 +3602,7 @@ function plugins($post) {
                 $messages = NULL;
                 $pagecontent_conf = NULL;
                 if($plugin_error === false) {
-                    $pagecontent_start_conf = '<table width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
+                    $pagecontent_start_conf = '<table summary="" width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
                     # Plugin Infos die reinvolge ist wichtig
                     $plugins_info_array = array("Plugin_name","plugins_titel_version","plugins_titel_description","plugins_titel_author","plugins_titel_web");
                     foreach($plugins_info_array as $pos => $info) {
@@ -3627,7 +3629,7 @@ function plugins($post) {
 
                     if(count($plugin->getConfig()) >= 1) {
                         $pagecontent_conf .= '<tr><td width="100%" colspan="2" class="td_togglen_padding_bottom" nowrap>';
-                        $pagecontent_conf .= '<table width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
+                        $pagecontent_conf .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
 
                         $config = $plugin->getConfig();
                         foreach($config as $name => $inhalt) {
@@ -4055,7 +4057,7 @@ function returnFormatToolbar($currentcat) {
 
     // Information zeigen, wenn JavaScript nicht aktiviert
     $content = "<noscript>".returnMessage(false,getLanguageValue("toolbar_nojs_text"))."</noscript>"
-    ."<table width=\"99%\" cellspacing=\"2\" border=\"0\" cellpadding=\"0\">"
+    .'<table summary="" width="99%" cellspacing="2" border="0" cellpadding="0">'
     ."<tr>"
     // Überschrift Syntaxelemente
     ."<td width=\"59%\" nowrap>"
@@ -4106,7 +4108,7 @@ function returnFormatToolbar($currentcat) {
     ."</td>"
     // Farben
     ."<td nowrap>"
-    ."<table cellspacing=\"0\" border=\"0\" cellpadding=\"0\"><tr><td>"
+    .'<table summary="" cellspacing="0" border="0" cellpadding="0"><tr><td>'
     ."<img class=\"js\" style=\"background-color:#AA0000\" alt=\"Farbe\" id=\"farbicon\" title=\"[farbe=RRGGBB| ... ] - ".getLanguageValue("toolbar_desc_farbe")."\" src=\"gfx/jsToolbar/farbe.png\" onClick=\"insert('[farbe=' + document.getElementById('farbcode').value + '|', ']', true)\">"
     ."</td><td nowrap>"
     ."<div class=\"colordiv\">"
@@ -4117,7 +4119,7 @@ function returnFormatToolbar($currentcat) {
     ."</td>"
     ."</tr>"
     ."</table>"
-    ."<table width=\"99%\" cellspacing=\"2\" border=\"0\" cellpadding=\"0\">"
+    .'<table summary="" width="99%" cellspacing="2" border="0" cellpadding="0">'
     ."<tr>";
 
     // Benutzerdefinierte Syntaxelemente vorbereiten
@@ -4150,10 +4152,10 @@ function returnFormatToolbar($currentcat) {
 
     // Smileys
     if ($CMS_CONF->get("replaceemoticons") == "true") {
-        $content .= "<table width=\"33%\" cellspacing=\"2\" border=\"0\" cellpadding=\"0\"><tr><td nowrap>".returnSmileyBar()."</td></tr></table>";
+        $content .= '<table summary="" width="33%" cellspacing="2" border="0" cellpadding="0"><tr><td nowrap>'.returnSmileyBar().'</td></tr></table>';
     }
     # Plugins
-    $content .= '<table width="66%" cellspacing="2" border="0" cellpadding="0">'
+    $content .= '<table summary="" width="66%" cellspacing="2" border="0" cellpadding="0">'
                 .'<tr><td width="66%" colspan="2">'.getLanguageValue("toolbar_platzhalter").'</td></tr>'
                 .'<tr><td width="33%">'.returnPluginSelectbox().'</td>'
                 .'<td width="33%">'.returnPlatzhalterSelectbox().'</td>'

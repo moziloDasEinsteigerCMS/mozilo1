@@ -356,10 +356,10 @@ $CHARSET = 'UTF-8';
             $url = $URL_BASE.substr($CAT_REQUEST,3)."/".substr($PAGE_REQUEST,3).".html";
         }
         // TODO: sollte auch wahlweise ueber ein Template gehen
-        return '<form action="'.$url.'" method="post">
+        return '<form action="'.$url.'" method="post" class="contentpassword">
         '.$language->getLanguageValue0("passwordform_pagepasswordplease_0").' 
-        <input type="password" name="password" />
-        <input type="submit" value="'.$language->getLanguageValue0("passwordform_send_0").'" />
+        <input type="password" name="password" class="contentpassword_input" />
+        <input type="submit" value="'.$language->getLanguageValue0("passwordform_send_0").'" class="contentpassword_button" />
         </form>';
     }
 
