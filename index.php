@@ -1393,7 +1393,7 @@ $CHARSET = 'UTF-8';
             $calculation_data = getRandomCalculationData();
             $_SESSION['calculation_result'] = $calculation_data[1];
             $form .= "<tr><td colspan=\"2\">".$language->getLanguageValue0("contactform_spamprotection_text_0")."</td></tr>"
-                ."<tr><td style=\"padding-right:10px;\">".$calculation_data[0]."</td>"
+                ."<tr><td style=\"padding-right:10px;\">".$calculation_data[0]."*</td>"
                 ."<td><input type=\"text\" id=\"contact_calculation\" name=\"".$_SESSION['contactform_calculation']."\" value=\"\" /></td></tr>";
             
             $form .= "<tr><td style=\"padding-right:10px;\">&nbsp;</td><td>".$language->getLanguageValue0("contactform_mandatory_fields_0")."</td></tr>"
