@@ -1,10 +1,13 @@
+* {
+    font-family: tahoma, Arial, Verdana, sans-serif;
+    font-size:13px;
+}
 body
 {
-    color:#000000;
-    font-family: Arial, Verdana, sans-serif;
-    font-size:14px;
+    color:#11132;
     margin:0;
     padding:0;
+    text-align:center;
 }
 .form
 {
@@ -14,87 +17,39 @@ body
 }
 table
 {
-    font-size:14px;
-    /*width: 100%;
-    border-collapse:separate;*/
+}
+td {
+vertical-align:top;
 }
 
 
 
 input, select
 {
-    font-size:14px;
+    -moz-border-radius:2x;
 }
 
 .titel /* Titel */
 {
-    font-size:16px;
+    font-size:1.3em;
     font-weight:bolder;
     margin-top:10px;
     margin-bottom:5px;
     text-decoration:none;
 }
-/* Titel 
-h2 
-{
-    font-size:16px;
-    font-weight:bolder;
-    margin-top:10px;
-    margin-bottom:5px;
-    text-decoration:none;
-}*/
-h3 /* Titel erkl�rung*/
-{
-    /*font-size: 12px;*/
-    margin-top:10px;
-    margin-bottom:5px;
-    text-decoration:none;
-}
-p /* Text miteilung*/
-{
-    /*font-size:12px;*/
-    padding: 10px;
-    text-align: justify;
-}
-/*
-.font_small
-{
-    font-size:11px;
-}*/
-
-/*.access_key
-{
-    text-decoration:underline;
-}*/
-#table_admin
-{
-/*    width: 930px;
-    position:absolute; 
-    left:10px;
-    top:10px;*/
+/* Die Haupttabelle */
+#table_admin {
+    width:980px;
+    margin:10px auto;
     padding:0px;
-    margin:0px;
+    text-align:justify;
+/*    margin:0px;
     margin-left:10px;
     margin-top:10px;
     margin-right:10%;
-    margin-bottom:10px;
-    background-color:#F8F8F8;
+    margin-bottom:10px;*/
     border:none;
 }
-
-/*
-.div_content
-{
-    width:100%;
-    height:450px;
-}
-*/
-
-/*
-#table_admin td
-{
-    border:1px solid #ff0000;
-}*/
 
 #td_title
 {
@@ -105,13 +60,11 @@ p /* Text miteilung*/
 }
 #table_titel
 {
-    /*width:100%;*/
 }
 
 #td_table_titel_text
 {
     padding-left:10px;
-    /*line-height:24px;*/
     color: #5E8AB4;
     font-weight: bold;
     text-align:left;
@@ -147,13 +100,13 @@ p /* Text miteilung*/
 {
     text-decoration:none;
     font-weight:bold;
-    font-size:12px;
-    color:#000000;
+    color:#1E4A74;
 }
 
 .td_button {
     padding:0;
     margin:0;
+    vertical-align:bottom;
 }
 
 .td_button_activ {
@@ -168,9 +121,10 @@ p /* Text miteilung*/
     padding-left:5px;
     padding-right:10px;
     padding-top:3px;
-    padding-bottom:0px;
+    padding-bottom:3px;
     border: 1px solid #C0C0C0;
     background-color:#C9D7EB;
+    -moz-border-radius:5px 5px 0px 0px;
 }
 
 .td_button_activ a
@@ -180,10 +134,12 @@ p /* Text miteilung*/
     padding-left:5px;
     padding-right:10px;
     padding-top:3px;
-    padding-bottom:5px;
+    padding-bottom:8px;
     border: 1px solid #C0C0C0;
     border-bottom:none;
     background-color:#F8F8F8;
+    color:#002A54;
+    -moz-border-radius:5px 5px 0px 0px;
 }
 
 .rest_td_tabs
@@ -204,11 +160,9 @@ p /* Text miteilung*/
 #td_tabs
 {
     padding:0;
-    padding-top:10px;
+    padding-top:5px;
     margin:0;
     border:none;
-    /*background-color: #F8F8F8;
-    background-color: #ffffff;*/
 }
 
 #td_content
@@ -219,7 +173,7 @@ p /* Text miteilung*/
     border-left:1px solid #C0C0C0;
     border-right:1px solid #C0C0C0;
     border-bottom:1px solid #C0C0C0;
-    background-color: transparent;
+    background-color:#F8F8F8;
 }
 
 .message_erfolg
@@ -233,6 +187,7 @@ p /* Text miteilung*/
     background-color:#DDFFDD;
     background-position:5px 5px;
     background-repeat:no-repeat;
+    -moz-border-radius:5px;
 }
 
 .message_fehler
@@ -246,6 +201,7 @@ p /* Text miteilung*/
     background-color:#FFDDDD;
     background-position:5px 5px;
     background-repeat:no-repeat;
+    -moz-border-radius:5px;
 }
 
 .table_toggle
@@ -267,6 +223,10 @@ p /* Text miteilung*/
     padding-bottom:10px;
     border-top:1px solid #C0C0C0;
 }
+.td_toggle_inbetween
+{
+    background-color:#fff0f0;
+}
 .td_toggle_new
 {
     background-color:#fff0f0;
@@ -285,15 +245,11 @@ p /* Text miteilung*/
 
 .td_togglen
 {
-    /*padding-left:20px;*/
 }
 
 .td_togglen_padding_bottom
 {
-    /*margin:0;
-    padding:0;*/
     padding-bottom:10px;
-    /*padding-left:30px;*/
 }
 
 .td_icons
@@ -304,13 +260,11 @@ p /* Text miteilung*/
 .td_title
 {
     color:#686868;
-    font-size:11px;
 }
 
 .td_left_title
 {
     color:#686868;
-    font-size:11px;
     text-align:left;
     padding-right:10px;
 }
@@ -318,7 +272,6 @@ p /* Text miteilung*/
 .td_right_title
 {
     color:#686868;
-    font-size:11px;
     text-align:right;
     padding-right:10px;
 }
@@ -326,14 +279,12 @@ p /* Text miteilung*/
 .td_center_title
 {
     color:#686868;
-    font-size:11px;
     text-align:center;
 }
 
 .td_left_title_padding_bottom
 {
     color:#686868;
-    font-size:11px;
     text-align:left;
     padding-right:10px;
     padding-bottom:10px;
@@ -342,7 +293,6 @@ p /* Text miteilung*/
 .td_right_title_padding_bottom
 {
     color:#686868;
-    font-size:11px;
     text-align:right;
     padding-right:10px;
     padding-bottom:10px;
@@ -351,24 +301,14 @@ p /* Text miteilung*/
 .td_center_title_padding_bottom
 {
     color:#686868;
-    font-size:11px;
     text-align:center;
     padding-bottom:10px;
 }
-/*
-.td_cms_left_padding_left
-{
-    text-align:left;
-    padding-left:30px;
-    padding-top:10px;
-    padding-bottom:10px;
-}*/
 
 .td_cms_left
 {
     text-align:left;
     padding-left:30px;
-    /*padding-left:10px;*/
     padding-top:10px;
     padding-bottom:10px;
     vertical-align:top;
@@ -378,7 +318,6 @@ p /* Text miteilung*/
 {
     text-align:right;
     padding-right:10px;
-    /*padding-left:10px;*/
     padding-top:10px;
     padding-bottom:10px;
     vertical-align:top;
@@ -398,8 +337,6 @@ p /* Text miteilung*/
 {
     padding-top:10px;
     padding-bottom:10px;
-    /*padding:10px 0px;*/
-    /*font-size:14px;*/
     font-weight:bolder;
     text-align:left;
     border-bottom:1px solid #C0C0C0;
@@ -409,8 +346,6 @@ p /* Text miteilung*/
 {
     padding-top:10px;
     padding-bottom:10px;
-    /*padding:10px 0px;*/
-    /*font-size:14px;*/
     font-weight:bolder;
     text-align:left;
     border-top:1px solid #C0C0C0;
@@ -421,8 +356,6 @@ p /* Text miteilung*/
 {
     padding-top:10px;
     padding-bottom:10px;
-    /*padding:10px 0px;*/
-    /*font-size:14px;*/
     font-weight:bolder;
     text-align:left;
     border-top:1px solid #C0C0C0;
@@ -432,22 +365,17 @@ p /* Text miteilung*/
 {
     margin:0;
     padding:0;
-    /*margin-bottom:20px;*/
     border-collapse:collapse;
 }
 
 .td_gallery_img
 {
     padding:5px;
-    /*padding:10px 0px;*/
-    /*font-size:14px;*/
     border:1px solid #C0C0C0;
 }
 
 .table_contact
 {
-    /*text-align:left;
-    vertical-align:middle;*/
     border-collapse:collapse;
     margin:0;
     padding:0;
@@ -462,7 +390,6 @@ p /* Text miteilung*/
 .td_contact_title
  {
     color:#686868;
-    font-size:11px;
     font-weight:bolder;
 }
 /*zum Testen*/
@@ -478,9 +405,6 @@ td
     margin:0px;
     padding:0px;
     color:#000000;
-    font-size:14px;
-    height:18px;/*  fontsize + 4px*/
-    /*border:0;*/
     border:1px solid #C0C0C0;
     width:100%;
     background-color:#F8F8F8;
@@ -492,8 +416,6 @@ td
     margin:0px;
     padding:0px;
     color:#000000;
-    font-size:14px;
-    height:18px;/*  fontsize + 4px*/
     border:1px solid #C0C0C0;
     width:100%;
 }
@@ -504,8 +426,6 @@ td
     margin:0px;
     padding:0px;
     color:#000000;
-    font-size:14px;
-    height:18px;/*  fontsize + 4px*/
     border:1px solid #C0C0C0;
     width:70%;
 }
@@ -516,8 +436,6 @@ td
     margin:0px;
     padding:0px;
     color:#000000;
-    font-size:14px;
-    height:18px;/*  fontsize + 4px*/
     border:1px solid #C0C0C0;
     width:120px;
 }
@@ -528,15 +446,11 @@ td
     margin:0px;
     padding:0px;
     color:#000000;
-    font-size:14px;
-    height:18px;/*  fontsize + 4px*/
     border:1px solid #C0C0C0;
 }
 
 .plugin_textarea
 {
-    /*vertical-align:middle;*/
-    font-size:14px;
     margin:0px;
     padding:0px;
     border:1px solid #C0C0C0;
@@ -544,8 +458,6 @@ td
 
 .plugin_select
 {
-    /*vertical-align:middle;*/
-    font-size:14px;
     margin:0px;
     padding:0px;
     border:1px solid #C0C0C0;
@@ -554,14 +466,12 @@ td
 .text_cat_page
 {
     color:#000000;
-    font-size:14px;
     font-weight:bold;
 }
 
 .text_info
 {
     color:#000000;
-    font-size:11px;
 }
 
 .text_grau
@@ -596,7 +506,6 @@ td
     vertical-align:middle;
     margin:0px;
     padding:0px;
-    height:18px;/*  fontsize + 4px*/
     border:1px solid #C0C0C0;
     width:100%;
 }
@@ -606,40 +515,6 @@ td
     vertical-align:middle;
     padding:0px;
 }
-/*
-.input_noedit
-{
-    color:#686868;
-    vertical-align:middle;
-    margin:0px;
-    padding:0px;
-    height:18px;
-    border:1px solid #C0C0C0;
-    font-weight:bold;
-    width:100%;
-    background:#f8f8f8;
-    overflow:scroll;
-}*/
-/*
-.div_noedit
-{
-    color:#686868;
-    vertical-align:middle;
-    margin:0px;
-    padding:0px;
-    border:1px solid #C0C0C0;
-    font-size:14px;
-    font-weight:bold;
-    width:250px;
-    background:#f8f8f8;
-    overflow:auto;
-}
-
-* html .div_noedit
-{
-    overflow-x:scroll;
-    overflow-y:visible;
-}*/
 
 .input_submit
 {
@@ -648,7 +523,6 @@ td
     padding:0 4px;
     height:24px;
     font-weight: bold;
-    /*background:#F8F8F8;*/
     border: 1px solid #C0C0C0;
     background-color:#C9D7EB;
 }
@@ -656,51 +530,31 @@ td
 
 .file_link
 {
-    font-weight:bold;
-    color:#000000;
-    font-size:14px;
-/*    text-decoration:none;*/
 }
 
 .file_link:hover
 {
-    color:#ff0000;
 }
 
 
 
 .table_cms
 {
-/*    margin:0;*/
     padding:0;
     text-align:left;
     vertical-align:middle;
-    /*margin-left:3%;*/
-    /*width:100%;*/
-    /*border:1px solid #ff0000;*/
 }
 
 
 
 .td_cms_2_1
 {
-/*    padding-left:20px;
-    padding-top:10px;
-    padding-bottom:10px;*/
-    /*border:none;
-    border:1px solid #00ff00;*/
-    /*width: 3%;*/
-    /*border-top:1px solid #C0C0C0;*/
 }
 
 .td_cms_2_2
 {
-    /*padding-left:20px;*/
     padding-top:10px;
     padding-bottom:10px;
-    /*border:none;
-    border:1px solid #00ff00;*/
-    /*width: 62%;*/
     border-bottom:1px solid #C0C0C0;
     vertical-align:top;
 }
@@ -710,48 +564,21 @@ td
     padding-left:20px;
     padding-top:10px;
     padding-bottom:10px;
-    /*border:none;
-    border:1px solid #00ff00;*/
     text-align:left;
-    /*width: 35%;*/
     border-bottom:1px solid #C0C0C0;
 }
 .table_cms tr
 {
-    /*margin:0;
-    padding:10px 0;*/
-    /*border-left:2px solid #0000ff;
-    border-right:2px solid #0000ff;*/
-    /*border-top:1px solid #C0C0C0;*/
-    /*background:#f0f0f0;*/
-    /*border-top:1px solid #C0C0C0;*/
 }
-/*
-.td_cms_titel
-{
-    padding-top:20px;
-    padding-bottom:10px;
-    font-weight:bolder;
-    text-align:left;
-    border-bottom:1px solid #C0C0C0;
-}*/
 
 .table_cms td
 {
-    /*margin:0;
-    padding:10px 0;*/
-    /*border-left:2px solid #0000ff;
-    border-right:2px solid #0000ff;*/
-    /*border-top:1px solid #C0C0C0;*/
-    /*background:#f0f0f0;*/
-    /*border:1px solid #0000ff;*/
 }
 .input_cms_text
 {
     vertical-align:middle;
     margin:0px;
     padding:0px;
-    height:18px;/*  fontsize + 4px*/
     border:1px solid #C0C0C0;
     width:260px;
 }
@@ -761,7 +588,6 @@ td
     vertical-align:middle;
     margin:0px;
     padding:0px;
-    height:18px;/*  fontsize + 4px*/
     border:1px solid #C0C0C0;
     width:260px;
 }
@@ -771,14 +597,12 @@ td
     vertical-align:middle;
     margin:0px;
     padding:0px;
-    height:18px;/*  fontsize + 4px*/
     border:1px solid #C0C0C0;
     width:50px;
 }
 
 .textarea_cms
 {
-    /*vertical-align:middle;*/
     margin:0px;
     padding:0px;
     height:120px;
@@ -808,7 +632,6 @@ td
     margin:0px;
     margin-left:10px;
     padding:0px;
-    height:18px;/*  fontsize + 4px*/
     border:1px solid #C0C0C0;
 }
 
@@ -832,14 +655,8 @@ td
     border: 1px solid #C0C0C0;
     width:100%;
 }
-/*
-div td {
-    border: 1px solid #ff0000;
-}*/
 #table_loginform
 {
-    /*margin:10px;
-    width:280px;*/
 }
 div#loginform_maindiv
 {
@@ -852,7 +669,6 @@ div#loginform_maindiv
     left: 50%;
     position: absolute;
     border: 1px solid #C0C0C0;
-    /*padding: 10px;*/
     background-color: white;
 }
 div#loginform_maindiv_disabled
@@ -866,7 +682,6 @@ div#loginform_maindiv_disabled
     left: 50%;
     position: absolute;
     border: 1px solid #C0C0C0;
-    /*padding: 10px;*/
     background-color: #e0e0e0;
     color:#777777;
 }
@@ -886,7 +701,6 @@ div#loginform_shadowdiv
     left: 50%;
     position: absolute;
     background-color: #DCDCDC;
-    /*padding: 10px;*/
 }
 
 div.message_fehler
@@ -902,15 +716,3 @@ div.message_fehler
     background-color: #FFECEC;
     text-align: center;
 }
-/*
-div#loginform_logo
-{
-    height: 416px;
-    width: 667px;
-    padding: 0;
-    top: 50%;
-    left: 50%;
-    position: absolute;
-    background-color: #DCDCDC;
-    padding: 10px;
-}*/
