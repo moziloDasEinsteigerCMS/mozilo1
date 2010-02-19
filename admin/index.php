@@ -180,6 +180,7 @@ $EXT_DRAFT     = ".tmp";
 $EXT_LINK     = ".lnk";
 
 $icon_size = "24x24"; # 16x16 22x22 24x24 32x32 48x48
+$icon_size_tabs = "16x16"; # 16x16 22x22 24x24 32x32 48x48
 
 $post = NULL;
 # getRequestParam() ferarbeitet nur $_POST sachen deshalb hier eine ausname
@@ -316,7 +317,7 @@ foreach($array_tabs as $position => $language) {
     }
     if($action == $language) $activ = "_activ"; else $activ = NULL;
     $html .= '<td align="left" valign="bottom" width="2%" class="td_button'.$activ.'" nowrap'.$tooltip.'>';
-    $html .= '<a id="tab_'.$position.'" href="index.php?action_'.$position.'='.$language.'" title="'.getLanguageValue($language."_button",true).'"><img class="tab_img" src="gfx/icons/'.$icon_size.'/'.$language.'.png" alt="" hspace="0" vspace="0" border="0">'.getLanguageValue($language."_button").'</a>';
+    $html .= '<a id="tab_'.$position.'" href="index.php?action_'.$position.'='.$language.'" title="'.getLanguageValue($language."_button",true).'"><img class="tab_img" src="gfx/icons/'.$icon_size_tabs.'/'.$language.'.png" alt="" hspace="0" vspace="0" border="0">'.getLanguageValue($language."_button").'</a>';
     $html .= '<script type="text/javascript">document.getElementById("tab_'.$position.'").href="index.php?action_'.$position.'='.$language.'&javascript=ja";</script>';
     $html .= '</td>';
 # width="24" height="24"
@@ -614,21 +615,21 @@ function category($post) {
             if(count($post['categories']['cat']['position']) < $max_cat_page + 1) {
                 $pagecontent .= '<tr><td width="100%" class="td_toggle_new">'
 	                .'<table summary="" width="100%" class="table_new" border="0" cellspacing="0" cellpadding="0">'
-	                .'<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td>'
-	                .'<td width="30%" class="td_left_title"><b>'.$text_name.'</b>'
-	                .'</td><td width="30%" class="td_left_title"><b>'.$text_url_adress.'</b> '.$text_url_adress_description.'</td>'
-	                .'<td width="6%" class="td_center_title">&nbsp;</td>'
-	                .'<td width="6%" class="td_center_title">'.getLanguageValue("blank").'</td>'
-	                .'<td width="6%" class="td_center_title">'.getLanguageValue("self").'</td><td>&nbsp;</td></tr>';
+	                .'<tr><td class="td_left_title"><b>'.$text_position.'</b></td>'
+	                .'<td class="td_left_title"><b>'.$text_name.'</b>'
+	                .'</td><td class="td_left_title"><b>'.$text_url_adress.'</b> '.$text_url_adress_description.'</td>'
+	                .'<td class="td_center_title">&nbsp;</td>'
+	                .'<td class="td_center_title">'.getLanguageValue("blank").'</td>'
+	                .'<td class="td_center_title">'.getLanguageValue("self").'</td></tr>';
                 $pagecontent .= '<tr>';
-                $pagecontent .= '<td width="6%" class="td_left_title"><input type="hidden" name="categories[cat][position]['.$max_cat_page.']" value="'.$post['categories']['cat']['position'][$max_cat_page].'">';
+                $pagecontent .= '<td class="td_left_title"><input type="hidden" name="categories[cat][position]['.$max_cat_page.']" value="'.$post['categories']['cat']['position'][$max_cat_page].'">';
                 $pagecontent .= '<input '.$post['categories']['cat']['error_html']['new_position'][$max_cat_page].'class="input_text" type="text" name="categories[cat][new_position]['.$max_cat_page.']" value="'.$post['categories']['cat']['new_position'][$max_cat_page].'" size="2" maxlength="2"'.$tooltip_category_help_new_position.'></td>';
-                $pagecontent .= '<td width="30%" class="td_left_title"><input type="text" '.$post['categories']['cat']['error_html']['new_name'][$max_cat_page].' class="input_text" name="categories[cat][new_name]['.$max_cat_page.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['new_name'][$max_cat_page], true, true).'" maxlength="'.$max_strlen.'"'.$tooltip_category_help_new_name.'></td>';
-                $pagecontent .= '<td width="30%" class="td_left_title"><input type="text" '.$post['categories']['cat']['error_html']['new_url'][$max_cat_page].' class="input_text" name="categories[cat][new_url]['.$max_cat_page.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['new_url'][$max_cat_page], true, true).'" maxlength="'.$max_strlen.'"'.$tooltip_help_new_url.'></td>';
-                $pagecontent .= '<td width="6%" class="td_center_title"'.$tooltip_help_target.'><b>'.$text_target.'</b></td><td width="6%" class="td_center_title"><input type="radio" name="categories[cat][new_target]['.$max_cat_page.']" value="-_blank-"'.$post['categories']['cat']['checked_blank'][$max_cat_page].$tooltip_help_target_blank.'></td>';
-                $pagecontent .= '<td width="6%" class="td_center_title"><input type="radio" name="categories[cat][new_target]['.$max_cat_page.']" value="-_self-"'.$post['categories']['cat']['checked_selv'][$max_cat_page].$tooltip_help_target_self.'></td>';
-                $pagecontent .= '<td>&nbsp;';
-                $pagecontent .= '</td></tr>';
+                $pagecontent .= '<td class="td_left_title"><input type="text" '.$post['categories']['cat']['error_html']['new_name'][$max_cat_page].' class="input_text" name="categories[cat][new_name]['.$max_cat_page.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['new_name'][$max_cat_page], true, true).'" maxlength="'.$max_strlen.'"'.$tooltip_category_help_new_name.'></td>';
+                $pagecontent .= '<td class="td_left_title"><input type="text" '.$post['categories']['cat']['error_html']['new_url'][$max_cat_page].' class="input_text" name="categories[cat][new_url]['.$max_cat_page.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['new_url'][$max_cat_page], true, true).'" maxlength="'.$max_strlen.'"'.$tooltip_help_new_url.'></td>';
+                $pagecontent .= '<td class="td_center_title"'.$tooltip_help_target.'><b>'.$text_target.'</b></td>'
+                .'<td class="td_center_title"><input type="radio" name="categories[cat][new_target]['.$max_cat_page.']" value="-_blank-"'.$post['categories']['cat']['checked_blank'][$max_cat_page].$tooltip_help_target_blank.'></td>';
+                $pagecontent .= '<td class="td_center_title"><input type="radio" name="categories[cat][new_target]['.$max_cat_page.']" value="-_self-"'.$post['categories']['cat']['checked_selv'][$max_cat_page].$tooltip_help_target_self.'></td>';
+                $pagecontent .= '</tr>';
                 $pagecontent .= '</table>';
                 $pagecontent .= '</td></tr>';
             }
@@ -1025,16 +1026,20 @@ function page($post) {
             if(!isset($display_new_cat)) {
                 $pagecontent .= '<tr><td width="100%" class="td_toggle_new">';
                 $pagecontent .= '<table summary="" width="100%" class="table_data" border="0" cellspacing="0" cellpadding="0">';
-                $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td width="30%" class="td_left_title"><b>'.$text_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_url_adress.'</b> '.$text_url_adress_description.'</td><td width="6%" class="td_center_title">&nbsp;</td><td width="6%" class="td_center_title">'.getLanguageValue("blank").'</td><td width="6%" class="td_center_title">'.getLanguageValue("self").'</td><td>&nbsp;</td></tr>';
+                $pagecontent .= '<tr><td class="td_left_title"><b>'.$text_position.'</b></td>'
+                .'<td class="td_left_title"><b>'.$text_name.'</b></td>'
+                .'<td class="td_left_title"><b>'.$text_url_adress.'</b> '.$text_url_adress_description.'</td>'
+                .'<td class="td_center_title">&nbsp;</td>'
+                .'<td class="td_center_title">'.getLanguageValue("blank").'</td>'
+                .'<td class="td_center_title">'.getLanguageValue("self").'</td></tr>';
                 $pagecontent .= '<tr>';
                 $pagecontent .= '<td width="6%" class="td_left_title"><input type="hidden" name="categories['.$cat.'][position]['.$max_cat_page.']" value="'.$post['categories'][$cat]['position'][$max_cat_page].'">';
                 $pagecontent .= '<input '.$post['categories'][$cat]['error_html']['new_position'][$max_cat_page].'class="input_text" type="text" name="categories['.$cat.'][new_position]['.$max_cat_page.']" value="'.$post['categories'][$cat]['new_position'][$max_cat_page].'" size="2" maxlength="2"'.$tooltip_page_help_new_position.'></td>';
-                $pagecontent .= '<td width="30%" class="td_left_title"><input type="text" '.$post['categories'][$cat]['error_html']['new_name'][$max_cat_page].' class="input_text" name="categories['.$cat.'][new_name]['.$max_cat_page.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_name'][$max_cat_page],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_new_name.'></td>';
-                $pagecontent .= '<td width="30%" class="td_left_title"><input type="text" '.$post['categories'][$cat]['error_html']['new_url'][$max_cat_page].' class="input_text" name="categories['.$cat.'][new_url]['.$max_cat_page.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_url'][$max_cat_page],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_help_new_url.'></td>';
-                $pagecontent .= '<td width="6%" class="td_center_title"'.$tooltip_help_target.'><b>'.$text_target.'</b></td><td width="6%" class="td_center_title"><input type="radio" name="categories['.$cat.'][new_target]['.$max_cat_page.']" value="-_blank-"'.$post['categories'][$cat]['checked_blank'][$max_cat_page].''.$tooltip_help_target_blank.'></td>';
-                $pagecontent .= '<td width="6%" class="td_center_title"><input type="radio" name="categories['.$cat.'][new_target]['.$max_cat_page.']" value="-_self-"'.$post['categories'][$cat]['checked_selv'][$max_cat_page].''.$tooltip_help_target_self.'></td>';
-                $pagecontent .= '<td nowrap>&nbsp;';
-                $pagecontent .= '</td>';
+                $pagecontent .= '<td class="td_left_title"><input type="text" '.$post['categories'][$cat]['error_html']['new_name'][$max_cat_page].' class="input_text" name="categories['.$cat.'][new_name]['.$max_cat_page.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_name'][$max_cat_page],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_new_name.'></td>';
+                $pagecontent .= '<td class="td_left_title"><input type="text" '.$post['categories'][$cat]['error_html']['new_url'][$max_cat_page].' class="input_text" name="categories['.$cat.'][new_url]['.$max_cat_page.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_url'][$max_cat_page],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_help_new_url.'></td>';
+                $pagecontent .= '<td class="td_center_title"'.$tooltip_help_target.'><b>'.$text_target.'</b></td>'
+                .'<td class="td_center_title"><input type="radio" name="categories['.$cat.'][new_target]['.$max_cat_page.']" value="-_blank-"'.$post['categories'][$cat]['checked_blank'][$max_cat_page].''.$tooltip_help_target_blank.'></td>';
+                $pagecontent .= '<td class="td_center_title"><input type="radio" name="categories['.$cat.'][new_target]['.$max_cat_page.']" value="-_self-"'.$post['categories'][$cat]['checked_selv'][$max_cat_page].''.$tooltip_help_target_self.'></td>';
                 $pagecontent .= '</tr></table>';
 
                 $pagecontent .= '</td></tr>';
@@ -1102,24 +1107,33 @@ function page($post) {
             $pagecontent .= '<td width="100%" class="td_togglen_padding_bottom" align="right" '.$post['categories'][$cat]['error_html']['display'][$pos].' id="toggle_'.substr($cat,0,2).'_'.$pos.'">';
 
             if(isset($post['categories'][$cat]['url'][$pos])) {
-                $pagecontent .= '<table summary="" width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data"><tr><td width="30%" valign="bottom" nowrap class="td_left_title"><b>'.$text_new_name.'</b></td>';
-                $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_url_adress.'</b></td>';
-                $pagecontent .= '<td width="30%" class="td_left_title">';
+                $pagecontent .= '<table summary="" width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data">'
+                .'<tr><td width="30%" valign="bottom" nowrap class="td_left_title"><b>'.$text_new_name.'</b></td>';
+                $pagecontent .= '<td class="td_right_title" nowrap><b>'.$text_url_adress.'</b></td>';
+                $pagecontent .= '<td class="td_left_title">';
                 $pagecontent .= '<input type="text" class="input_readonly" name="categories['.$cat.'][url]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['url'][$pos],true,true).'" maxlength="'.$max_strlen.'" readonly>';
-
-                $pagecontent .= '</td><td width="6%" class="td_center_title">&nbsp;</td><td width="6%" valign="bottom" class="td_center_title">'.getLanguageValue("blank").'</td><td width="6%" valign="bottom" class="td_center_title">'.getLanguageValue("self").'</td><td class="td_left_title">&nbsp;</td>';
+                $pagecontent .= '</td>'
+                .'<td class="td_center_title">&nbsp;</td>'
+                .'<td valign="bottom" class="td_center_title">'.getLanguageValue("blank").'</td>'
+                .'<td valign="bottom" class="td_center_title">'.getLanguageValue("self").'</td>';
                 $pagecontent .= '</tr><tr>';
                 $pagecontent .= '';
-                $pagecontent .= '<td width="30%" class="td_left_title"><input type="text" '.$post['categories'][$cat]['error_html']['new_name'][$pos].' class="input_text" name="categories['.$cat.'][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_name'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_name.'></td>';
-                $pagecontent .= '<td width="9%" class="td_right_title" nowrap><b>'.$text_url_new_adress.'</b></td>';
-                $pagecontent .= '<td width="30%" class="td_left_title"><input type="text" '.$post['categories'][$cat]['error_html']['new_url'][$pos].' class="input_text" name="categories['.$cat.'][new_url]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_url'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_help_url.'></td>';
-                $pagecontent .= '<td width="6%" class="td_center_title"'.$tooltip_help_target.'><b>'.$text_target.'</b></td><td width="6%" class="td_center_title"><input type="radio" name="categories['.$cat.'][new_target]['.$pos.']" value="-_blank-"'.$post['categories'][$cat]['checked_blank'][$pos].''.$tooltip_help_target_blank.'></td>';
-                $pagecontent .= '<td width="6%" class="td_center_title"><input type="radio" name="categories['.$cat.'][new_target]['.$pos.']" value="-_self-"'.$post['categories'][$cat]['checked_selv'][$pos].''.$tooltip_help_target_self.'><input type="hidden" name="categories['.$cat.'][target]['.$pos.']" value="'.$post['categories'][$cat]['target'][$pos].'"></td><td>&nbsp;</td>';
+                $pagecontent .= '<td class="td_left_title"><input type="text" '.$post['categories'][$cat]['error_html']['new_name'][$pos].' class="input_text" name="categories['.$cat.'][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_name'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_name.'></td>';
+                $pagecontent .= '<td class="td_right_title" nowrap><b>'.$text_url_new_adress.'</b></td>';
+                $pagecontent .= '<td class="td_left_title"><input type="text" '.$post['categories'][$cat]['error_html']['new_url'][$pos].' class="input_text" name="categories['.$cat.'][new_url]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_url'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_help_url.'></td>';
+                $pagecontent .= '<td class="td_center_title"'.$tooltip_help_target.'><b>'.$text_target.'</b></td>'
+                .'<td width="6%" class="td_center_title"><input type="radio" name="categories['.$cat.'][new_target]['.$pos.']" value="-_blank-"'.$post['categories'][$cat]['checked_blank'][$pos].''.$tooltip_help_target_blank.'></td>';
+                $pagecontent .= '<td class="td_center_title"><input type="radio" name="categories['.$cat.'][new_target]['.$pos.']" value="-_self-"'.$post['categories'][$cat]['checked_selv'][$pos].''.$tooltip_help_target_self.'><input type="hidden" name="categories['.$cat.'][target]['.$pos.']" value="'.$post['categories'][$cat]['target'][$pos].'"></td>';
                 $pagecontent .= '</tr></table>';
             } else {
-                $pagecontent .= '<table summary="" width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0"><tr><td width="30%" class="td_left_title" nowrap><b>'.$text_new_name.'</b></td><td width="6%" class="td_left_title">&nbsp;</td><td width="30%" class="td_left_title"><b>'.$text_page_password.'</b></td><td class="td_left_title">&nbsp;</td></tr>';
-                $pagecontent .= '<tr><td width="30%" class="td_left_title" nowrap><input type="text" '.$post['categories'][$cat]['error_html']['new_name'][$pos].' class="input_text" name="categories['.$cat.'][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_name'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_name.'></td><td width="6%">&nbsp;</td><td width="30%" class="td_left_title"><input type="text" '.$post['categories'][$cat]['error_html']['password'][$pos].' class="input_text" name="categories['.$cat.'][password]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['password'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_password.'></td><td class="td_left_title">';
-
+                $pagecontent .= '<table summary="" width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0"><tr>'
+                .'<td width="30%" class="td_left_title" nowrap><b>'.$text_new_name.'</b></td><td width="6%" class="td_left_title">&nbsp;</td>'.
+                '<td width="30%" class="td_left_title"><b>'.$text_page_password.'</b></td>'
+                .'<td class="td_left_title">&nbsp;</td></tr>';
+                $pagecontent .= '<tr><td class="td_left_title" nowrap><input type="text" '.$post['categories'][$cat]['error_html']['new_name'][$pos].' class="input_text" name="categories['.$cat.'][new_name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['new_name'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_name.'></td>'
+                .'<td>&nbsp;</td>'
+                .'<td class="td_left_title"><input type="text" '.$post['categories'][$cat]['error_html']['password'][$pos].' class="input_text" name="categories['.$cat.'][password]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['password'][$pos],true,true).'" maxlength="'.$max_strlen.'"'.$tooltip_page_help_password.'></td>'
+                .'<td class="td_left_title">';
                 if($PASSWORDS->get($cat."/".$post['categories'][$cat]['position'][$pos]."_".$post['categories'][$cat]['name'][$pos])) {
                     $pagecontent .= '<b>'.$text_page_password_del.'</b>&nbsp;<input class="input_check" type="checkbox" name="categories['.$cat.'][password_del]['.$pos.']" value="yes"'.$tooltip_page_help_password_del.'>';
                 } else {
@@ -1861,15 +1875,13 @@ function gallery($post) {
     $pagecontent .= '<td width="20%" class="td_left_title_padding_bottom">
     <table summary="" width="100%" cellspacing="0" border="0" cellpadding="0">
     <tr>
-    <td width="10%">&nbsp;</td>
-    <td width="10%" class="td_center_title">&nbsp;&nbsp;'.getLanguageValue("blank").'&nbsp;&nbsp;</td>
-    <td width="10%" class="td_center_title">&nbsp;&nbsp;'.getLanguageValue("self").'&nbsp;&nbsp;</td>
-    <td width="70%">&nbsp;</td>
+    <td width="33%">&nbsp;</td>
+    <td width="33%" class="td_center_title">&nbsp;&nbsp;'.getLanguageValue("blank").'&nbsp;&nbsp;</td>
+    <td width="33%" class="td_center_title">&nbsp;&nbsp;'.getLanguageValue("self").'&nbsp;&nbsp;</td>
     </tr><tr>
     <td class="td_center_title"><b'.$tooltip_help_target.'>'.$text_target.'</b></td>
     <td class="td_center_title"><input type="radio" name="gallery[setings][target]" value="_blank"'.$tooltip_help_target_blank.$checket_blank.'></td>
     <td class="td_center_title"><input type="radio" name="gallery[setings][target]" value="_self"'.$tooltip_help_target_self.$checket_self.'></td>
-    <td>&nbsp;</td>
     </tr>
     </table></td>';
     if($ADMIN_CONF->get('showexpert') == "true") {
@@ -1940,13 +1952,13 @@ function gallery($post) {
 
 
 
-        $pagecontent .= '<td width="30%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_newname.'>';#<b>Setings</b>
+        $pagecontent .= '<td class="td_left_title_padding_bottom td_toggle_new"'.$tooltip_gallery_help_newname.'>';
         $pagecontent .= '<b>'.$text_gallery_newname.'</b>';
         $pagecontent .= '</td>';
-        $pagecontent .= '<td width="70%" align="right" valign="top" class="td_title"><b>'.getLanguageValue("files_button_upload").'</b></td>';
+        $pagecontent .= '<td align="right" valign="top" class="td_title td_toggle_new"><b>'.getLanguageValue("gallery_newimage").'</b></td>';
         $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="30%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_newname.'><input type="text" class="input_text" name="gallery['.$currentgalerien.'][newname]" value="" maxlength="'.$max_strlen.'"'.$post['gallery']['error_html']['newname'][$currentgalerien].$tooltip_gallery_help_newname.'></td>';
-        $pagecontent .= '<td width="70%" align="right" valign="top" class="td_togglen_padding_bottom">';
+        $pagecontent .= '<td class="td_left_title_padding_bottom td_toggle_padding"'.$tooltip_gallery_help_newname.'><input type="text" class="input_text" name="gallery['.$currentgalerien.'][newname]" value="" maxlength="'.$max_strlen.'"'.$post['gallery']['error_html']['newname'][$currentgalerien].$tooltip_gallery_help_newname.'></td>';
+        $pagecontent .= '<td align="right" valign="top" class="td_togglen_padding_bottom td_toggle_padding">';
         $pagecontent .= '<input type="file" id="uploadfileinput_'.$pos.'" name="uploadfile['.$currentgalerien.']" class="uploadfileinput">
                         <div id="files_list_'.$pos.'" class="text_cat_page"></div>
                         <script type="text/javascript">
@@ -2515,7 +2527,9 @@ function files($post) {
         if (isValidDirOrFile($file) && ($subhandle = @opendir($CONTENT_DIR_REL.$file."/dateien"))) {
             $hasdata = false;
             $pagecontent .= '<table summary="" width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
-            $pagecontent .= '<tr><td class="td_left_title_padding_bottom" colspan="1">'.$text_files_text_upload.'</td><td colspan="4" class="td_right_title_padding_bottom"'.$tooltip_files_help_upload.'><input type="file" id="uploadfileinput_'.$pos.'" name="uploadfile" class="uploadfileinput"></td></tr><tr><td colspan="5" class="td_right_title_padding_bottom"><div id="files_list_'.$pos.'" class="text_cat_page"></div>';
+            $pagecontent .= '<tr><td class="td_left_title_padding_bottom td_toggle_new" colspan="1">'.$text_files_text_upload.'</td>'
+            .'<td colspan="4" class="td_right_title_padding_bottom td_toggle_new"'.$tooltip_files_help_upload.'><input type="file" id="uploadfileinput_'.$pos.'" name="uploadfile" class="uploadfileinput"></td></tr>'
+            .'<tr><td colspan="5" class="td_right_title_padding_bottom td_toggle"><div id="files_list_'.$pos.'" class="text_cat_page"></div>';
             $pagecontent .= '<script type="text/javascript">
             <!-- Create an instance of the multiSelector class, pass it the output target and the max number of files -->
             var multi_selector = new MultiSelector( document.getElementById( \'files_list_'.$pos.'\' ), \''.$maxnumberoffiles.'\', \''.$text_files_button_cut.'\' );
@@ -3429,7 +3443,7 @@ function admin($post) {
             if (substr($element,9,4) == $ADMIN_CONF->get("language")) {
                 $selected = "selected ";
             }
-            $pagecontent .= "<option ".$selected."value=\"".substr($element,9,4)."\">".substr($element,9,4)." (".getLanguageValue("admin_input_translator")." ".$currentlanguage."</option>";
+            $pagecontent .= "<option ".$selected."value=\"".substr($element,9,4)."\">".substr($element,9,4)." (".getLanguageValue("admin_input_translator")." ".$currentlanguage.")</option>";
         }
     }
 
