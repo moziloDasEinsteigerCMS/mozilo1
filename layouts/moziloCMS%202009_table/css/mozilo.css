@@ -125,9 +125,13 @@ s {
 /* [ueber1|...] */
 /* ------------ */
 h1 {
-	font-size:130%;
+    /*font-family: Arial, Helvetica, sans-serif;*/
+    font-size: 20px;
+    color: #0B1C47;
+    font-weight: normal;
+/*	font-size:130%;
 	margin-top:10px;
-	margin-bottom:5px;
+	margin-bottom:5px;*/
 }
 
 
@@ -150,6 +154,34 @@ h3 {
 	margin-bottom:4px;
 }
 
+
+/* -------------------------------------------------------- */
+/* [zentriert|...] */
+/* --------------- */
+.aligncenter {
+    text-align:center;
+}
+
+/* -------------------------------------------------------- */
+/* [links|...] */
+/* ----------- */
+.alignleft {
+    text-align:left;
+}
+
+/* -------------------------------------------------------- */
+/* [rechts|...] */
+/* ------------ */
+.alignright {
+    text-align:right;
+}
+
+/* -------------------------------------------------------- */
+/* [block|...] */
+/* ----------- */
+.alignjustify {
+    text-align:justify;
+}
 
 /* -------------------------------------------------------- */
 /* [liste|...] */
