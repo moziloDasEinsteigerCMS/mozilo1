@@ -24,7 +24,7 @@ td {
 
 
 
-input, select
+input, select, textarea
 {
     -moz-border-radius:2px;
     -webkit-border-radius:2px;
@@ -462,6 +462,7 @@ td
     padding:0px;
     color:#000000;
     border:1px solid #C0C0C0;
+    width:200px;
 }
 
 .plugin_textarea
@@ -469,6 +470,7 @@ td
     margin:0px;
     padding:0px;
     border:1px solid #C0C0C0;
+    width:200px;
 }
 
 .plugin_select
@@ -476,6 +478,7 @@ td
     margin:0px;
     padding:0px;
     border:1px solid #C0C0C0;
+    width:200px;
 }
 
 .text_cat_page
