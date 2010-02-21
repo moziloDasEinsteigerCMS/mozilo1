@@ -1,2 +1,2 @@
 [ueber1|Eine Galerie]
-[galerie|moziloCMS]
+{Galerie|moziloCMS}
