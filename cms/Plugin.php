@@ -1,9 +1,9 @@
 <?php
 /* 
 * 
-* $Revision: 399 $
-* $LastChangedDate: 2010-01-21 17:36:18 +0100 (Do, 21. Jan 2010) $
-* $Author: stefanbe $
+* $Revision$
+* $LastChangedDate$
+* $Author$
 *
 */
 
