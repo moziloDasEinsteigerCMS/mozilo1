@@ -667,10 +667,10 @@ function category($post) {
 
         $pagecontent .= '<table summary="" width="100%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
        if(!isset($display_new_cat_name)) {
-            $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td class="td_left_title"><b>'.$text_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_contents.'</b></td><td width="15%" class="td_icons">&nbsp;</td></tr>';
+            $pagecontent .= '<tr><td width="8%" class="td_left_title"><b>'.$text_position.'</b></td><td class="td_left_title"><b>'.$text_name.'</b></td><td width="30%" class="td_left_title"><b>'.$text_contents.'</b></td><td width="15%" class="td_icons">&nbsp;</td></tr>';
             $display_new_cat_name = true;
         }
-        $pagecontent .= '<tr><td width="6%" class="td_left_title"><input type="hidden" name="categories[cat][position]['.$pos.']" value="'.$post['categories']['cat']['position'][$pos].'">';
+        $pagecontent .= '<tr><td width="8%" class="td_left_title"><input type="hidden" name="categories[cat][position]['.$pos.']" value="'.$post['categories']['cat']['position'][$pos].'">';
         $pagecontent .= '<input '.$post['categories']['cat']['error_html']['new_position'][$pos].'class="input_text" type="text" name="categories[cat][new_position]['.$pos.']" value="'.$post['categories']['cat']['new_position'][$pos].'" size="2" maxlength="2"'.$tooltip_category_help_position.'>';
         $pagecontent .= '</td><td class="td_left_title"><span '.$post['categories']['cat']['error_html']['name'][$pos].'class="text_cat_page">'.$specialchars->rebuildSpecialChars($post['categories']['cat']['name'][$pos], true, true).'</span><input type="hidden" name="categories[cat][name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['name'][$pos], true, true).'"></td><td width="30%" class="td_left_title"><span class="text_info">'.$text.'</span></td><td width="15%" class="td_icons">';
         if(getRequestParam('javascript', true)) {
@@ -972,7 +972,7 @@ function page($post) {
 
     $array_getTooltipValue = array("help_new_url","help_target_blank","help_target_self","help_target","help_url",
         "page_help_edit","page_help_position","page_help_new_position","page_help_name","page_help_new_name",
-        "page_help_move","page_help_editieren","page_help_delete","page_help_copy","page_help_password","page_help_password_del");
+        "page_help_move","page_help_editieren","page_help_edit_pages","page_help_delete","page_help_copy","page_help_password","page_help_password_del");
 
     # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getTooltipValue as $language) {
@@ -1005,7 +1005,7 @@ function page($post) {
         $pagecontent .= '<td width="20%" class="td_left_title"><span class="text_info">'.$text.'</span></td>';
         $pagecontent .= '<td width="15%" class="td_icons">&nbsp;';
         if(getRequestParam('javascript', true)) {
-            $pagecontent .= '<span id="toggle_'.substr($cat,0,2).'_linkBild"'.$tooltip_page_help_edit.'></span>';
+            $pagecontent .= '<span id="toggle_'.substr($cat,0,2).'_linkBild"'.$tooltip_page_help_edit_pages.'></span>';
         }
         $pagecontent .= '</td></tr>';
         $pagecontent .= '</table>';
@@ -1068,10 +1068,10 @@ function page($post) {
 
             $pagecontent .= '<table summary="" width="100%" class="table_data" border="0" cellspacing="0" cellpadding="0">';
             if(!isset($display_new_cat_name)) {
-                $pagecontent .= '<tr><td width="6%" class="td_left_title"><b>'.$text_position.'</b></td><td class="td_left_title"><b>'.$text_name.'</b></td><td width="12%" class="td_left_title"><b>'.$text_page_status.'</b></td><td width="17%" class="td_left_title"><b>'.$text_page_move.'</b></td><td width="12%" class="td_left_title">&nbsp;</td><td width="15%" class="td_icons">&nbsp;</td></tr>';
+                $pagecontent .= '<tr><td width="8%" class="td_left_title"><b>'.$text_position.'</b></td><td class="td_left_title"><b>'.$text_name.'</b></td><td width="12%" class="td_left_title"><b>'.$text_page_status.'</b></td><td width="17%" class="td_left_title"><b>'.$text_page_move.'</b></td><td width="12%" class="td_left_title">&nbsp;</td><td width="15%" class="td_icons">&nbsp;</td></tr>';
                 $display_new_cat_name = true;
             }
-            $pagecontent .= '<tr><td width="6%" class="td_left_title"><input '.$post['categories'][$cat]['error_html']['new_position'][$pos].'class="input_text" type="text" name="categories['.$cat.'][new_position]['.$pos.']" value="'.$post['categories'][$cat]['new_position'][$pos].'" size="2" maxlength="2"'.$tooltip_page_help_position.'><input type="hidden" name="categories['.$cat.'][position]['.$pos.']" value="'.$post['categories'][$cat]['position'][$pos].'"></td>';
+            $pagecontent .= '<tr><td width="8%" class="td_left_title"><input '.$post['categories'][$cat]['error_html']['new_position'][$pos].'class="input_text" type="text" name="categories['.$cat.'][new_position]['.$pos.']" value="'.$post['categories'][$cat]['new_position'][$pos].'" size="2" maxlength="2"'.$tooltip_page_help_position.'><input type="hidden" name="categories['.$cat.'][position]['.$pos.']" value="'.$post['categories'][$cat]['position'][$pos].'"></td>';
             $pagecontent .= '<td class="td_left_title">';
             if($post['categories'][$cat]['ext'][$pos] == $EXT_PAGE) {
                 $text = "(".$text_page_saveasnormal.")";
