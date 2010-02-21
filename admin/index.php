@@ -2940,8 +2940,8 @@ function config($post) {
     // Zeile "WEBSITE-TITELLEISTE"
     $titlebarsep = $specialchars->rebuildSpecialChars($CMS_CONF->get("titlebarseparator"),true,true);
     $txt_websitetitle = getLanguageValue("config_input_websitetitle");
-    $txt_category = getLanguageValue("category_button");
-    $txt_page = getLanguageValue("page_button");
+    $txt_category = getLanguageValue("category");
+    $txt_page = getLanguageValue("page");
     $pagecontent .= "<tr><td class=\"td_cms_left\">".getLanguageValue("config_text_websitetitlebar")."</td>";
     $pagecontent .= "<td class=\"td_cms_left\"><select name=\"titlebarformat\" class=\"input_cms_select\">";
     $titlebarformats = array(
@@ -2990,7 +2990,7 @@ function config($post) {
         }
         $pagecontent .= "<option".$selected." value=\"".substr($file,0,strlen($file)-strlen(".conf"))."\">";
         // Übersetzer aus der aktuellen Sprachdatei holen
-        $languagefile = new Properties("../sprachen/$file",true);
+        $languagefile = new Properties("../cms/sprachen/$file",true);
         $pagecontent .= substr($file,0,strlen($file)-strlen(".conf"))." (".getLanguageValue("config_input_translator")." ".$languagefile->get("_translator_0").")";
         $pagecontent .= "</option>";
     }
