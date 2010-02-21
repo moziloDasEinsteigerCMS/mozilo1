@@ -23,11 +23,14 @@ td {
 }
 
 
-/*
+
 input, select
 {
     -moz-border-radius:2px;
-}*/
+    -webkit-border-radius:2px;
+    -khtml-border-radius:2px;
+    border-radius:2px;
+}
 
 .titel /* Titel */
 {
@@ -124,7 +127,10 @@ input, select
     padding-bottom:3px;
     border: 1px solid #C0C0C0;
     background-color:#C9D7EB;
-   /* -moz-border-radius:5px 5px 0px 0px;*/
+    -moz-border-radius:5px 5px 0px 0px;
+    -webkit-border-radius:5px 5px 0px 0px;
+    -khtml-border-radius:5px 5px 0px 0px;
+    border-radius:5px 5px 0px 0px;
 }
 
 .td_button_activ a
@@ -139,7 +145,10 @@ input, select
     border-bottom:none;
     background-color:#F8F8F8;
     color:#002A54;
-    /*-moz-border-radius:5px 5px 0px 0px;*/
+    -moz-border-radius:5px 5px 0px 0px;
+    -webkit-border-radius:5px 5px 0px 0px;
+    -khtml-border-radius:5px 5px 0px 0px;
+    border-radius:5px 5px 0px 0px;
 }
 
 .rest_td_tabs
@@ -187,7 +196,10 @@ input, select
     background-color:#DDFFDD;
     background-position:5px 5px;
     background-repeat:no-repeat;
-    /*-moz-border-radius:5px;*/
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    -khtml-border-radius:5px;
+    border-radius:5px;
 }
 
 .message_fehler
@@ -201,7 +213,10 @@ input, select
     background-color:#FFDDDD;
     background-position:5px 5px;
     background-repeat:no-repeat;
-    /*-moz-border-radius:5px;*/
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    -khtml-border-radius:5px;
+    border-radius:5px;
 }
 
 .table_toggle
@@ -649,13 +664,19 @@ td
     margin-top: 10px;
     margin-bottom: 10px;
     background-color:#ffffff;
-    /*-moz-border-radius:2px;*/
+    -moz-border-radius:2px;
+    -webkit-border-radius:2px;
+    -khtml-border-radius:2px;
+    border-radius:2px;
 }
 .login_input
 {
     border: 1px solid #C0C0C0;
     width:100%;
-    /*-moz-border-radius:2px;*/
+    -moz-border-radius:2px;
+    -webkit-border-radius:2px;
+    -khtml-border-radius:2px;
+    border-radius:2px;
 }
 #table_loginform
 {
@@ -672,7 +693,10 @@ div#loginform_maindiv
     position: absolute;
     border: 1px solid #C0C0C0;
     background-color: white;
-    /*-moz-border-radius:5px;*/
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    -khtml-border-radius:5px;
+    border-radius:5px;
 }
 div#loginform_maindiv_disabled
 {
@@ -687,7 +711,10 @@ div#loginform_maindiv_disabled
     border: 1px solid #C0C0C0;
     background-color: #e0e0e0;
     color:#777777;
-    /*-moz-border-radius:5px;*/
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    -khtml-border-radius:5px;
+    border-radius:5px;
 }
 div#loginform_maindiv_disabled .login_input, div#loginform_maindiv_disabled .login_submit {
     background-color: #e0e0e0;
@@ -705,7 +732,10 @@ div#loginform_shadowdiv
     left: 50%;
     position: absolute;
     background-color: #DCDCDC;
-    /*-moz-border-radius:5px;*/
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    -khtml-border-radius:5px;
+    border-radius:5px;
 }
 
 div.message_fehler
