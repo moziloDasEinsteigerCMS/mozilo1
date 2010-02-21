@@ -4,7 +4,7 @@
 }
 body
 {
-    color:#11132;
+    color:#111132;
     margin:0;
     padding:0;
     text-align:center;
@@ -20,6 +20,15 @@ table
 }
 td {
     vertical-align:top;
+}
+
+a {
+    color:#1E4A74;
+    font-weight:bold;
+    text-decoration:none;
+}
+a:hover {
+    text-decoration:underline;
 }
 
 
