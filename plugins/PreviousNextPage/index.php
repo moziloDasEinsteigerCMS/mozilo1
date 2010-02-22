@@ -142,10 +142,12 @@ class PreviousNextPage extends Plugin {
             "mozilo",
             // Download-URL
             "http://cms.mozilo.de",
-            array('{LASTCHANGE|text}' => 'Lastchange Text Default "Letzte Änderung:"',
-                '{LASTCHANGE|page}' => 'Name der zuletzt geaenderten Inhaltsseite',
-                '{LASTCHANGE|pagelink}' => 'kompletter Link auf diese Inhaltsseite',
-                '{LASTCHANGE|date}' => 'formatiertes Datum der letzten Aenderung')
+            array('{PreviousNextPage|PreviousPage}' => '',
+                '{PreviousNextPage|PreviousPageFile}' => '',
+                '{PreviousNextPage|PreviousPageName}' => '',
+                '{PreviousNextPage|NextPage}' => '',
+                '{PreviousNextPage|NextPageFile}' => '',
+                '{PreviousNextPage|NextPageName}' => '')
             );
 
         if(isset($info[$language])) {
