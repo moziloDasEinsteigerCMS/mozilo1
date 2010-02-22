@@ -3622,7 +3622,7 @@ function plugins($post) {
                         if($pos == 0) continue;
                         if($pos == 2) {
                             $plugin_info[$pos] = str_replace(array("&lt;","&gt;"),array("<",">"),$plugin_info[$pos]);
-                            $plugin_info[$pos] = strip_tags($plugin_info[$pos], '<span><br \/><br>');
+                            $plugin_info[$pos] = strip_tags($plugin_info[$pos], '<span><br>');
                             $plugin_info[$pos] = htmlentities($plugin_info[$pos],ENT_NOQUOTES,$CHARSET);
                             $plugin_info[$pos] = str_replace(array('&amp;#',"&lt;","&gt;"),array('&#',"<",">"),$plugin_info[$pos]);
                         } elseif($pos == 4) {
