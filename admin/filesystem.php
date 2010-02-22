@@ -342,7 +342,7 @@ function updateReferencesInText($currentPagesContent, $currentPagesCategory, $mo
     // Für jeden Treffer...
 $debug = false; # true false
     foreach ($matches[0] as $i => $match) {
-if($debug) echo "alle matches = $match -----------<br>\n";
+if($debug) echo "alle matches = $match -----------<br />\n";
         # ein Hack weil dieses preg_match_all nicht mit ^, [ und ] im attribut umgehen kann
         $match = str_replace(array("&#94;&#091;","&#94;&#093;"),array("^[","^]"),$match);
         // ...Auswertung und Verarbeitung der Informationen
@@ -355,8 +355,8 @@ if($debug) echo "alle matches = $match -----------<br>\n";
         }
         if(in_array($allowed_test,$allowed_attributes))
         {
-if($debug) echo "match = $match -----------<br>\n";
-if($debug) echo "datei = $pos_currentPagesCategory/$movedPage<br>\n";
+if($debug) echo "match = $match -----------<br />\n";
+if($debug) echo "datei = $pos_currentPagesCategory/$movedPage<br />\n";
             # weil oldPage und newPage lehr sind Kategorie rename
             if(!empty($oldCategory) and !empty($newCategory) and empty($oldPage) and empty($newPage))
             {
@@ -364,7 +364,7 @@ if($debug) echo "datei = $pos_currentPagesCategory/$movedPage<br>\n";
                 if(strstr($match,"|".$oldCategory.":") or strstr($match,"|".$oldCategory."]"))
                 {
                     $replace_match = str_replace($oldCategory,$newCategory,$match);
-if($debug) echo "cat = $match -> $replace_match<br>\n";
+if($debug) echo "cat = $match -> $replace_match<br />\n";
                 }
             }
             # weil newCategory lehr Inhaltseite rename
@@ -376,7 +376,7 @@ if($debug) echo "cat = $match -> $replace_match<br>\n";
                 and $pos_oldCategory == $pos_currentPagesCategory )))
                 {
                     $replace_match = str_replace($oldPage,$newPage,$match);
-if($debug) echo "page = $match -> $replace_match<br>\n";
+if($debug) echo "page = $match -> $replace_match<br />\n";
                 }
             }
             # alles voll dann move Inhaltseite in andere Kategorie
@@ -389,7 +389,7 @@ if($debug) echo "page = $match -> $replace_match<br>\n";
                 and $oldCategory != $newCategory)
                 {
                     $replace_match = str_replace("|","|$oldCategory:",$match);
-if($debug) echo "+++cat = $match -> $replace_match<br>\n";
+if($debug) echo "+++cat = $match -> $replace_match<br />\n";
                     }
                 # weil in der zu bearbeitende Inhaltseite ein Object ist
                 # das in der Kategorie liegt in die die Inhaltseite verschoben wird,
@@ -399,13 +399,13 @@ if($debug) echo "+++cat = $match -> $replace_match<br>\n";
                 and $pos_currentPagesCategory == $pos_newCategory)
                 {
                     $replace_match = str_replace("|$newCategory:","|",$match);
-if($debug) echo "---cat = $match -> $replace_match<br>\n";
+if($debug) echo "---cat = $match -> $replace_match<br />\n";
                 }
                 # alle andern Inhaltseiten die [attribut|oldCategory:oldPage] enthalten ändern
                 elseif(strstr($match,"|$oldCategory:$oldPage]"))
                 {
                     $replace_match = str_replace("$oldCategory:$oldPage","$newCategory:$newPage",$match);
-if($debug) echo "cat_page = $match -> $replace_match<br>\n";
+if($debug) echo "cat_page = $match -> $replace_match<br />\n";
                 }
             }
             # änderung nur wenn was geändert wurde
@@ -413,10 +413,10 @@ if($debug) echo "cat_page = $match -> $replace_match<br>\n";
                 # ein Hack weil dieses preg_match_all nicht mit ^, [ und ] im attribut umgehen kann
                 $matches[0][$i] = str_replace(array("&#94;&#091;","&#94;&#093;"),array("^[","^]"),$matches[0][$i]);
                 $currentPagesContent = str_replace ($matches[0][$i], $replace_match, $currentPagesContent);
-if($debug) echo "diff == match = ".$matches[0][$i]." | replace_match = $replace_match<br>\n";
+if($debug) echo "diff == match = ".$matches[0][$i]." | replace_match = $replace_match<br />\n";
                 $changesmade = true;
             }
-if($debug) echo "<br>\n";
+if($debug) echo "<br />\n";
         }    
     }
     // Konvertierten Seiteninhalt zurückgeben

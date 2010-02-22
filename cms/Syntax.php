@@ -91,7 +91,7 @@ class Syntax {
             $value = $matches[2][$i];
 
             // Ausgabe zu Testzwecken
-            // echo "$i: $attribute - $value <br>";
+            // echo "$i: $attribute - $value <br />";
             
             // externer Link
             if ($attribute == "link") {

@@ -422,10 +422,10 @@ class Galerie extends Plugin {
             <br />
             <span style="font-weight:bold;">Konfiguration:</span><br />
             Das Ausehen kann durch Anordnen der Platzhalter im Textfeld geändert werden: {GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION}, {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}
-            <!--Bei Target <SPAN style="font-weight:bold;">blank</SPAN>:<br>
-            Optional ein Link Text am Ende mit <SPAN style="color:red;">Komma</SPAN> getränt z.B. <SPAN style="font-weight:bold;">{Galerie|Meine Galerie , Link Text}</SPAN><br>
-            <SPAN style="font-weight:bold;">{Galerie}</SPAN> in der <SPAN style="color:red;">gallerytemplate.html</SPAN> des Layouts. <br>
-            Erzeugt wird das Ausehen durch Anordnen dieser Platzhaltern <SPAN style="font-weight:bold;">{GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION}, {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}</SPAN> im Textfeld.<br>-->',
+            <!--Bei Target <SPAN style="font-weight:bold;">blank</SPAN>:<br />
+            Optional ein Link Text am Ende mit <SPAN style="color:red;">Komma</SPAN> getränt z.B. <SPAN style="font-weight:bold;">{Galerie|Meine Galerie , Link Text}</SPAN><br />
+            <SPAN style="font-weight:bold;">{Galerie}</SPAN> in der <SPAN style="color:red;">gallerytemplate.html</SPAN> des Layouts. <br />
+            Erzeugt wird das Ausehen durch Anordnen dieser Platzhaltern <SPAN style="font-weight:bold;">{GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION}, {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}</SPAN> im Textfeld.<br />-->',
             // Name des Autors
            "mozilo",
             // Download-URL

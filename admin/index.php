@@ -373,7 +373,7 @@ if (($intervallsetting != "") && preg_match("/^[0-9]+$/", $intervallsetting) && 
     else {
         $nextbackup = $lastbackup + $intervallinseconds;
         if($nextbackup <= time())    {
-            $html .= returnMessage(false, getLanguageValue("admin_messages_backup").'<br>Bitte bestätigen <input type="submit" name="lastbackup_yes" value="'.getLanguageValue("yes").'">');
+            $html .= returnMessage(false, getLanguageValue("admin_messages_backup").'<br />Bitte bestätigen <input type="submit" name="lastbackup_yes" value="'.getLanguageValue("yes").'">');
         }
     }
 }
@@ -851,7 +851,7 @@ function deleteCategory($post) {
     # Nachfragen wirklich Löschen
     if(!isset($_POST['confirm'])) {
         $del_cat = key($post['action_data']['deletecategory']);
-        $post['ask'] = getLanguageValue("category_ask_delete").'<br><span style="font-weight:normal;">-&gt;&nbsp;&nbsp;'.messagesOutLen($specialchars->rebuildSpecialChars($del_cat, true, true)).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletecategory]" value="'.$post['action_data']['deletecategory'].'"><input type="hidden" name="del_cat" value="'.$del_cat.'">';
+        $post['ask'] = getLanguageValue("category_ask_delete").'<br /><span style="font-weight:normal;">-&gt;&nbsp;&nbsp;'.messagesOutLen($specialchars->rebuildSpecialChars($del_cat, true, true)).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletecategory]" value="'.$post['action_data']['deletecategory'].'"><input type="hidden" name="del_cat" value="'.$del_cat.'">';
         $post['makepara'] = "yes";
         return $post;
     }
@@ -915,7 +915,7 @@ function page($post) {
                 $pagecontent .= categoriesMessages($post);
                 $cat = key($post['action_data']['editsite']);
                 $page = $post['action_data']['editsite'][$cat];
-                $pagecontent .= '<span class="titel">'.getLanguageValue("page_edit").' -&gt; </span>'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen($EXT_PAGE))), true, true).'<br><br>';
+                $pagecontent .= '<span class="titel">'.getLanguageValue("page_edit").' -&gt; </span>'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen($EXT_PAGE))), true, true).'<br /><br />';
                 $pagecontent .= $post['content'];
                 $pagecontent .= '<input type="hidden" name="checkpara" value="no">';
                 return array(getLanguageValue("page_button"), $pagecontent);
@@ -1555,7 +1555,7 @@ function deleteSite($post) {
     $del_page = $cat."/".$post['action_data']['deletesite'][$cat];
     # Nachfragen wirklich Löschen
     if(!isset($_POST['confirm'])) {
-        $post['ask'] = getLanguageValue("page_ask_delete").':<br><span style="font-weight:normal;">->&nbsp;&nbsp;'.$specialchars->rebuildSpecialChars($post['action_data']['deletesite'][$cat],true,true).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletesite]['.$cat.']" value="'.$post['action_data']['deletesite'][$cat].'">';
+        $post['ask'] = getLanguageValue("page_ask_delete").':<br /><span style="font-weight:normal;">->&nbsp;&nbsp;'.$specialchars->rebuildSpecialChars($post['action_data']['deletesite'][$cat],true,true).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletesite]['.$cat.']" value="'.$post['action_data']['deletesite'][$cat].'">';
         $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
         $post['makepara'] = "yes";
         return $post;
@@ -2355,7 +2355,7 @@ function deleteGalleryImg($post) {
         if (isset($_POST['confirm']) and ($_POST['confirm'] == "false")) {
             $post['gallery']['error_html']['display'][$gallery] = 'style="display:block;" ';
         } else {
-            $post['ask'] = getLanguageValue("gallery_ask_delete_img").':<br><span style="font-weight:normal;">->&nbsp;&nbsp;'.$specialchars->rebuildSpecialChars($del_file,true,true).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletegalleryimg]['.$gallery.']" value="'.$del_file.'">';
+            $post['ask'] = getLanguageValue("gallery_ask_delete_img").':<br /><span style="font-weight:normal;">->&nbsp;&nbsp;'.$specialchars->rebuildSpecialChars($del_file,true,true).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletegalleryimg]['.$gallery.']" value="'.$del_file.'">';
             $post['gallery']['error_html']['display'][$gallery] = 'style="display:block;" ';
         }
     }
@@ -2371,7 +2371,7 @@ function deleteGallery($post) {
     # Nachfragen wirklich Löschen
     if(!isset($_POST['confirm'])) {
         $del_gallery = key($post['action_data']['deletegallery']);
-        $post['ask'] = getLanguageValue("gallery_ask_delete").'<br><span style="font-weight:normal;">-&gt;&nbsp;&nbsp;'.messagesOutLen($specialchars->rebuildSpecialChars($del_gallery, true, true)).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletegallery]" value="'.$post['action_data']['deletegallery'].'"><input type="hidden" name="del_gallery" value="'.$del_gallery.'">';
+        $post['ask'] = getLanguageValue("gallery_ask_delete").'<br /><span style="font-weight:normal;">-&gt;&nbsp;&nbsp;'.messagesOutLen($specialchars->rebuildSpecialChars($del_gallery, true, true)).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletegallery]" value="'.$post['action_data']['deletegallery'].'"><input type="hidden" name="del_gallery" value="'.$del_gallery.'">';
     }
     # Gallery Löschen    
     if(isset($_POST['confirm']) and $_POST['confirm'] == "true" and isset($_POST['del_gallery']) and !empty($_POST['del_gallery'])) {
@@ -2667,7 +2667,7 @@ function deleteFile($post) {
             return $post;
         }
     } else {
-        $post['ask'] = getLanguageValue("files_ask_delete").':<br><span style="font-weight:normal;">->&nbsp;&nbsp;'.$specialchars->rebuildSpecialChars($del_file,true,true).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletefile]['.$cat.']" value="'.$del_file.'">';
+        $post['ask'] = getLanguageValue("files_ask_delete").':<br /><span style="font-weight:normal;">->&nbsp;&nbsp;'.$specialchars->rebuildSpecialChars($del_file,true,true).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletefile]['.$cat.']" value="'.$del_file.'">';
 
         $key = array_keys($post['categories']['cat']['position'], substr($cat,0,2));
         $post['categories']['cat']['error_html']['display'][$key[0]] = 'style="display:block;" ';
@@ -3136,14 +3136,14 @@ function config($post) {
         $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_showhiddenpages").'</td>';
         $pagecontent .= '<td class="td_cms_left">'
             // Obsolet seit 1.12
-            //.buildCheckBox("showhiddenpagesinlastchanged", ($CMS_CONF->get("showhiddenpagesinlastchanged") == "true")).getLanguageValue("config_input_lastchanged").'<br>'
-            .buildCheckBox("showhiddenpagesinsearch", ($CMS_CONF->get("showhiddenpagesinsearch") == "true")).getLanguageValue("config_input_search").'<br>'
-            .buildCheckBox("showhiddenpagesinsitemap", ($CMS_CONF->get("showhiddenpagesinsitemap") == "true")).getLanguageValue("config_input_sitemap").'<br>'
-            .buildCheckBox("showhiddenpagesasdefaultpage", ($CMS_CONF->get("showhiddenpagesasdefaultpage") == "true")).getLanguageValue("config_input_pagesasdefaultpage").'<br>'
+            //.buildCheckBox("showhiddenpagesinlastchanged", ($CMS_CONF->get("showhiddenpagesinlastchanged") == "true")).getLanguageValue("config_input_lastchanged").'<br />'
+            .buildCheckBox("showhiddenpagesinsearch", ($CMS_CONF->get("showhiddenpagesinsearch") == "true")).getLanguageValue("config_input_search").'<br />'
+            .buildCheckBox("showhiddenpagesinsitemap", ($CMS_CONF->get("showhiddenpagesinsitemap") == "true")).getLanguageValue("config_input_sitemap").'<br />'
+            .buildCheckBox("showhiddenpagesasdefaultpage", ($CMS_CONF->get("showhiddenpagesasdefaultpage") == "true")).getLanguageValue("config_input_pagesasdefaultpage").'<br />'
             .buildCheckBox("showhiddenpagesincmsvariables", ($CMS_CONF->get("showhiddenpagesincmsvariables") == "true")).getLanguageValue("config_input_pagesincmsvariables").'</td></tr>';
         // Zeile "Links öffnen self blank"
         $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_target").'</td>';
-        $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("targetblank_download", ($CMS_CONF->get("targetblank_download") == "true")).getLanguageValue("config_input_download").'<br>'.buildCheckBox("targetblank_link", ($CMS_CONF->get("targetblank_link") == "true")).getLanguageValue("config_input_link").'</td></tr>';
+        $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("targetblank_download", ($CMS_CONF->get("targetblank_download") == "true")).getLanguageValue("config_input_download").'<br />'.buildCheckBox("targetblank_link", ($CMS_CONF->get("targetblank_link") == "true")).getLanguageValue("config_input_link").'</td></tr>';
         // Zeile "wenn page == cat"
         $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("config_text_catnamedpages").'</td>';
         $pagecontent .= '<td class="td_cms_left">'.buildCheckBox("hidecatnamedpages", ($CMS_CONF->get("hidecatnamedpages") == "true")).getLanguageValue("config_input_catnamedpages").'</td></tr>';
@@ -3622,7 +3622,7 @@ function plugins($post) {
                         if($pos == 0) continue;
                         if($pos == 2) {
                             $plugin_info[$pos] = str_replace(array("&lt;","&gt;"),array("<",">"),$plugin_info[$pos]);
-                            $plugin_info[$pos] = strip_tags($plugin_info[$pos], '<span><br>');
+                            $plugin_info[$pos] = strip_tags($plugin_info[$pos], '<span><br />');
                             $plugin_info[$pos] = htmlentities($plugin_info[$pos],ENT_NOQUOTES,$CHARSET);
                             $plugin_info[$pos] = str_replace(array('&amp;#',"&lt;","&gt;"),array('&#',"<",">"),$plugin_info[$pos]);
                         } elseif($pos == 4) {
@@ -3655,7 +3655,7 @@ function plugins($post) {
                                         $conf_inhalt = implode(",", trim($_POST[$currentelement][$name]));
                                     # alle die kein array sind
                                     } else {
-                                        $conf_inhalt = str_replace(array("\r\n","\r","\n"),"<br>",trim($_POST[$currentelement][$name]));
+                                        $conf_inhalt = str_replace(array("\r\n","\r","\n"),"<br />",trim($_POST[$currentelement][$name]));
                                     }
                                     if(isset($config[$name]['regex_error'])) {
                                         $regex_error = $config[$name]['regex_error'];
@@ -3704,7 +3704,7 @@ function plugins($post) {
                             if($conf_plugin->get($name)) {
                                 $value = ' value="'.$conf_plugin->get($name).'"';
                                 if($config[$name]['type'] == "textarea") {
-                                    $value = str_replace("<br>","\n",$conf_plugin->get($name));
+                                    $value = str_replace("<br />","\n",$conf_plugin->get($name));
                                 }
                                 if($config[$name]['type'] == "password") {
                                     $value = NULL;
@@ -3766,7 +3766,7 @@ function plugins($post) {
                                             if($conf_plugin->get($name) == $key) {
                                                 $checked = ' checked="checked"';
                                             }
-                                            $input .= $descriptions.'&nbsp;&nbsp;<input name="'.$currentelement.'['.$name.']"'.$type.$value.$checked.'><br>';
+                                            $input .= $descriptions.'&nbsp;&nbsp;<input name="'.$currentelement.'['.$name.']"'.$type.$value.$checked.'><br />';
                                         }
                                     }
                                 } elseif($config[$name]['type'] == "checkbox") {
@@ -3774,7 +3774,7 @@ function plugins($post) {
                                     if($conf_plugin->get($name) == "true") {
                                         $checked = ' checked="checked"';
                                     }
-                                    $input .= '<input name="'.$currentelement.'['.$name.']"'.$type.$checked.' value="true"><br>';
+                                    $input .= '<input name="'.$currentelement.'['.$name.']"'.$type.$checked.' value="true"><br />';
                                 } elseif($config[$name]['type'] == "file") {
                                     $display_toggle = ' style="display:block;"';
                                     $messages .= returnMessage(false, getLanguageValue("plugins_error_type_file"));

@@ -560,15 +560,15 @@ function messagesOutLen($string) {
     for($s = 0;strlen($string) > strlen($new_string);$s = ($s + $max_string_len)) {
         # String oder Restsring ist kleiner $max_string_len
         if(strlen(substr($string,$s)) <= $max_string_len) {
-            $new_string .= substr($string,$s)."<br>";
+            $new_string .= substr($string,$s)."<br />";
         # im Teilsring ist ein Lehrzeichen. Ab dem Lehrzeichen ist neuer Teilstring
         } elseif(strrpos(substr($string,$s,$max_string_len)," ") > 1) {
             $len = strrpos(substr($string,$s,$max_string_len)," ");
             $new_string .= substr($string,$s,$len);
             $s = $s - ($max_string_len - strrpos(substr($string,$s,$max_string_len)," "));
-        # im Teilsring ist kein Lehrzeichen <br> einsetzen. Ab dem <br> ist neuer Teilstring
+        # im Teilsring ist kein Lehrzeichen <br /> einsetzen. Ab dem <br /> ist neuer Teilstring
         } else {
-            $new_string .= substr($string,$s,$max_string_len)."<br>";
+            $new_string .= substr($string,$s,$max_string_len)."<br />";
         }
     }
     return $new_string;
@@ -591,7 +591,7 @@ function categoriesMessages($post) {
                 if(empty($titel_tmp)) {
                     $titel_tmp = $error_language." MUSS NOCH INS LANGUAGE";
                 }
-                $error_titel = $error_titel."<br>".$titel_tmp;
+                $error_titel = $error_titel."<br />".$titel_tmp;
                 $error_array = $post[$message_art][$error_language][key($post[$message_art][$error_language])];
             }
             $error_inhalt = NULL;
@@ -611,7 +611,7 @@ function categoriesMessages($post) {
                 $error_inhalt .= '<b>-&gt;</b>&nbsp;&nbsp;'.messagesOutLen(str_replace("&lt;b&gt;&gt;&lt;/b&gt;","<b>&gt;</b>",$specialchars->rebuildSpecialChars($inhalt, true, true)));
             }
             if(!empty($error_inhalt)) {
-                $error_text = $error_titel.'<br><span style="font-weight:normal;">'.$error_inhalt.'</span>';
+                $error_text = $error_titel.'<br /><span style="font-weight:normal;">'.$error_inhalt.'</span>';
             } else {
                 $error_text = $error_titel;
             }

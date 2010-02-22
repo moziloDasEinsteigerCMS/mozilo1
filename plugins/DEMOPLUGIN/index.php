@@ -349,7 +349,7 @@ class DEMOPLUGIN extends Plugin {
             "<b>Demo-Plugin</b>",
             // moziloCMS-Version
             "1.12",
-            // Kurzbeschreibung nur <span> und <br> sind erlaubt
+            // Kurzbeschreibung nur <span> und <br /> sind erlaubt
             "Beispiel-Plugin, das die Möglichkeiten des Plugin-Systems von moziloCMS aufzeigt",
             // Name des Autors
             "mozilo",

@@ -24,7 +24,7 @@ function createTooltipWZ($title, $body,$parameter = NULL)
     } else {
         if(!isset($BASIC_LANGUAGE->properties[$title]) and !isset($BASIC_LANGUAGE->properties[$body]))
             return NULL;
-        return ' onmouseover="Tip(\'<b>'.trim(getLanguageValue($title)).'</b><br>'.trim(getLanguageValue($body)).'\''.$parameter.')" onmouseout="UnTip()"';
+        return ' onmouseover="Tip(\'<b>'.trim(getLanguageValue($title)).'</b><br />'.trim(getLanguageValue($body)).'\''.$parameter.')" onmouseout="UnTip()"';
     }
 }
     
