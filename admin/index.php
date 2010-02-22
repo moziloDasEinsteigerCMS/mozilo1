@@ -4023,7 +4023,7 @@ function returnPlatzhalterSelectbox() {
     .'<option class="noaction" value="">'.getLanguageValue("toolbar_platzhalter").'</option>';
     foreach ($platzhalter_array as $value) {
         $language = str_replace(array('{','}'),'',$value);
-        $selectbox .= '<option value="'.$value.'">'.$value.' ('.getLanguageValue("toolbar_platzhalter_".$language).')</option>';
+        $selectbox .= '<option title="'.getLanguageValue("toolbar_platzhalter_".$language).'" value="'.$value.'">'.$value.'</option>';
     }
     $selectbox .= '</select>';
     return $selectbox;
