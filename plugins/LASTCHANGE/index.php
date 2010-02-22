@@ -2,11 +2,7 @@
 
 /***************************************************************
 *
-* Sitemap-Plugin für moziloCMS.
-* 
-* Mit der Variablen {SITEMAP} kann an beliebiger Stelle des CMS
-* (Template oder Inhaltsseiten) die aktuelle Sitemap eingefügt 
-* werden.
+* Plugin für moziloCMS, das die letzte Änderungen zurückgibt
 * 
 ***************************************************************/
 
@@ -15,8 +11,7 @@ class LASTCHANGE extends Plugin {
     /***************************************************************
     * 
     * Gibt den HTML-Code zurück, mit dem die Plugin-Variable ersetzt 
-    * wird. Der String-Parameter $value ist Pflicht, kann aber leer 
-    * sein.
+    * wird.
     * 
     ***************************************************************/
     function getContent($value) {
@@ -24,7 +19,7 @@ class LASTCHANGE extends Plugin {
 
         if(!function_exists('getLastChangedContentPageAndDateLAST')) {
             // ------------------------------------------------------------------------------
-            // Rueckgabe eines Array, bestehend aus:
+            // Rueckgabe eines Arrays, bestehend aus:
             // - Name der zuletzt geaenderten Inhaltsseite
             // - kompletter Link auf diese Inhaltsseite  
             // - formatiertes Datum der letzten Aenderung
@@ -126,7 +121,6 @@ class LASTCHANGE extends Plugin {
     /***************************************************************
     * 
     * Gibt die Konfigurationsoptionen als Array zurück.
-    * Ist keine Konfiguration nötig, gibt die Funktion false zurück.
     * 
     ***************************************************************/
     function getConfig() {
@@ -134,20 +128,20 @@ class LASTCHANGE extends Plugin {
         $language = $ADMIN_CONF->get("language");
 
         $config['deDE'] = array();
-        // Nicht vergessen: Das gesamte Array zurückgeben
         $config['deDE']['messagetext']  = array(
             "type" => "text",
-            "description" => "Text für {LASTCHANGE|text}",
+            "description" => 'Eigener Text für "Letzte Änderung:"',
             "maxlength" => "100",
             "size" => "30"
             );
         $config['deDE']['date']  = array(
             "type" => "text",
-            "description" => "Datums Format",
+            "description" => "Eigenes Datumsformat",
             "maxlength" => "100",
             "size" => "30"
             );
 
+        // Nicht vergessen: Das gesamte Array zurückgeben
         if(isset($config[$language])) {
             return $config[$language];
         } else {
@@ -160,56 +154,50 @@ class LASTCHANGE extends Plugin {
     
     /***************************************************************
     * 
-    * Gibt die Plugin-Infos als Array zurück - in dieser 
-    * Reihenfolge:
-    *   - Name des Plugins
-    *   - Version des Plugins
-    *   - Kurzbeschreibung
-    *   - Name des Autors
-    *   - Download-URL
+    * Gibt die Plugin-Infos als Array zurück. 
     * 
     ***************************************************************/
     function getInfo() {
         global $ADMIN_CONF;
-        $language = $ADMIN_CONF->get("language");
-
+        global $ADMIN_CONF;
+        $adminlanguage = $ADMIN_CONF->get("language");
+               
         $info['deDE'] = array(
             // Plugin-Name
-            "<b>LASTCHANGE 0.1</b>",
-            // Plugin-Version
+            "<b>LastChange</b> 1.0",
+            // CMS-Version
             "1.12",
             // Kurzbeschreibung
-            'Erzeugt für die Platzhalter:<br>'
-            .'<SPAN style="font-weight:bold;">{LASTCHANGE}</SPAN> = {LASTCHANGE|text} {LASTCHANGE|pagelink} {LASTCHANGE|date}<br>'
-            .'<SPAN style="font-weight:bold;">{LASTCHANGE|text}</SPAN> Default "Letzte Änderung:"<br>'
-            .'<SPAN style="font-weight:bold;">{LASTCHANGE|page}</SPAN> Name der Inhaltseite<br>'
-            .'<SPAN style="font-weight:bold;">{LASTCHANGE|pagelink}</SPAN> Link zur Inhaltseite<br>'
-            .'<SPAN style="font-weight:bold;">{LASTCHANGE|date}</SPAN> Datum der Letzten Änderung<br><br>'
-            .'Das Datums Format kann Angepast werden Default "%d.%m.%Y, %H:%M:%S"<br>'
-            .'%d = Tag 2stelig<br>'
-            .'%m = Monat 2stelig<br>'
-            .'%Y = Jahr 4stelig<br>'
-            .'%H = Stunde<br>'
-            .'%M = Minute<br>'
-            .'%S = Sekunden<br>'
-            .'Weitere Infos zum Datumsformat siehe PHP date<br>',
+            'Zeigt die letzte Änderung an.<br/>
+            <br/>
+            <span style="font-weight:bold;">Nutzung:</span><br />
+            {LASTCHANGE|} gibt etwas aus wie: "Letzte Änderung: Willkommen (22.02.2010, 09:07:20)"<br />
+            {LASTCHANGE|text} gibt etwas aus wie: "Letzte Änderung"<br />
+            {LASTCHANGE|page} gibt etwas aus wie: "Willkommen"<br />
+            {LASTCHANGE|pagelink} gibt etwas aus wie: "Willkommen" (mit Link auf die Inhaltsseite)<br />
+            {LASTCHANGE|date} gibt etwas aus wie: "(22.02.2010, 09:07:20)"<br />
+            <br />
+            <span style="font-weight:bold;">Konfiguration:</span><br />
+            Das Plugin bezieht den Text "Letzte Änderung" und das Datumsformat aus der CMS-Sprachdatei; man kann beides aber auch selbst angeben. Dabei orientiert sich das Datumsformat an der PHP-Funktion date().',
             // Name des Autors
             "mozilo",
             // Download-URL
             "http://cms.mozilo.de",
-            array('{LASTCHANGE|text}' => 'Lastchange Text Default "Letzte Änderung:"',
+            array(
+                '{LASTCHANGE}' => 'Letzte Änderung mit Link und Datum',
+                '{LASTCHANGE|text}' => 'Text "Letzte Änderung:"',
                 '{LASTCHANGE|page}' => 'Name der zuletzt geaenderten Inhaltsseite',
                 '{LASTCHANGE|pagelink}' => 'kompletter Link auf diese Inhaltsseite',
                 '{LASTCHANGE|date}' => 'formatiertes Datum der letzten Aenderung')
             );
 
-        if(isset($info[$language])) {
-            return $info[$language];
+        if(isset($info[$adminlanguage])) {
+            return $info[$adminlanguage];
         } else {
             return $info['deDE'];
         }
     } // function getInfo
 
-} // class SITEMAP
+} // class LASTCHANGE
 
 ?>

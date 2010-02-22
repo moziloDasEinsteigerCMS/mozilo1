@@ -332,7 +332,7 @@ class DEMOPLUGIN extends Plugin {
     * 
     * Gibt die Plugin-Infos als Array zurück - in dieser 
     * Reihenfolge:
-    *   - Name des Plugins + Version
+    *   - Name und Version des Plugins
     *   - für moziloCMS-Version
     *   - Kurzbeschreibung
     *   - Name des Autors
@@ -346,7 +346,7 @@ class DEMOPLUGIN extends Plugin {
         # nur eine Sprache ---------------------------------
         $info = array(
             // Plugin-Name + Version
-            "Plugin-Demo",
+            "<b>Demo-Plugin</b>",
             // moziloCMS-Version
             "1.12",
             // Kurzbeschreibung nur <span> und <br> sind erlaubt
@@ -355,72 +355,14 @@ class DEMOPLUGIN extends Plugin {
             "mozilo",
             // Download-URL
             "http://cms.mozilo.de",
-            # Platzhalter für die Selectbox im Inhaltseite Edit wenn lehr erscheint es nicht in Selectbox
-            array('{DEMOPLUGIN}' => 'Optional Kurtzbeschreibung',
-                    '{DEMOPLUGIN|}' => 'Optional Meine Kurtzbeschreibung, Optinal Text für Link Platzhalter blank',
-                    '{DEMOPLUGIN|Value_1,}' => 'Optional Meine Kurtzbeschreibung',
-                    '{DEMOPLUGIN|Value_2,}' => 'Optional Meine Kurtzbeschreibung'
-                    )
-            );
-#        return $info;
-
-        # mehr sprachig wenn Sprache nicht vorhanden wird deDE benutzt ---------------
-
-
-            # Beispiel:
-            #        Platzhalter => Kurtzbeschreibung
-            # array('{Platzhalter|}' => 'Meine Platzhalter, Optinal Text für Link Platzhalter blank')
-            # in Selectbox erscheint {Platzhalter|Optional Meine Kurtzbeschreibung, Optinal Text für Link Platzhalter blank}
-            # in Inhaltseite {Platzhalter|}
-            # oder   Platzhalter => Kurtzbeschreibung
-            # array('{Platzhalter}' => 'Optional Kurtzbeschreibung')
-            # in Selectbox erscheint {Platzhalter}
-            # in Inhaltseite {Platzhalter}
-            # und mit mehreren die alle in der Selectbox erscheint
-            # array('{Platzhalter_1}' => 'Optional Kurtzbeschreibung_1', '{Platzhalter_2}' => 'Optional Kurtzbeschreibung_2')
-
-        $info['deDE'] = array(
-            // Plugin-Name + Version
-            "<b>Plugin-Demo</b>",
-            // moziloCMS-Version
-            "1.12",
-            // Kurzbeschreibung nur <span> und <br> sind erlaubt
-            "Beispiel-Plugin, das die Möglichkeiten des Plugin-Systems von moziloCMS aufzeigt",
-            // Name des Autors
-            "mozilo",
-            // Download-URL
-            "http://cms.mozilo.de",
-            # Platzhalter für die Selectbox im Inhaltseite Edit wenn lehr erscheint es nicht in Selectbox
-            array('{DEMOPLUGIN}' => 'Optional Kurtzbeschreibung',
-                    '{DEMOPLUGIN|}' => 'Optional Meine Kurtzbeschreibung, Optinal Text für Link Platzhalter blank',
-                    '{DEMOPLUGIN|Value_1,}' => 'Optional Meine Kurtzbeschreibung',
-                    '{DEMOPLUGIN|Value_2,}' => 'Optional Meine Kurtzbeschreibung'
-                    )
-                );
-        $info['enEN'] = array(
-            // Plugin-Name + Version
-            "Plugin-Demo Englisch",
-            // moziloCMS-Version
-            "1.12",
-            // Kurzbeschreibung
-            "Beispiel-Plugin, das die Möglichkeiten des Plugin-Systems von moziloCMS aufzeigt",
-            // Name des Autors
-            "mozilo",
-            // Download-URL
-            "http://cms.mozilo.de",
-            # Platzhalter für die Selectbox im Inhaltseite Edit wenn lehr erscheint es nicht in Selectbox
-            array('{DEMOPLUGIN}' => 'Optional Kurtzbeschreibung',
-                    '{DEMOPLUGIN|}' => 'Optional Meine Kurtzbeschreibung, Optinal Text für Link Platzhalter blank',
-                    '{DEMOPLUGIN|Value_1,}' => 'Optional Meine Kurtzbeschreibung',
-                    '{DEMOPLUGIN|Value_2,}' => 'Optional Meine Kurtzbeschreibung'
-                    )
-                );
-        if(isset($info[$language])) {
-            return $info[$language];
-        } else {
-            return $info['deDE'];
-        }
-
+            // Platzhalter für die Selectbox in der Editieransicht 
+            // - ist das Array leer, erscheint das Plugin nicht in der Selectbox
+            array(
+                '{DEMOPLUGIN}' => 'Kurzbeschreibung',
+                '{DEMOPLUGIN|}' => 'Kurzbeschreibung mit Parameter'
+            )
+        );
+        return $info;
     } // function getInfo
 
 } // class DEMOPLUGIN

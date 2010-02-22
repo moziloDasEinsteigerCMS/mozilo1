@@ -79,10 +79,18 @@ function insertAndResetSelectbox(selectbox) {
 
 function insertPluginAndResetSelectbox(selectbox) {
     if (selectbox.selectedIndex > 0) {
-        if (selectbox.options[selectbox.selectedIndex].value.search(/\|/) != -1) {
-            insert(selectbox.options[selectbox.selectedIndex].value, '}', true);
-        } else {
-            insert(selectbox.options[selectbox.selectedIndex].value, '', false);
+		var currentValue = selectbox.options[selectbox.selectedIndex].value;
+    	// {PLUGIN|}
+    	if (currentValue.search(/\|\}/) != -1) {
+    		insert(currentValue.substring(0, currentValue.length-1), '}', true);
+    	}
+    	// {PLUGIN|wert}
+    	else if (currentValue.search(/\|/) != -1) {
+            insert(currentValue, '', false);
+        } 
+    	// {PLUGIN}
+    	else {
+            insert(currentValue, '', false);
         }
         selectbox.selectedIndex = 0;
     }

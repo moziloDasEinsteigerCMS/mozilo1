@@ -4050,13 +4050,18 @@ function returnPluginSelectbox() {
             if ($plugin_conf->get("active") == "true") {
 	            if(isset($plugin_info[5]) and is_array($plugin_info[5])) {
 	                foreach($plugin_info[5] as $platzh => $info) {
-	                    if(strpos($platzh,'|') > 0) {
+	                	// wenn es vorgegebene Werte gibt: {PLUGIN|wert} 
+	                    /*if(strpos($platzh,'|') > 0) {
 	                        $info = str_replace('}',''.$info.'}',$platzh);
-	                        $selectbox .= '<option value="'.str_replace('}','',$platzh).'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
-	                    } else {
+	                        $selectbox .= '<option title="'.$specialchars->rebuildSpecialChars($info, false, true).'" value="'.str_replace('}','',$platzh).'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
+	                    }
+	                    // keine vorgegebenen Werte: {PLUGIN}
+	                    else {
 	                        $info = $platzh.' '.$info;
 	                        $selectbox .= '<option value="'.$platzh.'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
-	                    }
+	                    }*/
+                        //$info = $platzh.' '.$info;
+                        $selectbox .= '<option title="'.$specialchars->rebuildSpecialChars($info, false, true).'" value="'.$platzh.'">'.$platzh.'</option>';
 	                }
 	            }
             }

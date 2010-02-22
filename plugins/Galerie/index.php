@@ -2,35 +2,16 @@
 
 /***************************************************************
 * 
-* Demo-Plugin für moziloCMS.
-* 
-* 
-* Jedes moziloCMS-Plugin muß...
-* - als Verzeichnis [PLUGINNAME] unterhalb von "plugins" liegen.
-* - im Pluginverzeichnis eine plugin.conf mit den Plugin-
-*   Einstellungen enthalten (diese kann auch leer sein).
-* - eine index.php enthalten, in der eine Klasse "[PLUGINNAME]" 
-*   definiert ist.
-* 
-* Die Plugin-Klasse muß...
-* - von der Klasse "Plugin" erben ("class [PLUGINNAME] extends Plugin")
-* - folgende Funktionen enthalten:
-*   getContent($value)
-*       -> gibt die HTML-Ersetzung der Plugin-Variable zurück
-*   getConfig()
-*       -> gibt die Konfigurationsoptionen als Array zurück
-*   getInfo()
-*       -> gibt die Plugin-Infos als Array zurück
+* Eingebettete Galerie für moziloCMS.
 * 
 ***************************************************************/
 class Galerie extends Plugin {
 
 
-    /***************************************************************
+	/***************************************************************
     * 
     * Gibt den HTML-Code zurück, mit dem die Plugin-Variable ersetzt 
-    * wird. Der String-Parameter $value ist Pflicht, kann aber leer 
-    * sein.
+    * wird.
     * 
     ***************************************************************/
     function getContent($value) {
@@ -49,197 +30,197 @@ class Galerie extends Plugin {
         // ------------------------------------------------------------------------------
         // Galeriemenü erzeugen
         // ------------------------------------------------------------------------------
-if(!function_exists('getGalleryMenu')) {
-        function getGalleryMenu($picarray,$linkprefix,$gal_request,$index,$first,$previous,$next,$last) {
-            global $language;
-        
-            // Keine Bilder im Galerieverzeichnis?
-            if (count($picarray) == 0)
-                return "&nbsp;";
+        if(!function_exists('getGalleryMenu')) {
+	        function getGalleryMenu($picarray,$linkprefix,$gal_request,$index,$first,$previous,$next,$last) {
+	            global $language;
+	        
+	            // Keine Bilder im Galerieverzeichnis?
+	            if (count($picarray) == 0)
+	                return "&nbsp;";
+	
+	            $gallerymenu = "<ul class=\"gallerymenu\">";
+	        
+	            // Link "Erstes Bild"
+	            if ($index == $first)
+	                $linkclass = "gallerymenuactive";
+	            else
+	                $linkclass = "gallerymenu";
+	            $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$linkprefix."gal=".$gal_request."&amp;index=".$first."\" class=\"$linkclass\">".$language->getLanguageValue0("message_firstimage_0")."</a></li>";
+	            // Link "Voriges Bild"
+	            $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$linkprefix."gal=".$gal_request."&amp;index=".$previous."\" class=\"gallerymenu\">".$language->getLanguageValue0("message_previousimage_0")."</a></li>";
+	            // Link "Nächstes Bild"
+	            $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$linkprefix."gal=".$gal_request."&amp;index=".$next."\" class=\"gallerymenu\">".$language->getLanguageValue0("message_nextimage_0")."</a></li>";
+	            // Link "Letztes Bild"
+	            if ($index == $last)
+	                $linkclass = "gallerymenuactive";
+	            else
+	                $linkclass = "gallerymenu";
+	            $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$linkprefix."gal=".$gal_request."&amp;index=".$last."\" class=\"$linkclass\">".$language->getLanguageValue0("message_lastimage_0")."</a></li>";
+	            // Rückgabe des Menüs
+	            return $gallerymenu."</ul>";
+	        }
 
-            $gallerymenu = "<ul class=\"gallerymenu\">";
-        
-            // Link "Erstes Bild"
-            if ($index == $first)
-                $linkclass = "gallerymenuactive";
-            else
-                $linkclass = "gallerymenu";
-            $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$linkprefix."gal=".$gal_request."&amp;index=".$first."\" class=\"$linkclass\">".$language->getLanguageValue0("message_firstimage_0")."</a></li>";
-            // Link "Voriges Bild"
-            $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$linkprefix."gal=".$gal_request."&amp;index=".$previous."\" class=\"gallerymenu\">".$language->getLanguageValue0("message_previousimage_0")."</a></li>";
-            // Link "Nächstes Bild"
-            $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$linkprefix."gal=".$gal_request."&amp;index=".$next."\" class=\"gallerymenu\">".$language->getLanguageValue0("message_nextimage_0")."</a></li>";
-            // Link "Letztes Bild"
-            if ($index == $last)
-                $linkclass = "gallerymenuactive";
-            else
-                $linkclass = "gallerymenu";
-            $gallerymenu .= "<li class=\"gallerymenu\"><a href=\"".$linkprefix."gal=".$gal_request."&amp;index=".$last."\" class=\"$linkclass\">".$language->getLanguageValue0("message_lastimage_0")."</a></li>";
-            // Rückgabe des Menüs
-            return $gallerymenu."</ul>";
+		    // ------------------------------------------------------------------------------
+	        // Nummernmenü erzeugen
+	        // ------------------------------------------------------------------------------
+	        function getNumberMenu($picarray,$linkprefix,$index,$gal_request,$first,$last) {
+	        
+	            // Keine Bilder im Galerieverzeichnis?
+	            if (count($picarray) == 0)
+	                return "&nbsp;";
+	        
+	            $numbermenu = "<ul class=\"gallerynumbermenu\">";
+	            for ($i=$first; $i<=$last; $i++) {
+	                $cssclass = $index == $i ? "gallerynumbermenuactive" : "gallerynumbermenu";
+	                $numbermenu .= "<li class=\"gallerynumbermenu\">"
+	                    ."<a href=\"".$linkprefix."gal=".$gal_request."&amp;index=".$i."\" class=\"".$cssclass."\">".$i."</a>"
+	            ."</li>";
+	            }
+	            // Rückgabe des Menüs
+	            $numbermenu .= "</ul>";
+	            return $numbermenu;
+	        }
+	    
+	        // ------------------------------------------------------------------------------
+	        // Nummernmenü erzeugen
+	        // ------------------------------------------------------------------------------
+	        function getThumbnails($picarray,$dir_thumbs_src,$dir_gallery_src,$alldescriptions) {
+	            global $GALLERY_CONF;
+	            global $specialchars;
+	            global $language;
+	            // Aus Config auslesen: Wieviele Bilder pro Tabellenzeile?
+	            $picsperrow = $GALLERY_CONF->get("gallerypicsperrow");
+	                if (($picsperrow == "") || ($picsperrow == 0))
+	                    $picsperrow = 4;
+	            
+	            $thumbs = "<table class=\"gallerytable\" summary=\"gallery table\"><tr>";
+	            $i = 0;
+	            for ($i=0; $i<count($picarray); $i++) {
+	                // Bildbeschreibung holen
+	                $description = getCurrentDescription($picarray[$i],$picarray,$alldescriptions);
+	                if ($description == "")
+	                    $description = "&nbsp;";
+	                // Neue Tabellenzeile aller picsperrow Zeichen
+	                if (($i > 0) && ($i % $picsperrow == 0))
+	                    $thumbs .= "</tr><tr>";
+	                $thumbs .= "<td class=\"gallerytd\" style=\"width:".floor(100 / $picsperrow)."%;\">"
+	                ."<a href=\"".$specialchars->replaceSpecialChars($dir_gallery_src.$picarray[$i],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$i],true,true))."\">"
+	                ."<img src=\"".$specialchars->replaceSpecialChars($dir_thumbs_src.$picarray[$i],true)."\" alt=\"".$specialchars->rebuildSpecialChars($picarray[$i],true,true)."\" class=\"thumbnail\" />"
+	                ."</a><br />"
+	                .$description
+	                ."</td>";
+	            }
+	            while ($i % $picsperrow > 0) {
+	                $thumbs .= "<td class=\"gallerytd\">&nbsp;</td>";
+	                $i++;
+	            }
+	            $thumbs .= "</tr></table>";
+	            // Rückgabe der Thumbnails
+	            return $thumbs;
+	        }
+	        
+	        // ------------------------------------------------------------------------------
+	        // Aktuelles Bild anzeigen
+	        // ------------------------------------------------------------------------------
+	        function getCurrentPic($picarray,$dir_gallery_src,$dir_gallery,$index) {
+	            global $specialchars;
+	            global $language;
+	        
+	            // Keine Bilder im Galerieverzeichnis?
+	            if (count($picarray) == 0)
+	                return "&nbsp;";
+	            // Link zur Vollbildansicht öffnen
+	            $currentpic = "<a href=\"".$specialchars->replaceSpecialChars($dir_gallery_src.$picarray[$index-1],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$index-1],true,true))."\">";
+	            // Bilder für die Anzeige skalieren
+	            $size = getimagesize($dir_gallery.$picarray[$index-1]);
+	            $currentpic .= "<img width=\"$size[0]\" height=\"$size[1]\" src=\"".$specialchars->replaceSpecialChars($dir_gallery_src.$picarray[$index-1],true)."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $specialchars->rebuildSpecialChars($picarray[$index-1],true,true))."\" />";
+	            // Link zur Vollbildansicht schliessen
+	            $currentpic .= "</a>";
+	            // Rückgabe des Bildes
+	            return $currentpic;
+	        }
+	    
+	        // ------------------------------------------------------------------------------
+	        // Beschreibung zum aktuellen Bild anzeigen
+	        // ------------------------------------------------------------------------------
+	        function getCurrentDescription($picname,$picarray,$alldescriptions) {
+	            global $specialchars;
+	            
+	            // Keine Bilder im Galerieverzeichnis?
+	            if (count($picarray) == 0)
+	            return "&nbsp;";
+	            // Bildbeschreibung einlesen
+	            $description = $alldescriptions->get($picname);
+	            if(strlen($description) > 0) {
+	                    return $specialchars->rebuildSpecialChars($description,false,true);
+	            } else {
+	                return "&nbsp;";
+	            }
+	        }
+	
+	
+	        // ------------------------------------------------------------------------------
+	        // Position in der Galerie anzeigen
+	        // ------------------------------------------------------------------------------
+	        function getXoutofY($picarray,$index,$last) {
+	            global $language;
+	        
+	            // Keine Bilder im Galerieverzeichnis?
+	            if (count($picarray) == 0)
+	            return "&nbsp;";
+	            return $language->getLanguageValue2("message_gallery_xoutofy_2", $index, $last);
+	        }
+	    
+	        // ------------------------------------------------------------------------------
+	        // Auslesen des übergebenen Galerieverzeichnisses, Rückgabe als Array
+	        // ------------------------------------------------------------------------------
+	        function getPicsAsArray($dir, $filetypes) {
+	            $picarray = array();
+	            $currentdir = opendir($dir);
+	            // Alle Dateien des übergebenen Verzeichnisses einlesen...
+	            while ($file = readdir($currentdir)){
+	                if(isValidDirOrFile($file) and (in_array(strtolower(substr(strrchr($file, "."), 1, strlen(strrchr($file, "."))-1)), $filetypes))) {
+	                    // ...wenn alles passt, ans Bilder-Array anhängen
+	                    $picarray[] = $file;
+	                }
+	            }
+	            closedir($currentdir);
+	            sort($picarray);
+	            return $picarray;
+	        }
+	    
+	        // ------------------------------------------------------------------------------
+	        // Hilfsfunktion: Extrahiert das Embedded-Template aus dem Gesamt-Template
+	        // ------------------------------------------------------------------------------
+	/*
+	        function extractEmbeddedTemplate($template) {
+	            global $GALLERY_CONF;
+	            preg_match("/\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_START\}[\s|\t]*--\>(.*)\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_END\}[\s|\t]*--\>/Umsi", $template, $matches);
+	            if (sizeof($matches) > 1) {
+	                return "<div class=\"embeddedgallery\">".$matches[1]."</div>";
+	            }
+	            else {
+	                return false;
+	            }
+	        }*/
+	        // ------------------------------------------------------------------------------
+	        // Hilfsfunktion: "title"-Attribut zusammenbauen (oder nicht, wenn nicht konfiguriert)
+	        // ------------------------------------------------------------------------------
+	/*
+	        function getTitleAttribute($value) {
+	            global $CMS_CONF;
+	            if ($CMS_CONF->get("showsyntaxtooltips") == "true") {
+	                return " title=\"".$value."\"";
+	            }
+	            return "";
+	        }*/
+	        // ------------------------------------------------------------------------------
+	        // Hilfsfunktion: Deadlink erstellen
+	        // ------------------------------------------------------------------------------
+	        function createDeadlink($content, $title) {
+	            return "<span class=\"deadlink\"".getTitleAttribute($title).">$content</span>";
+	        }
         }
-            
-        // ------------------------------------------------------------------------------
-        // Nummernmenü erzeugen
-        // ------------------------------------------------------------------------------
-        function getNumberMenu($picarray,$linkprefix,$index,$gal_request,$first,$last) {
-        
-            // Keine Bilder im Galerieverzeichnis?
-            if (count($picarray) == 0)
-                return "&nbsp;";
-        
-            $numbermenu = "<ul class=\"gallerynumbermenu\">";
-            for ($i=$first; $i<=$last; $i++) {
-                $cssclass = $index == $i ? "gallerynumbermenuactive" : "gallerynumbermenu";
-                $numbermenu .= "<li class=\"gallerynumbermenu\">"
-                    ."<a href=\"".$linkprefix."gal=".$gal_request."&amp;index=".$i."\" class=\"".$cssclass."\">".$i."</a>"
-            ."</li>";
-            }
-            // Rückgabe des Menüs
-            $numbermenu .= "</ul>";
-            return $numbermenu;
-        }
-    
-        // ------------------------------------------------------------------------------
-        // Nummernmenü erzeugen
-        // ------------------------------------------------------------------------------
-        function getThumbnails($picarray,$dir_thumbs_src,$dir_gallery_src,$alldescriptions) {
-            global $GALLERY_CONF;
-            global $specialchars;
-            global $language;
-            // Aus Config auslesen: Wieviele Bilder pro Tabellenzeile?
-            $picsperrow = $GALLERY_CONF->get("gallerypicsperrow");
-                if (($picsperrow == "") || ($picsperrow == 0))
-                    $picsperrow = 4;
-            
-            $thumbs = "<table class=\"gallerytable\" summary=\"gallery table\"><tr>";
-            $i = 0;
-            for ($i=0; $i<count($picarray); $i++) {
-                // Bildbeschreibung holen
-                $description = getCurrentDescription($picarray[$i],$picarray,$alldescriptions);
-                if ($description == "")
-                    $description = "&nbsp;";
-                // Neue Tabellenzeile aller picsperrow Zeichen
-                if (($i > 0) && ($i % $picsperrow == 0))
-                    $thumbs .= "</tr><tr>";
-                $thumbs .= "<td class=\"gallerytd\" style=\"width:".floor(100 / $picsperrow)."%;\">"
-                ."<a href=\"".$specialchars->replaceSpecialChars($dir_gallery_src.$picarray[$i],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$i],true,true))."\">"
-                ."<img src=\"".$specialchars->replaceSpecialChars($dir_thumbs_src.$picarray[$i],true)."\" alt=\"".$specialchars->rebuildSpecialChars($picarray[$i],true,true)."\" class=\"thumbnail\" />"
-                ."</a><br />"
-                .$description
-                ."</td>";
-            }
-            while ($i % $picsperrow > 0) {
-                $thumbs .= "<td class=\"gallerytd\">&nbsp;</td>";
-                $i++;
-            }
-            $thumbs .= "</tr></table>";
-            // Rückgabe der Thumbnails
-            return $thumbs;
-        }
-        
-        // ------------------------------------------------------------------------------
-        // Aktuelles Bild anzeigen
-        // ------------------------------------------------------------------------------
-        function getCurrentPic($picarray,$dir_gallery_src,$dir_gallery,$index) {
-            global $specialchars;
-            global $language;
-        
-            // Keine Bilder im Galerieverzeichnis?
-            if (count($picarray) == 0)
-                return "&nbsp;";
-            // Link zur Vollbildansicht öffnen
-            $currentpic = "<a href=\"".$specialchars->replaceSpecialChars($dir_gallery_src.$picarray[$index-1],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$index-1],true,true))."\">";
-            // Bilder für die Anzeige skalieren
-            $size = getimagesize($dir_gallery.$picarray[$index-1]);
-            $currentpic .= "<img width=\"$size[0]\" height=\"$size[1]\" src=\"".$specialchars->replaceSpecialChars($dir_gallery_src.$picarray[$index-1],true)."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $specialchars->rebuildSpecialChars($picarray[$index-1],true,true))."\" />";
-            // Link zur Vollbildansicht schliessen
-            $currentpic .= "</a>";
-            // Rückgabe des Bildes
-            return $currentpic;
-        }
-    
-        // ------------------------------------------------------------------------------
-        // Beschreibung zum aktuellen Bild anzeigen
-        // ------------------------------------------------------------------------------
-        function getCurrentDescription($picname,$picarray,$alldescriptions) {
-            global $specialchars;
-            
-            // Keine Bilder im Galerieverzeichnis?
-            if (count($picarray) == 0)
-            return "&nbsp;";
-            // Bildbeschreibung einlesen
-            $description = $alldescriptions->get($picname);
-            if(strlen($description) > 0) {
-                    return $specialchars->rebuildSpecialChars($description,false,true);
-            } else {
-                return "&nbsp;";
-            }
-        }
-
-
-        // ------------------------------------------------------------------------------
-        // Position in der Galerie anzeigen
-        // ------------------------------------------------------------------------------
-        function getXoutofY($picarray,$index,$last) {
-            global $language;
-        
-            // Keine Bilder im Galerieverzeichnis?
-            if (count($picarray) == 0)
-            return "&nbsp;";
-            return $language->getLanguageValue2("message_gallery_xoutofy_2", $index, $last);
-        }
-    
-        // ------------------------------------------------------------------------------
-        // Auslesen des übergebenen Galerieverzeichnisses, Rückgabe als Array
-        // ------------------------------------------------------------------------------
-        function getPicsAsArray($dir, $filetypes) {
-            $picarray = array();
-            $currentdir = opendir($dir);
-            // Alle Dateien des übergebenen Verzeichnisses einlesen...
-            while ($file = readdir($currentdir)){
-                if(isValidDirOrFile($file) and (in_array(strtolower(substr(strrchr($file, "."), 1, strlen(strrchr($file, "."))-1)), $filetypes))) {
-                    // ...wenn alles passt, ans Bilder-Array anhängen
-                    $picarray[] = $file;
-                }
-            }
-            closedir($currentdir);
-            sort($picarray);
-            return $picarray;
-        }
-    
-        // ------------------------------------------------------------------------------
-        // Hilfsfunktion: Extrahiert das Embedded-Template aus dem Gesamt-Template
-        // ------------------------------------------------------------------------------
-/*
-        function extractEmbeddedTemplate($template) {
-            global $GALLERY_CONF;
-            preg_match("/\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_START\}[\s|\t]*--\>(.*)\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_END\}[\s|\t]*--\>/Umsi", $template, $matches);
-            if (sizeof($matches) > 1) {
-                return "<div class=\"embeddedgallery\">".$matches[1]."</div>";
-            }
-            else {
-                return false;
-            }
-        }*/
-        // ------------------------------------------------------------------------------
-        // Hilfsfunktion: "title"-Attribut zusammenbauen (oder nicht, wenn nicht konfiguriert)
-        // ------------------------------------------------------------------------------
-/*
-        function getTitleAttribute($value) {
-            global $CMS_CONF;
-            if ($CMS_CONF->get("showsyntaxtooltips") == "true") {
-                return " title=\"".$value."\"";
-            }
-            return "";
-        }*/
-        // ------------------------------------------------------------------------------
-        // Hilfsfunktion: Deadlink erstellen
-        // ------------------------------------------------------------------------------
-        function createDeadlink($content, $title) {
-            return "<span class=\"deadlink\"".getTitleAttribute($title).">$content</span>";
-        }
-}
 
         $embedded = $GALLERY_CONF->get("target");
 
@@ -388,7 +369,6 @@ if(!function_exists('getGalleryMenu')) {
     /***************************************************************
     * 
     * Gibt die Konfigurationsoptionen als Array zurück.
-    * Ist keine Konfiguration nötig, ist dieses Array leer.
     * 
     ***************************************************************/
     function getConfig() {
@@ -398,14 +378,20 @@ if(!function_exists('getGalleryMenu')) {
         // Rückgabe-Array initialisieren
         // Das muß auf jeden Fall geschehen!
         $config['deDE'] = array();
+        $config['enEN'] = array();
         $config['deDE']['gallerytemplate'] = array(
             "type" => "textarea",                       // Pflicht:  Eingabetyp 
             "cols" => "50",                             // Pflicht:  Spaltenanzahl 
             "rows" => "7",                              // Pflicht:  Zeilenanzahl
-            "description" => "Die Platzhalter in die Gewünschte Reihenfolge anordnen. Zeilenumbrüche sind erlaubt",     // Pflicht:  Beschreibung
+            "description" => "Hier können die Galerie-Platzhalter in die gewünschte Reihenfolge gebracht werden (Zeilenumbrüche sind erlaubt).",     // Pflicht:  Beschreibung
+        );
+        $config['enEN']['gallerytemplate'] = array(
+            "type" => "textarea",                       // Pflicht:  Eingabetyp 
+            "cols" => "50",                             // Pflicht:  Spaltenanzahl 
+            "rows" => "7",                              // Pflicht:  Zeilenanzahl
+            "description" => "Here, you may change the order of the gallery placeholders.",     // Pflicht:  Beschreibung
         );
         // Nicht vergessen: Das gesamte Array zurückgeben
-
         if(isset($config[$language])) {
             return $config[$language];
         } else {
@@ -416,15 +402,8 @@ if(!function_exists('getGalleryMenu')) {
     
     /***************************************************************
     * 
-    * Gibt die Plugin-Infos als Array zurück - in dieser 
-    * Reihenfolge:
-    *   - Name des Plugins
-    *   - Version des Plugins
-    *   - Kurzbeschreibung
-    *   - Name des Autors
-    *   - Download-URL
-    *   - Platzhalter eintrag in Select im Inhatseite Edit
-    * 
+    * Gibt die Plugin-Infos als Array zurück
+    *  
     ***************************************************************/
     function getInfo() {
         global $ADMIN_CONF;
@@ -432,23 +411,27 @@ if(!function_exists('getGalleryMenu')) {
 
         $info['deDE'] = array(
             // Plugin-Name
-            "mozilioCMS Standart <b>Galerie</b> 0.1",
-            // Plugin-Version
+            "<b>Eingebettete Galerie</b> 1.0",
+            // CMS-Version
             "1.12",
             // Kurzbeschreibung
-            'Erzeugt die moziloCMS Standart Galerie embedded fähig.<br />
-            Platzhalter:<br>
-            <SPAN style="font-weight:bold;">{Galerie|Meine Galerie}</SPAN> für dir Inhaltseite.<br>
-            Bei Target <SPAN style="font-weight:bold;">blank</SPAN>:<br>
+            'Erstellt eine in Inhaltsseiten einbettbare Galerieansicht.<br />
+            <br />
+            <span style="font-weight:bold;">Nutzung:</span><br />
+            {Galerie|moziloCMS} bettet die Galerie "moziloCMS" in die Inhaltsseite ein.<br />
+            <br />
+            <span style="font-weight:bold;">Konfiguration:</span><br />
+            Das Ausehen kann durch Anordnen der Platzhalter im Textfeld geändert werden: {GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION}, {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}
+            <!--Bei Target <SPAN style="font-weight:bold;">blank</SPAN>:<br>
             Optional ein Link Text am Ende mit <SPAN style="color:red;">Komma</SPAN> getränt z.B. <SPAN style="font-weight:bold;">{Galerie|Meine Galerie , Link Text}</SPAN><br>
             <SPAN style="font-weight:bold;">{Galerie}</SPAN> in der <SPAN style="color:red;">gallerytemplate.html</SPAN> des Layouts. <br>
-            Erzeugt wird das Ausehen durch Anordnen dieser Platzhaltern <SPAN style="font-weight:bold;">{GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION}, {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}</SPAN> im Textfeld.<br>',
+            Erzeugt wird das Ausehen durch Anordnen dieser Platzhaltern <SPAN style="font-weight:bold;">{GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION}, {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}</SPAN> im Textfeld.<br>-->',
             // Name des Autors
            "mozilo",
             // Download-URL
             "http://cms.mozilo.de",
-            # Platzhalter => Kurtzbeschreibung
-            array('{Galerie|}' => 'Meine Galerie, Optinal Text für Link Galerie blank')
+            # Platzhalter => Kurzbeschreibung
+            array('{Galerie|}' => 'Eingebettete Galerie')
             );
 
         if(isset($info[$language])) {

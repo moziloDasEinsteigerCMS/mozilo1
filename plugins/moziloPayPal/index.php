@@ -2,25 +2,8 @@
 
 /***************************************************************
 * 
-* Demo-Plugin für moziloCMS.
-* 
-* 
-* Jedes moziloCMS-Plugin muß...
-* - als Verzeichnis [PLUGINNAME] unterhalb von "plugins" liegen.
-* - im Pluginverzeichnis eine plugin.conf mit den Plugin-
-*   Einstellungen enthalten (diese kann auch leer sein).
-* - eine index.php enthalten, in der eine Klasse "[PLUGINNAME]" 
-*   definiert ist.
-* 
-* Die Plugin-Klasse muß...
-* - von der Klasse "Plugin" erben ("class [PLUGINNAME] extends Plugin")
-* - folgende Funktionen enthalten:
-*   getContent($value)
-*       -> gibt die HTML-Ersetzung der Plugin-Variable zurück
-*   getConfig()
-*       -> gibt die Konfigurationsoptionen als Array zurück
-*   getInfo()
-*       -> gibt die Plugin-Infos als Array zurück
+* PayPal-Button-Plugin für moziloCMS
+* Gibt einen PayPal-Button aus.
 * 
 ***************************************************************/
 class moziloPayPal extends Plugin {
@@ -29,16 +12,14 @@ class moziloPayPal extends Plugin {
     /***************************************************************
     * 
     * Gibt den HTML-Code zurück, mit dem die Plugin-Variable ersetzt 
-    * wird. Der String-Parameter $value ist Pflicht, kann aber leer 
-    * sein.
+    * wird.
     * 
     ***************************************************************/
     function getContent($value) {
         global $URL_BASE;
         global $PLUGIN_DIR_NAME;
 
-        $values = explode(",", $value);
-        $paypal = $values[0].'<form action="https://www.paypal.com/cgi-bin/webscr" method="post" title="Unterst&uuml;tzen Sie mozilo mit einer Spende!">
+        $paypal = '<form action="https://www.paypal.com/cgi-bin/webscr" method="post" title="Unterst&uuml;tzen Sie mozilo mit einer Spende!">
                 <input type="hidden" name="cmd" value="_s-xclick" />
                 <input type="image" src="'.$URL_BASE.$PLUGIN_DIR_NAME.'/moziloPayPal/spendenbanner105x40.png" name="submit" alt="Zahlen Sie mit PayPal - schnell, kostenlos und sicher!" />
                 <img alt="Unterst&uuml;tzen Sie mozilo mit einer Spende" src="https://www.paypal.com/de_DE/i/scr/pixel.gif" width="1" height="1" />
@@ -52,43 +33,35 @@ class moziloPayPal extends Plugin {
     /***************************************************************
     * 
     * Gibt die Konfigurationsoptionen als Array zurück.
-    * Ist keine Konfiguration nötig, ist dieses Array leer.
     * 
     ***************************************************************/
     function getConfig() {
-        // Rückgabe-Array initialisieren
-        // Das muß auf jeden Fall geschehen!
-        $config = array();
-        // Nicht vergessen: Das gesamte Array zurückgeben
-        return $config;
+        // keine Konfiguration nötig
+        return array();
     } // function getConfig    
     
     
     /***************************************************************
     * 
-    * Gibt die Plugin-Infos als Array zurück - in dieser 
-    * Reihenfolge:
-    *   - Name des Plugins
-    *   - Version des Plugins
-    *   - Kurzbeschreibung
-    *   - Name des Autors
-    *   - Download-URL
+    * Gibt die Plugin-Infos als Array zurück.
     * 
     ***************************************************************/
     function getInfo() {
         return array(
             // Plugin-Name
-            "<b>mozilo PayPal Spenden Button</b> 0.1",
-            // Plugin-Version
+            "<b>PayPal-Button</b> 1.0",
+            // CMS-Version
             "1.12",
             // Kurzbeschreibung
-            'Erzeugt den PayPal Spenden Button. <br>Patzhalter: <br><SPAN style="font-weight:bold;">{moziloPayPal}</SPAN> <br> <span style="font-weight:bold;">{moziloPayPal|Spenden}</span> mit Überschrieft',
+            'Erzeugt den PayPal-Spendenbutton. <br />
+            <br />
+            <span style="font-weight:bold;">Nutzung:</span><br />
+            {moziloPayPal} erzeugt den PayPal-Button.',
             // Name des Autors
             "mozilo",
             // Download-URL
             "http://cms.mozilo.de",
-            array('{moziloPayPal|}' => 'Überschrieft Spenden',
-                '{moziloPayPal}' => 'ohne Überschrieft')
+            array('{moziloPayPal}' => 'PayPal-Button')
             );
     } // function getInfo
 
