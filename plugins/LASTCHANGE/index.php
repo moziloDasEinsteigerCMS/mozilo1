@@ -171,7 +171,7 @@ class LASTCHANGE extends Plugin {
             'Zeigt die letzte Änderung an.<br />
             <br />
             <span style="font-weight:bold;">Nutzung:</span><br />
-            {LASTCHANGE|} gibt etwas aus wie: "Letzte Änderung: Willkommen (22.02.2010, 09:07:20)"<br />
+            {LASTCHANGE} gibt etwas aus wie: "Letzte Änderung: Willkommen (22.02.2010, 09:07:20)"<br />
             {LASTCHANGE|text} gibt etwas aus wie: "Letzte Änderung"<br />
             {LASTCHANGE|page} gibt etwas aus wie: "Willkommen"<br />
             {LASTCHANGE|pagelink} gibt etwas aus wie: "Willkommen" (mit Link auf die Inhaltsseite)<br />
