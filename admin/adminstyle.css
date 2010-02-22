@@ -205,10 +205,10 @@ input, select, textarea
     background-color:#DDFFDD;
     background-position:5px 5px;
     background-repeat:no-repeat;
-    -moz-border-radius:5px;
-    -webkit-border-radius:5px;
-    -khtml-border-radius:5px;
-    border-radius:5px;
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    -khtml-border-radius:3px;
+    border-radius:3px;
 }
 
 .message_fehler
@@ -222,10 +222,10 @@ input, select, textarea
     background-color:#FFDDDD;
     background-position:5px 5px;
     background-repeat:no-repeat;
-    -moz-border-radius:5px;
-    -webkit-border-radius:5px;
-    -khtml-border-radius:5px;
-    border-radius:5px;
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    -khtml-border-radius:3px;
+    border-radius:3px;
 }
 
 .table_toggle
