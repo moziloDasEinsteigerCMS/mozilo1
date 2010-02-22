@@ -186,9 +186,9 @@ class LASTCHANGE extends Plugin {
             array(
                 '{LASTCHANGE}' => 'Letzte Änderung mit Link und Datum',
                 '{LASTCHANGE|text}' => 'Text "Letzte Änderung:"',
-                '{LASTCHANGE|page}' => 'Name der zuletzt geaenderten Inhaltsseite',
-                '{LASTCHANGE|pagelink}' => 'kompletter Link auf diese Inhaltsseite',
-                '{LASTCHANGE|date}' => 'formatiertes Datum der letzten Aenderung')
+                '{LASTCHANGE|page}' => 'Name der zuletzt geänderten Inhaltsseite',
+                '{LASTCHANGE|pagelink}' => 'Link auf die zuletzt geänderte Inhaltsseite',
+                '{LASTCHANGE|date}' => 'Datum der letzten Änderung')
             );
 
         if(isset($info[$adminlanguage])) {
