@@ -168,8 +168,8 @@ class LASTCHANGE extends Plugin {
             // CMS-Version
             "1.12",
             // Kurzbeschreibung
-            'Zeigt die letzte Änderung an.<br/>
-            <br/>
+            'Zeigt die letzte Änderung an.<br />
+            <br />
             <span style="font-weight:bold;">Nutzung:</span><br />
             {LASTCHANGE|} gibt etwas aus wie: "Letzte Änderung: Willkommen (22.02.2010, 09:07:20)"<br />
             {LASTCHANGE|text} gibt etwas aus wie: "Letzte Änderung"<br />

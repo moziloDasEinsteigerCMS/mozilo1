@@ -3631,7 +3631,8 @@ function plugins($post) {
                             $plugin_info[$pos] = htmlentities(strip_tags($plugin_info[$pos]),ENT_COMPAT,$CHARSET);
                         }
                         if(isset($plugin_info[$pos])) {
-                            $pagecontent_conf .= '<tr><td width="10%" valign="top" class="td_left_title_padding_bottom" nowrap><b class="text_grau">'.getLanguageValue($info).'</b></td><td width="90%" class="td_togglen_padding_bottom">'.$plugin_info[$pos].'</td></tr>';
+                            $pagecontent_conf .= '<tr><td width="30%" valign="top" class="td_right_title_padding_bottom" nowrap><b class="text_grau">'.getLanguageValue($info).'</b></td>'
+                                .'<td width="70%" class="td_togglen_padding_bottom">'.$plugin_info[$pos].'</td></tr>';
                         }
                         if($pos == 4) {
                             # Das getInfo() array hat mehr als 4 einträge wir brauchen hier aber nur die 4
@@ -3640,8 +3641,8 @@ function plugins($post) {
                     }
 
                     if(count($plugin->getConfig()) >= 1) {
-                        $pagecontent_conf .= '<tr><td width="100%" colspan="2" class="td_togglen_padding_bottom" nowrap>';
-                        $pagecontent_conf .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
+//                        $pagecontent_conf .= '<tr><td width="100%" colspan="2" class="td_togglen_padding_bottom" nowrap>';
+//                        $pagecontent_conf .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
 
                         $config = $plugin->getConfig();
                         foreach($config as $name => $inhalt) {
@@ -3783,12 +3784,12 @@ function plugins($post) {
                                 }
                             }
                             # Ausgeben nowrap
-                            $pagecontent_conf .= '<tr><td width="40%" valign="top" class="td_right_title_padding_bottom"><b>'.$config[$name]['description'].'</b></td>';
-                            $pagecontent_conf .= '<td width="60%" valign="top" class="td_togglen_padding_bottom" nowrap>'.$input.'</td></tr>';
+                            $pagecontent_conf .= '<tr><td width="30%" valign="top" class="td_right_title_padding_bottom"><b>'.$config[$name]['description'].'</b></td>';
+                            $pagecontent_conf .= '<td width="70%" valign="top" class="td_togglen_padding_bottom" nowrap>'.$input.'</td></tr>';
                         }
-                        $pagecontent_conf .= '</table>';
+//                        $pagecontent_conf .= '</table>';
 
-                        $pagecontent_conf .= '</td></tr>';
+//                        $pagecontent_conf .= '</td></tr>';
                     }
                     $pagecontent_conf .= '</table>';
 
