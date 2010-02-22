@@ -4040,21 +4040,25 @@ function returnPluginSelectbox() {
     $plugins = getDirContentAsArray($PLUGIN_DIR_REL, false);
     $selectbox = '<select class="overviewselect" name="plugins" onchange="insertPluginAndResetSelectbox(this);">'
     .'<option class="noaction" value="">'.getLanguageValue("toolbar_plugins").'</option>';
-    foreach ($plugins as $currentplugins) {
-        if (file_exists($PLUGIN_DIR_REL.$currentplugins."/index.php")) {
-            require_once($PLUGIN_DIR_REL.$currentplugins."/index.php");
-            $plugin = new $currentplugins();
+    foreach ($plugins as $currentplugin) {
+        if (file_exists($PLUGIN_DIR_REL.$currentplugin."/index.php")) {
+            require_once($PLUGIN_DIR_REL.$currentplugin."/index.php");
+            $plugin = new $currentplugin();
             $plugin_info = $plugin->getInfo();
-            if(isset($plugin_info[5]) and is_array($plugin_info[5])) {
-                foreach($plugin_info[5] as $platzh => $info) {
-                    if(strpos($platzh,'|') > 0) {
-                        $info = str_replace('}',' '.$info.'}',$platzh);
-                        $selectbox .= '<option value="'.str_replace('}','',$platzh).'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
-                    } else {
-                        $info = $platzh.' '.$info;
-                        $selectbox .= '<option value="'.$platzh.'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
-                    }
-                }
+            // Plugin nur in der Auswahlliste zeigen, wenn es aktiv geschaltet ist
+            $plugin_conf = new Properties($PLUGIN_DIR_REL.$currentplugin."/plugin.conf",true);
+            if ($plugin_conf->get("active") == "true") {
+	            if(isset($plugin_info[5]) and is_array($plugin_info[5])) {
+	                foreach($plugin_info[5] as $platzh => $info) {
+	                    if(strpos($platzh,'|') > 0) {
+	                        $info = str_replace('}',''.$info.'}',$platzh);
+	                        $selectbox .= '<option value="'.str_replace('}','',$platzh).'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
+	                    } else {
+	                        $info = $platzh.' '.$info;
+	                        $selectbox .= '<option value="'.$platzh.'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
+	                    }
+	                }
+	            }
             }
         }
     }
