@@ -434,7 +434,7 @@ function home($post) {
         $gdlibinstalled = getLanguageValue("no");
     }
     else {
-    	    $gdlibinstalled = getLanguageValue("yes");
+            $gdlibinstalled = getLanguageValue("yes");
     }
 
     $test_mail_adress = NULL;
@@ -614,13 +614,13 @@ function category($post) {
             # Neue Kategorie nicht Anzeigen wenn es schonn 100 Kategorien gibt
             if(count($post['categories']['cat']['position']) < $max_cat_page + 1) {
                 $pagecontent .= '<tr><td width="100%" class="td_toggle_new">'
-	                .'<table summary="" width="100%" class="table_new" border="0" cellspacing="0" cellpadding="0">'
-	                .'<tr><td class="td_left_title"><b>'.$text_position.'</b></td>'
-	                .'<td class="td_left_title"><b>'.$text_name.'</b>'
-	                .'</td><td class="td_left_title"><b>'.$text_url_adress.'</b> '.$text_url_adress_description.'</td>'
-	                .'<td class="td_center_title">&nbsp;</td>'
-	                .'<td class="td_center_title">'.getLanguageValue("blank").'</td>'
-	                .'<td class="td_center_title">'.getLanguageValue("self").'</td></tr>';
+                    .'<table summary="" width="100%" class="table_new" border="0" cellspacing="0" cellpadding="0">'
+                    .'<tr><td class="td_left_title"><b>'.$text_position.'</b></td>'
+                    .'<td class="td_left_title"><b>'.$text_name.'</b>'
+                    .'</td><td class="td_left_title"><b>'.$text_url_adress.'</b> '.$text_url_adress_description.'</td>'
+                    .'<td class="td_center_title">&nbsp;</td>'
+                    .'<td class="td_center_title">'.getLanguageValue("blank").'</td>'
+                    .'<td class="td_center_title">'.getLanguageValue("self").'</td></tr>';
                 $pagecontent .= '<tr>';
                 $pagecontent .= '<td class="td_left_title"><input type="hidden" name="categories[cat][position]['.$max_cat_page.']" value="'.$post['categories']['cat']['position'][$max_cat_page].'">';
                 $pagecontent .= '<input '.$post['categories']['cat']['error_html']['new_position'][$max_cat_page].'class="input_text" type="text" name="categories[cat][new_position]['.$max_cat_page.']" value="'.$post['categories']['cat']['new_position'][$max_cat_page].'" size="2" maxlength="2"'.$tooltip_category_help_new_position.'></td>';
@@ -2878,7 +2878,7 @@ function config($post) {
     if(count($language_array) <= 0) {
         $post['error_messages']['config_error_language_emty'][] = NULL;
         $error_color['cmslanguage'] = ' style="background-color:#FF7029;"';
-    } elseif(!in_array($CMS_CONF->get('cmslanguage').".conf",$language_array)) {
+    } elseif(!in_array("language_".$CMS_CONF->get('cmslanguage').".conf",$language_array)) {
         $post['error_messages']['config_error_language_existed'][] = $CMS_CONF->get('cmslanguage');
         $error_color['cmslanguage'] = ' style="background-color:#FF7029;"';
     }
@@ -2984,14 +2984,16 @@ function config($post) {
     $pagecontent .= "<tr><td class=\"td_cms_left\">".getLanguageValue("config_text_cmslanguage")."</td>";
     $pagecontent .= "<td class=\"td_cms_left\"><select name=\"cmslanguage\" class=\"input_cms_select\"".$error_color['cmslanguage'].">";
     foreach($language_array as $file) {
+    	$currentlanguagecode = substr($file,strlen("language_"),strlen($file)-strlen("language_")-strlen(".conf"));
         $selected = NULL;
-        if(substr($file,0,strlen($file)-strlen(".conf")) == $CMS_CONF->get("cmslanguage")) {
+        // aktuell ausgewählte Sprache als ausgewählt markieren 
+        if($currentlanguagecode == $CMS_CONF->get("cmslanguage")) {
             $selected = " selected";
         }
-        $pagecontent .= "<option".$selected." value=\"".substr($file,0,strlen($file)-strlen(".conf"))."\">";
+        $pagecontent .= "<option".$selected." value=\"".$currentlanguagecode."\">";
         // Übersetzer aus der aktuellen Sprachdatei holen
         $languagefile = new Properties("../cms/sprachen/$file",true);
-        $pagecontent .= substr($file,0,strlen($file)-strlen(".conf"))." (".getLanguageValue("config_input_translator")." ".$languagefile->get("_translator_0").")";
+        $pagecontent .= $currentlanguagecode." (".getLanguageValue("config_input_translator")." ".$languagefile->get("_translator_0").")";
         $pagecontent .= "</option>";
     }
     $pagecontent .= "</select></td></tr>";
@@ -4049,22 +4051,22 @@ function returnPluginSelectbox() {
             // Plugin nur in der Auswahlliste zeigen, wenn es aktiv geschaltet ist
             $plugin_conf = new Properties($PLUGIN_DIR_REL.$currentplugin."/plugin.conf",true);
             if ($plugin_conf->get("active") == "true") {
-	            if(isset($plugin_info[5]) and is_array($plugin_info[5])) {
-	                foreach($plugin_info[5] as $platzh => $info) {
-	                	// wenn es vorgegebene Werte gibt: {PLUGIN|wert} 
-	                    /*if(strpos($platzh,'|') > 0) {
-	                        $info = str_replace('}',''.$info.'}',$platzh);
-	                        $selectbox .= '<option title="'.$specialchars->rebuildSpecialChars($info, false, true).'" value="'.str_replace('}','',$platzh).'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
-	                    }
-	                    // keine vorgegebenen Werte: {PLUGIN}
-	                    else {
-	                        $info = $platzh.' '.$info;
-	                        $selectbox .= '<option value="'.$platzh.'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
-	                    }*/
+                if(isset($plugin_info[5]) and is_array($plugin_info[5])) {
+                    foreach($plugin_info[5] as $platzh => $info) {
+                        // wenn es vorgegebene Werte gibt: {PLUGIN|wert} 
+                        /*if(strpos($platzh,'|') > 0) {
+                            $info = str_replace('}',''.$info.'}',$platzh);
+                            $selectbox .= '<option title="'.$specialchars->rebuildSpecialChars($info, false, true).'" value="'.str_replace('}','',$platzh).'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
+                        }
+                        // keine vorgegebenen Werte: {PLUGIN}
+                        else {
+                            $info = $platzh.' '.$info;
+                            $selectbox .= '<option value="'.$platzh.'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
+                        }*/
                         //$info = $platzh.' '.$info;
                         $selectbox .= '<option title="'.$specialchars->rebuildSpecialChars($info, false, true).'" value="'.$platzh.'">'.$platzh.'</option>';
-	                }
-	            }
+                    }
+                }
             }
         }
     }
@@ -4460,7 +4462,7 @@ function checkBoxChecked($checkboxrequest) {
 // Hilfsfunktion: Baut für das übergebene Thema den URL zur Hilfe zusammen
 // ------------------------------------------------------------------------------
     function getHelpUrlForSubject($subject) {
-    	// Das könnte später noch mehrsprachig erweitert werden, wenn anderssprachige Dokus existieren
+        // Das könnte später noch mehrsprachig erweitert werden, wenn anderssprachige Dokus existieren
         return "http://cms.mozilo.de/hilfe/?thema=".$subject;
     }
 

@@ -8,26 +8,6 @@
 *
 */
 
-
-
-/*
-######
-INHALT
-######
-        
-        Projekt "Flatfile-basiertes CMS für Einsteiger"
-        Sprachunterst�tzung
-        Klasse ITF04-1
-        Industrieschule Chemnitz
-
-        Ronny Monser
-        Arvid Zimmermann
-        Oliver Lorenz
-        www.mozilo.de
-
-######
-*/
-
 class Language {
     
     var $LANG_CONF;
@@ -41,9 +21,11 @@ class Language {
         global $BASE_DIR_CMS;
 
         $currentlanguage = $CMS_CONF->get("cmslanguage");
-        if (($currentlanguage == "") || (!file_exists($BASE_DIR_CMS."sprachen/$currentlanguage.conf")))
+        // Standardsprache Deutsch verwenden, wenn konfigurierte Sprachdatei nicht vorhanden
+        if (($currentlanguage == "") || (!file_exists($BASE_DIR_CMS."sprachen/language_$currentlanguage.conf"))) {
             $currentlanguage = "Deutsch";
-        $this->LANG_CONF = new Properties($BASE_DIR_CMS."sprachen/$currentlanguage.conf");
+        }
+        $this->LANG_CONF = new Properties($BASE_DIR_CMS."sprachen/language_$currentlanguage.conf");
     }
     
 

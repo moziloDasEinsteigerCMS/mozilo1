@@ -66,7 +66,7 @@ function makeDefaultConf($conf_datei) {
                         'websitekeywords' => '',
                         'websitetitle' => 'moziloCMS%20-%20Das%20CMS%20f%C3%BCr%20Einsteiger'),
                     'select' => array(
-                        'cmslanguage' => 'Deutsch',
+                        'cmslanguage' => 'deDE',
                         'cmslayout' => 'moziloCMS%202009',
                         'defaultcat' => '10_Willkommen',
 #                        'menu2' => 'no_menu2',
