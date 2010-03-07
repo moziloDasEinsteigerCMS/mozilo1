@@ -198,7 +198,7 @@ class DEMOPLUGIN extends Plugin {
             "size" => "30",                             // optional: dargestellte Zeichen
             "regex" => "/^[a-z]{3}$/",                   // optional: Erlaubte Werte als regulärer Ausdruck (hier: drei kleine Buchstaben; wird beim Speichern der Einstellungen überprüft)
             "regex_error" => "Die Eingabe muss genau 3 kleine Buchstaben enthalten." // optional: Fehlermeldung für die RegEx-Überprüfung
-            );
+        );
 
             
         /***************************************************************
@@ -237,7 +237,7 @@ class DEMOPLUGIN extends Plugin {
         $config['janeinoption'] = array(
             "type" => "checkbox",                       // Pflicht:  Eingabetyp 
             "description" => "Ja oder nein?"            // Pflicht:  Beschreibung
-            );
+        );
 
         
         /***************************************************************
@@ -262,7 +262,7 @@ class DEMOPLUGIN extends Plugin {
                 "gruen" => "Grün"
                 )
 */
-            );
+        );
         
         
         /***************************************************************
@@ -288,42 +288,53 @@ class DEMOPLUGIN extends Plugin {
                 ),
 */
             "multiple" => "true"                        // optional: Mehrfachauswahl erlauben
-            ); 
+        ); 
 
-        
         // Nicht vergessen: Das gesamte Array zurückgeben
         return $config;
         
-        # mehr sprachig wenn Sprache nicht vorhanden wird deDE benutzt ---------------
+        // Aber halt, alle Optionen wären dann ja in Deutsch - auch für User, die eine andere 
+        // Sprache im Admin eingestellt haben!
+
+        // Man kann die Optionen auch in verschiedenen Sprachen beschreiben; 
+        // angezeigt wird dann die, die im Admin eingestellt ist (z.B. deDE oder enEN).
+        
+        // Dafür muß jede Beschreibung natürlich für verschiedene Sprachen verfügbar sein;
+        // hier das Beispiel von zwei Optionen jeweils in Deutsch und Englisch:
+
         $config['deDE']['janeinoption'] = array(
-            "type" => "checkbox",                       // Pflicht:  Eingabetyp 
-            "description" => "Ja oder nein?"            // Pflicht:  Beschreibung
-            );
+            "type" => "checkbox",
+            "description" => "Ja oder nein?"
+        );
         $config['deDE']['texteingabe']  = array(
-            "type" => "text",                           // Pflicht:  Eingabetyp
-            "description" => "Bitte Wert eingeben",     // Pflicht:  Beschreibung
-            "maxlength" => "100",                       // optional: maximale Länge
-            "size" => "30",                             // optional: dargestellte Zeichen
-            "regex" => "/^[a-z]{3}$/",                   // optional: Erlaubte Werte als regulärer Ausdruck (hier: drei kleine Buchstaben; wird beim Speichern der Einstellungen überprüft)
-            "regex_error" => "Die Eingabe muss genau 3 kleine Buchstaben enthalten." // optional: Fehlermeldung für die RegEx-Überprüfung
-            );
+            "type" => "text",
+            "description" => "Bitte Wert eingeben",
+            "maxlength" => "100",
+            "size" => "30",
+            "regex" => "/^[a-z]{3}$/",
+            "regex_error" => "Die Eingabe muss genau 3 kleine Buchstaben enthalten."
+        );
         
         $config['enEN']['janeinoption'] = array(
-            "type" => "checkbox",                       // Pflicht:  Eingabetyp 
-            "description" => "Ja oder nein?"            // Pflicht:  Beschreibung
-            );
+            "type" => "checkbox",
+            "description" => "Yes or no?"
+        );
         $config['enEN']['texteingabe']  = array(
-            "type" => "text",                           // Pflicht:  Eingabetyp
-            "description" => "Bitte Wert eingeben",     // Pflicht:  Beschreibung
-            "maxlength" => "100",                       // optional: maximale Länge
-            "size" => "30",                             // optional: dargestellte Zeichen
-            "regex" => "/^[a-z]{3}$/",                   // optional: Erlaubte Werte als regulärer Ausdruck (hier: drei kleine Buchstaben; wird beim Speichern der Einstellungen überprüft)
-            "regex_error" => "Die Eingabe muss genau 3 kleine Buchstaben enthalten." // optional: Fehlermeldung für die RegEx-Überprüfung
-            );
+            "type" => "text",
+            "description" => "Please enter a value",
+            "maxlength" => "100",
+            "size" => "30",
+            "regex" => "/^[a-z]{3}$/",
+            "regex_error" => "Your input has to consist of exactly three small letters."
+        );
+            
+        // Jetzt wird das Optionen-Array in der aktuell verwendeten Sprache zurückgegeben. 
         if(isset($config[$language])) {
             return $config[$language];
-        } else {
-            return $config['deDE'];
+        }
+        // Stellt das Plugin diese Sprache nicht zur Verfügung, werden die englischen Optionen zurückgegeben.
+        else {
+            return $config['enEN'];
         }
     } // function getConfig    
     
@@ -359,10 +370,14 @@ class DEMOPLUGIN extends Plugin {
             // - ist das Array leer, erscheint das Plugin nicht in der Selectbox
             array(
                 '{DEMOPLUGIN}' => 'Kurzbeschreibung',
-                '{DEMOPLUGIN|}' => 'Kurzbeschreibung mit Parameter'
+                '{DEMOPLUGIN|}' => 'Kurzbeschreibung'
             )
         );
+        // Rückgabe der Infos.
+        // Auch hier könnte man die Inhalte natürlich von der aktuell im Admin eingestellten 
+        // Sprache abhängig machen - siehe getConfig().
         return $info;
+        
     } // function getInfo
 
 } // class DEMOPLUGIN
