@@ -525,6 +525,23 @@ class Syntax {
                 $content = str_replace ("$match", $specialchars->getHtmlEntityDecode($nobrvalue), $content);
             }
 
+/*
+            Das "php"-Element ist seit moziloCMS 1.12 veraltet und wird nur noch aus Gründen 
+            der Abwärtskompatibilität mitgeführt. Bitte erstellen Sie für die Ausführung von 
+            eigenem PHP-Code ein Plugin. 
+
+            // Ausführung von PHP-Code
+            elseif ($attribute == "php") {
+                // Formatierungen rückgängig machen, um den reinen PHP-Code zu erhalten!
+                $value = preg_replace("/&#(\d*);/Umsie", "''.chr('\\1').''", $value);
+                $value = preg_replace("/&#092;/Umsi", "&amp;#092;", $value);
+                $value = preg_replace("/&#036;/Umsi", "&amp;#036;", $value);
+                $value = html_entity_decode($value);
+                $content = str_replace ("$match", eval($value), $content);
+            }
+*/
+
+
             // Tabellen
             elseif ($attribute == "tabelle") {
                 // Tabelleninhalt aufbauen
@@ -654,13 +671,13 @@ class Syntax {
                 if ($USER_SYNTAX->keyExists($attribute)) {
                     // Platzhalter {VALUE} im definierten Syntaxelement ersetzen
                     $replacetext = str_replace("{VALUE}", $value, replacePlaceholders($USER_SYNTAX->get($attribute),"", ""));
-	                    /* 
-	                    //Einfach Kommentarzeichen entfernen, wenn folgende Funktionalität gewünscht ist:
-	                    // Platzhalter {DESCRIPTION} wird durch $value ersetzt, wenn $description selbst leer ist
-	                    if ($description == "")
-	                        $replacetext = str_replace("{DESCRIPTION}", $value, $replacetext);
-	                    else
-	                    */
+                        /* 
+                        //Einfach Kommentarzeichen entfernen, wenn folgende Funktionalität gewünscht ist:
+                        // Platzhalter {DESCRIPTION} wird durch $value ersetzt, wenn $description selbst leer ist
+                        if ($description == "")
+                            $replacetext = str_replace("{DESCRIPTION}", $value, $replacetext);
+                        else
+                        */
                         // Platzhalter {DESCRIPTION} im definierten Syntaxelement durch die Beschreibung ersetzen
                         $replacetext = str_replace("{DESCRIPTION}", $description, $replacetext);
 
