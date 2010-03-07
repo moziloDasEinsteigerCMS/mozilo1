@@ -137,9 +137,11 @@ input, select, textarea
     border: 1px solid #C0C0C0;
     background-color:#C9D7EB;
     -moz-border-radius:5px 5px 0px 0px;
-    -webkit-border-radius:5px 5px 0px 0px;
-    -khtml-border-radius:5px 5px 0px 0px;
-    border-radius:5px 5px 0px 0px;
+	-webkit-border-top-left-radius:5px;
+	-webkit-border-top-right-radius:5px;
+	-khtml-border-top-right-radius:5px;
+	-khtml-border-top-left-radius:5px;
+	border-radius:5px 5px 0px 0px;
 }
 
 .td_button_activ a
@@ -155,8 +157,10 @@ input, select, textarea
     background-color:#F8F8F8;
     color:#002A54;
     -moz-border-radius:5px 5px 0px 0px;
-    -webkit-border-radius:5px 5px 0px 0px;
-    -khtml-border-radius:5px 5px 0px 0px;
+	-webkit-border-top-left-radius:5px;
+	-webkit-border-top-right-radius:5px;
+	-khtml-border-top-right-radius:5px;
+	-khtml-border-top-left-radius:5px;
     border-radius:5px 5px 0px 0px;
 }
 
