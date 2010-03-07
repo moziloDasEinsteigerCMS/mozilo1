@@ -12,11 +12,11 @@
 /*
 ######
 		
-	Ein Sonderzeichenkonverter für moziloCMS
+	Ein Sonderzeichenkonverter fÃ¼r moziloCMS
 
 ######
 */
-	require_once("../SpecialChars.php");
+	require_once("../cms/SpecialChars.php");
 	$specialchars = new SpecialChars();
 	
 	$htmlstart = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
@@ -64,7 +64,7 @@
 	."</tr>\n"
 	."<tr>\n"
 /*	."<td colspan=\"2\">\n"
-	."<h2>Unterstützte Zeichen / Supported characters</h2>\n"
+	."<h2>UnterstÃ¼tzte Zeichen / Supported characters</h2>\n"
 	.$specialchars->getSpecialCharsString(" ", 52)."\n"
 	."</td>\n"
 	."</tr>\n"*/
