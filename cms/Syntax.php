@@ -116,6 +116,14 @@ class Syntax {
                         default: { 
                         }
                     }
+                    # erstmal alle HTML Zeichen wandeln
+                    $link = $specialchars->getHtmlEntityDecode($value);
+                    # alle url encodete Zeichen wandeln
+                    $link = $specialchars->rebuildSpecialChars($link,false,false);
+                    # alles url encodeten
+                    $link = $specialchars->replaceSpecialChars($link,false);
+                    # alle :,?,&,;,= zurück wandeln
+                    $link = str_replace(array('%3A','%3F','%26','%3B','%3D'),array(':','?','&amp;',';','='),$link);
                     $content = str_replace ($match, "<a class=\"link\" href=\"$value\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", $value)).$this->TARGETBLANK_LINK.">$shortenendlink</a>", $content);
                 }
                 else {
@@ -125,6 +133,14 @@ class Syntax {
 
             // externer Link mit eigenem Text
             elseif (substr($attribute,0,5) == "link=") {
+                # erstmal alle HTML Zeichen wandeln
+                $link = $specialchars->getHtmlEntityDecode($value);
+                # alle url encodete Zeichen wandeln
+                $link = $specialchars->rebuildSpecialChars($link,false,false);
+                # alles url encodeten
+                $link = $specialchars->replaceSpecialChars($link,false);
+                # alle :,?,&,;,= zurück wandeln
+                $link = str_replace(array('%3A','%3F','%26','%3B','%3D'),array(':','?','&amp;',';','='),$link);
                 // überprüfung auf korrekten Link
                 if (preg_match($this->LINK_REGEX, $value)) {
                     $content = str_replace ($match, "<a class=\"link\" href=\"$value\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", $value)).$this->TARGETBLANK_LINK.">".substr($attribute, 5, strlen($attribute)-5)."</a>", $content);
