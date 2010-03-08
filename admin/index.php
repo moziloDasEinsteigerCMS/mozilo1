@@ -19,7 +19,7 @@ $BASE_DIR = str_replace($ADMIN_DIR_NAME,"",getcwd());
 $CMS_DIR_NAME = "cms";
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
 $BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
-$URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen($ADMIN_DIR_NAME."/index.php")));
+$URL_BASE = substr($_SERVER['PHP_SELF'],0,-(strlen($ADMIN_DIR_NAME."/index.php")));
 
 
 $debug = "nein"; # ja oder nein
