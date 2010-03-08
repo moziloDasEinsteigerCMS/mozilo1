@@ -124,7 +124,7 @@ class Syntax {
                     $link = $specialchars->replaceSpecialChars($link,false);
                     # alle :,?,&,;,= zurück wandeln
                     $link = str_replace(array('%3A','%3F','%26','%3B','%3D'),array(':','?','&amp;',';','='),$link);
-                    $content = str_replace ($match, "<a class=\"link\" href=\"$value\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", $value)).$this->TARGETBLANK_LINK.">$shortenendlink</a>", $content);
+                    $content = str_replace ($match, "<a class=\"link\" href=\"$link\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", $value)).$this->TARGETBLANK_LINK.">$shortenendlink</a>", $content);
                 }
                 else {
                     $content = str_replace ($match, $this->createDeadlink($value, $language->getLanguageValue1("tooltip_link_extern_error_1", $value)), $content);
@@ -143,7 +143,7 @@ class Syntax {
                 $link = str_replace(array('%3A','%3F','%26','%3B','%3D'),array(':','?','&amp;',';','='),$link);
                 // überprüfung auf korrekten Link
                 if (preg_match($this->LINK_REGEX, $value)) {
-                    $content = str_replace ($match, "<a class=\"link\" href=\"$value\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", $value)).$this->TARGETBLANK_LINK.">".substr($attribute, 5, strlen($attribute)-5)."</a>", $content);
+                    $content = str_replace ($match, "<a class=\"link\" href=\"$link\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", $value)).$this->TARGETBLANK_LINK.">".substr($attribute, 5, strlen($attribute)-5)."</a>", $content);
                 }
                 else {
                     $content = str_replace ($match, $this->createDeadlink(substr($attribute, 5, strlen($attribute)-5), $language->getLanguageValue1("tooltip_link_extern_error_1", $value)), $content);
