@@ -37,7 +37,7 @@ $CHARSET = 'UTF-8';
     $USER_SYNTAX  = new Properties($BASE_DIR_CMS."conf/syntax.conf",true);
     $URL_BASE = NULL;
     if($CMS_CONF->get("modrewrite") == "true") {
-        $URL_BASE = substr(str_replace($_SERVER['DOCUMENT_ROOT'],"",$_SERVER['SCRIPT_FILENAME']),0,-(strlen("index.php")));
+        $URL_BASE = substr($_SERVER['PHP_SELF'],0,-(strlen("index.php")));
     }
     require_once($BASE_DIR_CMS."Language.php");
     $language       = new Language();
