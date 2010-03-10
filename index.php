@@ -332,13 +332,6 @@ $CHARSET = 'UTF-8';
     if(strpos($HTML,'{TABLEOFCONTENTS}') !== false)
         $HTML = preg_replace('/{TABLEOFCONTENTS}/', $syntax->getToC($pagecontent), $HTML);
 
-    # Titel der Galerie wird bei blank benutzt
-    if(strpos($HTML,'{CURRENTGALLERY}') !== false) {
-        if(getRequestParam('gal', false)) {
-            $HTML = preg_replace('/{CURRENTGALLERY}/', $specialchars->rebuildSpecialChars(getRequestParam('gal', true),false,true), $HTML);
-        }
-    }
-
     }
     
 // ------------------------------------------------------------------------------
