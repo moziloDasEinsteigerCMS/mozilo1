@@ -308,22 +308,30 @@ class Galerie extends Plugin {
                     $template = '<div class="embeddedgallery">'.$this->settings->get("gallerytemplate").'</div>';
                 } else {
                     $template = $this->settings->get("gallerytemplate");
+                    if(strrpos("tmp".$value,'{NUMBERMENU}') > 0) {
+                        $template = $value;
+                    }
                 }
             } else { 
                 $template = "{GALLERYMENU}{NUMBERMENU}\n{CURRENTPIC}\n{CURRENTDESCRIPTION}";
+                if(strrpos("tmp".$value,'{NUMBERMENU}') > 0) {
+                    $template = $value;
+                }
             }
             $html = $template;
 
             if (count($picarray) == 0) {
                 $html = preg_replace('/{NUMBERMENU}/', $language->getLanguageValue0("message_galleryempty_0"), $html);
             }
+            # Titel der Galerie
+            $html = preg_replace('/{CURRENTGALLERY}/', $specialchars->rebuildSpecialChars($gal_request,false,true), $html);
             if ($usethumbs) {
                 $html = preg_replace('/{GALLERYMENU}/', "&nbsp;", $html);
                 $html = preg_replace('/{NUMBERMENU}/', getThumbnails($picarray,$dir_thumbs_src,$dir_gallery_src,$alldescriptions), $html);
                 $html = preg_replace('/{CURRENTPIC}/', "&nbsp;", $html);
                 $html = preg_replace('/{CURRENTDESCRIPTION}/', "&nbsp;", $html);
                 $html = preg_replace('/{XOUTOFY}/', "&nbsp;", $html);
-                } else {
+            } else {
                 $html = preg_replace('/{GALLERYMENU}/', getGalleryMenu($picarray,$linkprefix,$gal_request,$index,$first,$previous,$next,$last), $html);
                 $html = preg_replace('/{NUMBERMENU}/', getNumberMenu($picarray,$linkprefix,$index,$gal_request,$first,$last), $html);
                 $html = preg_replace('/{CURRENTPIC}/', getCurrentPic($picarray,$dir_gallery_src,$dir_gallery,$index), $html);
@@ -411,27 +419,28 @@ class Galerie extends Plugin {
 
         $info['deDE'] = array(
             // Plugin-Name
-            "<b>Eingebettete Galerie</b> 1.0",
+            "<b>Standart Galerie</b> 0.1",
             // CMS-Version
             "1.12",
             // Kurzbeschreibung
-            'Erstellt eine in Inhaltsseiten einbettbare Galerieansicht.<br />
+            'Erstellt die Standart Galerieansicht.<br />
             <br />
             <span style="font-weight:bold;">Nutzung:</span><br />
-            {Galerie|moziloCMS} bettet die Galerie "moziloCMS" in die Inhaltsseite ein.<br />
+            {Galerie|moziloCMS} Erstellt die Galerie "moziloCMS".<br />
+            Im admin Galerie kann bestimt werden ob Target blank oder self.<br />
+            Bei blank wird die gallerytemplate.html Benutzt und es kann Optional {Galerie|moziloCMS,Optinaler Link Text} mit übergeben werden.<br />
+            Bei self wird sie in die Inhaltseite eingebettet<br />
             <br />
             <span style="font-weight:bold;">Konfiguration:</span><br />
-            Das Ausehen kann durch Anordnen der Platzhalter im Textfeld geändert werden: {GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION}, {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}
-            <!--Bei Target <SPAN style="font-weight:bold;">blank</SPAN>:<br />
-            Optional ein Link Text am Ende mit <SPAN style="color:red;">Komma</SPAN> getränt z.B. <SPAN style="font-weight:bold;">{Galerie|Meine Galerie , Link Text}</SPAN><br />
-            <SPAN style="font-weight:bold;">{Galerie}</SPAN> in der <SPAN style="color:red;">gallerytemplate.html</SPAN> des Layouts. <br />
-            Erzeugt wird das Ausehen durch Anordnen dieser Platzhaltern <SPAN style="font-weight:bold;">{GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION}, {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}</SPAN> im Textfeld.<br />-->',
+            Das Ausehen kann durch Anordnen der Platzhalter im Textfeld geändert werden: {CURRENTGALLERY} {GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION}, {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}<br />
+            In der gallerytemplate.html können wie gewont weiterhin die Platzhalter eingetragen werden.<br />
+            Alerdings müssen sie mit dem Galerieplatzhalter umschlossen werden inclusieve der HTML Tags.',
             // Name des Autors
            "mozilo",
             // Download-URL
             "http://cms.mozilo.de",
             # Platzhalter => Kurzbeschreibung
-            array('{Galerie|}' => 'Eingebettete Galerie')
+            array('{Galerie|}' => 'Standart Galerie')
             );
 
         if(isset($info[$language])) {
