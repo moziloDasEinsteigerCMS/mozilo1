@@ -1583,19 +1583,11 @@ $CHARSET = 'UTF-8';
         $deactiv_plugins = array();
         // alle Plugins einlesen
         $dircontent = getDirContentAsArray($PLUGIN_DIR_REL, false, false);
-        # Plugin Galerie gipts nicht manuel hinzufuegen
-/*        if(!is_dir(getcwd()."/$PLUGIN_DIR/Galerie")) {
-            $availableplugins[] = "Galerie";
-        }*/
         foreach ($dircontent as $currentelement) {
             # alle Plugins suchen
             if (file_exists($PLUGIN_DIR_REL.$currentelement."/index.php")) {
                 $availableplugins[] = $currentelement;
             }
-            # wens die gallery.php ist gibts keine plugin.conf
-/*            if($currentelement == "Galerie" and !is_dir(getcwd()."/$PLUGIN_DIR/".$currentelement)) {
-                continue;
-            }*/
             # nach schauen ob das Plugin active ist
             if(file_exists($PLUGIN_DIR_REL.$currentelement."/plugin.conf")) {
                 $conf_plugin = new Properties($PLUGIN_DIR_REL.$currentelement."/plugin.conf",true);
@@ -1655,11 +1647,6 @@ $CHARSET = 'UTF-8';
             // ...ueberpruefen, ob es eine zugehörige Plugin-PHP-Datei gibt
             if (in_array($currentvariable, $availableplugins)) {
                 $replacement = "";
-                # Plugin Galerie gibts nicht dann gallery.php benutzen
-/*                if($currentvariable == "Galerie" and !is_dir(getcwd()."/$PLUGIN_DIR/".$currentvariable)) {
-                    # Plugin-Code includieren aus der gallery.php
-                    require_once(getcwd()."/gallery.php");
-                } else {*/
                 if (file_exists($PLUGIN_DIR_REL.$currentvariable."/index.php")) {
                     // Plugin-Code includieren
                     require_once($PLUGIN_DIR_REL.$currentvariable."/index.php");
