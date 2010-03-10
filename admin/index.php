@@ -4104,7 +4104,6 @@ function returnFormatToolbar($currentcat) {
     .returnFormatToolbarIcon("seite")
     .returnFormatToolbarIcon("kategorie")
     .returnFormatToolbarIcon("datei")
-    .returnFormatToolbarIcon("galerie")
     .returnFormatToolbarIcon("bild")
     .returnFormatToolbarIcon("bildlinks")
     .returnFormatToolbarIcon("bildrechts")
