@@ -317,26 +317,9 @@ class Syntax {
                 $cleanedvalue = $specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($value),false);
                 $link_text = "";
                 if(substr($attribute,0,8) == "galerie=") {
-                    $link_text = substr($attribute, 8, strlen($attribute)-8);
+                    $link_text = ",".substr($attribute, 8, strlen($attribute)-8);
                 }
-                else {
-                    $link_text = $value;
-                }
-                if (file_exists($BASE_DIR.$GALLERIES_DIR_NAME."/".$cleanedvalue)) {
-                    $handle = opendir($BASE_DIR.$GALLERIES_DIR_NAME."/".$cleanedvalue);
-                    $j=0;
-                    while ($file = readdir($handle)) {
-                        if (is_file($BASE_DIR.$GALLERIES_DIR_NAME."/".$cleanedvalue."/".$file) && ($file <> "texte.conf")) {
-                            $j++;
-                        }
-                    }
-                    closedir($handle);
-                    $content = str_replace ($match, "<a class=\"gallery\" href=\"".$URL_BASE.$CMS_DIR_NAME."/gallery.php?gal=$cleanedvalue\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $value, $j))." target=\"_blank\">$link_text</a>", $content);
-                }
-                // Galerie nicht vorhanden
-                else {
-                    $content = str_replace ($match, $this->createDeadlink($value, $this->LANG->getLanguageValue1("tooltip_link_gallery_error_1", $value)), $content);
-                }
+                $content = str_replace ($match, '{Galerie|'.$cleanedvalue.$link_text.'}', $content);
             }
 
             // Bild aus dem Dateiverzeichnis oder externes Bild
