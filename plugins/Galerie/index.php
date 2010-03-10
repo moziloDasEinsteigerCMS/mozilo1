@@ -275,7 +275,7 @@ class Galerie extends Plugin {
         }
 
         # Galerie erzeugen
-        if (($embedded == "_self") or (getRequestParam('gal', false) and getRequestParam('plugin', false))) {
+        if (($embedded == "_self") or (getRequestParam('gal', false))) {
 
             $alldescriptions = new Properties($dir_gallery."texte.conf");
 
@@ -360,7 +360,7 @@ class Galerie extends Plugin {
             if(isset($values[1])) {
                 $gal_name = $specialchars->rebuildSpecialChars($values[1], false, true);
             }
-            return "<a class=\"gallery\" href=\"".$linkprefix."gal=".$gal_request."&amp;plugin=Galerie\" ".getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $specialchars->rebuildSpecialChars($values[0], false, true), $j))."target=\"".$GALLERY_CONF->get("target")."\">".$gal_name."</a>";
+            return "<a class=\"gallery\" href=\"".$linkprefix."gal=".$gal_request."\" ".getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $specialchars->rebuildSpecialChars($values[0], false, true), $j))."target=\"".$GALLERY_CONF->get("target")."\">".$gal_name."</a>";
         }
     } // function getContent
     
