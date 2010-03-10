@@ -1547,11 +1547,15 @@ $CHARSET = 'UTF-8';
             $currentplugin = $matches[1][$pos];
             if (sizeof($plugin) > 1) {
                 $currentplugin = $plugin[0];
+                if(strrpos("tmp".$plugin[1],'{') > 0) {
+                    $currentplugin = substr($plugin[1],strrpos($plugin[1],'{') + 1);
+                }
             }
             # Platzhalter werden alle mit ersetzt ~platz-, -platzend~
             if(!in_array($currentplugin, $availableplugins)) {
-                $string_search = $matches[0][$pos];
-                $string_new = str_replace(array('{','}'),array('~platz-','-platzend~'),$matches[0][$pos]);
+                # Platzhalter haben keine Parameter
+                $string_search = '{'.$currentplugin.'}';
+                $string_new = '~platz-'.$currentplugin.'-platzend~';
             # alle {PluginPlatzhalter} nicht Verschachtelt
             } elseif(strrpos($matches[0][$pos],'{',1) == 0) {
                 $string_search = $matches[0][$pos];
@@ -1644,6 +1648,8 @@ $CHARSET = 'UTF-8';
 
                 $currentvariable = substr($match_plugin,0,strpos($match_plugin,'|'));
                 $currentvalue = substr($match_plugin,strpos($match_plugin,'|') + 1);
+                # um den Pluigins die möglichkeit zu geben auf die Platzhalter zuzugreifen
+                $currentvalue = str_replace(array('~platz-','-platzend~'),array('{','}'),$currentvalue);
 /*
             if (sizeof($valuearray) > 1) {
                 $currentvariable = $valuearray[0];
