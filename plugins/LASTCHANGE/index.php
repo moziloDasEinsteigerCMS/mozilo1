@@ -24,7 +24,7 @@ class LASTCHANGE extends Plugin {
             // - kompletter Link auf diese Inhaltsseite  
             // - formatiertes Datum der letzten Aenderung
             // ------------------------------------------------------------------------------
-            function getLastChangedContentPageAndDateLAST($dateformat){
+            function getLastChangedContentPageAndDateLAST($dateformat,$showhiddenpages){
                 global $CONTENT_DIR_REL;
                 global $language;
                 global $specialchars;
@@ -35,7 +35,7 @@ class LASTCHANGE extends Plugin {
                 $currentdir = opendir($CONTENT_DIR_REL);
                 while ($file = readdir($currentdir)) {
                     if (isValidDirOrFile($file)) {
-                        $latestofdir = getLastChangeOfCatLAST($CONTENT_DIR_REL.$file);
+                        $latestofdir = getLastChangeOfCatLAST($CONTENT_DIR_REL.$file,$showhiddenpages);
                         if ($latestofdir['time'] > $latestchanged['time']) {
                             $latestchanged['cat'] = $file;
                             $latestchanged['file'] = $latestofdir['file'];
@@ -59,12 +59,11 @@ class LASTCHANGE extends Plugin {
             // ------------------------------------------------------------------------------
             // Einlesen eines Kategorie-Verzeichnisses, Rueckgabe der zuletzt geaenderten Datei
             // ------------------------------------------------------------------------------
-            function getLastChangeOfCatLAST($dir){
+            function getLastChangeOfCatLAST($dir,$showhiddenpages) {
                 global $EXT_HIDDEN;
                 global $EXT_PAGE;
-                global $CMS_CONF;
 
-                $showhiddenpages = ($CMS_CONF->get("showhiddenpagesinlastchanged") == "true");
+#                $showhiddenpages = ($this->settings->get("showhiddenpagesinlastchanged") == "true");
                 
                 $latestchanged = array("file" => "filename", "time" => 0);
                 $currentdir = opendir($dir);
@@ -74,7 +73,7 @@ class LASTCHANGE extends Plugin {
                         if ( 
                             (substr($file, strlen($file)-4, 4) == $EXT_PAGE)
                             // oder, wenn konfiguriert, auch versteckte
-                            || ($showhiddenpages && substr($file, strlen($file)-4, 4) == $EXT_HIDDEN)
+                            || ($showhiddenpages == "true" && substr($file, strlen($file)-4, 4) == $EXT_HIDDEN)
                             )
                             {
                             if (filemtime($dir."/".$file) > $latestchanged['time']) {
@@ -90,6 +89,9 @@ class LASTCHANGE extends Plugin {
 
 
         }
+        $showhiddenpages = "false"; # 1 oder 2
+        if($this->settings->get("showhiddenpagesinlastchanged"))
+            $showhiddenpages = $this->settings->get("showhiddenpagesinlastchanged");
 
         $messagetext = $language->getLanguageValue0("message_lastchange_0");
         if($this->settings->get("messagetext"))
@@ -100,16 +102,16 @@ class LASTCHANGE extends Plugin {
         if($value == "text") {
             return $messagetext;
         } elseif($value == "page") {
-            $lastchangeinfo = getLastChangedContentPageAndDateLAST($dateformat);
+            $lastchangeinfo = getLastChangedContentPageAndDateLAST($dateformat,$showhiddenpages);
             return $lastchangeinfo[0];
         } elseif($value == "pagelink") {
-            $lastchangeinfo = getLastChangedContentPageAndDateLAST($dateformat);
+            $lastchangeinfo = getLastChangedContentPageAndDateLAST($dateformat,$showhiddenpages);
             return $lastchangeinfo[1];
         } elseif($value == "date") {
-            $lastchangeinfo = getLastChangedContentPageAndDateLAST($dateformat);
+            $lastchangeinfo = getLastChangedContentPageAndDateLAST($dateformat,$showhiddenpages);
             return $lastchangeinfo[2];
         } else {
-            $lastchangeinfo = getLastChangedContentPageAndDateLAST($dateformat);
+            $lastchangeinfo = getLastChangedContentPageAndDateLAST($dateformat,$showhiddenpages);
             return $messagetext." ".$lastchangeinfo[1]." (".$lastchangeinfo[2].")";
         }
 
@@ -140,6 +142,10 @@ class LASTCHANGE extends Plugin {
             "maxlength" => "100",
             "size" => "30"
             );
+        $config['deDE']['showhiddenpagesinlastchanged'] = array(
+            "type" => "checkbox",
+            "description" => "Versteckte Inhaltsseiten mit einbeziehen"
+            );
 
         // Nicht vergessen: Das gesamte Array zurückgeben
         if(isset($config[$language])) {
@@ -164,7 +170,7 @@ class LASTCHANGE extends Plugin {
                
         $info['deDE'] = array(
             // Plugin-Name
-            "<b>LastChange</b> 1.0",
+            "<b>LastChange</b> 0.1",
             // CMS-Version
             "1.12",
             // Kurzbeschreibung
