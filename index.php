@@ -1703,8 +1703,10 @@ $CHARSET = 'UTF-8';
         if(substr($tmp_link[1], 0, 13) != "http%3A%2F%2F") {
             $tmp_link[1] = "http%3A%2F%2F".$tmp_link[1];
         }
+
+        $tmp_link[1] = substr($tmp_link[1],0,-(strlen($EXT_LINK)));
         $titel = $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1",$specialchars->rebuildSpecialChars($tmp_link[1], true, true)));
-        return '<a href="'.$specialchars->rebuildSpecialChars(substr($tmp_link[1],0,-(strlen($EXT_LINK))), true, true).'"'.$css.' target="'.$target.'"'.$titel.'>'.$specialchars->rebuildSpecialChars(substr($tmp_link[0],3), true, true).'</a> ';
+        return '<a href="'.$specialchars->rebuildSpecialChars($tmp_link[1], true, true).'"'.$css.' target="'.$target.'"'.$titel.'>'.$specialchars->rebuildSpecialChars(substr($tmp_link[0],3), true, true).'</a> ';
     }
     
 ?>
