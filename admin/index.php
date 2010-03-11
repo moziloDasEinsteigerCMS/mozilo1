@@ -1817,7 +1817,7 @@ function gallery($post) {
     $array_getLanguageValue = array("gallery_scale","gallery_scale_thumbs",
         "gallery_picsperrow","gallery_usethumbs","gallery_target","gallery_scaleimages",
         "gallery_rebuildthumbs","gallery_size","gallery_subtitle","gallery_button_cut","gallery_newname",
-        "gallery_button_img_delete","gallery_button_gallery_delete","target","toggle_show","toggle_hide");
+        "gallery_button_img_delete","gallery_button_gallery_delete","target","toggle_show","toggle_hide","gallery_no_preview");
 
     # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getLanguageValue as $language) {
@@ -1984,9 +1984,10 @@ function gallery($post) {
             $size = getimagesize($GALLERIES_DIR_REL.$currentgalerien."/".$file);
             // Vorschaubild anzeigen, wenn vorhanden; sonst Originalbild
             if (file_exists($GALLERIES_DIR_REL.$currentgalerien."/$PREVIEW_DIR_NAME/".$file)) {
-                $preview = $specialchars->replaceSpecialChars($URL_BASE.$GALLERIES_DIR_NAME."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file,true);
+                $preview = '<a href="'.$specialchars->replaceSpecialChars($URL_BASE.$GALLERIES_DIR_NAME."/".$currentgalerien."/".$file,true).'" target="_blank"'.$tooltip_gallery_help_picture.'>'
+                .'<img src="'.$specialchars->replaceSpecialChars($URL_BASE.$GALLERIES_DIR_NAME."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file,true).'" alt="'.$specialchars->rebuildSpecialChars($file, true, true).'" style="height:60px;border:none;" /></a>';
             } else {
-                $preview = $specialchars->replaceSpecialChars($URL_BASE.$GALLERIES_DIR_NAME."/".$currentgalerien."/".$file,true);
+                $preview = '<div style="color:red;text-align:center;"><b>'.$text_gallery_no_preview.'</b></div>';
             }
             if($new_tr === true) {
                 $pagecontent .= "<tr>";
@@ -1994,9 +1995,9 @@ function gallery($post) {
             }#
             $pagecontent .= '<td width="'.$td_width.'" align="left" valign="top" class="td_gallery_img">';
             $pagecontent .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_gallery_img">
-                            <tr><td rowspan="5" valign="top" width="10%" style="padding-right:10px;"><a href="'.$specialchars->replaceSpecialChars($URL_BASE.$GALLERIES_DIR_NAME."/".$currentgalerien."/".$file,true).'" target="_blank"'.$tooltip_gallery_help_picture.'>';
-            $pagecontent .= '<img src="'.$preview.'" alt="'.$specialchars->rebuildSpecialChars($file, true, true).'" style="height:60px;border:none;" />';
-            $pagecontent .= '</a></td>
+                            <tr><td rowspan="5" valign="top" width="10%" style="padding-right:10px;">';
+            $pagecontent .= $preview;
+            $pagecontent .= '</td>
                             <td height="1%" class="td_left_title"'.$tooltip_gallery_help_size.'><b>'.$text_gallery_size.'</b></td></tr>
                             <tr><td height="1%" class="td_togglen_padding_bottom">'.$size[0].' x '.$size[1].' Pixel</td></tr>
                             <tr><td height="1%" class="td_left_title"><b>'.$text_gallery_subtitle.'</b></td></tr>
@@ -2058,21 +2059,19 @@ function newGalleryImg($post) {
     foreach($_FILES as $array_name => $tmp) {
         if($_FILES[$array_name]['error'] == 0) {
             $gallery = explode("_",$array_name);
-            $error = uploadFile($_FILES[$array_name], $GALLERIES_DIR_REL.$gallery[1]."/", $forceoverwrite,$GALLERY_CONF->get('maxwidth'), $GALLERY_CONF->get('maxtheight'));
+            $error = uploadFile($_FILES[$array_name], $GALLERIES_DIR_REL.$gallery[1]."/", $forceoverwrite,$GALLERY_CONF->get('maxwidth'), $GALLERY_CONF->get('maxtheight'), true);
             if(!empty($error)) {
                 $post['error_messages'][key($error)][] = $gallery[1]."/".$error[key($error)];
             } else {
-#                if($GALLERY_CONF->get("usethumbs") == "true") {
-                    require_once($BASE_DIR_CMS."Image.php");
-                    $pict = $specialchars->replaceSpecialChars($_FILES[$array_name]['name'],false);
-                    $size    = GetImageSize($GALLERIES_DIR_REL.$gallery[1]."/".$pict);
-                    if($size[0] <= $GALLERY_CONF->get('maxthumbwidth') and $size[1] <= $GALLERY_CONF->get('maxthumbheight')) {
-                        copy($GALLERIES_DIR_REL.$gallery[1]."/".$pict,$GALLERIES_DIR_REL.$gallery[1]."/".$PREVIEW_DIR_NAME."/".$pict);
-                    } else {
-                        scaleImage($pict, $GALLERIES_DIR_REL.$gallery[1]."/", $GALLERIES_DIR_REL.$gallery[1]."/".$PREVIEW_DIR_NAME."/", $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'));
-                    }
-                    useChmod($GALLERIES_DIR_REL.$gallery[1]."/".$PREVIEW_DIR_NAME."/".$pict);
-#                }
+                require_once($BASE_DIR_CMS."Image.php");
+                $pict = $specialchars->replaceSpecialChars($_FILES[$array_name]['name'],false);
+                $size    = GetImageSize($GALLERIES_DIR_REL.$gallery[1]."/".$pict);
+                if($size[0] <= $GALLERY_CONF->get('maxthumbwidth') and $size[1] <= $GALLERY_CONF->get('maxthumbheight')) {
+                    copy($GALLERIES_DIR_REL.$gallery[1]."/".$pict,$GALLERIES_DIR_REL.$gallery[1]."/".$PREVIEW_DIR_NAME."/".$pict);
+                } else {
+                    scaleImage($pict, $GALLERIES_DIR_REL.$gallery[1]."/", $GALLERIES_DIR_REL.$gallery[1]."/".$PREVIEW_DIR_NAME."/", $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'));
+                }
+                useChmod($GALLERIES_DIR_REL.$gallery[1]."/".$PREVIEW_DIR_NAME."/".$pict);
                 $post['messages']['gallery_message_new_img'][] = $_FILES[$array_name]['name']." <b>></b> ".$gallery[1];
                 $post['gallery']['error_html']['display'][$gallery[1]] = ' style="display:block;"';
             }
@@ -4365,7 +4364,7 @@ function setLayoutAndDependentSettings($layoutfolder) {
 }
 
 // Hochgeladene Datei ueberpruefen und speichern
-function uploadFile($uploadfile, $destination, $forceoverwrite,$MAX_IMG_WIDTH,$MAX_IMG_HEIGHT){
+function uploadFile($uploadfile, $destination, $forceoverwrite,$MAX_IMG_WIDTH,$MAX_IMG_HEIGHT,$image = false){
     global $ADMIN_CONF;
     global $specialchars;
     global $BASE_DIR_CMS;
@@ -4389,7 +4388,7 @@ function uploadFile($uploadfile, $destination, $forceoverwrite,$MAX_IMG_WIDTH,$M
             move_uploaded_file($uploadfile['tmp_name'], $destination.$uploadfile_name);
             // chmod, wenn so eingestellt
             useChmod($destination.$uploadfile_name);#maximagewidth maximageheight
-            if(!empty($MAX_IMG_WIDTH) or !empty($MAX_IMG_HEIGHT)) {
+            if(!empty($MAX_IMG_WIDTH) or !empty($MAX_IMG_HEIGHT) and $image) {
                 // Bilddaten feststellen
                 $size = getimagesize($destination.$uploadfile_name);
                 // Mimetype herausfinden
@@ -4398,6 +4397,8 @@ function uploadFile($uploadfile, $destination, $forceoverwrite,$MAX_IMG_WIDTH,$M
                 if($image_typ == "gif" or $image_typ == "png" or $image_typ == "jpeg") {
                     require_once($BASE_DIR_CMS."Image.php");
                     scaleImage($uploadfile_name, $destination, $destination, $MAX_IMG_WIDTH, $MAX_IMG_HEIGHT);
+                } else {
+                    return array("files_error_no_image" => $uploadfile_name);
                 }
             }
         return;
