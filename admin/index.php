@@ -672,7 +672,11 @@ function category($post) {
         }
         $pagecontent .= '<tr><td width="8%" class="td_left_title"><input type="hidden" name="categories[cat][position]['.$pos.']" value="'.$post['categories']['cat']['position'][$pos].'">';
         $pagecontent .= '<input '.$post['categories']['cat']['error_html']['new_position'][$pos].'class="input_text" type="text" name="categories[cat][new_position]['.$pos.']" value="'.$post['categories']['cat']['new_position'][$pos].'" size="2" maxlength="2"'.$tooltip_category_help_position.'>';
-        $pagecontent .= '</td><td class="td_left_title"><span '.$post['categories']['cat']['error_html']['name'][$pos].'class="text_cat_page">'.$specialchars->rebuildSpecialChars($post['categories']['cat']['name'][$pos], true, true).'</span><input type="hidden" name="categories[cat][name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['name'][$pos], true, true).'"></td><td width="30%" class="td_left_title"><span class="text_info">'.$text.'</span></td><td width="15%" class="td_icons">';
+        $pagecontent .= '</td><td class="td_left_title">';
+        $pagecontent .= '<span '.$post['categories']['cat']['error_html']['name'][$pos].'class="text_cat_page">'.$specialchars->rebuildSpecialChars($post['categories']['cat']['name'][$pos], true, true).'</span>';
+# ein Test das auch der Name Toggle bar ist
+#        $pagecontent .= '<span onclick="cat_togglen(\'toggle_'.$pos.'\',\'gfx/icons/'.$icon_size.'/edit.png\',\'gfx/icons/'.$icon_size.'/edit-hide.png\',\''.$text_toggle_show.'\',\''.$text_toggle_hide.'\',\'true\');" '.$post['categories']['cat']['error_html']['name'][$pos].'class="text_cat_page">'.$specialchars->rebuildSpecialChars($post['categories']['cat']['name'][$pos], true, true).'</span>';
+        $pagecontent .= '<input type="hidden" name="categories[cat][name]['.$pos.']" value="'.$specialchars->rebuildSpecialChars($post['categories']['cat']['name'][$pos], true, true).'"></td><td width="30%" class="td_left_title"><span class="text_info">'.$text.'</span></td><td width="15%" class="td_icons">';
         if(getRequestParam('javascript', true)) {
             $pagecontent .= '<span id="toggle_'.$pos.'_linkBild"'.$tooltip_category_help_edit.'></span>';
         }
