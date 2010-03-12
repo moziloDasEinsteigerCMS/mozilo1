@@ -1258,7 +1258,7 @@ function copymoveSite($post) {
                     and !empty($post['categories'][$cat]['password_del'][$pos]))
             {
                 $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
-                $post['messages']['del_password'][] = $tmp_page;
+                $post['messages']['page_message_del_password'][] = $tmp_page;
                 $PASSWORDS->delete($cat."/".$tmp_page);
             }
             if(!$PASSWORDS->get($cat."/".$tmp_page)
@@ -1267,7 +1267,7 @@ function copymoveSite($post) {
             {
                 $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
                 $post['display'][$cat]['error_html']['display'][$pos] = 'style="display:block;" ';
-                $post['messages']['new_password'][] = $tmp_page;
+                $post['messages']['page_message_new_password'][] = $tmp_page;
                 $PASSWORDS->set($cat."/".$tmp_page,$pwcrypt->encrypt($post['categories'][$cat]['password'][$pos]));
                 $post['categories'][$cat]['password'][$pos] = NULL;
             } elseif($PASSWORDS->get($cat."/".$tmp_page) != $pwcrypt->encrypt($post['categories'][$cat]['password'][$pos])
@@ -1276,7 +1276,7 @@ function copymoveSite($post) {
             {
                 $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
                 $post['display'][$cat]['error_html']['display'][$pos] = 'style="display:block;" ';
-                $post['messages']['change_password'][] = $tmp_page;
+                $post['messages']['page_message_change_password'][] = $tmp_page;
                 $PASSWORDS->set($cat."/".$tmp_page,$pwcrypt->encrypt($post['categories'][$cat]['password'][$pos]));
                 $post['categories'][$cat]['password'][$pos] = NULL;
             }
@@ -2486,7 +2486,7 @@ function files($post) {
     if($ADMIN_CONF->get("overwriteuploadfiles") == "true") {
             $overwrite = ' checked="checked"';
     }
-    $pagecontent .= '&nbsp;&nbsp;<input class="input_check_copy" type="checkbox" name="overwrite" value="on"'.$tooltip_files_help_overwrite.$overwrite.'>&nbsp;<span class="td_left_title"'.$tooltip_files_help_overwrite.$overwrite.'><b>'.getLanguageValue("files_button_overwrite").'</b></span>';
+    $pagecontent .= '&nbsp;&nbsp;<input class="input_check_copy" type="checkbox" name="overwrite" value="on"'.$tooltip_files_help_overwrite.$overwrite.'>&nbsp;<span class="td_left_title"'.$tooltip_files_help_overwrite.'><b>'.getLanguageValue("files_button_overwrite").'</b></span>';
     $pagecontent .= '</td></tr>';
 
     foreach ($post['categories']['cat']['position'] as $pos => $position) {
