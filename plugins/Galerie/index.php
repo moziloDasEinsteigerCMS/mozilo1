@@ -26,6 +26,7 @@ class Galerie extends Plugin {
         global $CHARSET;
         global $PAGE_REQUEST;
         global $LAYOUT_DIR;
+        global $BASE_DIR;
 
         // ------------------------------------------------------------------------------
         // Galeriemenü erzeugen
@@ -84,7 +85,7 @@ class Galerie extends Plugin {
 	        // ------------------------------------------------------------------------------
 	        // Nummernmenü erzeugen
 	        // ------------------------------------------------------------------------------
-	        function getThumbnails($picarray,$dir_thumbs_src,$dir_gallery_src,$alldescriptions) {
+	        function getThumbnails($picarray,$dir_thumbs_src,$dir_thumbs,$dir_gallery_src,$alldescriptions) {
 	            global $GALLERY_CONF;
 	            global $specialchars;
 	            global $language;
@@ -103,11 +104,14 @@ class Galerie extends Plugin {
 	                // Neue Tabellenzeile aller picsperrow Zeichen
 	                if (($i > 0) && ($i % $picsperrow == 0))
 	                    $thumbs .= "</tr><tr>";
-	                $thumbs .= "<td class=\"gallerytd\" style=\"width:".floor(100 / $picsperrow)."%;\">"
-	                ."<a href=\"".$specialchars->replaceSpecialChars($dir_gallery_src.$picarray[$i],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$i],true,true))."\">"
-	                ."<img src=\"".$specialchars->replaceSpecialChars($dir_thumbs_src.$picarray[$i],true)."\" alt=\"".$specialchars->rebuildSpecialChars($picarray[$i],true,true)."\" class=\"thumbnail\" />"
-	                ."</a><br />"
-	                .$description
+	                $thumbs .= "<td class=\"gallerytd\" style=\"width:".floor(100 / $picsperrow)."%;\">";
+
+                    if (file_exists($specialchars->replaceSpecialChars($dir_thumbs.$picarray[$i],false))) {
+                        $thumbs .= "<a href=\"".$specialchars->replaceSpecialChars($dir_gallery_src.$picarray[$i],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$i],true,true))."\"><img src=\"".$specialchars->replaceSpecialChars($dir_thumbs_src.$picarray[$i],true)."\" alt=\"".$specialchars->rebuildSpecialChars($picarray[$i],true,true)."\" class=\"thumbnail\" /></a><br />";
+                    } else {
+                         $thumbs .= '<div style="text-align:center;"><a style="color:red;" href="'.$specialchars->replaceSpecialChars($dir_gallery_src.$picarray[$i],true).'" target="_blank" title="'.$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$i],true,true)).'"><b>'.$language->getLanguageValue0('message_gallery_no_preview').'</b></a></div>';
+                    }
+	                $thumbs .= $description
 	                ."</td>";
 	            }
 	            while ($i % $picsperrow > 0) {
@@ -262,9 +266,10 @@ class Galerie extends Plugin {
         if($CMS_CONF->get("modrewrite") == "true") {
             $dir_gallery_src    = $URL_BASE."galerien/".$gal_request."/";
             $dir_thumbs_src     = $dir_gallery_src."vorschau/";
-
-
+            $dir_gallery        = $BASE_DIR."galerien/".$gal_request."/";
+            $dir_thumbs         = $dir_gallery."vorschau/";
         }
+
         # keine Galerie angegeben oder Galerie gibts nicht
         if (($gal_request == "") || (!file_exists($dir_gallery))) {
             if($gal_request == "") {
@@ -327,7 +332,7 @@ class Galerie extends Plugin {
             $html = preg_replace('/{CURRENTGALLERY}/', $specialchars->rebuildSpecialChars($gal_request,false,true), $html);
             if ($usethumbs) {
                 $html = preg_replace('/{GALLERYMENU}/', "&nbsp;", $html);
-                $html = preg_replace('/{NUMBERMENU}/', getThumbnails($picarray,$dir_thumbs_src,$dir_gallery_src,$alldescriptions), $html);
+                $html = preg_replace('/{NUMBERMENU}/', getThumbnails($picarray,$dir_thumbs_src,$dir_thumbs,$dir_gallery_src,$alldescriptions), $html);
                 $html = preg_replace('/{CURRENTPIC}/', "&nbsp;", $html);
                 $html = preg_replace('/{CURRENTDESCRIPTION}/', "&nbsp;", $html);
                 $html = preg_replace('/{XOUTOFY}/', "&nbsp;", $html);
