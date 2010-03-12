@@ -265,7 +265,8 @@ $CHARSET = 'UTF-8';
                 $pagetitle         = $pagecontentarray[2];
             }
         }
-    }  
+    }
+
     // Smileys ersetzen
     if ($CMS_CONF->get("replaceemoticons") == "true") {
         $pagecontent = $smileys->replaceEmoticons($pagecontent);
@@ -1131,6 +1132,8 @@ $CHARSET = 'UTF-8';
         if ($CAT_REQUEST != "") {
             // "unbehandelter" Name der aktuellen Kategorie ("10_M%FCllers%20Kuh")
             $content = preg_replace('/{CATEGORY}/', $CAT_REQUEST, $content);
+            // Aus dem "unbehandelter" Name der aktuellen Kategorie werden für die URL die % zu %25
+            $content = preg_replace('/{CATEGORY_URL}/', $specialchars->replaceSpecialChars($CAT_REQUEST,true), $content);
             // "sauberer" Name der aktuellen Kategorie ("Muellers Kuh")
             if(strpos("tmp".$content,'{CATEGORY_NAME}') !== false)
                 $content = preg_replace('/{CATEGORY_NAME}/', catToName($CAT_REQUEST, true), $content);
@@ -1139,6 +1142,8 @@ $CHARSET = 'UTF-8';
         else {
             // "unbehandelter" Name der aktuellen Kategorie ("10_M%FCllers%20Kuh")
             $content = preg_replace('/{CATEGORY}/', $cattitle, $content);
+            // Aus dem "unbehandelter" Name der aktuellen Kategorie werden für die URL die % zu %25
+            $content = preg_replace('/{CATEGORY_URL}/', $specialchars->replaceSpecialChars($cattitle,true), $content);
             // "sauberer" Name der aktuellen Kategorie ("Muellers Kuh")
             $content = preg_replace('/{CATEGORY_NAME}/', $cattitle, $content);
         }
@@ -1146,34 +1151,21 @@ $CHARSET = 'UTF-8';
         if ($PAGE_REQUEST != "") {
             // "unbehandelter" Name der aktuellen Inhaltsseite ("10_M%FCllers%20Kuh")
             $content = preg_replace('/{PAGE}/', $PAGE_REQUEST, $content);
+            // Aus dem "unbehandelter" Name der aktuellen Inhaltsseite werden für die URL die % zu %25
+            $content = preg_replace('/{PAGE_URL}/', $specialchars->replaceSpecialChars($PAGE_REQUEST,true), $content);
             // Dateiname der aktuellen Inhaltsseite ("10_M%FCllers%20Kuh.txt")
             $content = preg_replace('/{PAGE_FILE}/', $PAGE_FILE, $content);
             // "sauberer" Name der aktuellen Inhaltsseite ("Muellers Kuh")
             if(strpos("tmp".$content,'{PAGE_NAME}') !== false)
                 $content = preg_replace('/{PAGE_NAME}/', pageToName($PAGE_FILE, true), $content);
             
-            if(strpos("tmp".$content,'{PREVIOUS_') !== false or strpos("tmp".$content,'{NEXT_') !== false) {
-                $neighbourPages = getNeighbourPages($PAGE_REQUEST);
-                // "unbehandelter" Name der vorigen Inhaltsseite ("00_Der%20M%FCller")
-                $content = preg_replace('/{PREVIOUS_PAGE}/', substr($neighbourPages[0], 0, strlen($neighbourPages[0]) - 4), $content);
-                // Dateiname der vorigen Inhaltsseite ("00_Der%20M%FCller.txt")
-                $content = preg_replace('/{PREVIOUS_PAGE_FILE}/', $neighbourPages[0], $content);
-                // "sauberer" Name der vorigen Inhaltsseite ("Der Mueller")
-                if(strpos("tmp".$content,'{PREVIOUS_PAGE_NAME}') !== false)
-                    $content = preg_replace('/{PREVIOUS_PAGE_NAME}/', pageToName($neighbourPages[0], true), $content);
-                // "unbehandelter" Name der naechsten Inhaltsseite ("20_M%FCllers%20M%FChle")
-                $content = preg_replace('/{NEXT_PAGE}/', substr($neighbourPages[1], 0, strlen($neighbourPages[1]) - 4), $content);
-                // Dateiname der naechsten Inhaltsseite ("20_M%FCllers%20M%FChle.txt")
-                $content = preg_replace('/{NEXT_PAGE_FILE}/', $neighbourPages[1], $content);
-                // "sauberer" Name der naechsten Inhaltsseite ("Muellers Muehle")
-                if(strpos("tmp".$content,'{NEXT_PAGE_NAME}') !== false)
-                    $content = preg_replace('/{NEXT_PAGE_NAME}/', pageToName($neighbourPages[1], true), $content);
-            }
         }
         // Suche, Sitemap
         else {
             // "unbehandelter" Name der aktuellen Inhaltsseite ("10_M-uuml-llers-nbsp-Kuh")
             $content = preg_replace('/{PAGE}/', $pagetitle, $content);
+            // Aus dem "unbehandelter" Name der aktuellen Inhaltsseite werden für die URL die % zu %25
+            $content = preg_replace('/{PAGE_URL}/', $specialchars->replaceSpecialChars($pagetitle,true), $content);
             // Dateiname der aktuellen Inhaltsseite ("10_M-uuml-llers-nbsp-Kuh.txt")
             $content = preg_replace('/{PAGE_FILE}/', $pagetitle, $content);
             // "sauberer" Name der aktuellen Inhaltsseite ("Muellers Kuh")
