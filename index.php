@@ -1407,7 +1407,8 @@ $CHARSET = 'UTF-8';
     function getRequestParam($param, $clean) {
         global $URL_BASE;
         global $CMS_CONF;
-        // Nullbytes abfangen!
+
+       // Nullbytes abfangen!
         if (strpos($_SERVER['REQUEST_URI'], "\x00") > 0) {
             die();
         }
@@ -1416,7 +1417,22 @@ $CHARSET = 'UTF-8';
             $request = NULL;
             # ein hack für alte links
             if (isset($_REQUEST[$param])) {
-                return rawurldecode($_REQUEST[$param]);
+                # wenn in der url ein ~ drin ist solte das eine sehr alte url sein
+                if(strpos($_REQUEST[$param],'~') > 0) {
+                    global $specialchars;
+                    // Leerzeichen
+                    $old_url = preg_replace("/-nbsp~/", " ", $_REQUEST[$param]);
+                    // @, ?
+                    $old_url = preg_replace("/-at~/", "@", $old_url);
+                    $old_url = preg_replace("/-ques~/", "?", $old_url);
+                    // Alle mozilo-Entities in HTML-Entities umwandeln!
+                    $old_url = preg_replace("/-([^-~]+)~/U", "&$1;", $old_url);
+                    // & escapen 
+                    //$text = preg_replace("/&+(?!(.+);)/U", "&amp;", $text);
+                    return $specialchars->getHtmlEntityDecode($old_url);
+                } else {
+                    return rawurldecode($_REQUEST[$param]);
+                }
             }
             if($param == "cat") {
                 # ein tmp dafor weil wenn $URL_BASE = / ist werden alle / ersetzt durch nichts
