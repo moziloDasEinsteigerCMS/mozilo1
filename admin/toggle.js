@@ -2,7 +2,6 @@ function cat_togglen(toggleid,iconShow,iconHide,noIconTextShow,noIconTextHide,kl
 
     var linkButton = "<input id=\"" + toggleid + "_button\" class=\"input_img_button\" type=\"image\" value=\"" + noIconTextShow + "\"  src=\"" + iconShow + "\" onclick=\"cat_togglen('" + toggleid + "','" + iconShow + "','" + iconHide + "','" + noIconTextShow + "','" + noIconTextHide + "','true');\">";
 
-
     if (document.getElementById(toggleid + '_linkBild')) {
         document.getElementById(toggleid + '_linkBild').innerHTML = linkButton;
     }
@@ -29,7 +28,6 @@ function cat_togglen(toggleid,iconShow,iconHide,noIconTextShow,noIconTextHide,kl
                 document.getElementById(toggleid + '_button').value = noIconTextHide;
             }
         } else {
-// alert(toggleid);
             document.getElementById(toggleid).style.display = "none";
         }
     }
