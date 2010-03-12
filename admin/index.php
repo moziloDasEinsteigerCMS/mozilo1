@@ -4390,6 +4390,16 @@ function uploadFile($uploadfile, $destination, $forceoverwrite,$MAX_IMG_WIDTH,$M
         // alles okay, hochladen!
         else {
             move_uploaded_file($uploadfile['tmp_name'], $destination.$uploadfile_name);
+            $line_error = __LINE__ - 1;
+            $last_error['line'] = NULL;
+            if(function_exists("error_get_last")) {
+                $last_error = @error_get_last();
+            }
+            if($last_error['line'] == $line_error) {
+                return array("php_error" => $last_error['message']);
+            } elseif(!is_file($destination.$uploadfile_name."1")) {
+                return array("files_error_upload" => $uploadfile_name);
+            }
             // chmod, wenn so eingestellt
             useChmod($destination.$uploadfile_name);#maximagewidth maximageheight
             if(!empty($MAX_IMG_WIDTH) or !empty($MAX_IMG_HEIGHT) and $image) {
