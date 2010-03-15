@@ -3350,7 +3350,7 @@ function admin($post) {
                 $error_color['newpw'] = ' style="background-color:#FF7029;"';
                 $error_color['newpwrepeat'] = ' style="background-color:#FF7029;"';
             // Neues Paßwort wenigstens sechs Zeichen lang und mindestens aus kleinen und großen Buchstaben sowie Zahlen bestehend?
-            } elseif ((strlen($post['newpw']) <= 6) or !preg_match("/[0-9]/", $post['newpw']) or !preg_match("/[a-z]/", $post['newpw']) or !preg_match("/[A-Z]/", $post['newpw'])) {
+            } elseif ((strlen($post['newpw']) < 6) or !preg_match("/[0-9]/", $post['newpw']) or !preg_match("/[a-z]/", $post['newpw']) or !preg_match("/[A-Z]/", $post['newpw'])) {
                 $post['error_messages']['pw_error_newpwerror']['color'] = "#FF7029";
                 $post['error_messages']['pw_error_newpwerror'][] = NULL;
                 $error_color['newpw'] = ' style="background-color:#FF7029;"';
