@@ -4067,7 +4067,7 @@ function returnPluginSelectbox() {
                             $selectbox .= '<option value="'.$platzh.'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
                         }*/
                         //$info = $platzh.' '.$info;
-                        $selectbox .= '<option title="'.$specialchars->rebuildSpecialChars($info, false, true).'" value="'.str_replace('}','',$platzh).'">'.$platzh.'</option>';
+                        $selectbox .= '<option title="'.$specialchars->rebuildSpecialChars($info, false, true).'" value="'.$platzh.'">'.$platzh.'</option>';
                     }
                 }
             }
