@@ -2063,6 +2063,13 @@ function newGalleryImg($post) {
     foreach($_FILES as $array_name => $tmp) {
         if($_FILES[$array_name]['error'] == 0) {
             $gallery = explode("_",$array_name);
+            unset($gallery[0]);
+            unset($gallery[count($gallery)]);
+            $gallery_tmp = NULL;
+            foreach($gallery as $tmp) {
+                $gallery_tmp .= $tmp."_";
+            }
+            $gallery[1] = substr($gallery_tmp,0,-1);
             $error = uploadFile($_FILES[$array_name], $GALLERIES_DIR_REL.$gallery[1]."/", $forceoverwrite,$GALLERY_CONF->get('maxwidth'), $GALLERY_CONF->get('maxtheight'), true);
             if(!empty($error)) {
                 $post['error_messages'][key($error)][] = $gallery[1]."/".$error[key($error)];
@@ -4397,7 +4404,7 @@ function uploadFile($uploadfile, $destination, $forceoverwrite,$MAX_IMG_WIDTH,$M
             }
             if($last_error['line'] == $line_error) {
                 return array("php_error" => $last_error['message']);
-            } elseif(!is_file($destination.$uploadfile_name."1")) {
+            } elseif(!is_file($destination.$uploadfile_name)) {
                 return array("files_error_upload" => $uploadfile_name);
             }
             // chmod, wenn so eingestellt
