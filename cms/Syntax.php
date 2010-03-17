@@ -364,8 +364,8 @@ class Syntax {
                 // Bild in aktueller Kategorie
                 if (count($valuearray) == 1) {
                     // Bilddatei existiert
-                    if (file_exists($CONTENT_DIR_REL.$cat."/".$CONTENT_FILES_DIR_NAME."/".$value)) {
-                        $imgsrc = $specialchars->replaceSpecialChars($URL_BASE.$CONTENT_DIR_NAME."/".$cat."/".$CONTENT_FILES_DIR_NAME."/".$value,true);
+                    if (file_exists($CONTENT_DIR_REL.$cat."/".$CONTENT_FILES_DIR_NAME."/".$specialchars->replaceSpecialChars($value,false))) {
+                        $imgsrc = $specialchars->replaceSpecialChars($URL_BASE.$CONTENT_DIR_NAME."/".$cat."/".$CONTENT_FILES_DIR_NAME."/".$specialchars->replaceSpecialChars($value,false),true);
                     }
                     // externes Bild
                     elseif (preg_match($this->LINK_REGEX, $value)) {
