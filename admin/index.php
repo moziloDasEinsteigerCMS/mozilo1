@@ -2388,6 +2388,7 @@ function deleteGallery($post) {
         $del_gallery = $GALLERIES_DIR_REL.$_POST['del_gallery'];
         $post['error_messages'] = deleteDir($del_gallery);
         if(!file_exists($GALLERIES_DIR_REL.$_POST['del_gallery'])) {
+            unset($post['gallery'][$_POST['del_gallery']]);
             $post['messages']['gallery_message_deleted'][] = $_POST['del_gallery'];
         } else {
             if(!isset($post['error_messages'])) {
@@ -2573,13 +2574,13 @@ function files($post) {
                 else
                     $starttime = $counterstart;
                 $dayscounted = ceil((time() - $starttime) / (60*60*24));
-#                if ($dayscounted == 0)
-#                    $downloadsperday = 0;
-#                else
-#                    $downloadsperday = round(($downloads/$dayscounted), 2);
+                if ($dayscounted == 0)
+                    $downloadsperday = 0;
+                else
+                    $downloadsperday = round(($downloads/$dayscounted), 2);
 #                if ($downloads > 0)
-#                    $downloadsperdaytext = "(".$downloadsperday." ".getLanguageValue("data_downloadsperday").")";
-#                else
+#                    $downloadsperdaytext = "/ ".getLanguageValue("files_text_downloads_day")." ".$downloadsperday;
+ #               else
                     $downloadsperdaytext = "";
                 // Dateigröße
                 $filesize = filesize($CONTENT_DIR_REL.$file."/dateien/".$subfile);
