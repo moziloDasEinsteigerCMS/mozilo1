@@ -608,7 +608,7 @@ function categoriesMessages($post) {
                         continue;
                     }
                 }
-                $error_inhalt .= '<b>-&gt;</b>&nbsp;&nbsp;'.messagesOutLen(str_replace("&lt;b&gt;&gt;&lt;/b&gt;","<b>&gt;</b>",$specialchars->rebuildSpecialChars($inhalt, true, true)));
+                $error_inhalt .= '→&nbsp;&nbsp;'.messagesOutLen(str_replace("&lt;b&gt;&gt;&lt;/b&gt;","<b>&gt;</b>",$specialchars->rebuildSpecialChars($inhalt, true, true)));
             }
             if(!empty($error_inhalt)) {
                 $error_text = $error_titel.'<br /><span style="font-weight:normal;">'.$error_inhalt.'</span>';
@@ -632,6 +632,21 @@ function categoriesMessages($post) {
         $return_text .= Messages($post, $message_art, $message_error);
     }
     return $return_text;
+}
+
+function askMessages($title,$message,$input_name,$input_value,$input2_name = false,$input2_value = false) {
+    global $icon_size;
+    global $specialchars;
+    $input2 = NULL;
+    if($input2_name and $input2_value)
+        $input2 = '<input type="hidden" name="'.$input2_name.'" value="'.$input2_value.'">';
+    $ask = '<div class="message_ask">'.getLanguageValue($title).':<br />'
+            .'<span style="font-weight:normal;">→&nbsp;&nbsp;'.messagesOutLen($specialchars->rebuildSpecialChars($message,true,true)).'</span>'
+            .'<div style="text-align:center">'
+            .'<input type="image" name="confirm_true" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="margin-right:60px">'
+            .'<input type="image" name="confirm_false" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'">'
+            .'<input type="hidden" name="'.$input_name.'" value="'.$input_value.'">'.$input2.'</div></div>';
+    return $ask;
 }
 
 # Nur Positions Verschiebung Position -> Neue Position inerhalb einer Kategorie oder Kategorie selbst
