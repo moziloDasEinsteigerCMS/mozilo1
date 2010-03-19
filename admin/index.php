@@ -4227,23 +4227,21 @@ function returnOverviewSelectbox($type, $currentcat) {
             $categories = getDirContentAsArray($CONTENT_DIR_REL, false);
             foreach ($categories as $catdir) {
                 if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
-                if (isValidDirOrFile($catdir)) {
-                    $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
-                    $elements[] = array($cleancatname, $cleancatname);
-                    $handle = opendir($CONTENT_DIR_REL.$catdir);
-                    while (($file = readdir($handle))) {
-                        if (isValidDirOrFile($file) && is_file($CONTENT_DIR_REL.$catdir."/".$file) && ((substr($file, strlen($file)-4, 4) == $EXT_PAGE) || (substr($file, strlen($file)-4, 4) == $EXT_HIDDEN))) {
-                            $cleanpagename = $specialchars->rebuildSpecialChars(substr($file, 3, strlen($file) - 3 - strlen($EXT_PAGE)), true, true);
-                            $completepagename = $cleanpagename;
-                            if (substr($file, strlen($file)-4, 4) == $EXT_HIDDEN)
-                                $completepagename = $cleanpagename." (".getLanguageValue("page_saveashidden").")";
-                            if ($catdir == $currentcat)
-                                $elements[] = array($spacer.$completepagename, $cleanpagename);
-                            else
-                                $elements[] = array($spacer.$completepagename, $cleancatname.":".$cleanpagename);
-                        }
+                $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
+                $elements[] = array($cleancatname, ":".$cleancatname);
+                $files = getFiles($CONTENT_DIR_REL.$catdir, $EXT_LINK);
+                natcasesort($files);
+                foreach($files as $file) {
+                    if ((substr($file, strlen($file)-4, 4) == $EXT_PAGE) || (substr($file, strlen($file)-4, 4) == $EXT_HIDDEN)) {
+                        $cleanpagename = $specialchars->rebuildSpecialChars(substr($file, 3, strlen($file) - 3 - strlen($EXT_PAGE)), true, true);
+                        $completepagename = $cleanpagename;
+                        if (substr($file, strlen($file)-4, 4) == $EXT_HIDDEN)
+                            $completepagename = $cleanpagename." (".getLanguageValue("page_saveashidden").")";
+                        if ($catdir == $currentcat)
+                            $elements[] = array($spacer.$completepagename, $cleanpagename);
+                        else
+                            $elements[] = array($spacer.$completepagename, $cleancatname.":".$cleanpagename);
                     }
-                    closedir($handle);
                 }
             }
             $selectname = "pages";
@@ -4255,24 +4253,15 @@ function returnOverviewSelectbox($type, $currentcat) {
             $categories = getDirContentAsArray($CONTENT_DIR_REL, false);
             foreach ($categories as $catdir) {
                 if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
-                if (isValidDirOrFile($catdir)) {
-                    $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
-                    $elements[] = array($cleancatname, ":".$cleancatname);
-                    $handle = opendir($CONTENT_DIR_REL.$catdir."/dateien");
-                    $currentcat_filearray = array();
-                    while (($file = readdir($handle))) {
-                        if (isValidDirOrFile($file) && is_file($CONTENT_DIR_REL.$catdir."/dateien/".$file)) {
-                            $currentcat_filearray[] = $file;
-                        }
-                    }
-                    natcasesort($currentcat_filearray);
-                    foreach ($currentcat_filearray as $current_file) {
-                        if ($catdir == $currentcat)
-                            $elements[] = array($spacer.$specialchars->rebuildSpecialChars($current_file, true, true), $specialchars->rebuildSpecialChars($current_file, true, true));
-                        else
-                            $elements[] = array($spacer.$specialchars->rebuildSpecialChars($current_file, true, true), $cleancatname.":".$specialchars->rebuildSpecialChars($current_file, true, true));
-                    }
-                    closedir($handle);
+                $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
+                $elements[] = array($cleancatname, ":".$cleancatname);
+                $currentcat_filearray = getFiles($CONTENT_DIR_REL.$catdir."/dateien");
+                natcasesort($currentcat_filearray);
+                foreach ($currentcat_filearray as $current_file) {
+                    if ($catdir == $currentcat)
+                        $elements[] = array($spacer.$specialchars->rebuildSpecialChars($current_file, true, true), $specialchars->rebuildSpecialChars($current_file, true, true));
+                    else
+                        $elements[] = array($spacer.$specialchars->rebuildSpecialChars($current_file, true, true), $cleancatname.":".$specialchars->rebuildSpecialChars($current_file, true, true));
                 }
             }
             $selectname = "files";
@@ -4312,8 +4301,7 @@ function returnOverviewSelectbox($type, $currentcat) {
     foreach ($elements as $element) {
         if (substr($element[1], 0, 1) == ":") {
             $select .= "<option class=\"noaction\" value=\"\">".$element[0]."</option>";
-        }
-        else {
+        } else {
         if(strstr($element[1],"[") or strstr($element[1],"]"))
             $element[1] = str_replace(array("[","]"),array("&#94;[","&#94;]"),$element[1]);
             $select .= "<option class=\"hasaction\" value=\"".$element[1]."\">".$element[0]."</option>";
