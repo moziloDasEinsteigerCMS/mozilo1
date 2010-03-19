@@ -26,179 +26,168 @@
 # =============================================================================
 
 */
-/*
-class Thumbnail {
-    
-// ------------------------------------------------------------------------------    
-// Konstruktor
+
 // ------------------------------------------------------------------------------
-    function Thumbnail(){
-    }*/
-
-    // ------------------------------------------------------------------------------
-    // Thumbnail anlegen
-    // ------------------------------------------------------------------------------
-    function scaleImage($pic, $dir_origin, $dir_target, $maxWidth, $maxHeight, $make_thumbs = false) {
-        # nichts machen $maxWidth und $maxHeight sind leer
-        if(empty($maxHeight) and empty($maxWidth)) return;
-        if(!extension_loaded("gd")) return;
-        // --------------------------------------------------------------------
-        // Bildgröße und MIME Type holen
-        // --------------------------------------------------------------------
-        $size    = @GetImageSize($dir_origin.$pic);
-        $mime    = $size['mime'];
-        $width  = $size[0];
-        $height = $size[1];
-        // --------------------------------------------------------------------
-        // Variablen
-        // --------------------------------------------------------------------
-        if(empty($maxHeight) and !empty($maxWidth)) {
-            $maxHeight = ($height / $width) * $maxWidth;
-        }
-        if(empty($maxWidth) and !empty($maxHeight)) {
-            $maxWidth = ($width / $height) * $maxHeight;
-        }
-
-        // --------------------------------------------------------------------
-        // Sicherheitsüberprüfungen
-        // --------------------------------------------------------------------
-
-        // Der Bildname darf folgende Zeichen nicht enthalten / : .. < >
-         if ( strpos($pic, ':') || preg_match('/(\.\.|<|>)/', $pic) )
-         {
-             die("Error: Bilddatei ". $dir_origin . $pic ."enthält nicht gültige Zeichen!");
-         }
-
-        // Handelt es sich bei der Datei auch wirklich um ein Bild
-        if ( substr($mime, 0, 6) != 'image/' )
-        {
-            return 0;
-            #die ("Error: Bei der Datei handelt es nicht um ein Bild: ". $dir_origin . $pic ." => MIMETYPE: ". $mime);
-        }
-
-
-        // --------------------------------------------------------------------
-        // Die Seitenverhältnisse von Breite zu Höhe und Höhe zu Breite ermitteln,
-        // und dann die Breite und Höhe für das Vorschaubild ermitteln,
-        // aber nur, wenn das Originalbild größer als das Zielbild ist
-        // --------------------------------------------------------------------
-        $xRatio        = $maxWidth / $width;
-        $yRatio        = $maxHeight / $height;
-
-        if ($xRatio * $height < $maxHeight)
-        { // Bildmaße auf Basis der Breite
-            $tnHeight    = ceil($xRatio * $height);
-            $tnWidth    = $maxWidth;
-        }
-        else // Bildmaße auf Basis der Höhe
-        {
-            $tnWidth    = ceil($yRatio * $width);
-             $tnHeight    = $maxHeight;
-        }
-        # Bild grösse <= Neue grösse also nicht zu tun
-        if($width <= $tnWidth and $height <= $tnHeight) {
-            # Vorschaubilder neu erzwingen $make_thumbs = true
-            if($make_thumbs === false) return;
-        }
-
-        // --------------------------------------------------------------------
-        // Hauptteil zum Scalieren erstellen
-        // --------------------------------------------------------------------
-
-        // Welche Funktionen sollen genutzt werden um die Vorschaubilder zu erzeugen
-        switch ($size['mime'])
-        {
-            // Damit werden GIFs verarbeitet
-            case 'image/gif':
-                $creationFunction    = 'ImageCreateFromGif';
-                $outputFunction        = 'ImageGif';
-                $doSharpen            = TRUE;
-            break;
-    
-            // Damit werden PNGs verarbeitet
-            case 'image/x-png':
-            case 'image/png':
-                $creationFunction    = 'ImageCreateFromPng';
-                $outputFunction        = 'ImagePng';
-                $doSharpen            = TRUE;
-                 // PNG braucht einen Kompressionslevel 0 (Keine Kompression) bis 9 - (5 sollte ausreichen für Vorschaubilder)
-                $quality            = 5;
-            break;
-
-            // Damit werden JPEGs verarbeitet
-            case 'image/pipeg':
-            case 'image/jpeg':
-            case 'image/pjpeg':
-                $creationFunction    = 'ImageCreateFromJpeg';
-                $outputFunction         = 'ImageJpeg';
-                $doSharpen            = TRUE;
-                $quality            = 65;
-            break;
-
-            // alles andere wird einfach copiert (Sollte noch verbessert werden!)
-            default:
-#                copy($dir_origin.$pic, $dir_target.$pic);
-                return;
-            break;
-        }
-
-
-        // Das Quellbild in ein Objekt laden
-        $src    = $creationFunction($dir_origin.$pic);
-
-        // Ein leeres Objekt für das Ziel anlegen
-        $dst    = imagecreatetruecolor($tnWidth, $tnHeight);
-
-        // Transparenz im Bild einschalten (nur GIF und PNG)
-        if (in_array($size['mime'], array('image/gif', 'image/png')))
-        {
-            $transparencyIndex = imagecolortransparent($src);
-            $transparencyColor = array('red' => 255, 'green' => 255, 'blue' => 255);
-            
-            if ($transparencyIndex >= 0) {
-                $transparencyColor    = @imagecolorsforindex($src, $transparencyIndex);   
-                $transparencyIndex    = imagecolorallocate($dst, $transparencyColor['red'], $transparencyColor['green'], $transparencyColor['blue']);
-                imagefill($dst, 0, 0, $transparencyIndex);
-                imagecolortransparent($dst, $transparencyIndex);
-
-                // Wenn GIF und Transparenz gefunden, dann DO_SHARPEN ausschalten.
-                // Führt sonst zu unschönen ergebnissen
-                if (in_array($size['mime'], array('image/gif')))
-                    $doSharpen = FALSE;
-            }
-        }
-
-        // Jetzt wird das Bild in das Objekt $dst geladen und die grösse verändert
-        ImageCopyResampled($dst, $src, 0, 0, 0, 0, $tnWidth, $tnHeight, $width, $height);
-
-
-        // Hier wird versucht das Zielbild noch etwas schärfer zu bekommen
-        // Das Basiert auf zwei dingen
-        // 1. Die Different der Quell- und Zielgrösse
-        // 2. Der Finalen Grösse
-        if ($doSharpen)
-        {
-            $sharpness    = findSharp($width, $tnWidth);
-    
-            $sharpenMatrix    = array(
-                array(-1, -2, -1),
-                array(-2, $sharpness + 12, -2),
-                array(-1, -2, -1)
-            );
-
-            $divisor        = $sharpness;
-            $offset            = 0;
-            imageconvolution($dst, $sharpenMatrix, $divisor, $offset);
-        }
-        // Das Zielbild speichern
-        $outputFunction($dst, $dir_target.$pic, $quality);
-        chmod($dir_target.$pic, getChmod());
-
-        // Aufräumen
-        ImageDestroy($src);
-        ImageDestroy($dst);
+// Thumbnail anlegen
+// ------------------------------------------------------------------------------
+function scaleImage($pic, $dir_origin, $dir_target, $maxWidth, $maxHeight, $make_thumbs = false) {
+    # nichts machen $maxWidth und $maxHeight sind leer
+    if(empty($maxHeight) and empty($maxWidth)) return;
+    if(!extension_loaded("gd")) return;
+    // --------------------------------------------------------------------
+    // Bildgröße und MIME Type holen
+    // --------------------------------------------------------------------
+    $size    = @GetImageSize($dir_origin.$pic);
+    $mime    = $size['mime'];
+    $width  = $size[0];
+    $height = $size[1];
+    // --------------------------------------------------------------------
+    // Variablen
+    // --------------------------------------------------------------------
+    if(empty($maxHeight) and !empty($maxWidth)) {
+        $maxHeight = ($height / $width) * $maxWidth;
     }
-#}
+    if(empty($maxWidth) and !empty($maxHeight)) {
+        $maxWidth = ($width / $height) * $maxHeight;
+    }
+
+    // --------------------------------------------------------------------
+    // Sicherheitsüberprüfungen
+    // --------------------------------------------------------------------
+
+    // Der Bildname darf folgende Zeichen nicht enthalten / : .. < >
+     if ( strpos($pic, ':') || preg_match('/(\.\.|<|>)/', $pic) )
+     {
+         die("Error: Bilddatei ". $dir_origin . $pic ."enthält nicht gültige Zeichen!");
+     }
+
+    // Handelt es sich bei der Datei auch wirklich um ein Bild
+    if ( substr($mime, 0, 6) != 'image/' )
+    {
+        return 0;
+    }
+
+
+    // --------------------------------------------------------------------
+    // Die Seitenverhältnisse von Breite zu Höhe und Höhe zu Breite ermitteln,
+    // und dann die Breite und Höhe für das Vorschaubild ermitteln,
+    // aber nur, wenn das Originalbild größer als das Zielbild ist
+    // --------------------------------------------------------------------
+    $xRatio        = $maxWidth / $width;
+    $yRatio        = $maxHeight / $height;
+
+    if ($xRatio * $height < $maxHeight)
+    { // Bildmaße auf Basis der Breite
+        $tnHeight    = ceil($xRatio * $height);
+        $tnWidth    = $maxWidth;
+    }
+    else // Bildmaße auf Basis der Höhe
+    {
+        $tnWidth    = ceil($yRatio * $width);
+         $tnHeight    = $maxHeight;
+    }
+    # Bild grösse <= Neue grösse also nicht zu tun
+    if($width <= $tnWidth and $height <= $tnHeight) {
+        # Vorschaubilder neu erzwingen $make_thumbs = true
+        if($make_thumbs === false) return;
+    }
+
+    // --------------------------------------------------------------------
+    // Hauptteil zum Scalieren erstellen
+    // --------------------------------------------------------------------
+
+    // Welche Funktionen sollen genutzt werden um die Vorschaubilder zu erzeugen
+    switch ($size['mime'])
+    {
+        // Damit werden GIFs verarbeitet
+        case 'image/gif':
+            $creationFunction    = 'ImageCreateFromGif';
+            $outputFunction        = 'ImageGif';
+            $doSharpen            = TRUE;
+        break;
+
+        // Damit werden PNGs verarbeitet
+        case 'image/x-png':
+        case 'image/png':
+            $creationFunction    = 'ImageCreateFromPng';
+            $outputFunction        = 'ImagePng';
+            $doSharpen            = TRUE;
+             // PNG braucht einen Kompressionslevel 0 (Keine Kompression) bis 9 - (5 sollte ausreichen für Vorschaubilder)
+            $quality            = 5;
+        break;
+
+        // Damit werden JPEGs verarbeitet
+        case 'image/pipeg':
+        case 'image/jpeg':
+        case 'image/pjpeg':
+            $creationFunction    = 'ImageCreateFromJpeg';
+            $outputFunction         = 'ImageJpeg';
+            $doSharpen            = TRUE;
+            $quality            = 65;
+        break;
+
+        // alles andere wird einfach copiert (Sollte noch verbessert werden!)
+        default:
+            return;
+        break;
+    }
+
+
+    // Das Quellbild in ein Objekt laden
+    $src    = $creationFunction($dir_origin.$pic);
+
+    // Ein leeres Objekt für das Ziel anlegen
+    $dst    = imagecreatetruecolor($tnWidth, $tnHeight);
+
+    // Transparenz im Bild einschalten (nur GIF und PNG)
+    if (in_array($size['mime'], array('image/gif', 'image/png')))
+    {
+        $transparencyIndex = imagecolortransparent($src);
+        $transparencyColor = array('red' => 255, 'green' => 255, 'blue' => 255);
+        
+        if ($transparencyIndex >= 0) {
+            $transparencyColor    = @imagecolorsforindex($src, $transparencyIndex);   
+            $transparencyIndex    = imagecolorallocate($dst, $transparencyColor['red'], $transparencyColor['green'], $transparencyColor['blue']);
+            imagefill($dst, 0, 0, $transparencyIndex);
+            imagecolortransparent($dst, $transparencyIndex);
+
+            // Wenn GIF und Transparenz gefunden, dann DO_SHARPEN ausschalten.
+            // Führt sonst zu unschönen ergebnissen
+            if (in_array($size['mime'], array('image/gif')))
+                $doSharpen = FALSE;
+        }
+    }
+
+    // Jetzt wird das Bild in das Objekt $dst geladen und die grösse verändert
+    ImageCopyResampled($dst, $src, 0, 0, 0, 0, $tnWidth, $tnHeight, $width, $height);
+
+
+    // Hier wird versucht das Zielbild noch etwas schärfer zu bekommen
+    // Das Basiert auf zwei dingen
+    // 1. Die Different der Quell- und Zielgrösse
+    // 2. Der Finalen Grösse
+    if ($doSharpen)
+    {
+        $sharpness    = findSharp($width, $tnWidth);
+
+        $sharpenMatrix    = array(
+            array(-1, -2, -1),
+            array(-2, $sharpness + 12, -2),
+            array(-1, -2, -1)
+        );
+
+        $divisor        = $sharpness;
+        $offset            = 0;
+        imageconvolution($dst, $sharpenMatrix, $divisor, $offset);
+    }
+    // Das Zielbild speichern
+    $outputFunction($dst, $dir_target.$pic, $quality);
+    changeChmod($dir_target.$pic);
+
+    // Aufräumen
+    ImageDestroy($src);
+    ImageDestroy($dst);
+}
 
 // --------------------------------------------------------------------
 // Spezielle Functionen
