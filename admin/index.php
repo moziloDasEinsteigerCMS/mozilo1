@@ -205,6 +205,12 @@ foreach($array_tabs as $pos => $tab) {
     }
 }
 
+# IE Hack input image
+if(isset($_POST['confirm_true']) or isset($_POST['confirm_true_x']))
+    $_POST['confirm'] = "true";
+if(isset($_POST['confirm_false']) or isset($_POST['confirm_false_x']))
+    $_POST['confirm'] = "false";
+
 # action_data parameter die mit cat page zu tun haben
 if(isset($_POST['action_data'])) {
     # ist das Array für Kategorien oder Inhaltseiten nicht erzeugen
@@ -561,7 +567,7 @@ function category($post) {
     $pagecontent .= categoriesMessages($post);
 
     if(isset($post['ask'])) {
-        $pagecontent .= returnMessage(true, $post['ask']);
+        $pagecontent .= $post['ask'];
     }
 
     if(getRequestParam('javascript', true)) {
@@ -855,7 +861,7 @@ function deleteCategory($post) {
     # Nachfragen wirklich Löschen
     if(!isset($_POST['confirm'])) {
         $del_cat = key($post['action_data']['deletecategory']);
-        $post['ask'] = getLanguageValue("category_ask_delete").'<br /><span style="font-weight:normal;">-&gt;&nbsp;&nbsp;'.messagesOutLen($specialchars->rebuildSpecialChars($del_cat, true, true)).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletecategory]" value="'.$post['action_data']['deletecategory'].'"><input type="hidden" name="del_cat" value="'.$del_cat.'">';
+        $post['ask'] = askMessages("category_ask_delete",$del_cat,'action_data[deletecategory]',$post['action_data']['deletecategory'],"del_cat",$del_cat);
         $post['makepara'] = "yes";
         return $post;
     }
@@ -943,7 +949,7 @@ function page($post) {
     }
 
     if(isset($post['ask'])) {
-        $pagecontent .= returnMessage(true, $post['ask']);
+        $pagecontent .= $post['ask'];
     }
 
     $pagecontent .= categoriesMessages($post);
@@ -1559,7 +1565,7 @@ function deleteSite($post) {
     $del_page = $cat."/".$post['action_data']['deletesite'][$cat];
     # Nachfragen wirklich Löschen
     if(!isset($_POST['confirm'])) {
-        $post['ask'] = getLanguageValue("page_ask_delete").':<br /><span style="font-weight:normal;">->&nbsp;&nbsp;'.$specialchars->rebuildSpecialChars($post['action_data']['deletesite'][$cat],true,true).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletesite]['.$cat.']" value="'.$post['action_data']['deletesite'][$cat].'">';
+        $post['ask'] = askMessages("page_ask_delete",$post['action_data']['deletesite'][$cat],'action_data[deletesite]['.$cat.']',$post['action_data']['deletesite'][$cat]);
         $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
         $post['makepara'] = "yes";
         return $post;
@@ -1801,7 +1807,7 @@ function gallery($post) {
     $pagecontent .= categoriesMessages($post);
 
     if(isset($post['ask'])) {
-        $pagecontent .= returnMessage(true, $post['ask']);
+        $pagecontent .= $post['ask'];
     }
 
     if(getRequestParam('javascript', true)) {
@@ -2360,7 +2366,7 @@ function deleteGalleryImg($post) {
         if (isset($_POST['confirm']) and ($_POST['confirm'] == "false")) {
             $post['gallery']['error_html']['display'][$gallery] = 'style="display:block;" ';
         } else {
-            $post['ask'] = getLanguageValue("gallery_ask_delete_img").':<br /><span style="font-weight:normal;">->&nbsp;&nbsp;'.$specialchars->rebuildSpecialChars($del_file,true,true).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletegalleryimg]['.$gallery.']" value="'.$del_file.'">';
+            $post['ask'] = askMessages("gallery_ask_delete_img",$del_file,'action_data[deletegalleryimg]['.$gallery.']',$del_file);
             $post['gallery']['error_html']['display'][$gallery] = 'style="display:block;" ';
         }
     }
@@ -2376,7 +2382,7 @@ function deleteGallery($post) {
     # Nachfragen wirklich Löschen
     if(!isset($_POST['confirm'])) {
         $del_gallery = key($post['action_data']['deletegallery']);
-        $post['ask'] = getLanguageValue("gallery_ask_delete").'<br /><span style="font-weight:normal;">-&gt;&nbsp;&nbsp;'.messagesOutLen($specialchars->rebuildSpecialChars($del_gallery, true, true)).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletegallery]" value="'.$post['action_data']['deletegallery'].'"><input type="hidden" name="del_gallery" value="'.$del_gallery.'">';
+        $post['ask'] = askMessages("gallery_ask_delete",$del_gallery,'action_data[deletegallery]',$post['action_data']['deletegallery'],"del_gallery",$del_gallery);
     }
     # Gallery Löschen    
     if(isset($_POST['confirm']) and $_POST['confirm'] == "true" and isset($_POST['del_gallery']) and !empty($_POST['del_gallery'])) {
@@ -2417,7 +2423,7 @@ function files($post) {
         }
     }
     if(isset($post['ask'])) {
-        $pagecontent .= returnMessage(true, $post['ask']);
+        $pagecontent .= $post['ask'];
     }
 
     if(getRequestParam('javascript', true)) {
@@ -2673,8 +2679,7 @@ function deleteFile($post) {
             return $post;
         }
     } else {
-        $post['ask'] = getLanguageValue("files_ask_delete").':<br /><span style="font-weight:normal;">->&nbsp;&nbsp;'.$specialchars->rebuildSpecialChars($del_file,true,true).'</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="vertical-align:middle;">&nbsp;&nbsp;&nbsp;<input type="image" name="confirm" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="vertical-align:middle;"><input type="hidden" name="action_data[deletefile]['.$cat.']" value="'.$del_file.'">';
-
+        $post['ask'] = askMessages("files_ask_delete",$del_file,'action_data[deletefile]['.$cat.']',$del_file);
         $key = array_keys($post['categories']['cat']['position'], substr($cat,0,2));
         $post['categories']['cat']['error_html']['display'][$key[0]] = 'style="display:block;" ';
         return $post;
