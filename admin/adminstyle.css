@@ -232,6 +232,20 @@ input, select, textarea
     border-radius:3px;
 }
 
+.message_ask
+{
+    margin:10px;
+    color:#00aa00;
+    border:1px solid #00aa00;
+    padding:8px;
+    font-weight:bolder;
+    background-color:#DDFFDD;
+    -moz-border-radius:3px;
+    -webkit-border-radius:3px;
+    -khtml-border-radius:3px;
+    border-radius:3px;
+}
+
 .table_toggle
 {
     margin:0;
