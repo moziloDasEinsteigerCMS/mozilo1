@@ -312,11 +312,6 @@ $CHARSET = 'UTF-8';
     // Suchformular
     if(strpos($HTML,'{SEARCH}') !== false)
         $HTML = preg_replace('/{SEARCH}/', getSearchForm(), $HTML);
-
-    // Letzte Aenderung (obsolet seit 1.12 - nur aus Gründen der Abwärtskompatibilität noch dabei) 
-    if(strpos($HTML,'{LASTCHANGE}') !== false) {
-        $HTML = preg_replace('/{LASTCHANGE}/', $language->getLanguageValue0("message_lastchange_0")." ".$lastchangeinfo[1]." (".$lastchangeinfo[2].")", $HTML); 
-    }
     
     // Sitemap-Link
     $HTML = preg_replace('/{SITEMAPLINK}/', "<a href=\"".$URL_BASE."index.php?action=sitemap\" id=\"sitemaplink\"".getTitleAttribute($language->getLanguageValue0("tooltip_showsitemap_0")).">".$language->getLanguageValue0("message_sitemap_0")."</a>", $HTML);
@@ -713,82 +708,6 @@ $CHARSET = 'UTF-8';
         ."</fieldset></form>";
         return $form;
     }
-
-
-// ------------------------------------------------------------------------------
-// Rueckgabe eines Array, bestehend aus:
-// - Name der zuletzt geaenderten Inhaltsseite
-// - kompletter Link auf diese Inhaltsseite  
-// - formatiertes Datum der letzten Aenderung
-// ------------------------------------------------------------------------------
-    function getLastChangedContentPageAndDate(){
-        global $CONTENT_DIR_REL;
-        global $language;
-        global $specialchars;
-        global $CMS_CONF;
-        global $URL_BASE;
-
-        $latestchanged = array("cat" => "catname", "file" => "filename", "time" => 0);
-        $currentdir = opendir($CONTENT_DIR_REL);
-        while ($file = readdir($currentdir)) {
-            if (isValidDirOrFile($file)) {
-                $latestofdir = getLastChangeOfCat($CONTENT_DIR_REL.$file);
-                if ($latestofdir['time'] > $latestchanged['time']) {
-                    $latestchanged['cat'] = $file;
-                    $latestchanged['file'] = $latestofdir['file'];
-                    $latestchanged['time'] = $latestofdir['time'];
-                }
-            }
-        }
-        closedir($currentdir);
-        
-        $lastchangedpage = $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true);
-        # Mod Rewrite
-        $url = "index.php?cat=".substr($latestchanged['cat'],3)."&amp;page=".substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7);
-        if($CMS_CONF->get("modrewrite") == "true") {
-            $url = $URL_BASE.substr($latestchanged['cat'],3)."/".substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7).".html";
-        }
-        $linktolastchangedpage = "<a href=\"".$url."\"".getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", $specialchars->rebuildSpecialChars(substr($latestchanged['file'], 3, strlen($latestchanged['file'])-7), true, true), $specialchars->rebuildSpecialChars(substr($latestchanged['cat'], 3, strlen($latestchanged['cat'])-3), true, true)))." id=\"lastchangelink\">".$lastchangedpage."</a>";
-
-
-        $lastchangedate = @strftime($language->getLanguageValue0("_dateformat_0"), date($latestchanged['time']));
-
-        return array($lastchangedpage, $linktolastchangedpage,$lastchangedate);
-    }
-
-
-// ------------------------------------------------------------------------------
-// Einlesen eines Kategorie-Verzeichnisses, Rueckgabe der zuletzt geaenderten Datei
-// ------------------------------------------------------------------------------
-    function getLastChangeOfCat($dir){
-        global $EXT_HIDDEN;
-        global $EXT_PAGE;
-        global $CMS_CONF;
-
-        $showhiddenpages = ($CMS_CONF->get("showhiddenpagesinlastchanged") == "true");
-        
-        $latestchanged = array("file" => "filename", "time" => 0);
-        $currentdir = opendir($dir);
-        while ($file = readdir($currentdir)) {
-            if (is_file($dir."/".$file)) {
-                // normale Inhaltsseiten
-                if ( 
-                    (substr($file, strlen($file)-4, 4) == $EXT_PAGE)
-                    // oder, wenn konfiguriert, auch versteckte
-                    || ($showhiddenpages && substr($file, strlen($file)-4, 4) == $EXT_HIDDEN)
-                    )
-                    {
-                    if (filemtime($dir."/".$file) > $latestchanged['time']) {
-                        $latestchanged['file'] = $file;
-                        $latestchanged['time'] = filemtime($dir."/".$file);
-                    }
-                }
-        }
-        }
-        closedir($currentdir);
-        return $latestchanged;
-    }
-
 
 
 // ------------------------------------------------------------------------------
