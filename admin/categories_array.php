@@ -643,8 +643,8 @@ function askMessages($title,$message,$input_name,$input_value,$input2_name = fal
     $ask = '<div class="message_ask">'.getLanguageValue($title).':<br />'
             .'<span style="font-weight:normal;">→&nbsp;&nbsp;'.messagesOutLen($specialchars->rebuildSpecialChars($message,true,true)).'</span>'
             .'<div style="text-align:center">'
-            .'<input type="image" name="confirm_true" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="margin-right:60px">'
-            .'<input type="image" name="confirm_false" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'">'
+            .'<input type="image" name="confirm_true" value="true" alt="'.getLanguageValue("yes").'" src="gfx/icons/'.$icon_size.'/accept.png" title="'.getLanguageValue("yes").'" style="margin-right:10px">'.getLanguageValue("yes")
+            .'<input type="image" name="confirm_false" value="false" alt="'.getLanguageValue("no").'" src="gfx/icons/'.$icon_size.'/cancel.png" title="'.getLanguageValue("no").'" style="margin-right:10px;margin-left:60px">'.getLanguageValue("no")
             .'<input type="hidden" name="'.$input_name.'" value="'.$input_value.'">'.$input2.'</div></div>';
     return $ask;
 }
