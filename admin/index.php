@@ -2659,7 +2659,9 @@ function deleteFile($post) {
     $cat = key($post['action_data']['deletefile']);
     $del_file = $post['action_data']['deletefile'][$cat];
 
-        if (isset($_POST['confirm']) and ($_POST['confirm'] == "true")) {
+    if(isset($_POST['confirm']) and ($_POST['confirm'] == "false")) {
+        return $post;
+    } elseif(isset($_POST['confirm']) and ($_POST['confirm'] == "true")) {
         if(file_exists($CONTENT_DIR_REL.$cat."/dateien/".$del_file)) {
             @unlink($CONTENT_DIR_REL.$cat."/dateien/".$del_file);
             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
