@@ -185,7 +185,6 @@ function getDirContentAsArray($dir, $hiddeposition = true) {
         $handle = opendir($dir);
         while($file = readdir($handle)) {
             if(isValidDirOrFile($file)) {
-                // wenn $includefiles true ist, werden auch Dateien ins Array gesteckt; sonst nur Verzeichnisse
                 if (!is_file("$dir/$file")) {
                     # wenn $hiddeposition = true keine Position
                     if($hiddeposition === true)
