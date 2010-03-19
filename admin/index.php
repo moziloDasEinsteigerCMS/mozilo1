@@ -1756,7 +1756,7 @@ function gallery($post) {
                         # das Bild aus dem array nehmen der fehler muss mit ftp behoben werden
                         unset($gallerypics[$currentgalerien][$pos]);
                     } else {
-                        if($GALLERY_CONF->get("usethumbs") == "true" and is_file($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file)) {
+                        if(is_file($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file)) {
                             @rename($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file,$GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic);
                             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
                             $last_error['line'] = NULL;
@@ -1986,7 +1986,7 @@ function gallery($post) {
             $pos = $pos + 1;
             $lastsavedanchor = "";#$lastsavedanchor = " id=\"lastsavedimage\"";
             $size = getimagesize($GALLERIES_DIR_REL.$currentgalerien."/".$file);
-            // Vorschaubild anzeigen, wenn vorhanden; sonst Originalbild
+            // Vorschaubild anzeigen, wenn vorhanden; sonst Text
             if (file_exists($GALLERIES_DIR_REL.$currentgalerien."/$PREVIEW_DIR_NAME/".$file)) {
                 $preview = '<a href="'.$specialchars->replaceSpecialChars($URL_BASE.$GALLERIES_DIR_NAME."/".$currentgalerien."/".$file,true).'" target="_blank"'.$tooltip_gallery_help_picture.'>'
                 .'<img src="'.$specialchars->replaceSpecialChars($URL_BASE.$GALLERIES_DIR_NAME."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file,true).'" alt="'.$specialchars->rebuildSpecialChars($file, true, true).'" style="height:60px;border:none;" /></a>';
@@ -2278,20 +2278,15 @@ function editGallery($post) {
 
         #make_thumbs
         if(isset($post['gallery'][$gallery]['make_thumbs'])) {
-            if($GALLERY_CONF->get("usethumbs") == "true") {
-                require_once($BASE_DIR_CMS."Image.php");
-                $gallerypics = getFiles($GALLERIES_DIR_REL.$gallery,"");
-                foreach($gallerypics as $pos => $file) {
-                    # nur Dateien zulassen
-                    if(!is_dir($GALLERIES_DIR_REL.$gallery.'/'.$file)) {
-                        scaleImage($file, $GALLERIES_DIR_REL.$gallery.'/', $GALLERIES_DIR_REL.$gallery.'/'.$PREVIEW_DIR_NAME.'/', $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'),true);
-                        $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
-                        $post['messages']['gallery_messages_make_thumbs'][$gallery] = $gallery;
-                    }
+            require_once($BASE_DIR_CMS."Image.php");
+            $gallerypics = getFiles($GALLERIES_DIR_REL.$gallery,"");
+            foreach($gallerypics as $pos => $file) {
+                # nur Dateien zulassen
+                if(!is_dir($GALLERIES_DIR_REL.$gallery.'/'.$file)) {
+                    scaleImage($file, $GALLERIES_DIR_REL.$gallery.'/', $GALLERIES_DIR_REL.$gallery.'/'.$PREVIEW_DIR_NAME.'/', $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'),true);
+                    $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
+                    $post['messages']['gallery_messages_make_thumbs'][$gallery] = $gallery;
                 }
-            } else {
-                $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
-                $post['error_messages']['gallery_error_no_make_thumbs'][] = NULL;
             }
         }
         #scale_max
