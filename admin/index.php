@@ -3376,7 +3376,12 @@ function admin($post) {
             }
         }
 
-        $post['messages']['admin_messages_changes'][] = NULL;
+        if($LOGINCONF->get('initialsetup') == "false") {
+            $post['messages']['admin_messages_changes'][] = NULL;
+        } else {
+            $post['error_messages']['admin_error_initialsetup'][] = NULL;
+        }
+
 
     } #applay end
 
