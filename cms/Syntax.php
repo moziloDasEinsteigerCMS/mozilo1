@@ -552,7 +552,8 @@ class Syntax {
                     // Kopfzeilen
                     if (preg_match("/&lt;&lt;([^&gt;]*)/Umsi", $tablematch)) {
                         $linecontent = preg_replace('/\|/', '</th><th class="contenttable">', $tablelines[2][$j]);
-                        $linecontent = preg_replace('/&#38;/', '&', $linecontent);
+# Table Hack recursive Table siehe weiter unten
+#                        $linecontent = preg_replace('/&#38;/', '&', $linecontent);
                         $linecontent = preg_replace('/&lt;(.*)/', "$1", $linecontent);
                         $tablecontent .= "<tr><th class=\"contenttable\">$linecontent</th></tr>";
                     }
@@ -565,7 +566,8 @@ class Syntax {
                         }
                         // Pipes durch TD-Wechsel ersetzen
                         $linecontent = preg_replace('/\|/', '</td><td class="'.$css.'">', $tablelines[2][$j]);
-                        $linecontent = preg_replace('/&#38;/', '&', $linecontent);
+# Table Hack recursive Table siehe weiter unten
+#                        $linecontent = preg_replace('/&#38;/', '&', $linecontent);
                         $tablecontent .= "<tr><td class=\"$css\">$linecontent</td></tr>";
                     }
                     $j++;
@@ -713,6 +715,8 @@ class Syntax {
             $content = preg_replace('/<\/ul>(\r\n|\r|\n)?<ul>/', '', $content);
             // direkt aufeinanderfolgende numerierte Listen zusammenf�hren
             $content = preg_replace('/<\/ol>(\r\n|\r|\n)?<ol>/', '', $content);
+            # Table Hack recursive Table
+            $content = preg_replace('/&#38;/', '&', $content);
         }
 
         // Zeilenwechsel in Include-Tags wiederherstellen    
