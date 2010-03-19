@@ -54,7 +54,7 @@ if (($logindataconf->get("name") == "") || ($logindataconf->get("pw") == "")) {
 
 $HTML = "<!doctype html public \"-//W3C//DTD HTML 4.0 //EN\"><html>";
 // User hat sich ausgeloggt
-if (isset($_POST['logout'])) {
+if (isset($_POST['logout']) or isset($_POST['logout_x'])) {
     // Session beenden und die Sessiondaten löschen
     session_destroy();
     unset($_SESSION);
