@@ -61,7 +61,7 @@ $CHARSET = 'UTF-8';
     $TEMPLATE_FILE  = $LAYOUT_DIR."/template.html";
 
     # wenn ein Plugin die gallerytemplate.html benutzten möchte und sie blank ist 
-    if ($GALLERY_CONF->get("target") == "_blank" and getRequestParam("gal", true)) {
+    if ($GALLERY_CONF->get("target") == "_blank" and getRequestParam("gal", false)) {
         $TEMPLATE_FILE  = $LAYOUT_DIR."/gallerytemplate.html";
     }
 
@@ -84,8 +84,8 @@ $CHARSET = 'UTF-8';
     // Request-Parameter einlesen und dabei absichern
     $CAT_REQUEST_URL = $specialchars->replaceSpecialChars(getRequestParam('cat', false),false);
     $PAGE_REQUEST_URL = $specialchars->replaceSpecialChars(getRequestParam('page', false),false);
-    $ACTION_REQUEST = getRequestParam('action', true);
-    $QUERY_REQUEST = getRequestParam('query', true);
+    $ACTION_REQUEST = getRequestParam('action', false);
+    $QUERY_REQUEST = getRequestParam('query', false);
     $HIGHLIGHT_REQUEST = getRequestParam('highlight', false);
 
 #    $CONTENT_DIR_REL        = "kategorien";
@@ -978,11 +978,13 @@ $CHARSET = 'UTF-8';
 // Phrasen in Inhalt hervorheben
 // ------------------------------------------------------------------------------
     function highlight($content, $phrasestring) {
+        global $specialchars;
         // Zu highlightende Begriffe kommen kommasepariert ("begriff1,begriff2")-> in Array wandeln
 #        $phrasestring = rawurldecode($phrasestring);
         $phrasearray = explode(",", $phrasestring);
         // jeden Begriff highlighten
         foreach($phrasearray as $phrase) {
+            $phrase = $specialchars->rebuildSpecialChars($phrase, false, true);
             // Regex-Zeichen im zu highlightenden Text escapen (.\+*?[^]$(){}=!<>|:)
             $phrase = preg_quote($phrase);
             // Slashes im zu highlightenden Text escapen
