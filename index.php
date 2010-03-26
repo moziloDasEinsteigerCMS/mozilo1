@@ -1530,6 +1530,13 @@ $CHARSET = 'UTF-8';
                 }
             }
         }
+        # alle script sachen rausnemen da könten verschachtelungen mit {} drin sein
+        preg_match_all("/\<script(.*)\<\/script>/Umsi", $content, $java_script);
+        if(isset($java_script) and is_array($java_script)) {
+            foreach($java_script[0] as $pos => $script) {
+                $content = str_replace($script,'<!-- plugin script '.$pos.' -->',$content);
+            }
+        }
         // Alle Variablen aus dem Inhalt heraussuchen
         preg_match_all("/\{(.+)\}/Umsi", $content, $matches);
         # Alle Platzhalter die keine Plugins sind ersetze {, } mit ~platz-, -platzend~
@@ -1612,6 +1619,13 @@ $CHARSET = 'UTF-8';
         $content = str_replace(array('~platz-','-platzend~'),array('{','}'),$content);
         # fals doch noch was uebrig geblieben sein solte
         $content = str_replace(array('~start_in-','-end_in~','~start-','-end~'),array('{','}','{','}'),$content);
+        # alle script sachen wieder einsetzen
+        if(isset($java_script) and is_array($java_script)) {
+            foreach($java_script[0] as $pos => $script) {
+                $content = str_replace('<!-- plugin script '.$pos.' -->',$script,$content);
+            }
+        }
+
         return $content;
     }
 
