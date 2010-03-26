@@ -278,7 +278,10 @@ $CHARSET = 'UTF-8';
     }
 
     $HTML = $template;
-    $HTML = preg_replace('/{CONTENT}/', $pagecontent, $HTML);
+    # erst alle Plugin Platzhalter des Content ersetzen
+    $HTML = preg_replace('/{CONTENT}/', replacePluginVariables($pagecontent), $HTML);
+    # und dann die Restlichen Plugin Platzhalter ersetzen so können aus dem Content GLOBALS
+    # gesetzt werden die dann mit denn Restlichen Plugin Platzhalter (Template) ersetzen werden
     // Benutzer-Variablen ersetzen
     $HTML = replacePluginVariables($HTML);
 
