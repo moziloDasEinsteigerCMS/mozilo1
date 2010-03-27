@@ -4260,7 +4260,7 @@ function returnOverviewSelectbox($type, $currentcat) {
                 if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
                 $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
                 $elements[] = array($cleancatname, ":".$cleancatname);
-                $currentcat_filearray = getFiles($CONTENT_DIR_REL.$catdir."/dateien");
+                $currentcat_filearray = getFiles($CONTENT_DIR_REL.$catdir."/dateien","");
                 natcasesort($currentcat_filearray);
                 foreach ($currentcat_filearray as $current_file) {
                     if ($catdir == $currentcat)
