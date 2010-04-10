@@ -144,6 +144,7 @@ echo $HTML;
 
 // Aufbau des Login-Formulars
 function login_formular($enabled) {
+    global $CHARSET;
     $form = "<div id=\"loginform_shadowdiv\"></div>";
   if ($enabled)
         $form .= "<div id=\"loginform_maindiv\">";
