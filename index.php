@@ -279,11 +279,14 @@ $CHARSET = 'UTF-8';
 
     $HTML = $template;
     # erst alle Plugin Platzhalter des Content ersetzen
-    $HTML = preg_replace('/{CONTENT}/', replacePluginVariables($pagecontent), $HTML);
+    list($tmp,$css) = replacePluginVariables($pagecontent);
+    $HTML = preg_replace('/{CONTENT}/', $tmp, $HTML);
+    $HTML = str_replace(array("</head>","</HEAD>"),$css."</head>",$HTML);
     # und dann die Restlichen Plugin Platzhalter ersetzen so können aus dem Content GLOBALS
     # gesetzt werden die dann mit denn Restlichen Plugin Platzhalter (Template) ersetzen werden
     // Benutzer-Variablen ersetzen
-    $HTML = replacePluginVariables($HTML);
+    list($HTML,$css) = replacePluginVariables($HTML);
+    $HTML = str_replace(array("</head>","</HEAD>"),$css."</head>",$HTML);
 
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $HTML);
     $HTML = preg_replace('/{CHARSET}/', $CHARSET, $HTML);
@@ -1466,7 +1469,7 @@ $CHARSET = 'UTF-8';
     }
 
     # die geschweiften PluginPlatzhalter klammern ersetzen
-    function replacePluginsCurly($matches,$content,$availableplugins) {
+    function replacePluginsCurly($matches,$content,$availableplugins,$max = 0) {
         foreach($matches[0] as $pos => $inhalt) {
             $plugin = explode("|", $matches[1][$pos]);
             $currentplugin = $matches[1][$pos];
@@ -1496,8 +1499,9 @@ $CHARSET = 'UTF-8';
         # noch mal suchen
         preg_match_all("/\{(.+)\}/Umsi", $content, $matches);
         # solange suchen bis keine mehr vorhanden
-        if(count($matches[0]) > 0) {
-            $content = replacePluginsCurly($matches,$content,$availableplugins);
+        if(count($matches[0]) > 0 and $max < 5) {
+            $max++;
+            $content = replacePluginsCurly($matches,$content,$availableplugins,$max);
         }
         return $content;
     }
@@ -1511,6 +1515,8 @@ $CHARSET = 'UTF-8';
         global $URL_BASE;
         global $PLUGIN_DIR_NAME;
 
+        # Damit ein Platzhalter der als erste kommt erkant wierd
+        $content = "tmp".$content;
         $availableplugins = array();
         $deactiv_plugins = array();
         // alle Plugins einlesen
@@ -1543,8 +1549,8 @@ $CHARSET = 'UTF-8';
         # und jetzt noch die Verschachtelten und die {, } ersetzen mit ~start-, -end~,
         # inerhalb eines Plugins und ~start_in-, -end_in~
         $content = replacePluginsCurly($matches,$content,$availableplugins);
-
         $notexit = 0;
+        $css = "";
         // Fuer jeden Treffer...
         while ((strpos($content,'~start-') > 0)
                 or (strpos($content,'~start_in-') > 0)
@@ -1605,9 +1611,10 @@ $CHARSET = 'UTF-8';
                 $content = str_replace($match,$replacement,$content);
                 if (!in_array($currentvariable, $deactiv_plugins)
                     and file_exists($PLUGIN_DIR_REL.$currentvariable."/plugin.css")
-                    and strpos($content,$URL_BASE.$PLUGIN_DIR_NAME.'/'.$currentvariable.'/plugin.css') < 1) {
-                    $css = '<style type="text/css"> @import "'.$URL_BASE.$PLUGIN_DIR_NAME.'/'.$currentvariable.'/plugin.css"; </style></head>';
-                    $content = str_replace(array("</head>","</HEAD>"),$css,$content);
+                    and strpos($css,$URL_BASE.$PLUGIN_DIR_NAME.'/'.$currentvariable.'/plugin.css') < 1
+                    and strpos($content,$URL_BASE.$PLUGIN_DIR_NAME.'/'.$currentvariable.'/plugin.css') < 1)
+                    {
+                    $css .= '<style type="text/css"> @import "'.$URL_BASE.$PLUGIN_DIR_NAME.'/'.$currentvariable.'/plugin.css"; </style>';
                 }
             }
             $notexit++;
@@ -1625,8 +1632,9 @@ $CHARSET = 'UTF-8';
                 $content = str_replace('<!-- plugin script '.$pos.' -->',$script,$content);
             }
         }
-
-        return $content;
+        # Damit ein Platzhalter der als erste kommt erkant wierd zurück
+        $content = substr($content,3);
+        return array($content, $css);
     }
 
     function menuLink($link,$css) {
