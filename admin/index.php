@@ -3616,7 +3616,9 @@ function plugins($post) {
                 $pagecontent .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
                 # Plugin Info Prüfen
                 if(isset($plugin_info) and count($plugin_info) > 0) {
-                    $plugin_name = str_replace(array("&lt;","&gt;"),array("<",">"),htmlentities(strip_tags($plugin_info[0], '<b>'),ENT_COMPAT,$CHARSET),$plugin_info[0]);
+                    $plugin_name = strip_tags($plugin_info[0],'<b>');
+                    $plugin_name = htmlentities($plugin_name,ENT_COMPAT,$CHARSET);
+                    $plugin_name = str_replace(array("&lt;","&gt;"),array("<",">"),$plugin_name);
                 } else {
                     $plugin_name = getLanguageValue('plugins_error').' <span style="color:#ff0000">'.$currentelement.'</span>';
                     $plugin_error = true;
