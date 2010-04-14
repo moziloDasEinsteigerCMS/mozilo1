@@ -16,6 +16,7 @@ $ADMIN_TITLE = "moziloAdmin";
 $CHARSET = 'UTF-8';
 $ADMIN_DIR_NAME = "admin";
 $BASE_DIR = str_replace($ADMIN_DIR_NAME,"",getcwd());
+$BASE_DIR = substr($_SERVER["SCRIPT_FILENAME"],0,strrpos($_SERVER["SCRIPT_FILENAME"],'admin'));
 $CMS_DIR_NAME = "cms";
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
 $BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
@@ -2076,7 +2077,7 @@ function newGalleryImg($post) {
                 $gallery_tmp .= $tmp."_";
             }
             $gallery[1] = substr($gallery_tmp,0,-1);
-            $error = uploadFile($_FILES[$array_name], $GALLERIES_DIR_REL.$gallery[1]."/", $forceoverwrite,$GALLERY_CONF->get('maxwidth'), $GALLERY_CONF->get('maxtheight'), true);
+            $error = uploadFile($_FILES[$array_name], $GALLERIES_DIR_REL.$gallery[1]."/", $forceoverwrite,$GALLERY_CONF->get('maxwidth'), $GALLERY_CONF->get('maxtheight'));
             if(!empty($error)) {
                 $post['error_messages'][key($error)][] = $gallery[1]."/".$error[key($error)];
             } else {
@@ -4374,7 +4375,7 @@ function setLayoutAndDependentSettings($layoutfolder) {
 }
 
 // Hochgeladene Datei ueberpruefen und speichern
-function uploadFile($uploadfile, $destination, $forceoverwrite,$MAX_IMG_WIDTH,$MAX_IMG_HEIGHT,$image = false){
+function uploadFile($uploadfile, $destination, $forceoverwrite,$MAX_IMG_WIDTH,$MAX_IMG_HEIGHT){
     global $ADMIN_CONF;
     global $specialchars;
     global $BASE_DIR_CMS;
@@ -4408,7 +4409,7 @@ function uploadFile($uploadfile, $destination, $forceoverwrite,$MAX_IMG_WIDTH,$M
             }
             // chmod, wenn so eingestellt
             useChmod($destination.$uploadfile_name);#maximagewidth maximageheight
-            if(!empty($MAX_IMG_WIDTH) or !empty($MAX_IMG_HEIGHT) and $image) {
+            if((!empty($MAX_IMG_WIDTH) or !empty($MAX_IMG_HEIGHT)) and preg_match("/^(\w)+(.gif|.png|.jpeg|.jpg)$/",strtolower($uploadfile_name))) {
                 // Bilddaten feststellen
                 $size = getimagesize($destination.$uploadfile_name);
                 // Mimetype herausfinden
