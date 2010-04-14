@@ -19,18 +19,22 @@ class SpecialChars {
     function getHtmlEntityDecode($string) {
         global $CHARSET;
 
-        $replace = array_keys(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
-        # get_html_translation_table liefert die Zeichen im ISO-8859-1 Format - wir brauchen UTF-8
-        $replace = implode(",",$replace);
-        if(function_exists("utf8_encode")) {
-            $replace = utf8_encode($replace);
-        } elseif(function_exists("mb_convert_encoding")) {
-            $replace = mb_convert_encoding($replace, $CHARSET);
-        } elseif(function_exists("iconv")) {
-            $replace = iconv('ISO-8859-1', $CHARSET.'//IGNORE',$replace);
+        if((version_compare( phpversion(), '5.0' ) < 0)) {
+            $replace = array_keys(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
+            # get_html_translation_table liefert die Zeichen im ISO-8859-1 Format - wir brauchen UTF-8
+            $replace = implode(",",$replace);
+            if(function_exists("utf8_encode")) {
+                $replace = utf8_encode($replace);
+            } elseif(function_exists("mb_convert_encoding")) {
+                $replace = mb_convert_encoding($replace, $CHARSET);
+            } elseif(function_exists("iconv")) {
+                $replace = iconv('ISO-8859-1', $CHARSET.'//IGNORE',$replace);
+            }
+            $replace = explode(",",$replace);
+            $string = str_replace(array_values(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)), $replace, $string);
+        } else {
+            $string = html_entity_decode($string,ENT_QUOTES,$CHARSET);
         }
-        $replace = explode(",",$replace);
-        $string = str_replace(array_values(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)), $replace, $string);
         return $string;
     }
 
