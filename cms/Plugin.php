@@ -47,7 +47,7 @@ class Plugin {
             if ($handle = opendir($BASE_DIR."plugins/")) {
                 while (false !== ($plugin_dir = readdir($handle))) {
                     $key = array_search(strtolower($plugin_dir), $declared_classes);
-                    if(isset($declared_classes[$key]) and $key > 0) {
+                    if(isset($declared_classes[$key]) and $key > 0 and $plugin_class == strtolower($plugin_dir)) {
                         $plugin_class = $declared_classes[$key];
                         $plugin_class_dir = $plugin_dir;
                         break;
@@ -56,6 +56,7 @@ class Plugin {
                 closedir($handle);
             }
         }
+
         // diese (abstrakte) Klasse darf nicht direkt instanziiert werden!
         if ($plugin_class == $plugin_str || !is_subclass_of($this, $plugin_str)){
 #        if (get_class($this) == 'Plugin' || !is_subclass_of ($this, 'Plugin')){
