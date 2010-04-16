@@ -419,6 +419,7 @@ echo $html;
  ------------------------------ */
 
 function home($post) {
+    global $BASE_DIR;
     global $CMS_CONF;
     global $VERSION_CONF;
     global $ADMIN_CONF;
@@ -472,7 +473,9 @@ function home($post) {
     $pagecontent .= getLanguageValue("home_text_welcome");
     $pagecontent .= "</p>";
 
-    $path = dirname(dirname(__FILE__))."/";
+#$URL_BASE $BASE_DIR
+#    $path = dirname(dirname(__FILE__))."/";
+    $path = $BASE_DIR;
 #    $cmssize = convertFileSizeUnit(dirsize(getcwd()."/.."));
     $cmssize = convertFileSizeUnit(dirsize($path));
     $pagecontent .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">'
@@ -3675,7 +3678,7 @@ function plugins($post) {
                                 if(isset($_POST[$currentelement][$name])) {
                                     # ist array bei radio und select multi
                                     if(is_array($_POST[$currentelement][$name])) {
-                                        $conf_inhalt = implode(",", trim($_POST[$currentelement][$name]));
+                                        $conf_inhalt = implode(",", $_POST[$currentelement][$name]);
                                     # alle die kein array sind
                                     } else {
                                         $conf_inhalt = str_replace(array("\r\n","\r","\n"),"<br />",trim($_POST[$currentelement][$name]));
@@ -3700,7 +3703,7 @@ function plugins($post) {
                                         } else {
                                             $error = ' style="background-color:#FF0000;"';
                                             $display_toggle = ' style="display:block;"';
-                                            $messages = returnMessage(false, $regex_error);
+                                            $messages .= returnMessage(false, $regex_error);
                                         }
                                     } else {
                                         # nur in conf schreiben wenn sich der wert geändert hat und es kein password ist
