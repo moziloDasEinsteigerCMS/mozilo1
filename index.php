@@ -16,6 +16,7 @@ print_r($_REQUEST);
 echo "</pre>";
 */
 $BASE_DIR = getcwd()."/";
+$BASE_DIR = substr($_SERVER["SCRIPT_FILENAME"],0,strrpos($_SERVER["SCRIPT_FILENAME"],'index.php'));
 $CMS_DIR_NAME = "cms";
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
 
@@ -284,6 +285,10 @@ $CHARSET = 'UTF-8';
     $HTML = str_replace(array("</head>","</HEAD>"),$css."</head>",$HTML);
     # und dann die Restlichen Plugin Platzhalter ersetzen so können aus dem Content GLOBALS
     # gesetzt werden die dann mit denn Restlichen Plugin Platzhalter (Template) ersetzen werden
+    // Benutzer-Variablen ersetzen
+    list($HTML,$css) = replacePluginVariables($HTML);
+    $HTML = str_replace(array("</head>","</HEAD>"),$css."</head>",$HTML);
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // Benutzer-Variablen ersetzen
     list($HTML,$css) = replacePluginVariables($HTML);
     $HTML = str_replace(array("</head>","</HEAD>"),$css."</head>",$HTML);
@@ -1611,8 +1616,8 @@ $CHARSET = 'UTF-8';
                 $content = str_replace($match,$replacement,$content);
                 if (!in_array($currentvariable, $deactiv_plugins)
                     and file_exists($PLUGIN_DIR_REL.$currentvariable."/plugin.css")
-                    and strpos($css,$URL_BASE.$PLUGIN_DIR_NAME.'/'.$currentvariable.'/plugin.css') < 1
-                    and strpos($content,$URL_BASE.$PLUGIN_DIR_NAME.'/'.$currentvariable.'/plugin.css') < 1)
+                    and strpos($css,$currentvariable.'/plugin.css') < 1
+                    and strpos($content,$currentvariable.'/plugin.css') < 1)
                     {
                     $css .= '<style type="text/css"> @import "'.$URL_BASE.$PLUGIN_DIR_NAME.'/'.$currentvariable.'/plugin.css"; </style>';
                 }
@@ -1634,7 +1639,7 @@ $CHARSET = 'UTF-8';
         }
         # Damit ein Platzhalter der als erste kommt erkant wierd zurück
         $content = substr($content,3);
-        return array($content, $css);
+        return array($content,$css);
     }
 
     function menuLink($link,$css) {
