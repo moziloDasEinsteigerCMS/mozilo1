@@ -1178,6 +1178,10 @@ $CHARSET = 'UTF-8';
         $config_website = explode(",", ($contactformconfig->get("website")));
         $config_message = explode(",", ($contactformconfig->get("message")));
         
+        $mandatory = false;
+        if(($config_name[2] == "true") or ($config_mail[2] == "true") or ($config_website[2] == "true") or ($config_message[2] == "true"))
+            $mandatory = true;
+
         $errormessage = "";
         $form = "";
         
@@ -1281,7 +1285,7 @@ $CHARSET = 'UTF-8';
         if ($config_name[1] == "true") {
             // Bezeichner aus formular.conf nutzen, wenn gesetzt
             if ($config_name[0] != "") {
-                $form .= "<tr><td style=\"padding-right:10px;\">".$config_name[0];
+                $form .= "<tr><td style=\"padding-right:10px;\">".$specialchars->rebuildSpecialChars($config_name[0],false,true);
             } else {
                 $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_name_0");
             }
@@ -1293,7 +1297,7 @@ $CHARSET = 'UTF-8';
         if ($config_mail[1] == "true") {
             // Bezeichner aus formular.conf nutzen, wenn gesetzt
             if ($config_mail[0] != "") {
-                $form .= "<tr><td style=\"padding-right:10px;\">".$config_mail[0];
+                $form .= "<tr><td style=\"padding-right:10px;\">".$specialchars->rebuildSpecialChars($config_mail[0],false,true);
             } else {
                 $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_mail_0");
             }
@@ -1305,7 +1309,7 @@ $CHARSET = 'UTF-8';
         if ($config_website[1] == "true") {
             // Bezeichner aus formular.conf nutzen, wenn gesetzt
             if ($config_website[0] != "") {
-                $form .= "<tr><td style=\"padding-right:10px;\">".$config_website[0];
+                $form .= "<tr><td style=\"padding-right:10px;\">".$specialchars->rebuildSpecialChars($config_website[0],false,true);
             } else {
                 $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_website_0");
             }
@@ -1317,7 +1321,7 @@ $CHARSET = 'UTF-8';
         if ($config_message[1] == "true") {
             // Bezeichner aus formular.conf nutzen, wenn gesetzt
             if ($config_message[0] != "") {
-                $form .= "<tr><td style=\"padding-right:10px;\">".$config_message[0];
+                $form .= "<tr><td style=\"padding-right:10px;\">".$specialchars->rebuildSpecialChars($config_message[0],false,true);
             } else {
                 $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_message_0");
             }
@@ -1327,6 +1331,7 @@ $CHARSET = 'UTF-8';
             $form .= "</td><td><textarea rows=\"10\" cols=\"50\" id=\"contact_message\" name=\"".$_SESSION['contactform_message']."\">".$message."</textarea></td></tr>";
         }
         if ($usespamprotection) {
+            $mandatory = true;
             // Spamschutz-Aufgabe
             $calculation_data = getRandomCalculationData();
             $_SESSION['calculation_result'] = $calculation_data[1];
@@ -1334,9 +1339,10 @@ $CHARSET = 'UTF-8';
                 ."<tr><td style=\"padding-right:10px;\">".$calculation_data[0]."*</td>"
                 ."<td><input type=\"text\" id=\"contact_calculation\" name=\"".$_SESSION['contactform_calculation']."\" value=\"\" /></td></tr>";
             
-            $form .= "<tr><td style=\"padding-right:10px;\">&nbsp;</td><td>".$language->getLanguageValue0("contactform_mandatory_fields_0")."</td></tr>"
-            ."<tr><td style=\"padding-right:10px;\">&nbsp;</td><td><input type=\"submit\" class=\"submit\" id=\"contact_submit\" name=\"submit\" value=\"".$language->getLanguageValue0("contactform_submit_0")."\" /></td></tr>";
         }
+        if($mandatory)
+            $form .= "<tr><td style=\"padding-right:10px;\">&nbsp;</td><td>".$language->getLanguageValue0("contactform_mandatory_fields_0")."</td></tr>";
+        $form .= "<tr><td style=\"padding-right:10px;\">&nbsp;</td><td><input type=\"submit\" class=\"submit\" id=\"contact_submit\" name=\"submit\" value=\"".$language->getLanguageValue0("contactform_submit_0")."\" /></td></tr>";
         $form .= "</table>"
         ."</form>";
         
