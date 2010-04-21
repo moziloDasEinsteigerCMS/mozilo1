@@ -1,7 +1,8 @@
 <?php
 
-# Alle Platzhalter als array mit Beschreibung
-function makePlatzhalter() {
+# Alle Platzhalter
+function makePlatzhalter($all = false) {
+    # Alle Platzhalter für die Selctbox im Editor als array
     $platzhalter = array(
                         '{CATEGORY_NAME}',
                         '{CATEGORY}',
@@ -14,7 +15,23 @@ function makePlatzhalter() {
                         '{CONTACT}',
                         '{TABLEOFCONTENTS}'
     );
-
+    # Die Rstlichen Platzhalter
+    $platzhalter_rest = array(
+                        '{CSS_FILE}',
+                        '{CHARSET}',
+                        '{FAVICON_FILE}',
+                        '{LAYOUT_DIR}',
+                        '{WEBSITE_TITLE}',
+                        '{WEBSITE_KEYWORDS}',
+                        '{WEBSITE_DESCRIPTION}',
+                        '{MAINMENU}',
+                        '{DETAILMENU}'
+    );
+    if($all) {
+        foreach($platzhalter_rest as $platz) {
+            $platzhalter[] = $platz;
+        }
+    }
     return $platzhalter;
 }
 

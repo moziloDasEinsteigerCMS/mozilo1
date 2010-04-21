@@ -36,10 +36,12 @@ $CHARSET = 'UTF-8';
     $VERSION_CONF  = new Properties($BASE_DIR_CMS."conf/version.conf",true);
     $GALLERY_CONF  = new Properties($BASE_DIR_CMS."conf/gallery.conf",true);
     $USER_SYNTAX  = new Properties($BASE_DIR_CMS."conf/syntax.conf",true);
-    $URL_BASE = NULL;
-    if($CMS_CONF->get("modrewrite") == "true") {
-        $URL_BASE = substr($_SERVER['PHP_SELF'],0,-(strlen("index.php")));
-    }
+    $URL_BASE = substr($_SERVER['PHP_SELF'],0,-(strlen("index.php")));
+#    $URL_BASE = NULL;
+#    if($CMS_CONF->get("modrewrite") == "true") {
+#        $URL_BASE = substr($_SERVER['PHP_SELF'],0,-(strlen("index.php")));
+#    }
+
     require_once($BASE_DIR_CMS."Language.php");
     $language       = new Language();
     require_once($BASE_DIR_CMS."Syntax.php");
@@ -278,20 +280,38 @@ $CHARSET = 'UTF-8';
         $pagecontent = highlight($pagecontent, $HIGHLIGHT_REQUEST);
     }
 
+    # Vorhandene Plugins finden und in array $activ_plugins und $deactiv_plugins einsetzen
+    list($activ_plugins,$deactiv_plugins) = findPlugins();
+    # Platzhalter array aus DefaultConf hollen
+    $platzhalter = makePlatzhalter(true);
+    # Platzhalter ersetzen array erzeugen
+    foreach($platzhalter as $halter) {
+        $replace_platzhalter[] = str_replace(array('{','}'),array('~platz-','-platzend~'),$halter);
+    }
+    # Platzhalter im Template ersetzen
+    $template = str_replace($platzhalter,$replace_platzhalter,$template);
+    # Platzhalter im Content ersetzen
+    $pagecontent = str_replace($platzhalter,$replace_platzhalter,$pagecontent);
+
     $HTML = $template;
     # erst alle Plugin Platzhalter des Content ersetzen
-    list($tmp,$css) = replacePluginVariables($pagecontent);
+    list($tmp,$css) = replacePluginVariables($pagecontent,$activ_plugins,$deactiv_plugins);
     $HTML = preg_replace('/{CONTENT}/', $tmp, $HTML);
     $HTML = str_replace(array("</head>","</HEAD>"),$css."</head>",$HTML);
     # und dann die Restlichen Plugin Platzhalter ersetzen so können aus dem Content GLOBALS
     # gesetzt werden die dann mit denn Restlichen Plugin Platzhalter (Template) ersetzen werden
     // Benutzer-Variablen ersetzen
-    list($HTML,$css) = replacePluginVariables($HTML);
+    list($HTML,$css) = replacePluginVariables($HTML,$activ_plugins,$deactiv_plugins);
     $HTML = str_replace(array("</head>","</HEAD>"),$css."</head>",$HTML);
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // Benutzer-Variablen ersetzen
-    list($HTML,$css) = replacePluginVariables($HTML);
+    # und wenn durch die Plugins wieder Pluginplatzhalter enstanden sind
+    list($HTML,$css) = replacePluginVariables($HTML,$activ_plugins,$deactiv_plugins);
     $HTML = str_replace(array("</head>","</HEAD>"),$css."</head>",$HTML);
+
+    # alle Plugins die nicht existieren oder einen Fehler haben
+    $HTML = str_replace(array('~plugin_dead_start-','-plugin_dead_end~','-plugin_dead_grade~'),array('{','}','|'),$HTML);
+
+    # Platzhalter wieder herstellen
+    $HTML = str_replace($replace_platzhalter,$platzhalter,$HTML);
 
     $HTML = preg_replace('/{CSS_FILE}/', $CSS_FILE, $HTML);
     $HTML = preg_replace('/{CHARSET}/', $CHARSET, $HTML);
@@ -300,6 +320,7 @@ $CHARSET = 'UTF-8';
 
     // Platzhalter ersetzen
     $HTML = replacePlaceholders($HTML, $cattitle, $pagetitle);
+
     if(strpos($HTML,'{WEBSITE_TITLE}') !== false)
         $HTML = preg_replace('/{WEBSITE_TITLE}/', getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle), $HTML);
 
@@ -1473,172 +1494,144 @@ $CHARSET = 'UTF-8';
         $_SESSION['contactform_calculation'] = time()-rand(50, 60);
     }
 
-    # die geschweiften PluginPlatzhalter klammern ersetzen
-    function replacePluginsCurly($matches,$content,$availableplugins,$max = 0) {
-        foreach($matches[0] as $pos => $inhalt) {
-            $plugin = explode("|", $matches[1][$pos]);
-            $currentplugin = $matches[1][$pos];
-            if (sizeof($plugin) > 1) {
-                $currentplugin = $plugin[0];
-                if(strrpos("tmp".$plugin[1],'{') > 0) {
-                    $currentplugin = substr($plugin[1],strrpos($plugin[1],'{') + 1);
+    function findPlugins() {
+        global $PLUGIN_DIR_REL;
+
+        # Damit ein Platzhalter der als erste kommt erkant wierd
+        $activ_plugins = array();
+        $deactiv_plugins = array();
+        // alle Plugins einlesen
+        $dircontent = getDirContentAsArray($PLUGIN_DIR_REL, false, false);
+        foreach ($dircontent as $currentelement) {
+            # nach schauen ob das Plugin active ist
+            if(file_exists($PLUGIN_DIR_REL.$currentelement."/plugin.conf")
+                and file_exists($PLUGIN_DIR_REL.$currentelement."/index.php")) {
+                $conf_plugin = new Properties($PLUGIN_DIR_REL.$currentelement."/plugin.conf",true);
+                if($conf_plugin->get("active") == "false") {
+                    # array fuehlen mit deactivierte Plugin Platzhalter
+                    $deactiv_plugins[] = $currentelement;
+                } elseif($conf_plugin->get("active") == "true") {
+                    $activ_plugins[] = $currentelement;
                 }
+                unset($conf_plugin);
             }
-            # Platzhalter werden alle mit ersetzt ~platz-, -platzend~
-            if(!in_array($currentplugin, $availableplugins)) {
-                # Platzhalter haben keine Parameter
-                $string_search = '{'.$currentplugin.'}';
-                $string_new = '~platz-'.$currentplugin.'-platzend~';
-            # alle {PluginPlatzhalter} nicht Verschachtelt
-            } elseif(strrpos($matches[0][$pos],'{',1) == 0) {
-                $string_search = $matches[0][$pos];
-                $string_new = str_replace(array('{','}'),array('~start-','-end~'),$string_search);
-            # alle Verschachtelte {PluginPlatzhalter|variable{PluginPlatzhalter|variable}}
-            } elseif(strrpos($matches[0][$pos],'{',1) > 0) {
-                $string_search = substr($matches[0][$pos],strrpos($matches[0][$pos],'{',1));
-                $string_new = str_replace(array('{','}'),array('~start_in-','-end_in~'),$string_search);
-            }
-            # die geschweiften PluginPlatzhalter klammern ersetzen
-            $content = str_replace($string_search,$string_new,$content);
         }
-        # noch mal suchen
-        preg_match_all("/\{(.+)\}/Umsi", $content, $matches);
-        # solange suchen bis keine mehr vorhanden
-        if(count($matches[0]) > 0 and $max < 5) {
-            $max++;
-            $content = replacePluginsCurly($matches,$content,$availableplugins,$max);
-        }
-        return $content;
+        return array($activ_plugins,$deactiv_plugins);
     }
+
+
 // ------------------------------------------------------------------------------
 // Hilfsfunktion: Plugin-Variablen ersetzen
 // ------------------------------------------------------------------------------    
-    function replacePluginVariables($content) {
+    function replacePluginVariables($content,$activ_plugins,$deactiv_plugins) {
         global $PLUGIN_DIR_REL;
         global $syntax;
         global $language;
         global $URL_BASE;
         global $PLUGIN_DIR_NAME;
 
-        # Damit ein Platzhalter der als erste kommt erkant wierd
-        $content = "tmp".$content;
-        $availableplugins = array();
-        $deactiv_plugins = array();
-        // alle Plugins einlesen
-        $dircontent = getDirContentAsArray($PLUGIN_DIR_REL, false, false);
-        foreach ($dircontent as $currentelement) {
-            # alle Plugins suchen
-            if (file_exists($PLUGIN_DIR_REL.$currentelement."/index.php")) {
-                $availableplugins[] = $currentelement;
-            }
-            # nach schauen ob das Plugin active ist
-            if(file_exists($PLUGIN_DIR_REL.$currentelement."/plugin.conf")) {
-                $conf_plugin = new Properties($PLUGIN_DIR_REL.$currentelement."/plugin.conf",true);
-                if($conf_plugin->get("active") == "false") {
-                    # array fuehlen mit deactivierte Plugin Platzhalter
-                    $deactiv_plugins[] = $currentelement;
-                    unset($conf_plugin);
-                }
-            }
-        }
         # alle script sachen rausnemen da könten verschachtelungen mit {} drin sein
         preg_match_all("/\<script(.*)\<\/script>/Umsi", $content, $java_script);
-        if(isset($java_script) and is_array($java_script)) {
-            foreach($java_script[0] as $pos => $script) {
-                $content = str_replace($script,'<!-- plugin script '.$pos.' -->',$content);
+        if(count($java_script[0]) > 0) {
+            foreach($java_script[0] as $pos => $script_match) {
+                $content = str_replace($script_match,'<!-- plugin script '.$pos.'start -->',$content);
+                $script[] = array('<!-- plugin script '.$pos.'start -->' => $script_match);
             }
         }
-        // Alle Variablen aus dem Inhalt heraussuchen
-        preg_match_all("/\{(.+)\}/Umsi", $content, $matches);
-        # Alle Platzhalter die keine Plugins sind ersetze {, } mit ~platz-, -platzend~
-        # und jetzt noch die Verschachtelten und die {, } ersetzen mit ~start-, -end~,
-        # inerhalb eines Plugins und ~start_in-, -end_in~
-        $content = replacePluginsCurly($matches,$content,$availableplugins);
+        # alle style sachen rausnemen da könten verschachtelungen mit {} drin sein
+        preg_match_all("/\<style(.*)\<\/style>/Umsi", $content, $style);
+        if(count($style[0]) > 0) {
+            foreach($style[0] as $pos => $style_match) {
+                $content = str_replace($style_match,'<!-- plugin style '.$pos.'start -->',$content);
+                $script[] = array('<!-- plugin style '.$pos.'start -->' => $style_match);
+            }
+        }
+        # alle Platzhalter mit Parameter suchen die in einer Verschachtelung sind
+        preg_match_all("/\{([^\{\}]+)\|([^\{\}]*)\}/Um", $content, $matches);
+        # wenn keine gefunden die ohne Parameter suchen
+        if(count($matches[0]) <= 0) {
+            preg_match_all("/\{([^\|\{]+)\}/Umsi", $content, $matches);
+        }
         $notexit = 0;
         $css = "";
-        // Fuer jeden Treffer...
-        while ((strpos($content,'~start-') > 0)
-                or (strpos($content,'~start_in-') > 0)
-            ) {
-            # alle PluginPlatzhalter die in einem Plugin sind zuerst ersetzen
-            if(strpos($content,'~start_in-') > 0) {
-                $match_start = strrpos($content,'~start_in-');
-                $match_len = strpos($content,'-end_in~',$match_start) - $match_start + 8;
-                $match = substr($content,$match_start,$match_len);
-                $match_plugin = substr($match,10,strlen($match) - 18);
-            # dann alle anderen
-            } elseif(strpos($content,'~start-') > 0) {
-                $match_start = strpos($content,'~start-');
-                $match_len = strpos($content,'-end~',$match_start) - $match_start + 5;
-                $match = substr($content,$match_start,$match_len);
-                # bei PluginPlatzhalter die neben einander in einem Plugin stehen
-                if(strpos($match,'~start-',7) > 0) {
-                    $match = substr($match,strrpos($match,'~start-'));
-                }
-                $match_plugin = substr($match,7,strlen($match) - 12);
-            }
-            // ...erstmal schauen, ob ein Wert dabeisteht, z.B. {VARIABLE|wert}
-#            $valuearray = explode("|", $match_plugin);
-            if(substr($match_plugin,0,strpos($match_plugin,'|'))) {
-
-                $currentvariable = substr($match_plugin,0,strpos($match_plugin,'|'));
-                $currentvalue = substr($match_plugin,strpos($match_plugin,'|') + 1);
-                # um den Pluigins die möglichkeit zu geben auf die Platzhalter zuzugreifen
-                $currentvalue = str_replace(array('~platz-','-platzend~'),array('{','}'),$currentvalue);
-/*
-            if (sizeof($valuearray) > 1) {
-                $currentvariable = $valuearray[0];
-                $currentvalue = $valuearray[1];*/
-            // Sonst den Wert leer vorbelegen
-            } else {
-                $currentvariable = $match_plugin;
-                $currentvalue = "";
-            }
-            // ...ueberpruefen, ob es eine zugehörige Plugin-PHP-Datei gibt
-            if (in_array($currentvariable, $availableplugins)) {
-                $replacement = "";
-                if (file_exists($PLUGIN_DIR_REL.$currentvariable."/index.php")) {
-                    // Plugin-Code includieren
-                    require_once($PLUGIN_DIR_REL.$currentvariable."/index.php");
-                }
-                // Enthaelt der Code eine Klasse mit dem Namen des Plugins?
-                if (class_exists($currentvariable)) {
-                    if(!in_array($currentvariable, $deactiv_plugins)) {
-                        // Objekt instanziieren und Inhalt holen!
-                        $currentpluginobject = new $currentvariable();
-                        $replacement = $currentpluginobject->getPluginContent($currentvalue);
+        while (count($matches[0]) > 0 and $notexit < 10) {
+            # $matches[0] = {Plugin|Parameter}
+            # $matches[1] = Plugin name
+            # $matches[2] = Plugin Parameter
+            foreach($matches[0] as $pos => $halter) {
+                $match = $matches[0][$pos];
+                $plugin = $matches[1][$pos];
+                $plugin_parameter = "";
+                if(isset($matches[2][$pos]))
+                    $plugin_parameter = $matches[2][$pos];
+                // ...ueberpruefen, ob es eine zugehörige Plugin-PHP-Datei gibt
+                if(in_array($plugin, $activ_plugins)) {
+                    $replacement = "";
+                    if(file_exists($PLUGIN_DIR_REL.$plugin."/index.php")) {
+                        // Plugin-Code includieren
+                        require_once($PLUGIN_DIR_REL.$plugin."/index.php");
                     }
+                    // Enthaelt der Code eine Klasse mit dem Namen des Plugins?
+                    if(class_exists($plugin)) {
+                        if(!in_array($plugin, $deactiv_plugins)) {
+                            // Objekt instanziieren und Inhalt holen!
+                            $currentpluginobject = new $plugin();
+                            $replacement = $currentpluginobject->getPluginContent($plugin_parameter);
+                        }
+                    } else {
+                    $dead = str_replace(array('{','}','|'),array('~plugin_dead_start-','-plugin_dead_end~','-plugin_dead_grade~'),$match);
+                        $replacement = $syntax->createDeadlink($dead, $language->getLanguageValue1("plugin_error_1", $plugin));
+                    }
+                    // Variable durch Plugin-Inhalt (oder Fehlermeldung) ersetzen
+                    $content = str_replace($match,$replacement,$content);
+                    if(!in_array($plugin, $deactiv_plugins)
+                        and file_exists($PLUGIN_DIR_REL.$plugin."/plugin.css")
+                        and strpos($css,$plugin.'/plugin.css') < 1
+                        and strpos($content,$plugin.'/plugin.css') < 1)
+                        {
+                        $css .= '<style type="text/css"> @import "'.$URL_BASE.$PLUGIN_DIR_NAME.'/'.$plugin.'/plugin.css"; </style>';
+                    }
+                } elseif(in_array($plugin, $deactiv_plugins)) {
+                    # Deactiviertes Plugin mit nichts ersetzen
+                    $content = str_replace($match,"",$content);
                 } else {
-                    $replacement = $syntax->createDeadlink($match, $language->getLanguageValue1("plugin_error_1", $currentvariable));
+                    # Platzhalter nicht bekant
+                    $dead = str_replace(array('{','}','|'),array('~plugin_dead_start-','-plugin_dead_end~','-plugin_dead_grade~'),$match);
+                        $replacement = $syntax->createDeadlink($dead, $language->getLanguageValue1("plugin_error_1", $plugin));
+                    $content = str_replace($match,$replacement,$content);
                 }
-                // Variable durch Plugin-Inhalt (oder Fehlermeldung) ersetzen
-#                $content = preg_replace('/'.preg_quote($match, '/').'/Um', $replacement, $content);
-                $content = str_replace($match,$replacement,$content);
-                if (!in_array($currentvariable, $deactiv_plugins)
-                    and file_exists($PLUGIN_DIR_REL.$currentvariable."/plugin.css")
-                    and strpos($css,$currentvariable.'/plugin.css') < 1
-                    and strpos($content,$currentvariable.'/plugin.css') < 1)
-                    {
-                    $css .= '<style type="text/css"> @import "'.$URL_BASE.$PLUGIN_DIR_NAME.'/'.$currentvariable.'/plugin.css"; </style>';
+
+                # alle script sachen rausnemen da könten verschachtelungen mit {} drin sein
+                preg_match_all("/\<script(.*)\<\/script>/Umsi", $content, $java_script);
+                if(count($java_script[0]) > 0) {
+                    foreach($java_script[0] as $scriptpos => $script_match) {
+                        $content = str_replace($script_match,'<!-- plugin script '.$scriptpos.'drin'.$pos.' -->',$content);
+                        $script[] = array('<!-- plugin script '.$scriptpos.'drin'.$pos.' -->' => $script_match);
+                    }
                 }
+                # alle style sachen rausnemen da könten verschachtelungen mit {} drin sein
+                preg_match_all("/\<style(.*)\<\/style>/Umsi", $content, $style);
+                if(count($style[0]) > 0) {
+                    foreach($style[0] as $stylepos => $style_match) {
+                        $content = str_replace($style_match,'<!-- plugin style '.$stylepos.'drin'.$pos.' -->',$content);
+                        $script[] = array('<!-- plugin style '.$stylepos.'drin'.$pos.' -->' => $style_match);
+                    }
+                }
+            }
+            # noch mal alle Platzhalter mit Parameter suchen die in einer Verschachtelung sind
+            preg_match_all("/\{([^\{\}]+)\|([^\{\}]*)\}/Um", $content, $matches);
+            # wenn keine gefunden die ohne Parameter suchen
+            if(count($matches[0]) <= 0) {
+                preg_match_all("/\{([^\|\{]+)\}/Umsi", $content, $matches);
             }
             $notexit++;
-            # nach spaetestens 500 durchlaeufe die while schleife verlassen nicht das das
-            # zur endlosschleife wird
-            if($notexit > 500) break;
         }
-        # Platzhalter wieder herstellen
-        $content = str_replace(array('~platz-','-platzend~'),array('{','}'),$content);
-        # fals doch noch was uebrig geblieben sein solte
-        $content = str_replace(array('~start_in-','-end_in~','~start-','-end~'),array('{','}','{','}'),$content);
-        # alle script sachen wieder einsetzen
-        if(isset($java_script) and is_array($java_script)) {
-            foreach($java_script[0] as $pos => $script) {
-                $content = str_replace('<!-- plugin script '.$pos.' -->',$script,$content);
+        # alle script und style sachen wieder einsetzen
+        if(isset($script) and is_array($script)) {
+            foreach($script as $script_tmp) {
+                $content = str_replace(key($script_tmp),$script_tmp[key($script_tmp)],$content);
             }
         }
-        # Damit ein Platzhalter der als erste kommt erkant wierd zurück
-        $content = substr($content,3);
         return array($content,$css);
     }
 
