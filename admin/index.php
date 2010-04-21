@@ -131,8 +131,6 @@ if (!isset($_SESSION['login_okay']) or !$_SESSION['login_okay']) {
 }
 
 
-$MAILFUNCTIONS = new Mail();
-
 $USER_SYNTAX_FILE = $BASE_DIR_CMS."conf/syntax.conf";
 $USER_SYNTAX = new Properties($USER_SYNTAX_FILE,true);
 if($CMS_CONF->properties['usecmssyntax'] == "true" and !isset($USER_SYNTAX->properties['readonly'])) {
@@ -423,7 +421,6 @@ function home($post) {
     global $CMS_CONF;
     global $VERSION_CONF;
     global $ADMIN_CONF;
-    global $MAILFUNCTIONS;
     
     $pagecontent = NULL;
     $modrewrite = getLanguageValue("home_error_mod_rewrite");
@@ -455,8 +452,8 @@ function home($post) {
     // Testmail schicken
     if (getRequestParam('test_mail', true)) {
         if (getRequestParam('test_mail_adresse', true) and getRequestParam('test_mail_adresse', true) != "") {
-            if($MAILFUNCTIONS->isMailAvailable()) {
-                $MAILFUNCTIONS->sendMail(getLanguageValue("mailtest_mailsubject"), getLanguageValue("mailtest_mailcontent"),getRequestParam('test_mail_adresse', true),getRequestParam('test_mail_adresse', true));
+            if(isMailAvailable()) {
+                sendMail(getLanguageValue("mailtest_mailsubject"), getLanguageValue("mailtest_mailcontent"),getRequestParam('test_mail_adresse', true),getRequestParam('test_mail_adresse', true));
                 $post['messages']['home_messages_test_mail'][] = getRequestParam('test_mail_adresse', true);
             } else {
                 $post['error_messages']['home_messages_no_mail'][] = NULL;
@@ -929,7 +926,15 @@ function page($post) {
                 $pagecontent .= categoriesMessages($post);
                 $cat = key($post['action_data']['editsite']);
                 $page = $post['action_data']['editsite'][$cat];
-                $pagecontent .= '<span class="titel">'.getLanguageValue("page_edit").' -&gt; </span>'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen($EXT_PAGE))), true, true).'<br /><br />';
+                global $CMS_CONF;
+                global $URL_BASE;
+                $link = $URL_BASE.substr($cat,3).'/'.substr($page,3,-(strlen($EXT_PAGE))).".html";
+                if($CMS_CONF->get("modrewrite") != "true") {
+                    $link = $URL_BASE."index.php?cat=".substr($cat,3)."&amp;page=".substr($page,3,-(strlen($EXT_PAGE)));
+                }
+                $pagecontent .= '<span class="titel">'.getLanguageValue("page_edit").' → </span><a href="'.$link.'" target="_blank">'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen($EXT_PAGE))), true, true).'</a><br /><br />';
+
+
                 $pagecontent .= $post['content'];
                 $pagecontent .= '<input type="hidden" name="checkpara" value="no">';
                 return array(getLanguageValue("page_button"), $pagecontent);
@@ -3189,7 +3194,6 @@ function admin($post) {
     global $ADMIN_CONF;
     global $LOGINCONF;
     global $CMS_CONF;
-    global $MAILFUNCTIONS;
     global $specialchars;
     global $icon_size;
     global $BASE_DIR_ADMIN;
@@ -3474,7 +3478,7 @@ function admin($post) {
     $pagecontent .= "</select></td></tr>";
     if($LOGINCONF->get("initialsetup") == "false") {
         // Zeile "ADMIN-MAIL"
-        if($MAILFUNCTIONS->isMailAvailable())
+        if(isMailAvailable())
         {
             $pagecontent .= '<tr><td class="td_cms_left">'.getLanguageValue("admin_text_send_adminmail").'</td>';
             $pagecontent .= '<td class="td_cms_left">'

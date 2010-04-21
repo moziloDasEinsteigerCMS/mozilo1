@@ -46,10 +46,8 @@ $CHARSET = 'UTF-8';
     $language       = new Language();
     require_once($BASE_DIR_CMS."Syntax.php");
     require_once($BASE_DIR_CMS."Smileys.php");
-    require_once($BASE_DIR_CMS."Mail.php");
     $syntax         = new Syntax();
     $smileys        = new Smileys($BASE_DIR_CMS."smileys");
-    $mailfunctions  = new Mail();
 
     require_once($BASE_DIR_CMS."Plugin.php");
 
@@ -1157,14 +1155,15 @@ $CHARSET = 'UTF-8';
     function buildContactForm() {
         global $contactformconfig;
         global $language;
-        global $mailfunctions;
         global $CMS_CONF;
         global $WEBSITE_NAME;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
         global $CHARSET;
         global $specialchars;
+        global $BASE_DIR_CMS;
         
+        require_once($BASE_DIR_CMS."Mail.php");
         // existiert eine Mailadresse? Wenn nicht: Das Kontaktformular gar nicht anzeigen!
         if (strlen($contactformconfig->get("formularmail")) < 1) {
             return "<span class=\"deadlink\"".getTitleAttribute($language->getLanguageValue0("tooltip_no_mail_error_0")).">{CONTACT}</span>";
@@ -1253,10 +1252,10 @@ $CHARSET = 'UTF-8';
                 $mailsubject = $language->getLanguageValue1("contactform_mailsubject_1", $specialchars->getHtmlEntityDecode($WEBSITE_NAME));
                 // Wenn Mail-Adresse gesetzt ist: erhaelt der Absender eine copy
                 if ($mail <> "") {
-                    $mailfunctions->sendMail($mailsubject, $mailcontent, $contactformconfig->get("formularmail"), $mail);
+                    sendMail($mailsubject, $mailcontent, $contactformconfig->get("formularmail"), $mail);
                 }
                 // Mail Senden an eingestelte emailadresse
-                $mailfunctions->sendMail($mailsubject, $mailcontent, $contactformconfig->get("formularmail"), $contactformconfig->get("formularmail"));
+                sendMail($mailsubject, $mailcontent, $contactformconfig->get("formularmail"), $contactformconfig->get("formularmail"));
                 $form .= "<span id=\"contact_successmessage\">".$language->getLanguageValue0("contactform_confirmation_0")."</span>";
                 
                 // Felder leeren

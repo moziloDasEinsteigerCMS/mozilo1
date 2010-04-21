@@ -26,18 +26,24 @@ require_once($BASE_DIR_ADMIN."filesystem.php");
 session_start();
 
 // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
-@ini_set("display_errors", 0);
+#@ini_set("display_errors", 0);
 
 // Initialisierungen
 $logindataconf = new Properties($BASE_DIR_ADMIN."conf/logindata.conf");
 if(!isset($logindataconf->properties['readonly'])) {
     die($logindataconf->properties['error']);
 }
+$VERSION_CONF    = new Properties($BASE_DIR_CMS."conf/version.conf");
+if(!isset($VERSION_CONF->properties['readonly'])) {
+    die($VERSION_CONF->properties['error']);
+}
 
-$basicconf = new Properties($BASE_DIR_ADMIN."conf/basic.conf");
+$ADMIN_CONF = new Properties($BASE_DIR_ADMIN."conf/basic.conf");
+if(!isset($ADMIN_CONF->properties['readonly'])) {
+    die($ADMIN_CONF->properties['error']);
+}
 $pwcrypt = new Crypt();
-$mailfunctions = new Mail();
-$BASIC_LANGUAGE = new Properties($BASE_DIR_ADMIN."sprachen/language_".$basicconf->get("language").".conf");
+$BASIC_LANGUAGE = new Properties($BASE_DIR_ADMIN."sprachen/language_".$ADMIN_CONF->get("language").".conf");
 
 // MAXIMALE ANZAHL FALSCHER LOGINS
 $FALSELOGINLIMIT = 3;
@@ -97,16 +103,16 @@ elseif  (isset($_POST['login'])) {
         // Sperrzeit starten
         $logindataconf->set("loginlockstarttime", time());
         // Mail an Admin
-        if ($basicconf->get("sendadminmail") == "true") {
+        if ($ADMIN_CONF->get("sendadminmail") == "true") {
             $mailcontent = getLanguageValue("loginlocked_mailcontent")."\r\n\r\n"
                 .strftime(getLanguageValue("_dateformat"), time())."\r\n"
                 .$_SERVER['REMOTE_ADDR']." / ".gethostbyaddr($_SERVER['REMOTE_ADDR'])."\r\n"
                 .getLanguageValue("username").": ".$_POST['username'];
                 
                 // Prüfen, ob die Mail-Funktion vorhanden ist
-                if($mailfunctions->isMailAvailable())
+                if(isMailAvailable())
                 {
-                    $mailfunctions->sendMailToAdmin(getLanguageValue("loginlocked_mailsubject"), $mailcontent);
+                    sendMailToAdmin(getLanguageValue("loginlocked_mailsubject"), $mailcontent);
                 }
         }
         // Formular ausgrauen
