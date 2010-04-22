@@ -667,7 +667,7 @@ $CHARSET = 'UTF-8';
             foreach ($contentarray as $currentcontent) {
                 // Inhaltsseite nicht anzeigen, wenn sie genauso heißt wie die Kategorie
                 if ($CMS_CONF->get("hidecatnamedpages") == "true") {
-                    if(substr($currentcontent, 3, strlen($currentcontent) - 7) == substr($CAT_REQUEST, 3, strlen($CAT_REQUEST) - 3) and substr($currentcontent,-(strlen($EXT_LINK))) != $EXT_LINK) {
+                    if(substr($currentcontent, 3, strlen($currentcontent) - 7) == substr($cat, 3) and substr($currentcontent,-(strlen($EXT_LINK))) != $EXT_LINK) {
                         // Wenn es in der Kategorie nur diese eine (dank hidecatnamedpages eh nicht angezeigte) Seite gibt,
                         // dann gib als Detailmenue gleich einen Leerstring zurueck
                         if (count($contentarray) == 1) {
