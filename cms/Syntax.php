@@ -521,8 +521,11 @@ class Syntax {
             // HTML
             elseif ($attribute == "html"){
                 $nobrvalue = preg_replace('/(\r\n|\r|\n)/m', '{newline_in_html_tag}', $value);
-                $content = str_replace ("$match", $specialchars->getHtmlEntityDecode($nobrvalue), $content);
-            }
+                # Wichtig alle {,} und = die nicht in einem tag sind mussen in z.B. &#123; geschrieben sein
+                $nobrvalue = str_replace (array('&#123;','&#125;','&#061;'), array('&amp;#123;','&amp;#125;','&amp;#061;'), $nobrvalue);
+                $nobrvalue = $specialchars->getHtmlEntityDecode($nobrvalue);
+                $content = str_replace ("$match", $nobrvalue, $content);
+           }
 
 /*
             Das "php"-Element ist seit moziloCMS 1.12 veraltet und wird nur noch aus Gründen 
