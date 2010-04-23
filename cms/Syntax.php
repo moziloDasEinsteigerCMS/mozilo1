@@ -521,8 +521,10 @@ class Syntax {
             // HTML
             elseif ($attribute == "html"){
                 $nobrvalue = preg_replace('/(\r\n|\r|\n)/m', '{newline_in_html_tag}', $value);
-                # Wichtig alle {,} und = die nicht in einem tag sind mussen so z.B. &#123; geschrieben werden
-                $nobrvalue = str_replace (array('&#123;','&#125;','&#061;'), array('&amp;#123;','&amp;#125;','&amp;#061;'), $nobrvalue);
+                # Wichtig alle &#???; (sind die zeichen mit ^ dafor) nach &amp;#???; wandel damit
+                # getHtmlEntityDecode nicht das Zeichen herstellt
+                $nobrvalue = preg_replace("/\&\#(\d+)\;/Umsie", "'&amp;#\\1;'", $nobrvalue);
+#                $nobrvalue = str_replace (array('&#123;','&#125;','&#061;'), array('&amp;#123;','&amp;#125;','&amp;#061;'), $nobrvalue);
                 $nobrvalue = $specialchars->getHtmlEntityDecode($nobrvalue);
                 $content = str_replace ("$match", $nobrvalue, $content);
            }
