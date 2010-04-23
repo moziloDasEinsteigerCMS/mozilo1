@@ -118,6 +118,8 @@ function createCategory($new_cat) {
     global $specialchars;
     global $ADMIN_CONF;
 
+    # dummy fehlermeldung erzeugen
+    @chmod();
     @mkdir ("../kategorien/".$new_cat);
     $line_error = __LINE__ - 1;
     $last_error['line'] = NULL;
