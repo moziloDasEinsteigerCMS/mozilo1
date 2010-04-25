@@ -86,7 +86,7 @@ $CHARSET = 'UTF-8';
     $CAT_REQUEST_URL = $specialchars->replaceSpecialChars(getRequestParam('cat', false),false);
     $PAGE_REQUEST_URL = $specialchars->replaceSpecialChars(getRequestParam('page', false),false);
     $ACTION_REQUEST = getRequestParam('action', false);
-    $QUERY_REQUEST = getRequestParam('query', false);
+    $QUERY_REQUEST = stripcslashes(getRequestParam('query', false));
     $HIGHLIGHT_REQUEST = getRequestParam('highlight', false);
 
 #    $CONTENT_DIR_REL        = "kategorien";
@@ -97,6 +97,12 @@ $CHARSET = 'UTF-8';
     $PLUGIN_DIR_NAME         = "plugins";
     $PLUGIN_DIR_REL         = $BASE_DIR.$PLUGIN_DIR_NAME."/";
     $HTML                   = "";
+
+    $activ_plugins = "";
+    $deactiv_plugins = "";
+    # Vorhandene Plugins finden und in array $activ_plugins und $deactiv_plugins einsetzen
+    # wird für Search und Pluginplatzhaltern verwendet
+    list($activ_plugins,$deactiv_plugins) = findPlugins();
 
     $DEFAULT_CATEGORY = $CMS_CONF->get("defaultcat");
     // Ueberpruefen: Ist die Startkategorie vorhanden? Wenn nicht, nimm einfach die allererste als Standardkategorie
@@ -198,6 +204,8 @@ $CHARSET = 'UTF-8';
         global $URL_BASE;
         global $CHARSET;
         global $BASE_DIR_CMS;
+        global $activ_plugins;
+        global $deactiv_plugins;
 
     if (!$file = @fopen($TEMPLATE_FILE, "r"))
         die($language->getLanguageValue1("message_template_error_1", $TEMPLATE_FILE));
@@ -220,7 +228,8 @@ $CHARSET = 'UTF-8';
         $pagetitle         = $pagecontentarray[2];
     }
     elseif ($ACTION_REQUEST == "search") {
-        $pagecontentarray = getSearchResult();
+        require_once($BASE_DIR_CMS."Search.php");
+        $pagecontentarray = searchInPages();
         $pagecontent    = $pagecontentarray[0];
         $cattitle         = $pagecontentarray[1];
         $pagetitle         = $pagecontentarray[2];
@@ -273,13 +282,6 @@ $CHARSET = 'UTF-8';
         $pagecontent = $smileys->replaceEmoticons($pagecontent);
     }
 
-    // Gesuchte Phrasen hervorheben
-    if ($HIGHLIGHT_REQUEST <> "") {
-        $pagecontent = highlight($pagecontent, $HIGHLIGHT_REQUEST);
-    }
-
-    # Vorhandene Plugins finden und in array $activ_plugins und $deactiv_plugins einsetzen
-    list($activ_plugins,$deactiv_plugins) = findPlugins();
     # Platzhalter array aus DefaultConf hollen
     $platzhalter = makePlatzhalter(true);
     # Platzhalter ersetzen array erzeugen
@@ -294,6 +296,13 @@ $CHARSET = 'UTF-8';
     $HTML = $template;
     # erst alle Plugin Platzhalter des Content ersetzen
     list($tmp,$css) = replacePluginVariables($pagecontent,$activ_plugins,$deactiv_plugins);
+
+    // Gesuchte Phrasen hervorheben
+    if ($HIGHLIGHT_REQUEST <> "") {
+        require_once($BASE_DIR_CMS."Search.php");
+        $tmp = highlightSearch($tmp, $HIGHLIGHT_REQUEST);
+    }
+
     $HTML = preg_replace('/{CONTENT}/', $tmp, $HTML);
     $HTML = str_replace(array("</head>","</HEAD>"),$css."</head>",$HTML);
     # und dann die Restlichen Plugin Platzhalter ersetzen so können aus dem Content GLOBALS
@@ -649,7 +658,7 @@ $CHARSET = 'UTF-8';
             $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$URL_BASE."index.php".$modrewrite_dumy."?action=sitemap\" class=\"".$cssprefix."active\">".$language->getLanguageValue0("message_sitemap_0")."</a></li>";
         // Suchergebnis
         elseif (($ACTION_REQUEST == "search") && ($CMS_CONF->get("usesubmenu") == 0))
-            $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$URL_BASE."index.php".$modrewrite_dumy."?action=search&amp;query=".$specialchars->replaceSpecialChars($QUERY_REQUEST, true)."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", $specialchars->getHtmlEntityDecode($QUERY_REQUEST))."</a></li>";
+            $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$URL_BASE."index.php".$modrewrite_dumy."?action=search&amp;query=".$specialchars->replaceSpecialChars($QUERY_REQUEST, false)."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", $specialchars->getHtmlEntityDecode($QUERY_REQUEST))."</a></li>";
         // Entwurfsansicht
         elseif (($ACTION_REQUEST == "draft") && ($CMS_CONF->get("usesubmenu") == 0))
             $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$url_draft."action=draft\" class=\"".$cssprefix."active\">".pageToName($PAGE_REQUEST.$EXT_DRAFT, false)." (".$language->getLanguageValue0("message_draft_0").")</a></li>";
@@ -787,188 +796,6 @@ $CHARSET = 'UTF-8';
         return array($sitemap, $language->getLanguageValue0("message_sitemap_0"), $language->getLanguageValue0("message_sitemap_0"));
     }
 
-
-// ------------------------------------------------------------------------------
-// Anzeige der Suchergebnisse
-// ------------------------------------------------------------------------------
-    function getSearchResult() {
-        global $CONTENT_DIR_REL;
-        global $USE_CMS_SYNTAX;
-        global $QUERY_REQUEST;
-        global $language;
-        global $specialchars;
-        global $CMS_CONF;
-        global $URL_BASE;
-        global $EXT_LINK;
-
-        $showhiddenpages = ($CMS_CONF->get("showhiddenpagesinsearch") == "true");
-        $matchesoverall = 0;
-        $searchresults = "";
-
-        // Ueberhaupt erst etwas machen, wenn die Suche nicht leer ist
-        if (trim($QUERY_REQUEST) != "") {
-            // Damit die Links in der Ergbnisliste korrekt sind: Suchanfrage bereinigen
-            $queryarray = explode(" ", preg_replace('/"/', "", $QUERY_REQUEST));
-            $searchresults .= "<h1>".$language->getLanguageValue1("message_searchresult_1", (trim($specialchars->rebuildSpecialChars($QUERY_REQUEST,true,true))))."</h1>"
-            ."<div class=\"searchresults\">";
-
-            // Kategorien-Verzeichnis einlesen
-            $categoriesarray = getDirContentAsArray($CONTENT_DIR_REL, false, false);
-
-            // Alle Kategorien durchsuchen
-            foreach ($categoriesarray as $currentcategory) {
-
-                // Wenn die Kategorie keine Contentseiten hat, direkt zur naechsten springen
-                $contentarray = getDirContentAsArray($CONTENT_DIR_REL.$currentcategory, true, $showhiddenpages);
-                if ($contentarray == "") {
-                    continue;
-                }
-
-                $matchingpages = array();
-
-                // Alle Inhaltsseiten durchsuchen
-                foreach ($contentarray as $currentcontent) {
-                    # wenns ein link ist
-                    if(substr($currentcontent,-(strlen($EXT_LINK))) == $EXT_LINK) {
-                        continue;
-                    }
-                    // Treffer in der aktuellen Seite?
-                    if (pageContainsWord($currentcategory, $currentcontent, $queryarray, true)) {
-                        // wenn noch nicht im Treffer-Array: hinzufuegen
-                        if (!in_array($currentcontent, $matchingpages))
-                            $matchingpages[] = $currentcontent;
-                    }
-                }
-
-                // die gesammelten Seiten ausgeben
-                if (count($matchingpages) > 0) {
-                    $highlightparameter = implode(",", $queryarray);
-                    $categoryname = catToName($currentcategory, false);
-                    $searchresults .= "<h2>$categoryname</h2><ul>";
-                    foreach ($matchingpages as $matchingpage) {
-                        $url = "index.php?cat=".substr($currentcategory,3)."&amp;page=".substr($matchingpage, 3, strlen($matchingpage) - 7)."&amp;";
-                        if($CMS_CONF->get("modrewrite") == "true") {
-                            $url = $URL_BASE.substr($currentcategory,3)."/".substr($matchingpage, 3, strlen($matchingpage) - 7).".html?";
-                        }
-                        $pagename = pageToName($matchingpage, false);
-                        $filepath = $CONTENT_DIR_REL.$currentcategory."/".$matchingpage;
-                        $searchresults .= "<li>".
-                            "<a href=\"".$url.
-                            "highlight=".$specialchars->replaceSpecialChars($highlightparameter,false)."\"".
-                            getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", $pagename, $categoryname)).">".
-                            highlight($pagename,$highlightparameter).
-                            "</a>".
-                            "</li>";
-                    }
-                    $searchresults .= "</ul>";
-                    $matchesoverall += count($matchingpages);
-                }
-            }
-            $searchresults .= "</div>";
-        }
-        // Keine Inhalte gefunden?
-        if ($matchesoverall == 0)
-            $searchresults .= $language->getLanguageValue0("message_nodatafound_0", trim($QUERY_REQUEST));
-        // Rueckgabe des Menues
-        return array($searchresults, $language->getLanguageValue0("message_search_0"), $language->getLanguageValue1("message_searchresult_1", (trim($QUERY_REQUEST))));
-    }
-
-
-// ------------------------------------------------------------------------------
-// Inhaltsseite durchsuchen
-// ------------------------------------------------------------------------------
-    function pageContainsWord($cat, $page, $queryarray, $firstrecursion) {
-        global $CONTENT_DIR_REL;
-        global $specialchars;
-        global $CHARSET;
-        
-        $filepath = $CONTENT_DIR_REL.$cat."/".$page;
-        $ismatch = false;
-        $content = "";
-        
-        // Dateiinhalt auslesen, wenn vorhanden...
-        if (filesize($filepath) > 0) {
-            $handle = fopen($filepath, "r");
-            $content = fread($handle, filesize($filepath));
-            fclose($handle);
-            // Zuerst: includierte Seiten herausfinden!
-            preg_match_all("/\[include\|([^\[\]]*)\]/Um", $content, $matches);
-            // Fuer jeden Treffer...
-            foreach ($matches[1] as $i => $match) {
-                // ...Auswertung und Verarbeitung der Informationen
-                $valuearray = explode(":", $matches[1][$i]);
-                // Inhaltsseite in aktueller Kategorie
-                if (count($valuearray) == 1) {
-                    $includedpage = nameToPage($specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($matches[1][$i]),false), $cat);
-                    // verhindern, daß in der includierten Seite includierte Seiten auch noch durchsucht werden
-                    if ($firstrecursion) {
-                        // includierte Seite durchsuchen!
-                        if (pageContainsWord($cat, $includedpage, $queryarray,false)) {
-                            return true;
-                        }
-                    }
-                }
-                // Inhaltsseite in anderer Kategorie
-                else {
-                    $includedpagescat = nameToCategory($specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($valuearray[0]),false));
-                    $includedpage = nameToPage($specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($valuearray[1]),false), $includedpagescat);
-                    // verhindern, daß in der includierten Seite includierte Seiten auch noch durchsucht werden
-                    if ($firstrecursion) {
-                        // includierte Seite durchsuchen!
-                        if (pageContainsWord($includedpagescat, $includedpage, $queryarray, false)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            // alle horizontalen Linien ("[----]") von der Suche ausschließen
-            $content = preg_replace("/\[----\]/U", " ", $content);
-            # alle geschuetzten [] entfernen
-            $content = str_replace(array("^[","^]")," ",$content);
-            # alle html tags entfernen
-            $content = strip_tags($content);
-            $notexit = 0;
-            # tmp damit wenn als erstes im string [ ist keine 0 zurueck kommt
-             while((strpos("tmp".$content,'[') > 0)) {
-                $start = strrpos($content,'[');
-                $lengt = strpos($content,']',$start) - $start + 1; # 1 weil ] brauceh wir auch
-                $syntax = substr($content,$start,$lengt);
-                if(strpos(substr($syntax,1,-1),'[') == 0 and strpos($syntax,'=') == 0) {
-                    $match = substr($syntax,strpos($syntax,'|') + 1,-1);
-                    $content = str_replace($syntax,$match,$content);
-                } 
-                if(strpos(substr($syntax,1,-1),'[') == 0 and strpos($syntax,'=') > 0) {
-                    $match = substr($syntax,strpos($syntax,'=') + 1,strpos($syntax,'|') - strpos($syntax,'=') - 1);
-                    $content = str_replace($syntax,$match,$content);
-                }
-                $notexit++;
-                if($notexit > 500) break;
-            }
-            // Auch Emoticons in Doppelpunkten (z.B. ":lach:") sollen nicht beruecksichtigt werden
-            $content = preg_replace("/:[^\s]+:/U", " ", $content);
-        }
-        # nach alle Suchbegrieffe suchen
-        foreach($queryarray as $query) {
-            if ($query == "")
-                continue;
-            // Wenn...
-            if (
-                // ...der aktuelle Suchbegriff im Seitennamen...
-                (substr_count(strtolower(pageToName($page, false)), strtolower($query)) > 0)
-                // ...oder im eigentlichen Seiteninhalt vorkommt (ueberprueft werden nur Seiten, die nicht leer sind), ...
-                || ((filesize($filepath) > 0) && (substr_count(strtolower($content), strtolower($specialchars->getHtmlEntityDecode($query))) > 0))
-                ) {
-                // ...dann setze das Treffer-Flag
-                $ismatch = true;
-                # und abbrechen da einer von den suchbegrieffen gefunden
-                break;
-            }
-        }
-        // Ergebnis zurueckgeben
-        return $ismatch;
-    }
-
 // ------------------------------------------------------------------------------
 // E-Mail-Adressen verschleiern
 // ------------------------------------------------------------------------------
@@ -1001,33 +828,6 @@ $CHARSET = 'UTF-8';
         }
         return $encodedString;
     }
-
-
-
-// ------------------------------------------------------------------------------
-// Phrasen in Inhalt hervorheben
-// ------------------------------------------------------------------------------
-    function highlight($content, $phrasestring) {
-        global $specialchars;
-        // Zu highlightende Begriffe kommen kommasepariert ("begriff1,begriff2")-> in Array wandeln
-#        $phrasestring = rawurldecode($phrasestring);
-        $phrasearray = explode(",", $phrasestring);
-        // jeden Begriff highlighten
-        foreach($phrasearray as $phrase) {
-            $phrase = $specialchars->rebuildSpecialChars($phrase, false, true);
-            // Regex-Zeichen im zu highlightenden Text escapen (.\+*?[^]$(){}=!<>|:)
-            $phrase = preg_quote($phrase);
-            // Slashes im zu highlightenden Text escapen
-            $phrase = preg_replace("/\//", "\\\\/", $phrase);
-#            $phrase = htmlentities($phrase);
-            //$content = preg_replace("/((<[^>]*|{CONTACT})|$phrase)/ie", '"\2"=="\1"? "\1":"<span class=\"highlight\">\1</span>"', $content);
-            $content = preg_replace("/((<[^>]*|{CONTACT})|$phrase)/ie", '"\2"=="\1"? "\1":"<span class=\"highlight\">\1</span>"', $content); 
-        }
-        //
-        return $content;
-    }
-
-
 
 // ------------------------------------------------------------------------------
 // Rueckgabe des Website-Titels
