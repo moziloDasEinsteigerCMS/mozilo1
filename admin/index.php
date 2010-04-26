@@ -12,15 +12,21 @@ session_start();
 
 $ADMIN_TITLE = "moziloAdmin";
 
-#$CHARSET = 'ISO-8859-1';
-$CHARSET = 'UTF-8';
-$ADMIN_DIR_NAME = "admin";
-$BASE_DIR = str_replace($ADMIN_DIR_NAME,"",getcwd());
-$BASE_DIR = substr($_SERVER["SCRIPT_FILENAME"],0,strrpos($_SERVER["SCRIPT_FILENAME"],'admin'));
 $CMS_DIR_NAME = "cms";
+$ADMIN_DIR_NAME = "admin";
+#$CHARSET = 'ISO-8859-1';
+#$CHARSET = 'UTF-8';
+#$BASE_DIR = str_replace($ADMIN_DIR_NAME,"",getcwd());
+$BASE_DIR = substr($_SERVER["SCRIPT_FILENAME"],0,strrpos($_SERVER["SCRIPT_FILENAME"],$ADMIN_DIR_NAME));
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
 $BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
 $URL_BASE = substr($_SERVER['PHP_SELF'],0,-(strlen($ADMIN_DIR_NAME."/index.php")));
+
+if(is_file($BASE_DIR_CMS."DefaultConf.php")) {
+    require_once($BASE_DIR_CMS."DefaultConf.php");
+} else {
+    die("Fatal Error ".$BASE_DIR_CMS."DefaultConf.php Datei existiert nicht");
+}
 
 
 $debug = "nein"; # ja oder nein
@@ -50,11 +56,7 @@ if($debug == "ja") {
     $debug_txt = ob_get_contents();
     ob_end_clean();
 }
-if(is_file($BASE_DIR_CMS."DefaultConf.php")) {
-    require_once($BASE_DIR_CMS."DefaultConf.php");
-} else {
-    die("Fatal Error ".$BASE_DIR_CMS."DefaultConf.php Datei existiert nicht");
-}
+
 require_once($BASE_DIR_ADMIN."filesystem.php");
 require_once($BASE_DIR_ADMIN."string.php");
 require_once($BASE_DIR_CMS."Smileys.php");
@@ -78,8 +80,8 @@ if(!isset($BASIC_LANGUAGE->properties['readonly'])) {
     die($BASIC_LANGUAGE->properties['error']);
 }
 # Errors nicht ganz so tragisch
-if(!is_dir($BASE_DIR."kategorien")) {
-    die(getLanguageValue("error_dir")." ".$BASE_DIR."kategorien/");
+if(!is_dir($BASE_DIR.$CONTENT_DIR_NAME)) {
+    die(getLanguageValue("error_dir")." ".$BASE_DIR.$CONTENT_DIR_NAME."/");
 }
 if(!is_dir($BASE_DIR."layouts")) {
     die(getLanguageValue("error_dir")." ".$BASE_DIR."layouts/");
@@ -91,7 +93,7 @@ if(!is_dir($BASE_DIR_CMS."formular")) {
     die(getLanguageValue("error_dir")." ".$BASE_DIR_CMS."formular/");
 }
 if(!is_dir($BASE_DIR."galerien")) {
-    die(getLanguageValue("error_dir")." ".$BASE_DIR."galerien/");
+    die(getLanguageValue("error_dir")." ".$BASE_DIR.$GALLERIES_DIR_NAME."/");
 }
 
 $CMS_CONF    = new Properties($BASE_DIR_CMS."conf/main.conf",true);
@@ -163,12 +165,12 @@ if ($DOWNLOAD_COUNTS->get("_downloadcounterstarttime") == "" and !isset($DOWNLOA
     $DOWNLOAD_COUNTS->set("_downloadcounterstarttime", time());
 
 // Pfade
-$CONTENT_DIR_NAME        = "kategorien";
+#$CONTENT_DIR_NAME        = "kategorien";
 $CONTENT_DIR_REL        = $BASE_DIR.$CONTENT_DIR_NAME."/";
-$GALLERIES_DIR_NAME    = "galerien";
+#$GALLERIES_DIR_NAME    = "galerien";
 $GALLERIES_DIR_REL    = $BASE_DIR.$GALLERIES_DIR_NAME."/";
-$PREVIEW_DIR_NAME        = "vorschau";
-$PLUGIN_DIR_REL = $BASE_DIR."plugins/";
+#$PREVIEW_DIR_NAME        = "vorschau";
+$PLUGIN_DIR_REL = $BASE_DIR.$PLUGIN_DIR_NAME."/";
 
 $ALLOWED_SPECIALCHARS_REGEX = $specialchars->getSpecialCharsRegex();
 
@@ -540,6 +542,7 @@ function category($post) {
     global $CONTENT_DIR_REL;
     global $EXT_LINK;
     global $ADMIN_CONF;
+    global $CONTENT_FILES_DIR_NAME;
     global $icon_size;
     $max_cat_page = 100;
     $max_strlen = 255;
@@ -658,7 +661,7 @@ function category($post) {
             }
             // Anzahl Dateien auslesen
             $filecount = 0;
-            if($fileshandle = opendir($CONTENT_DIR_REL.$file."/dateien")) {
+            if($fileshandle = opendir($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME)) {
                  while (($filesdir = readdir($fileshandle))) {
                     if(isValidDirOrFile($filesdir))
                         $filecount++;
@@ -2417,6 +2420,8 @@ function files($post) {
     global $ADMIN_CONF;
     global $icon_size;
     global $URL_BASE;
+    global $CONTENT_DIR_NAME;
+    global $CONTENT_FILES_DIR_NAME;
 
     $max_cat_page = 100;
 
@@ -2450,9 +2455,9 @@ function files($post) {
             continue;
         }
         $file = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
-        if(!file_exists($CONTENT_DIR_REL.$file."/dateien")) {
-            $post['error_messages']['files_error_dateien'][] = $CONTENT_DIR_REL.$file."/dateien";
-            @mkdir ($CONTENT_DIR_REL.$file."/dateien");
+        if(!file_exists($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME)) {
+            $post['error_messages']['files_error_dateien'][] = $CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME;
+            @mkdir ($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME);
             $line_error = __LINE__ - 1;
             $last_error['line'] = NULL;
             if(function_exists("error_get_last")) {
@@ -2461,9 +2466,9 @@ function files($post) {
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
             } elseif(!is_dir($CONTENT_DIR_REL.$file."/dateien")) {
-                $post['error_messages']['files_error_mkdir_dateien'][] = $CONTENT_DIR_REL.$file."/dateien";
+                $post['error_messages']['files_error_mkdir_dateien'][] = $CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME;
             } else {
-                useChmod($CONTENT_DIR_REL.$file."/dateien");
+                useChmod($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME);
             }
         }
     }
@@ -2515,8 +2520,8 @@ function files($post) {
         $file = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
         // Anzahl Dateien auslesen
         $filecount = 0;
-        if(file_exists($CONTENT_DIR_REL.$file."/dateien")) {
-            if($fileshandle = opendir($CONTENT_DIR_REL.$file."/dateien")) {
+        if(file_exists($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME)) {
+            if($fileshandle = opendir($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME)) {
                  while (($filesdir = readdir($fileshandle))) {
                     if(isValidDirOrFile($filesdir))
                         $filecount++;
@@ -2546,7 +2551,7 @@ function files($post) {
         $pagecontent .= '<td '.$post['categories']['cat']['error_html']['display'][$pos].'id="toggle_'.$pos.'" align="right" class="td_togglen">';
 
         $file = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
-        if (isValidDirOrFile($file) && ($subhandle = @opendir($CONTENT_DIR_REL.$file."/dateien"))) {
+        if (isValidDirOrFile($file) && ($subhandle = @opendir($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME))) {
             $hasdata = false;
             $pagecontent .= '<table summary="" width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
             $pagecontent .= '<tr><td class="td_left_title_padding_bottom td_toggle_new" colspan="1">'.$text_files_text_upload.'</td>'
@@ -2575,7 +2580,7 @@ function files($post) {
                 if ($downloads == "")
                     $downloads = "0";
                 // Downloads pro Tag berechnen
-                $uploadtime = filemtime($CONTENT_DIR_REL.$file."/dateien/".$subfile);
+                $uploadtime = filemtime($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME."/".$subfile);
                 $counterstart = $DOWNLOAD_COUNTS->get("_downloadcounterstarttime");
                 // Berechnungsgrundlage fuer "Downloads pro Tag":
                 // Entweder Upload-Zeitpunkt oder Beginn der Statistik - genommen wird der spätere Zeitpunkt
@@ -2593,7 +2598,7 @@ function files($post) {
  #               else
                     $downloadsperdaytext = "";
                 // Dateigröße
-                $filesize = filesize($CONTENT_DIR_REL.$file."/dateien/".$subfile);
+                $filesize = filesize($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME."/".$subfile);
 
         $titel_dateien = NULL;
         if(!isset($display_titel_dateien)) {# Position:          
@@ -2601,7 +2606,7 @@ function files($post) {
             $display_titel_dateien = true;
         }
 
-                $pagecontent .= $titel_dateien.'<tr><td class="td_left_title_padding_bottom"><a class="file_link" href="'.$URL_BASE.'kategorien/'.$specialchars->replaceSpecialChars($file.'/dateien/'.$subfile,true).'" target="_blank"'.$tooltip_files_help_show.'>'.$specialchars->rebuildSpecialChars($subfile,true,true).'</a></td>'
+                $pagecontent .= $titel_dateien.'<tr><td class="td_left_title_padding_bottom"><a class="file_link" href="'.$URL_BASE.$CONTENT_DIR_NAME.'/'.$specialchars->replaceSpecialChars($file.'/dateien/'.$subfile,true).'" target="_blank"'.$tooltip_files_help_show.'>'.$specialchars->rebuildSpecialChars($subfile,true,true).'</a></td>'
                 .'<td class="td_left_title_padding_bottom" nowrap><span class="text_info">'.convertFileSizeUnit($filesize).'</span></td>'
                 .'<td class="td_left_title_padding_bottom" nowrap><span class="text_info">'.@strftime(getLanguageValue("_dateformat"), $uploadtime).'</span></td>'
                 .'<td class="td_center_title_padding_bottom" nowrap><span class="text_info">'.$downloads." ".$downloadsperdaytext.'</span></td>';
@@ -2634,6 +2639,7 @@ function newFile($post) {
     global $CONTENT_DIR_REL;
     global $error_color;
     global $ADMIN_CONF;
+    global $CONTENT_FILES_DIR_NAME;
 
     $forceoverwrite = "";
     if (isset($_POST['overwrite'])) {
@@ -2645,7 +2651,7 @@ function newFile($post) {
         if($_FILES[$array_name]['error'] == 0) {
             $cat_pos= explode("_",$array_name);
             $cat = sprintf("%02d",$cat_pos[1])."_".specialNrDir("$CONTENT_DIR_REL", sprintf("%02d",$cat_pos[1]));
-            $error = uploadFile($_FILES[$array_name], $CONTENT_DIR_REL.$cat."/dateien/", $forceoverwrite,$ADMIN_CONF->get("maximagewidth"),$ADMIN_CONF->get("maximageheight"));
+            $error = uploadFile($_FILES[$array_name], $CONTENT_DIR_REL.$cat."/".$CONTENT_FILES_DIR_NAME."/", $forceoverwrite,$ADMIN_CONF->get("maximagewidth"),$ADMIN_CONF->get("maximageheight"));
             if(!empty($error)) {
                 $post['error_messages'][key($error)][] = $cat."/".$error[key($error)];
                 $key = array_keys($post['categories']['cat']['position'], substr($cat,0,2));
@@ -2663,6 +2669,7 @@ function deleteFile($post) {
     global $specialchars;
     global $CONTENT_DIR_REL;
     global $DOWNLOAD_COUNTS;
+    global $CONTENT_FILES_DIR_NAME;
     global $icon_size;
 
     $cat = key($post['action_data']['deletefile']);
@@ -2671,8 +2678,8 @@ function deleteFile($post) {
     if(isset($_POST['confirm']) and ($_POST['confirm'] == "false")) {
         return $post;
     } elseif(isset($_POST['confirm']) and ($_POST['confirm'] == "true")) {
-        if(file_exists($CONTENT_DIR_REL.$cat."/dateien/".$del_file)) {
-            @unlink($CONTENT_DIR_REL.$cat."/dateien/".$del_file);
+        if(file_exists($CONTENT_DIR_REL.$cat."/".$CONTENT_FILES_DIR_NAME."/".$del_file)) {
+            @unlink($CONTENT_DIR_REL.$cat."/".$CONTENT_FILES_DIR_NAME."/".$del_file);
             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
             $last_error['line'] = NULL;
             if(function_exists("error_get_last")) {
@@ -2680,7 +2687,7 @@ function deleteFile($post) {
             }
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
-            } elseif(is_file($CONTENT_DIR_REL.$cat."/dateien/".$del_file)) {
+            } elseif(is_file($CONTENT_DIR_REL.$cat."/".$CONTENT_FILES_DIR_NAME."/".$del_file)) {
                 $post['error_messages']['files_error_delete'][] = $cat." <b>></b> ".$del_file;
             } else {
                 $post['messages']['files_message_deleted'][] = $cat." <b>></b> ".$del_file;
@@ -4228,6 +4235,7 @@ function returnFormatToolbarIcon($tag) {
 function returnOverviewSelectbox($type, $currentcat) {
     global $specialchars;
     global $CONTENT_DIR_REL;
+    global $CONTENT_FILES_DIR_NAME;
     global $GALLERIES_DIR_REL;
     global $EXT_PAGE;
     global $EXT_HIDDEN;
@@ -4272,7 +4280,7 @@ function returnOverviewSelectbox($type, $currentcat) {
                 if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
                 $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
                 $elements[] = array($cleancatname, ":".$cleancatname);
-                $currentcat_filearray = getFiles($CONTENT_DIR_REL.$catdir."/dateien","");
+                $currentcat_filearray = getFiles($CONTENT_DIR_REL.$catdir."/".$CONTENT_FILES_DIR_NAME,"");
                 natcasesort($currentcat_filearray);
                 foreach ($currentcat_filearray as $current_file) {
                     if ($catdir == $currentcat)

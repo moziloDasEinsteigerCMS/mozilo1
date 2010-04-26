@@ -70,11 +70,12 @@ function getDirs($dir,$complet = false,$exclude_link = false)
  --------------------------------------------------------------------------------*/
 function getFiles($dir, $excludeextension)
 {
+    global $CONTENT_FILES_DIR_NAME;
     //$dir = stripslashes($dir);
     $files = array();
     $handle = opendir($dir);
     while($file = readdir($handle)) {
-        if(isValidDirOrFile($file) && ($file != "dateien")) {
+        if(isValidDirOrFile($file) && ($file != $CONTENT_FILES_DIR_NAME)) {
             // auszuschließende Extensions nicht berücksichtigen
             if ($excludeextension != "") {
                 if (substr($file, strlen($file)-4, strlen($file)) != "$excludeextension")
@@ -117,10 +118,11 @@ function specialNrDir($dir, $nr)
 function createCategory($new_cat) {
     global $specialchars;
     global $ADMIN_CONF;
-
+    global $CONTENT_DIR_NAME;
+    global $CONTENT_FILES_DIR_NAME;
     # dummy fehlermeldung erzeugen
     @chmod();
-    @mkdir ("../kategorien/".$new_cat);
+    @mkdir ("../".$CONTENT_DIR_NAME."/".$new_cat);
     $line_error = __LINE__ - 1;
     $last_error['line'] = NULL;
     if(function_exists("error_get_last")) {
@@ -128,12 +130,12 @@ function createCategory($new_cat) {
     }
     if($last_error['line'] == $line_error) {
         $error['php_error'][] = $last_error['message'];
-    } elseif(!is_dir("../kategorien/".$new_cat)) {
+    } elseif(!is_dir("../".$CONTENT_DIR_NAME."/".$new_cat)) {
         $error['category_error_new'][] = $new_cat;
     }
     # ist kein Link
     if(!preg_match('/-_blank-|-_self-/', $new_cat)) {
-        @mkdir ("../kategorien/".$new_cat."/dateien");
+        @mkdir ("../".$CONTENT_DIR_NAME."/".$new_cat."/".$CONTENT_FILES_DIR_NAME);
         $line_error = __LINE__ - 1;
         $last_error['line'] = NULL;
         if(function_exists("error_get_last")) {
@@ -141,8 +143,8 @@ function createCategory($new_cat) {
         }
         if($last_error['line'] == $line_error) {
             $error['php_error'][] = $last_error['message'];
-        } elseif(!is_dir("../kategorien/".$new_cat."/dateien")) {
-            $error['category_error_new'][] = $new_cat."/dateien";
+        } elseif(!is_dir("../".$CONTENT_DIR_NAME."/".$new_cat."/".$CONTENT_FILES_DIR_NAME)) {
+            $error['category_error_new'][] = $new_cat."/".$CONTENT_FILES_DIR_NAME;
         }
     }
     if(isset($error['php_error']) or isset($error['category_error_new'])) {
@@ -150,10 +152,10 @@ function createCategory($new_cat) {
         return $error;
     }
     # bis hier kein fehler dann solte das chmod auch fehlerfrei gehen
-    useChmod("../kategorien/".$new_cat);
+    useChmod("../".$CONTENT_DIR_NAME."/".$new_cat);
     # ist kein Link
     if(!preg_match('/-_blank-|-_self-/', $new_cat)) {
-        useChmod("../kategorien/".$new_cat."/dateien");
+        useChmod("../".$CONTENT_DIR_NAME."/".$new_cat."/".$CONTENT_FILES_DIR_NAME);
     }
 }
 
@@ -472,11 +474,12 @@ function changeChmod($file) {
 # änder die dateirechte Recursiv wenn kein Parameter über geben wird das array $ordner benutzt
 function useChmod($dir = false, $error = NULL) {
     global $error;
+    global $CONTENT_DIR_NAME;
 
     if($dir === false) {
         $ordner = array("conf",
                         "../conf",
-                        "../kategorien","../galerien");
+                        "../".$CONTENT_DIR_NAME,"../galerien");
         foreach($ordner as $dirs) {
             $error_tmp = useChmod($dirs,$error);
             if(is_array($error_tmp)) {

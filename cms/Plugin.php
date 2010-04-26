@@ -36,6 +36,7 @@ class Plugin {
     */
     function Plugin() {
         global $BASE_DIR;
+        global $PLUGIN_DIR_NAME;
 
         $plugin_str = 'Plugin';
         $plugin_class = get_class($this);
@@ -44,7 +45,7 @@ class Plugin {
             # php4
             $plugin_str = strtolower($plugin_str);
             $declared_classes = get_declared_classes();
-            if ($handle = opendir($BASE_DIR."plugins/")) {
+            if ($handle = opendir($BASE_DIR.$PLUGIN_DIR_NAME."/")) {
                 while (false !== ($plugin_dir = readdir($handle))) {
                     $key = array_search(strtolower($plugin_dir), $declared_classes);
                     if(isset($declared_classes[$key]) and $key > 0 and $plugin_class == strtolower($plugin_dir)) {
@@ -73,8 +74,8 @@ class Plugin {
 #        if (file_exists("plugins/".get_class($this)."/plugin.conf")) {
 #            $this->settings = new Properties("plugins/".get_class($this)."/plugin.conf");
 #        }
-        if (file_exists($BASE_DIR."plugins/".$plugin_class_dir."/plugin.conf")) {
-            $this->settings = new Properties($BASE_DIR."plugins/".$plugin_class_dir."/plugin.conf");
+        if (file_exists($BASE_DIR.$PLUGIN_DIR_NAME."/".$plugin_class_dir."/plugin.conf")) {
+            $this->settings = new Properties($BASE_DIR.$PLUGIN_DIR_NAME."/".$plugin_class_dir."/plugin.conf");
         }
         // Wenn plugin.conf nicht vorhanden ist, wird die Fehlervariable gefüllt
         else {

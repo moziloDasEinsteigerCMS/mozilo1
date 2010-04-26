@@ -1,5 +1,13 @@
 <?php
 
+$CHARSET = 'UTF-8';
+
+$CONTENT_DIR_NAME        = "kategorien";
+$CONTENT_FILES_DIR_NAME      = "dateien";
+$PLUGIN_DIR_NAME         = "plugins";
+$GALLERIES_DIR_NAME    = "galerien";
+$PREVIEW_DIR_NAME        = "vorschau";
+
 # Alle Platzhalter
 function makePlatzhalter($all = false) {
     # Alle Platzhalter für die Selctbox im Editor als array

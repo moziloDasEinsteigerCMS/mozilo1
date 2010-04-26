@@ -27,6 +27,8 @@ class Galerie extends Plugin {
         global $PAGE_REQUEST;
         global $LAYOUT_DIR;
         global $BASE_DIR;
+        global $GALLERIES_DIR_NAME;
+        global $PREVIEW_DIR_NAME;
 
         // ------------------------------------------------------------------------------
         // Galeriemenü erzeugen
@@ -258,16 +260,16 @@ class Galerie extends Plugin {
         $gal_request = $specialchars->replacespecialchars($specialchars->getHtmlEntityDecode($values[0]),false);
         if (getRequestParam("gal", true))
             $gal_request = $specialchars->replacespecialchars(getRequestParam("gal", true),false);
-        $dir_gallery        = "galerien/".$gal_request."/";
-        $dir_thumbs         = $dir_gallery."vorschau/";
-        $dir_thumbs_src     = $dir_gallery."vorschau/";
-        $dir_gallery_src    = "galerien/".$gal_request."/";
+        $dir_gallery        = $GALLERIES_DIR_NAME."/".$gal_request."/";
+        $dir_thumbs         = $dir_gallery.$PREVIEW_DIR_NAME."/";
+        $dir_thumbs_src     = $dir_gallery.$PREVIEW_DIR_NAME."/";
+        $dir_gallery_src    = $GALLERIES_DIR_NAME."/".$gal_request."/";
 
         if($CMS_CONF->get("modrewrite") == "true") {
-            $dir_gallery_src    = $URL_BASE."galerien/".$gal_request."/";
-            $dir_thumbs_src     = $dir_gallery_src."vorschau/";
-            $dir_gallery        = $BASE_DIR."galerien/".$gal_request."/";
-            $dir_thumbs         = $dir_gallery."vorschau/";
+            $dir_gallery_src    = $URL_BASE.$GALLERIES_DIR_NAME."/".$gal_request."/";
+            $dir_thumbs_src     = $dir_gallery_src.$PREVIEW_DIR_NAME."/";
+            $dir_gallery        = $BASE_DIR.$GALLERIES_DIR_NAME."/".$gal_request."/";
+            $dir_thumbs         = $dir_gallery.$PREVIEW_DIR_NAME."/";
         }
 
         # keine Galerie angegeben oder Galerie gibts nicht

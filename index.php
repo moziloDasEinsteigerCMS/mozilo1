@@ -15,16 +15,18 @@ echo "<pre style=\"position:fixed;background-color:#000;color:#0f0;padding:5px;f
 print_r($_REQUEST);
 echo "</pre>";
 */
-$BASE_DIR = getcwd()."/";
+#$BASE_DIR = getcwd()."/";
 $BASE_DIR = substr($_SERVER["SCRIPT_FILENAME"],0,strrpos($_SERVER["SCRIPT_FILENAME"],'index.php'));
 $CMS_DIR_NAME = "cms";
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
 
-
-#$CHARSET = 'ISO-8859-1';
-$CHARSET = 'UTF-8';
-
+if(is_file($BASE_DIR_CMS."DefaultConf.php")) {
     require_once($BASE_DIR_CMS."DefaultConf.php");
+} else {
+    die("Fatal Error ".$BASE_DIR_CMS."DefaultConf.php Datei existiert nicht");
+}
+
+
     require_once($BASE_DIR_CMS."SpecialChars.php");
     require_once($BASE_DIR_CMS."Properties.php");
     
@@ -89,12 +91,11 @@ $CHARSET = 'UTF-8';
     $QUERY_REQUEST = stripcslashes(getRequestParam('query', false));
     $HIGHLIGHT_REQUEST = getRequestParam('highlight', false);
 
-#    $CONTENT_DIR_REL        = "kategorien";
-    $CONTENT_DIR_NAME        = "kategorien";
+#    $CONTENT_DIR_NAME        = "kategorien";
     $CONTENT_DIR_REL        = $BASE_DIR.$CONTENT_DIR_NAME."/";
-    $CONTENT_FILES_DIR_NAME      = "dateien";
-    $GALLERIES_DIR_NAME          = "galerien";
-    $PLUGIN_DIR_NAME         = "plugins";
+#    $CONTENT_FILES_DIR_NAME      = "dateien";
+#    $GALLERIES_DIR_NAME          = "galerien";
+#    $PLUGIN_DIR_NAME         = "plugins";
     $PLUGIN_DIR_REL         = $BASE_DIR.$PLUGIN_DIR_NAME."/";
     $HTML                   = "";
 
