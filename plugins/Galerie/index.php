@@ -426,28 +426,38 @@ class Galerie extends Plugin {
 
         $info['deDE'] = array(
             // Plugin-Name
-            "<b>Standart Galerie</b> 0.1",
+            "<b>moziloCMS-Standardgalerie</b> 0.1",
             // CMS-Version
             "1.12",
             // Kurzbeschreibung
-            'Erstellt die Standart Galerieansicht.<br />
+            'Erstellt die Standard-Galerieansicht.<br />
+            <br />
+            In den Galerie-Einstellungen im moziloAdmin kann bestimmt werden, ob die Galerie in einem neuen Fenster bzw. Tab ("Target blank") angezeigt werden soll oder im aktuellen ("Target self").<br />
+            Außerdem läßt sich in den erweiteren Galerie-Optionen mit dem Punkt "Vorschaubilder erzeugen und benutzen?" bestimmen, ob die Bilder im Einzelbildmodus (EM) oder im Übersichtsmodus (ÜM) dargestellt werden sollen.<br /> 
             <br />
             <span style="font-weight:bold;">Nutzung:</span><br />
-            {Galerie|moziloCMS} Erstellt die Galerie "moziloCMS".<br />
-            Im admin Galerie kann bestimt werden ob Target blank oder self.<br />
-            Bei blank wird die gallerytemplate.html Benutzt und es kann Optional {Galerie|moziloCMS,Optinaler Link Text} mit übergeben werden.<br />
-            Bei self wird sie in die Inhaltseite eingebettet<br />
+            {Galerie|moziloCMS} fügt die Galerie "moziloCMS" ein (bei "Target self") oder einen Link darauf (bei "Target blank").<br />
+            {Galerie|moziloCMS,Beliebiger Anzeigetext} fügt einen Link auf die Galerie "moziloCMS" mit dem angegebenen Anzeigetext ein (nur für "Target blank").<br />
             <br />
             <span style="font-weight:bold;">Konfiguration:</span><br />
-            Das Ausehen kann durch Anordnen der Platzhalter im Textfeld geändert werden: {CURRENTGALLERY} {GALLERYMENU}, {NUMBERMENU}, {CURRENTPIC}, {CURRENTDESCRIPTION}, {XOUTOFY}, {CURRENT_INDEX}, {PREVIOUS_INDEX}, {NEXT_INDEX}<br />
-            In der gallerytemplate.html können wie gewont weiterhin die Platzhalter eingetragen werden.<br />
-            Alerdings müssen sie mit dem Galerieplatzhalter umschlossen werden inclusieve der HTML Tags.',
+            Die Anordnung der einzelnen Funktionselemente mithilfe der Platzhalter im Textfeld geändert werden. Folgende Platzhalter stehen zur Verfügung:<br />
+            - {CURRENTGALLERY}: Name der Galerie<br />
+            - {GALLERYMENU}: Menü "erstes/voriges/nächstes/letztes Bild" (nur EM)<br />
+            - {NUMBERMENU}: Nummernmenü (im EM) / Übersicht aller Bilder inklusive Untertitel (im ÜM)<br />
+            - {CURRENTPIC}: aktuelles Bild (nur EM)<br />
+            - {CURRENTDESCRIPTION}: Untertitel des aktuellen Bildes (nur EM)<br />
+            - {XOUTOFY}: "Bild x von y" (nur EM)<br />
+            - {CURRENT_INDEX}: Aktueller Bildindex (nur EM)<br />
+            - {PREVIOUS_INDEX}: Voriger Bildindex (nur EM)<br />
+            - {NEXT_INDEX}: Nächster Bildindex (nur EM)<br />
+            <br />
+            Für die Verwendung in neuem Fenster/Tab können die beschriebenen Platzhalter in der gallerytemplate.html angeordnet werden.',
             // Name des Autors
            "mozilo",
             // Download-URL
             "http://cms.mozilo.de",
             # Platzhalter => Kurzbeschreibung
-            array('{Galerie|}' => 'Standart Galerie')
+            array('{Galerie|}' => 'moziloCMS-Standardgalerie')
             );
 
         if(isset($info[$language])) {
