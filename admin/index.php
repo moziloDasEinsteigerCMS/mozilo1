@@ -3698,6 +3698,11 @@ function plugins($post) {
                                     } else {
                                         $conf_inhalt = str_replace(array("\r\n","\r","\n"),"<br />",trim($_POST[$currentelement][$name]));
                                     }
+                                    # auf manchen Systemen mus ein stripslashes() gemacht werden
+                                    if(strpos("tmp".$conf_inhalt,'\\') > 0
+                                        and  addslashes(stripslashes($conf_inhalt)) == $conf_inhalt) {
+                                        $conf_inhalt = stripslashes($conf_inhalt);
+                                    }
                                     if(isset($config[$name]['regex_error'])) {
                                         $regex_error = $config[$name]['regex_error'];
                                     } else {
