@@ -149,7 +149,7 @@ function highlightSearch($content, $phrasestring) {
         $phrase = preg_quote($phrase);
         // Slashes im zu highlightenden Text escapen
         $phrase = preg_replace("/\//", "\\\\/", $phrase);
-        $content = preg_replace("/((<[^>]*|{CONTACT})|$phrase)/ie", '"\2"=="\1"? "\1":"<span class=\"highlight\">\1</span>"', $content); 
+        $content = preg_replace("/((<[^>]*)|$phrase)/ie", '"\2"=="\1"? "\1":"<span class=\"highlight\">\1</span>"', $content); 
     }
     return $content;
 }
