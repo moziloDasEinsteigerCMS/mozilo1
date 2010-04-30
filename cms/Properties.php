@@ -136,10 +136,10 @@ class Properties {
             } else {
                 $this->properties['error'] = $error_read.$this->file;
             }
-            if(!isset($this->properties['error']) and !($handle = @fopen($this->file, "a+"))) {
-                @fclose($handle);
+            if(!isset($this->properties['error']) and !($handle_w = @fopen($this->file, "a+"))) {
                 $this->properties['error'] = $error_write.$this->file;
             }
+            if($handle_w) @fclose($handle_w);
         }
 
         if(isset($this->properties['readonly'])) {
