@@ -393,6 +393,9 @@ $html .= "</td></tr>";
 if($debug == "ja") {
     ob_start();
     echo "<div style=\"overflow:auto;width:920px;height:400px;margin:0;margin-top:20px;padding:0;\"><pre style=\"background-color:#000;color:#0f0;padding:5px;margin:0;font-family:monospace;border:2px solid #777;\">";
+    if(function_exists("error_get_last")) {
+        print_r(@error_get_last());
+    }
 if(isset($debug_test))  print_r($debug_test);
     echo $debug_txt;
     echo "post ------------------------\n";
