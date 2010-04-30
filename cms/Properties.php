@@ -130,14 +130,14 @@ class Properties {
         if (!file_exists($this->file)) {
             return $this->properties['error'] = $error_nofile.$this->file;
         } else {
-            if(@fopen($this->file, "r")) {
-                @fclose($this->file);
+            if($handle = @fopen($this->file, "r")) {
+                @fclose($handle);
                 $this->properties['readonly'] = $error_readonly.$this->file;
             } else {
                 $this->properties['error'] = $error_read.$this->file;
             }
-            if(!isset($this->properties['error']) and !(@fopen($this->file, "a+"))) {
-                @fclose($this->file);
+            if(!isset($this->properties['error']) and !($handle = @fopen($this->file, "a+"))) {
+                @fclose($handle);
                 $this->properties['error'] = $error_write.$this->file;
             }
         }
