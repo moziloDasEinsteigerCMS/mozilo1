@@ -475,10 +475,11 @@ function changeChmod($file) {
 function useChmod($dir = false, $error = NULL) {
     global $error;
     global $CONTENT_DIR_NAME;
+    global $CMS_DIR_NAME;
 
     if($dir === false) {
         $ordner = array("conf",
-                        "../conf",
+                        "../".$CMS_DIR_NAME."/conf",
                         "../".$CONTENT_DIR_NAME,"../galerien");
         foreach($ordner as $dirs) {
             $error_tmp = useChmod($dirs,$error);
