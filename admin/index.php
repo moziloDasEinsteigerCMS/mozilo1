@@ -29,6 +29,7 @@ if(is_file($BASE_DIR_CMS."DefaultConf.php")) {
 $_GET = cleanREQUEST($_GET);
 $_REQUEST = cleanREQUEST($_REQUEST);
 $_POST = cleanREQUEST($_POST);
+if(isset($_FILE)) $_FILE = cleanREQUEST($_FILE);
 
 
 $debug = "nein"; # ja oder nein
