@@ -15,7 +15,7 @@ echo "<pre style=\"position:fixed;background-color:#000;color:#0f0;padding:5px;f
 print_r($_REQUEST);
 echo "</pre>";
 */
-#$BASE_DIR = getcwd()."/";
+
 $BASE_DIR = substr($_SERVER["SCRIPT_FILENAME"],0,strrpos($_SERVER["SCRIPT_FILENAME"],'index.php'));
 $CMS_DIR_NAME = "cms";
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
@@ -26,6 +26,9 @@ if(is_file($BASE_DIR_CMS."DefaultConf.php")) {
     die("Fatal Error ".$BASE_DIR_CMS."DefaultConf.php Datei existiert nicht");
 }
 
+$_GET = cleanREQUEST($_GET);
+$_REQUEST = cleanREQUEST($_REQUEST);
+$_POST = cleanREQUEST($_POST);
 
     require_once($BASE_DIR_CMS."SpecialChars.php");
     require_once($BASE_DIR_CMS."Properties.php");
@@ -1157,7 +1160,7 @@ if(is_file($BASE_DIR_CMS."DefaultConf.php")) {
         if (function_exists("mb_convert_encoding")) {
             $input = @mb_convert_encoding($input, $CHARSET);
         }
-        return stripslashes($input);    
+        return $input;
     }
 
 // ------------------------------------------------------------------------------
@@ -1166,11 +1169,6 @@ if(is_file($BASE_DIR_CMS."DefaultConf.php")) {
     function getRequestParam($param, $clean) {
         global $URL_BASE;
         global $CMS_CONF;
-
-       // Nullbytes abfangen!
-        if (strpos($_SERVER['REQUEST_URI'], "\x00") > 0) {
-            die();
-        }
 
         if(($CMS_CONF->get("modrewrite") == "true") and ($param == "cat" or $param == "page")) {
             $request = NULL;

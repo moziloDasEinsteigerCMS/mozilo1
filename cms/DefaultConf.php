@@ -8,6 +8,31 @@ $PLUGIN_DIR_NAME         = "plugins";
 $GALLERIES_DIR_NAME    = "galerien";
 $PREVIEW_DIR_NAME        = "vorschau";
 
+function cleanREQUEST($post_return) {
+    foreach($post_return as $key => $value) {
+        if(is_array($post_return[$key])) {
+            $post_return[$key] = cleanREQUEST($post_return[$key]);
+        } else {
+            // Nullbytes abfangen!
+            if (strpos("tmp".$value, "\x00") > 0 or strpos("tmp".$key, "\x00") > 0) {
+                die();
+            }
+            # auf manchen Systemen mus ein stripslashes() gemacht werden
+            if(strpos("tmp".$value,'\\') > 0
+                and  addslashes(stripslashes($value)) == $value) {
+                $value = stripslashes($value);
+            }
+            # auf manchen Systemen mus ein stripslashes() gemacht werden
+            if(strpos("tmp".$key,'\\') > 0
+                and  addslashes(stripslashes($key)) == $key) {
+                $value = stripslashes($key);
+            }
+            $post_return[$key] = $value;
+        }
+    }
+    return $post_return;
+}
+
 # Alle Platzhalter
 function makePlatzhalter($all = false) {
     # Alle Platzhalter für die Selctbox im Editor als array

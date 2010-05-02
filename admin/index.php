@@ -10,13 +10,11 @@
 
 session_start();
 
+
 $ADMIN_TITLE = "moziloAdmin";
 
 $CMS_DIR_NAME = "cms";
 $ADMIN_DIR_NAME = "admin";
-#$CHARSET = 'ISO-8859-1';
-#$CHARSET = 'UTF-8';
-#$BASE_DIR = str_replace($ADMIN_DIR_NAME,"",getcwd());
 $BASE_DIR = substr($_SERVER["SCRIPT_FILENAME"],0,strrpos($_SERVER["SCRIPT_FILENAME"],$ADMIN_DIR_NAME));
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
 $BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
@@ -27,6 +25,10 @@ if(is_file($BASE_DIR_CMS."DefaultConf.php")) {
 } else {
     die("Fatal Error ".$BASE_DIR_CMS."DefaultConf.php Datei existiert nicht");
 }
+
+$_GET = cleanREQUEST($_GET);
+$_REQUEST = cleanREQUEST($_REQUEST);
+$_POST = cleanREQUEST($_POST);
 
 
 $debug = "nein"; # ja oder nein
@@ -3698,11 +3700,6 @@ function plugins($post) {
                                     } else {
                                         $conf_inhalt = str_replace(array("\r\n","\r","\n"),"<br />",trim($_POST[$currentelement][$name]));
                                     }
-                                    # auf manchen Systemen mus ein stripslashes() gemacht werden
-                                    if(strpos("tmp".$conf_inhalt,'\\') > 0
-                                        and  addslashes(stripslashes($conf_inhalt)) == $conf_inhalt) {
-                                        $conf_inhalt = stripslashes($conf_inhalt);
-                                    }
                                     if(isset($config[$name]['regex_error'])) {
                                         $regex_error = $config[$name]['regex_error'];
                                     } else {
@@ -4479,7 +4476,7 @@ function checkBoxChecked($checkboxrequest) {
         if (function_exists("mb_convert_encoding")) {
             $input = @mb_convert_encoding($input,$CHARSET,@mb_detect_encoding($input,"UTF-8,ISO-8859-1,ISO-8859-15",true));
         }
-        return stripslashes($input);
+        return $input;
     }
 
 // ------------------------------------------------------------------------------
@@ -4487,10 +4484,6 @@ function checkBoxChecked($checkboxrequest) {
 // ------------------------------------------------------------------------------
     function getRequestParam($param, $clean) {
         if (isset($_POST[$param])) {
-          // Nullbytes abfangen! "tmp" weil bei nur einem zeichen strpos fehlschlägt
-            if (strpos("tmp".$_POST[$param], "\x00") > 0) {
-                die();
-            }
             if ($clean) {
                 return cleanInput($_POST[$param]);
             } else {

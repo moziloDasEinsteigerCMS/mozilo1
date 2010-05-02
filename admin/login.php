@@ -8,8 +8,8 @@
 *
 */
 
-#$CHARSET = 'ISO-8859-1';
-$CHARSET = 'UTF-8';
+// Session starten!
+session_start();
 
 if(!isset($BASE_DIR)) {
     $CMS_DIR_NAME = "cms";
@@ -19,12 +19,21 @@ if(!isset($BASE_DIR)) {
     $BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
     $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
 }
+
+if(is_file($BASE_DIR_CMS."DefaultConf.php")) {
+    require_once($BASE_DIR_CMS."DefaultConf.php");
+} else {
+    die("Fatal Error ".$BASE_DIR_CMS."DefaultConf.php Datei existiert nicht");
+}
+
+$_GET = cleanREQUEST($_GET);
+$_REQUEST = cleanREQUEST($_REQUEST);
+$_POST = cleanREQUEST($_POST);
+
 require_once($BASE_DIR_ADMIN."Crypt.php");
 require_once($BASE_DIR_CMS."Mail.php");
 require_once($BASE_DIR_ADMIN."filesystem.php");
 
-// Session starten!
-session_start();
 
 // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 #@ini_set("display_errors", 0);
