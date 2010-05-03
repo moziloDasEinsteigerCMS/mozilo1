@@ -371,8 +371,9 @@ $_POST = cleanREQUEST($_POST);
     if(strpos($HTML,'{TABLEOFCONTENTS}') !== false)
         $HTML = preg_replace('/{TABLEOFCONTENTS}/', $syntax->getToC($pagecontent), $HTML);
 
+    $HTML = str_replace(array('&#123;','&#125;','&#91;','&#93;'),array('{','}','[',']'),$HTML);
     }
-    
+
 // ------------------------------------------------------------------------------
 // Formular zur Passworteingabe anzeigen
 // ------------------------------------------------------------------------------
