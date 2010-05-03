@@ -3933,7 +3933,7 @@ function showEditPageForm($cat, $page, $newsite)    {
     $content .= '<input type="radio" name="saveas" value="'.$EXT_PAGE.'"'.$checkednormal.' accesskey="n" /> '.getLanguageValue("page_saveasnormal")
     .' <input type="radio" name="saveas" value="'.$EXT_HIDDEN.'"'.$checkedhidden.' accesskey="v" /> '.getLanguageValue("page_saveashidden")
     .' <input type="radio" name="saveas" value="'.$EXT_DRAFT.'"'.$checkeddraft.' accesskey="e" /> '.getLanguageValue("page_saveasdraft");
-$content .= returnOverviewSelectbox(4, $cat);
+    $content .= '<span style="margin-left:30px;margin-right:10px;">'.getLanguageValue("page_edit_next").'</span>'. returnOverviewSelectbox(4, $cat);
     return $content;
 }
 

@@ -73,7 +73,6 @@ select.overviewselect, select.usersyntaxselectbox, select.editnextpageselectbox 
 } 
 
 select.editnextpageselectbox {
-    margin-left: 30px;
     width:20%;
 } 
 
