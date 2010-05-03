@@ -39,8 +39,10 @@ function makePlatzhalter($all = false) {
     $platzhalter = array(
                         '{CATEGORY_NAME}',
                         '{CATEGORY}',
+                        '{CATEGORY_URL}',
                         '{PAGE_NAME}',
                         '{PAGE_FILE}',
+                        '{PAGE_URL}',
                         '{PAGE}',
                         '{SEARCH}',
                         '{SITEMAPLINK}',
