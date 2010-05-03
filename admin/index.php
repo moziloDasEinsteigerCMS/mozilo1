@@ -942,8 +942,6 @@ function page($post) {
                     $link = $URL_BASE."index.php?cat=".substr($cat,3)."&amp;page=".substr($page,3,-(strlen($EXT_PAGE)));
                 }
                 $pagecontent .= '<span class="titel">'.getLanguageValue("page_edit").' → </span><a href="'.$link.'" target="_blank">'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen($EXT_PAGE))), true, true).'</a><br /><br />';
-
-
                 $pagecontent .= $post['content'];
                 $pagecontent .= '<input type="hidden" name="checkpara" value="no">';
                 return array(getLanguageValue("page_button"), $pagecontent);
@@ -1224,9 +1222,24 @@ function editSite($post) {
             }
             $content = $_POST['pagecontent'];
         }
+
+        $edit_next_page = false;
+        if(isset($_POST['save']) and !isset($post['error_messages'])
+            and isset($_POST['edit_next_page']) and !empty($_POST['edit_next_page'])) {
+            if(is_file($CONTENT_DIR_REL.$_POST['edit_next_page'])) {
+                $cat_page = explode("/",$_POST['edit_next_page']);
+                $cat = $cat_page[0];
+                $page = $cat_page[1];
+                $content = 'editsite';
+                unset($post['action_data']['editsite']);
+                $post['action_data']['editsite'][$cat_page[0]] = $cat_page[1];
+                $edit_next_page = true;
+            }
+        }
+
         if(!isset($post['error_messages']))
             $post['messages']['page_message_edit'][] = NULL;
-        if(isset($_POST['savetemp']) or isset($post['error_messages'])) {
+        if(isset($_POST['savetemp']) or isset($post['error_messages']) or $edit_next_page) {
             $post['content'] = showEditPageForm($cat, $page,$content);
         } else {
             $post['editsite'] = 'no';
@@ -3920,6 +3933,7 @@ function showEditPageForm($cat, $page, $newsite)    {
     $content .= '<input type="radio" name="saveas" value="'.$EXT_PAGE.'"'.$checkednormal.' accesskey="n" /> '.getLanguageValue("page_saveasnormal")
     .' <input type="radio" name="saveas" value="'.$EXT_HIDDEN.'"'.$checkedhidden.' accesskey="v" /> '.getLanguageValue("page_saveashidden")
     .' <input type="radio" name="saveas" value="'.$EXT_DRAFT.'"'.$checkeddraft.' accesskey="e" /> '.getLanguageValue("page_saveasdraft");
+$content .= returnOverviewSelectbox(4, $cat);
     return $content;
 }
 
@@ -3941,11 +3955,12 @@ function saveContentToPage($content, $page) {
         return $error;
     } else {
         $handle = @fopen($page, "w");
-        if(get_magic_quotes_gpc()) {
-            fputs($handle, stripslashes($content));
-        } else {
+# wird von cleanREQUEST erledigt ???????????????????
+#        if(get_magic_quotes_gpc()) {
+#            fputs($handle, stripslashes($content));
+#        } else {
             fputs($handle, $content);
-        }
+#        }
         fclose($handle);
     }
     if(is_file($page)) {
@@ -4237,7 +4252,8 @@ function returnFormatToolbarIcon($tag) {
 
 
 // Rueckgabe einer Selectbox mit Elementen, die per Klick in die Inhaltsseite uebernommen werden können
-// $type: 1=Kategorien & nhaltsseiten 2=Dateien 3=Galerien
+// $type: 1=Kategorien & Inhaltsseiten 2=Dateien 3=Galerien
+// 4=Kategorien & Inhaltsseiten für Edit Select Inhaltseite ohne Klick in die Inhaltsseite
 function returnOverviewSelectbox($type, $currentcat) {
     global $specialchars;
     global $CONTENT_DIR_REL;
@@ -4254,7 +4270,7 @@ function returnOverviewSelectbox($type, $currentcat) {
     switch ($type) {
 
         // Inhaltsseiten und Kategorien
-        case 1:
+        case ($type == 1 or $type == 4):
             $categories = getDirContentAsArray($CONTENT_DIR_REL, false);
             foreach ($categories as $catdir) {
                 if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
@@ -4268,14 +4284,20 @@ function returnOverviewSelectbox($type, $currentcat) {
                         $completepagename = $cleanpagename;
                         if (substr($file, strlen($file)-4, 4) == $EXT_HIDDEN)
                             $completepagename = $cleanpagename." (".getLanguageValue("page_saveashidden").")";
-                        if ($catdir == $currentcat)
-                            $elements[] = array($spacer.$completepagename, $cleanpagename);
-                        else
-                            $elements[] = array($spacer.$completepagename, $cleancatname.":".$cleanpagename);
+                        if($type == 4) {
+                            $elements[] = array($spacer.$completepagename, $catdir."/".$file);
+                        } else {
+                            if ($catdir == $currentcat)
+                                $elements[] = array($spacer.$completepagename, $cleanpagename);
+                            else
+                                $elements[] = array($spacer.$completepagename, $cleancatname.":".$cleanpagename);
+                        }
                     }
                 }
             }
             $selectname = "pages";
+            if($type == 4)
+                $selectname = "edit_next_page";
             break;
 
         // Dateien
@@ -4313,6 +4335,8 @@ function returnOverviewSelectbox($type, $currentcat) {
 
     // Selectbox zusammenbauen
     $select = "<select name=\"$selectname\" class=\"overviewselect\" onchange=\"insertAndResetSelectbox(this);\">";
+    if($type == 4)
+        $select = "<select name=\"$selectname\" class=\"editnextpageselectbox\">";
     // Titel der Selectbox
     switch ($type) {
         // Inhaltsseiten und Kategorien
@@ -4327,15 +4351,18 @@ function returnOverviewSelectbox($type, $currentcat) {
         case 3:
             $select .="<option class=\"noaction\" value=\"\">".getLanguageValue("gallery_button").":</option>";
             break;
+        case 4:
+            $select .="<option class=\"noaction\" value=\"\">".getLanguageValue("page_edit").":</option>";
+            break;
     }
     // Elemente der Selectbox
     foreach ($elements as $element) {
         if (substr($element[1], 0, 1) == ":") {
             $select .= "<option class=\"noaction\" value=\"\">".$element[0]."</option>";
         } else {
-        if(strstr($element[1],"[") or strstr($element[1],"]"))
-            $element[1] = str_replace(array("[","]"),array("&#94;[","&#94;]"),$element[1]);
-            $select .= "<option class=\"hasaction\" value=\"".$element[1]."\">".$element[0]."</option>";
+            if(strstr($element[1],"[") or strstr($element[1],"]"))
+                $element[1] = str_replace(array("[","]"),array("&#94;[","&#94;]"),$element[1]);
+                $select .= "<option class=\"hasaction\" value=\"".$element[1]."\">".$element[0]."</option>";
         }
     }
     $select .= "</select>";

@@ -63,13 +63,18 @@ option.noaction {
 }
 option.hasaction {
 }
-select.overviewselect, select.usersyntaxselectbox {
+select.overviewselect, select.usersyntaxselectbox, select.editnextpageselectbox {
     margin-bottom: 0px;
 	  font-size:12px;
 	  border:1px solid #C0C0C0;
     height:18px;
     font-size:0.9em;
     width:90%;
+} 
+
+select.editnextpageselectbox {
+    margin-left: 30px;
+    width:20%;
 } 
 
 select.usersyntaxselectbox {
