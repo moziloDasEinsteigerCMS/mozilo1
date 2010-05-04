@@ -129,6 +129,7 @@ $PASSWORDS = new Properties($BASE_DIR_CMS."conf/passwords.conf",true);
 if(isset($PASSWORDS->properties['error'])) {
     die($PASSWORDS->properties['error']);
 }
+
 // Login ueberpruefen
 if (!isset($_SESSION['login_okay']) or !$_SESSION['login_okay']) {
     header("location:login.php?logout=true");
@@ -153,14 +154,6 @@ if(!is_file($BASE_DIR_CMS."formular/aufgaben.conf")) {
         die($AUFGABEN_CONF->properties['error']);
     }
     unset($AUFGABEN_CONF);
-}
-
-if(!is_file($BASE_DIR_CMS."conf/passwords.conf")) {
-    $PASSWORDS_CONF = new Properties($BASE_DIR_CMS."conf/passwords.conf",true);
-    if(!isset($PASSWORDS_CONF->properties['readonly'])) {
-        die($PASSWORDS_CONF->properties['error']);
-    }
-    unset($PASSWORDS_CONF);
 }
 
 // Abwärtskompatibilität: Downloadcounter initalisieren
