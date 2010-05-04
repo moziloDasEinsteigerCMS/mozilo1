@@ -7,6 +7,7 @@ $BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
 $OLD_CONF = "";
 $old_conf_dir = "update";
 $messages = "";
+$messages_rename = "";
 $convert = false;
 if(isset($_GET['convert']) and $_GET['convert'] == "true") {
     $convert = true;
@@ -165,16 +166,58 @@ function toUTF8($text) {
     return $text;
 }
 
-function changeToRawurl($dir = false) {
+function inhaltChange($file,$dir) {
     global $BASE_DIR;
-    global $files_to_utf8;
-    global $specialchars;
     global $convert;
     global $messages;
 
     $utf_update_file = true;
     if(file_exists($BASE_DIR.'/update/utf_update.php'))
         $utf_update_file = false;
+
+    if($convert and $utf_update_file) {
+        $fp = fopen ($BASE_DIR.$dir.'/'.$file, "r");
+        $inhalt = fread($fp, filesize($BASE_DIR.$dir.'/'.$file));
+        if(substr($file,-(strlen(".html"))) == ".html") {
+            $search = array(
+                        $dir,
+                        'layouts/{LAYOUT_DIR}',
+                        'iso-8859-1'
+                        );
+            $replace = array(
+                        '{LAYOUT_DIR}',
+                        '{LAYOUT_DIR}',
+                        '{CHARSET}'
+                        );
+            $inhalt = str_replace($search,$replace,$inhalt);
+        }
+        if(substr($file,-(strlen(".css"))) == ".css") {
+            $search_fildset = "\n".'fieldset#searchfieldset {'.
+                                '   border:none;'.
+                                '   margin:0px;'.
+                                '   padding:0px;'.
+                                '}';
+            $inhalt .= $search_fildset;
+        }
+        fclose($fp);
+        $fp_neu = fopen ($BASE_DIR.$dir.'/'.$file, "w");
+        $inhalt = toUTF8($inhalt);
+        fputs ($fp_neu, $inhalt);
+        fclose($fp_neu);
+    }
+    if($utf_update_file)
+        $messages .= "Wandle Datei nach UTF-8= ".$dir."/".$file."\n";
+    if(substr($file,-(strlen(".html"))) == ".html" and $utf_update_file)
+        $messages .= "Ändere Template = ".$dir."/".$file."\n";
+}
+
+function changeToRawurl($dir = false) {
+    global $BASE_DIR;
+    global $files_to_utf8;
+    global $specialchars;
+    global $convert;
+    global $messages_rename;
+
     if($dir === false) {
         $ordner = array("kategorien","galerien","layouts");
         foreach($ordner as $dirs) {
@@ -184,50 +227,36 @@ function changeToRawurl($dir = false) {
     }
     $handle = opendir($BASE_DIR.$dir);
     while($file = readdir($handle)) {
-        $new_name = $specialchars->replaceSpecialChars(rebuildOldSpecialChars($file),false);
         if(isValidDirOrFile($file)) {
+            $new_name = $specialchars->replaceSpecialChars(rebuildOldSpecialChars($file),false);
             if(is_dir($BASE_DIR.$dir.'/'.$file)) {
                 changeToRawurl($dir.'/'.$file);
                 if($new_name != $file and $specialchars->replaceSpecialChars($new_name,false) != $file) {
-                    $messages .= "Rename = $dir/$file -> $dir/$new_name\n";
+                    $messages_rename .= "Rename = $dir/$file -> $dir/$new_name\n";
                     if($convert)
                         rename($BASE_DIR.$dir.'/'.$file, $BASE_DIR.$dir.'/'.$new_name);
                 }
             } elseif(is_file($BASE_DIR.$dir.'/'.$file)) {
-                $utf_file = $new_name;
+                $change_file = $new_name;
                 if($new_name != $file and $specialchars->replaceSpecialChars($new_name,false) != $file) {
-                    $messages .= "Rename = $dir/$file -> $dir/$new_name\n";
+                    $messages_rename .= "Rename = $dir/$file -> $dir/$new_name\n";
                     if($convert)
                         rename($BASE_DIR.$dir.'/'.$file, $BASE_DIR.$dir.'/'.$new_name);
-                } else $utf_file = $file;
-                $utf = false;
+                } else $change_file = $file;
+
                 foreach($files_to_utf8 as $ext) {
-                    if(substr($new_name,-(strlen($ext))) == $ext)
-                        $utf = true;
-                }
-                if($convert and $utf and $utf_update_file) {
-                    $fp = fopen ($BASE_DIR.$dir.'/'.$utf_file, "r");
-                    $inhalt = fread($fp, filesize($BASE_DIR.$dir.'/'.$utf_file));
-                    if(substr($utf_file,-(strlen(".html"))) == ".html") {
-                        $search = array('layouts/{LAYOUT_DIR}','iso-8859-1');
-                        $replace = array('{LAYOUT_DIR}','{CHARSET}');
-                        $inhalt = str_replace($search,$replace,$inhalt);
+                    if(substr($new_name,-(strlen($ext))) == $ext) {
+                        inhaltChange($change_file,$dir);
+                        break;
                     }
-                    fclose($fp);
-                    $fp_neu = fopen ($BASE_DIR.$dir.'/'.$utf_file, "w");
-                    $inhalt = toUTF8($inhalt);
-                    fputs ($fp_neu, $inhalt);
-                    fclose($fp_neu);
                 }
-                if($utf and $utf_update_file)
-                    $messages .= "Wandle Datei nach UTF-8= ".$dir."/".$utf_file."\n";
-                if(substr($utf_file,-(strlen(".html"))) == ".html" and $utf_update_file)
-                    $messages .= "Ändere Template = ".$dir."/".$utf_file."\n";
             }
         }
     }
     closedir($handle);
 }
+
+
 changeToRawurl();
 if($convert) {
     $fp = fopen($BASE_DIR.'/update/utf_update.php', "w");
@@ -247,6 +276,7 @@ $html .= '<a href="?convert=true">Update Starten</a>';
 if(!$convert) {
 $html .= '<br><br><pre style="font-size:12px;">';
 $html .= $messages;
+$html .= $messages_rename;
 $html .= '</pre>';
 }
 $html .= "</body></html>";
