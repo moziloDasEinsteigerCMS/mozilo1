@@ -59,6 +59,7 @@ function makePlatzhalter($all = false) {
                         '{WEBSITE_TITLE}',
                         '{WEBSITE_KEYWORDS}',
                         '{WEBSITE_DESCRIPTION}',
+                        '{WEBSITE_NAME}',
                         '{MAINMENU}',
                         '{DETAILMENU}'
     );
