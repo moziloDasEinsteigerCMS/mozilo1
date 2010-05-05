@@ -22,6 +22,7 @@ require_once($BASE_DIR_ADMIN."filesystem.php");
 
 $conf_files = array(
                 'ADMIN_CONF' => $ADMIN_DIR_NAME.'/conf/basic.conf',
+#                'LOGIN_CONF' => $ADMIN_DIR_NAME.'/conf/logindata.conf',
                 'CMS_CONF' => $CMS_DIR_NAME.'/conf/main.conf',
                 'GALLERY_CONF' => $CMS_DIR_NAME.'/conf/gallery.conf',
                 'PASSWORDS' => $CMS_DIR_NAME.'/conf/passwords.conf',
@@ -113,16 +114,18 @@ function makeOldConf($old_conf_dir) {
     $handle = opendir($BASE_DIR.$old_conf_dir);
     while($file = readdir($handle)) {
         if(!isValidDirOrFile($file)) continue;
-        if($file == 'old.conf') {
+        if($file == 'old.conf' or $file == 'README.txt') {
             continue; 
         } elseif($file == 'logindata.conf' and !file_exists($BASE_DIR.$ADMIN_DIR_NAME.'/conf/logindata.conf')) {
             $messages .= "Copy ".$old_conf_dir.'/'.$file." -> ".$ADMIN_DIR_NAME.'/conf/logindata.conf'."\n";
             if($convert)
                 copy($BASE_DIR.$old_conf_dir.'/'.$file,$BASE_DIR.$ADMIN_DIR_NAME.'/conf/logindata.conf');
+            continue; 
         } elseif($file == 'syntax.conf' and !file_exists($BASE_DIR.$CMS_DIR_NAME.'/conf/syntax.conf')) {
             $messages .= "Copy ".$old_conf_dir.'/'.$file." -> ".$CMS_DIR_NAME.'/conf/syntax.conf'."\n";
             if($convert)
                 copy($BASE_DIR.$old_conf_dir.'/'.$file,$BASE_DIR.$CMS_DIR_NAME.'/conf/syntax.conf');
+            continue; 
         } else {
             $fp = fopen ($BASE_DIR.$old_conf_dir.'/'.$file, "r");
             $inhalt .= fread($fp, filesize($BASE_DIR.$old_conf_dir.'/'.$file));
