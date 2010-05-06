@@ -564,12 +564,17 @@ td
 {
     vertical-align:middle;
     margin:0px;
-    padding:0 4px;
-    height:24px;
+    padding:0px 4px;
+    height:1.9em;
     font-weight: bold;
     border: 1px solid #C0C0C0;
     background-color:#C9D7EB;
 }
+.input_submit:hover {
+    border: 1px solid #a0a0a0;
+    background-color:#a9b7cB;
+}
+
 
 
 .file_link

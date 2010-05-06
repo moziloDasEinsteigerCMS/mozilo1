@@ -65,11 +65,12 @@ option.hasaction {
 }
 select.overviewselect, select.usersyntaxselectbox, select.editnextpageselectbox {
     margin-bottom: 0px;
-	  font-size:12px;
-	  border:1px solid #C0C0C0;
+	font-size:12px;
+	border:1px solid #C0C0C0;
     height:18px;
     font-size:0.9em;
-    width:90%;
+    /*width:82%;*/
+    width:190px;
 } 
 
 select.editnextpageselectbox {
