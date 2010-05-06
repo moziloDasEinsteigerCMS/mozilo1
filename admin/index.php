@@ -3904,11 +3904,11 @@ function showEditPageForm($cat, $page, $newsite)    {
     # Achtung das \n ist nötig weil sonst der erste zeilenumbruch verschlugt wird
     $content .= '<textarea cols="96" rows="24" style="width:99%;height:'.$height.';" name="pagecontent">'."\n".$pagecontent.'</textarea><br />';
     $content .= '<input type="hidden" name="action_data['.$action.']['.$cat.']['.$page.']" value="'.$action.'" />';
-    $content .= '<input type="submit" name="cancel" value="'.getLanguageValue("button_cancel").'" accesskey="a" /> ';
+    $content .= '<input type="submit" class="input_submit" name="cancel" value="'.getLanguageValue("button_cancel").'" accesskey="a" /> ';
     // Zwischenspeichern-Button nicht beim Neuanlegen einer Inhaltsseite anzeigen
     if($newsite != 'newsite')
-        $content .= '<input type="submit" name="savetemp" value="'.getLanguageValue("button_savetemp").'" accesskey="w" /> ';
-    $content .= '<input type="submit" name="save" value="'.getLanguageValue("button_save").'" accesskey="s" /> ';
+        $content .= '<input type="submit" class="input_submit" name="savetemp" value="'.getLanguageValue("button_savetemp").'" accesskey="w" /> ';
+    $content .= '<input type="submit" class="input_submit" name="save" value="'.getLanguageValue("button_save").'" accesskey="s" /> ';
     // Auswahl "Speicher-Art"
     $extension = substr($page, strlen($page)-4, 4);
     $checkednormal = "";
