@@ -734,6 +734,10 @@ div#loginform_maindiv
     -webkit-border-radius:5px;
     -khtml-border-radius:5px;
     border-radius:5px;
+    -webkit-box-shadow: 5px 5px 2px #C0C0C0;
+    -moz-box-shadow: 5px 5px 2px #C0C0C0;
+    box-shadow: 5px 5px 2px #C0C0C0;
+
 }
 div#loginform_maindiv_disabled
 {
@@ -757,22 +761,6 @@ div#loginform_maindiv_disabled .login_input, div#loginform_maindiv_disabled .log
     background-color: #e0e0e0;
     border: 1px solid #C0C0C0;
     color: #777777;
-}
-div#loginform_shadowdiv
-{
-    height: 120px;
-    width: 320px;
-    margin-top: -55px;
-    margin-left: -155px;
-    padding: 0;
-    top: 50%;
-    left: 50%;
-    position: absolute;
-    background-color: #DCDCDC;
-    -moz-border-radius:5px;
-    -webkit-border-radius:5px;
-    -khtml-border-radius:5px;
-    border-radius:5px;
 }
 
 div.message_fehler
