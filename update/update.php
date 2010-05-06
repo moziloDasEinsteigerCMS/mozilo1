@@ -159,59 +159,92 @@ function rebuildOldSpecialChars($text) {
 
 function toUTF8($text) {
     global $CHARSET;
-    if(function_exists("utf8_encode")) {
-        $text = utf8_encode($text);
-    } elseif(function_exists("mb_convert_encoding")) {
-        $text = mb_convert_encoding($text, $CHARSET);
-    } elseif(function_exists("iconv")) {
-        $text = iconv('ISO-8859-1', $CHARSET.'//IGNORE',$text);
-    } else die("kein utf-8 converter zur verfügung");
+    if(!check_utf8($text)) {
+        if(function_exists("utf8_encode")) {
+            $text = utf8_encode($text);
+        } elseif(function_exists("mb_convert_encoding")) {
+            $text = mb_convert_encoding($text, $CHARSET);
+        } elseif(function_exists("iconv")) {
+            $text = iconv('ISO-8859-1', $CHARSET.'//IGNORE',$text);
+        } else die("kein utf-8 converter zur verfügung");
+    }
     return $text;
 }
+
+function check_utf8($str) {
+    $len = strlen($str);
+    for($i = 0; $i < $len; $i++){
+        $c = ord($str[$i]);
+        if ($c > 128) {
+            if (($c > 247)) return false;
+            elseif ($c > 239) $bytes = 4;
+            elseif ($c > 223) $bytes = 3;
+            elseif ($c > 191) $bytes = 2;
+            else return false;
+            if (($i + $bytes) > $len) return false;
+            while ($bytes > 1) {
+                $i++;
+                $b = ord($str[$i]);
+                if ($b < 128 || $b > 191) return false;
+                $bytes--;
+            }
+        }
+    }
+    return true;
+} // end of check_utf8
 
 function inhaltChange($file,$dir) {
     global $BASE_DIR;
     global $convert;
     global $messages;
 
-    $utf_update_file = true;
-    if(file_exists($BASE_DIR.'/update/utf_update.php'))
-        $utf_update_file = false;
+    $change = false;
+    $fp = fopen ($BASE_DIR.$dir.'/'.$file, "r");
+    $inhalt = fread($fp, filesize($BASE_DIR.$dir.'/'.$file));
+    fclose($fp);
+    if(substr($file,-(strlen(".html"))) == ".html") {
+        $search = array(
+                    $dir,
+                    'layouts/{LAYOUT_DIR}',
+                    'ISO-8859-1',
+                    'iso-8859-1'
+                    );
+        $replace = array(
+                    '{LAYOUT_DIR}',
+                    '{LAYOUT_DIR}',
+                    '{CHARSET}',
+                    '{CHARSET}'
+                    );
 
-    if($convert and $utf_update_file) {
-        $fp = fopen ($BASE_DIR.$dir.'/'.$file, "r");
-        $inhalt = fread($fp, filesize($BASE_DIR.$dir.'/'.$file));
-        if(substr($file,-(strlen(".html"))) == ".html") {
-            $search = array(
-                        $dir,
-                        'layouts/{LAYOUT_DIR}',
-                        'iso-8859-1'
-                        );
-            $replace = array(
-                        '{LAYOUT_DIR}',
-                        '{LAYOUT_DIR}',
-                        '{CHARSET}'
-                        );
+        $serch_match = str_replace(array('/','{','}'),array('\/','\{','\}'),implode("|", $search));
+        if(preg_match("/(".$serch_match.")/",$inhalt)) {
+            $change = true;
+            $messages .= "Ändere Template = ".$dir."/".$file."\n";
             $inhalt = str_replace($search,$replace,$inhalt);
         }
-        if(substr($file,-(strlen(".css"))) == ".css") {
-            $search_fildset = "\n".'fieldset#searchfieldset {'.
-                                '   border:none;'.
-                                '   margin:0px;'.
-                                '   padding:0px;'.
-                                '}';
+    }
+    if(substr($file,-(strlen(".css"))) == ".css") {
+        $search_fildset = "\n".'fieldset#searchfieldset {'.
+                            '   border:none;'.
+                            '   margin:0px;'.
+                            '   padding:0px;'.
+                            '}';
+        if(strpos($inhalt,'fieldset#searchfieldset') < 1) {
+            $change = true;
+            $messages .= "Ändere CSS = ".$dir."/".$file."\n";
             $inhalt .= $search_fildset;
         }
-        fclose($fp);
+    }
+    if(!check_utf8($inhalt)) {
+        $change = true;
+        $messages .= "Wandle Datei nach UTF-8= ".$dir."/".$file."\n";
+    }
+    if($convert and $change) {
         $fp_neu = fopen ($BASE_DIR.$dir.'/'.$file, "w");
         $inhalt = toUTF8($inhalt);
         fputs ($fp_neu, $inhalt);
         fclose($fp_neu);
     }
-    if($utf_update_file)
-        $messages .= "Wandle Datei nach UTF-8= ".$dir."/".$file."\n";
-    if(substr($file,-(strlen(".html"))) == ".html" and $utf_update_file)
-        $messages .= "Ändere Template = ".$dir."/".$file."\n";
 }
 
 function changeToRawurl($dir = false) {
@@ -246,7 +279,8 @@ function changeToRawurl($dir = false) {
                     if($convert)
                         rename($BASE_DIR.$dir.'/'.$file, $BASE_DIR.$dir.'/'.$new_name);
                 } else $change_file = $file;
-
+                if(!$convert)
+                    $change_file = $file;
                 foreach($files_to_utf8 as $ext) {
                     if(substr($new_name,-(strlen($ext))) == $ext) {
                         inhaltChange($change_file,$dir);
@@ -261,11 +295,6 @@ function changeToRawurl($dir = false) {
 
 
 changeToRawurl();
-if($convert) {
-    $fp = fopen($BASE_DIR.'/update/utf_update.php', "w");
-    fputs ($fp, "file inhalt in utf-8 gewandelt");
-    fclose($fp);
-}
 
 $html = '<!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN">'."\n";
 $html .= "<html>\n";
