@@ -161,7 +161,8 @@ echo $HTML;
 // Aufbau des Login-Formulars
 function login_formular($enabled) {
     global $CHARSET;
-  if ($enabled)
+    $form = "";
+    if ($enabled)
         $form .= "<div id=\"loginform_maindiv\">";
     else
         $form .= "<div id=\"loginform_maindiv_disabled\">";
