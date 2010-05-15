@@ -1,30 +1,37 @@
-Anleitung um eine moziloCMS 1.11.2 auf 1.12 zu erneuern
-Diese Anleitung beziht sich nur auf ein Standart moziloCMS eigene Sachen müssen per Hand
-wieder eingebaut werden
+Update-Scripte für moziloCMS 1.11.2 auf 1.12
 
-1. auf dem Webserver ein Neues Verzeichnis erstellen z.B neumozilo.
+Diese Anleitung bezieht sich nur auf ein Standard-moziloCMS; 
+eigene Erweiterungen müssen u.U. per Hand nachgezogen werden.
 
-2. moziloCMS 1.12 hollen und Entpacken den Inhalt nach neumozilo übertragen.
+1.  auf dem Webserver ein neues Verzeichnis erstellen 
+    (z.B "neumozilo").
 
-3. im neumozilo denn Ordner kategorien und galerien (nur bei eigenen Galerien)
-   mit dem aus dem Alten moziloCMS ersetzen.
+2.  moziloCMS 1.12 herunterladen, entpacken und den Inhalt nach 
+    "neumozilo" übertragen.
 
-4. Das eigene Template in das layouts Verzeichnis Kopieren.
+3.  im Verzeichnis "neumozilo" die Verzeichnisse "kategorien" 
+    und "galerien" mit diesen Verzeichnissen aus der alten 
+    moziloCMS-Installation ersetzen.
 
-5. aus dem Alten moziloCMS volgenden Dateien in den neumozilo/update Ordner Kopieren.
-   Dateien zu finden in admin/conf, conf und formular.
-        basic.conf
-        logindata.conf
-        downloads.conf
-        main.conf
-        syntax.conf
-        formular.conf
+4.  das Verzeichnis des bisher verwendeten Layouts in das 
+    Verzeichnis "layouts" der neuen CMS-Installation kopieren.
 
-6. im Browser update/update.php auf rufen und den Anweisungen folgen.
+5.  aus dem alten moziloCMS folgende Dateien direkt ins 
+    Verzeichnis "neumozilo/update" kopieren:
+    - admin/conf/basic.conf
+    - admin/conf/logindata.conf
+    - conf/downloads.conf
+    - conf/main.conf
+    - conf/syntax.conf
+    - formular/formular.conf
 
-7. die neumozilo Seite testen wenn alles gut kann die Alte ersetzt werden.
+6.  im Browser [neumozilo]/update/update.php aufrufen und den 
+    Anweisungen folgen.
 
-8. denn update Ordner Löschen
+7.  prüfen, ob die neue Installation sauber funktioniert
 
-9. viel Spass dabei :-)
+8.  alte Installation löschen und durch die neue ersetzen
 
+8.  das Verzeichnis "update" in der neuen Installation löschen
+
+9.  viel Spass mit moziloCMS 1.12 :-)
