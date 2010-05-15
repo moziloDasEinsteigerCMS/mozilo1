@@ -2848,7 +2848,7 @@ function config($post) {
                 continue;
             }
             if($syntax_name == "formularmail") {
-                 if($post[$syntax_name] != "" and !preg_match("/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/",$post[$syntax_name])) {
+                 if($post[$syntax_name] != "" and !preg_match("/^.+@.+\..+$/",$post[$syntax_name])) {
                     $post['error_messages']['config_error_formularmail']['color'] = "#FF7029";
                     $error_color['formularmail'] = ' style="background-color:#FF7029;"';
                     $error_messages = $syntax_name;
@@ -3303,7 +3303,7 @@ function admin($post) {
                     if(isset($post[$syntax_name])) {
                         $text = $post[$syntax_name];
                     } else continue;
-                    if($syntax_name == 'adminmail' and $text != "" and !preg_match("/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/",$text)) {
+                    if($syntax_name == 'adminmail' and $text != "" and !preg_match("/^.+@.+\..+$/",$text)) {
                         $error_messages = $syntax_name;
                     }
                     if($error_messages === false and $ADMIN_CONF->get($syntax_name) != $text) {
