@@ -32,6 +32,6 @@ eigene Erweiterungen müssen u.U. per Hand nachgezogen werden.
 
 8.  alte Installation löschen und durch die neue ersetzen
 
-8.  das Verzeichnis "update" in der neuen Installation löschen
+9.  das Verzeichnis "update" in der neuen Installation löschen
 
-9.  viel Spass mit moziloCMS 1.12 :-)
+10. viel Spass mit moziloCMS 1.12 :-)
