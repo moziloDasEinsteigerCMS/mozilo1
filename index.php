@@ -134,6 +134,8 @@ $_POST = cleanREQUEST($_POST);
     checkParameters();
     // Dann: HTML-Template einlesen und mit Inhalt fuellen
     readTemplate();
+    # manche Provider sind auf iso eingestelt
+    header('content-type: text/html; charset='.$CHARSET.'');
     // Zum Schluß: Ausgabe des fertigen HTML-Dokuments
     echo $HTML;
 
