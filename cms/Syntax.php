@@ -33,7 +33,9 @@ class Syntax {
                     // port                     \:[\d]{1,5}
                     // subdirs|files            (\w)+
         $this->LINK_REGEX   = "/^(https?|t?ftps?|gopher|telnets?|mms|imaps?|irc|pop3s?|rdp|smb|smtps?|sql|ssh|svn)\:\/\/((\w)+\:(\w)+\@)?[((\w)+\.)?(\w)+\.[a-zA-Z]{2,4}|([\d]{1,3}\.){3}[\d]{1,3}](\:[\d]{1,5})?((\w)+)?$/";
-        $this->MAIL_REGEX   = "/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/";
+        // Punycode-URLs können beliebige Zeichen im Domainnamen enthalten!
+        // $this->MAIL_REGEX   = "/^\w[\w|\.|\-]+@\w[\w|\.|\-]+\.[a-zA-Z]{2,4}$/";
+        $this->MAIL_REGEX   = "/^.+@.+\..+$/";
         
         // Externe Links in neuem Fenster öffnen?
         if ($CMS_CONF->get("targetblank_link") == "true") {
@@ -162,12 +164,15 @@ class Syntax {
             }
             elseif ($attribute == "mail"){
                 // Überprüfung auf Validität
-                if (preg_match($this->MAIL_REGEX, $value))
+                if (preg_match($this->MAIL_REGEX, $value)) {
+                    $value = html_entity_decode($value);
                     $content = str_replace ($match, "<a class=\"mail\" href=\"".obfuscateAdress("mailto:$value", 3)."\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", obfuscateAdress("$value", 3))).">".obfuscateAdress("$value", 3)."</a>", $content);
-                else
+                }
+                else {
                     $content = str_replace ($match, $this->createDeadlink($value, $language->getLanguageValue1("tooltip_link_mail_error_1", $value)), $content);
+                }
             }
-
+            
             // Kategorie-Link (überprüfen, ob Kategorie existiert)
             // Kategorie-Link mit eigenem Text
             elseif ($attribute == "kategorie" or substr($attribute,0,10) == "kategorie=") {
