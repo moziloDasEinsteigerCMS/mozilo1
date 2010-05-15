@@ -43,6 +43,9 @@ input, select, textarea
     -khtml-border-radius:2px;
     border-radius:2px;
 }
+textarea#pagecontent {
+    margin-bottom:5px;
+}
 
 .titel /* Titel */
 {
