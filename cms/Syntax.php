@@ -165,7 +165,7 @@ class Syntax {
             elseif ($attribute == "mail"){
                 // Überprüfung auf Validität
                 if (preg_match($this->MAIL_REGEX, $value)) {
-                    $value = html_entity_decode($value);
+                    $value = $specialchars->getHtmlEntityDecode($value);
                     $content = str_replace ($match, "<a class=\"mail\" href=\"".obfuscateAdress("mailto:$value", 3)."\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", obfuscateAdress("$value", 3))).">".obfuscateAdress("$value", 3)."</a>", $content);
                 }
                 else {
