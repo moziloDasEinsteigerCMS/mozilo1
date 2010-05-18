@@ -543,12 +543,6 @@ function changeToRawurl($dir = false) {
                     if(isset($css_file) and count($css_file) > 1 and in_array($change_file,$css_file)) {
                         $messages_more_css .= "\t$dir/$change_file\n";
                         continue;
-/*
-if(in_array($change_file,$css_file))
-    echo "css datei drin $dir<br>\n";
-echo "<pre>";
-print_r($css_file);
-echo "</pre><br>\n";*/
                     }
                     inhaltChange($change_file,$dir);
                     break;
