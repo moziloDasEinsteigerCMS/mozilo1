@@ -51,6 +51,120 @@ fieldset#searchfieldset {
    padding:0px;
 }
 ';
+$css_new['form#contact_form'] = '
+/* -------------------------------------------------------- */
+/* Kontaktformular */
+/* --------------- */
+form#contact_form {
+}
+table#contact_table {
+}
+table#contact_table td {
+    vertical-align:top;
+    padding:5px;
+}
+span#contact_errormessage{
+    color:#880000;
+    font-weight:bold;
+}
+span#contact_successmessage{
+    color:#008800;
+    font-weight:bold;
+}
+input#contact_name, input#contact_mail, input#contact_website {
+    width:200px;
+}
+textarea#contact_message {
+    width:200px;
+}
+input#contact_submit {
+    width:200px;
+}
+';
+
+$css_replace['div.imagesubtitle'] = 'span.imagesubtitle';
+$css_replace['div.leftcontentimage'] = 'span.leftcontentimage';
+$css_replace['div.rightcontentimage'] = 'span.rightcontentimage';
+$css_replace['em.deadlink'] = 'span.deadlink';
+$css_replace['em.highlight'] = 'span.highlight';
+$css_replace["\n".'b {'] = "\n".'b.contentbold {';
+$css_replace["\n".'i {'] = "\n".'i.contentitalic {';
+$css_replace["\n".'u {'] = "\n".'u.contentunderlined {';
+$css_replace["\n".'s {'] = "\n".'s.contentstrikethrough {';
+$css_replace["\n".'b{'] = "\n".'b.contentbold {';
+$css_replace["\n".'i{'] = "\n".'i.contentitalic {';
+$css_replace["\n".'u{'] = "\n".'u.contentunderlined {';
+$css_replace["\n".'s{'] = "\n".'s.contentstrikethrough {';
+
+# ein ! = darf nicht einthalten sein
+$css_messages['!imagesubtitle'] = '
+Suchen sie bitte in ihrer {datei}
+nach [bild|...], [bildlinks|...] und [bildrechts|...]
+und Ersetzen es mit dem hier und passen es an
+/* -------------------------------------------------------- */
+/* [bild|...] */
+/* ---------- */
+img {
+    border:none;
+}
+span.imagesubtitle {
+    margin:3px 3px;
+    text-align:justify;
+    font-size:87%;
+}
+/* -------------------------------------------------------- */
+/* [bildlinks|...] */
+/* --------------- */
+span.leftcontentimage {
+    margin:6px 20px 6px 0px;
+    float:left;
+}
+img.leftcontentimage {
+}
+/* -------------------------------------------------------- */
+/* [bildrechts|...] */
+/* ---------------- */
+span.rightcontentimage {
+    margin:6px 0px 6px 20px;
+    float:right;
+}
+img.rightcontentimage {
+}
+';
+
+$css_messages['em.bold'] = '
+Suchen sie bitte in ihrer {datei}
+nach em.bold und Ersetzen es mit dem hier und passen es an
+
+b.contentbold {
+}
+';
+$css_messages['em.italic'] = '
+Suchen sie bitte in ihrer {datei}
+nach em.italic und Ersetzen es mit dem hier und passen es an
+
+i.contentitalic {
+}
+';
+$css_messages['em.bolditalic'] = '
+Achtung em.bolditalic gibt es nicht mehr sie müssen in den Inhaltseiten [fettkursiv|]
+durch [fett|[kursiv|]] ersetzen und den style em.bolditalic { ???? }
+in {datei} entfernen
+';
+$css_messages['em.underlined'] = '
+Suchen sie bitte in ihrer {datei}
+nach em.underlined und Ersetzen es mit dem hier und passen es an
+
+u.contentunderlined {
+}
+';
+$css_messages['em.crossed'] = '
+Suchen sie bitte in ihrer {datei}
+nach em.crossed und Ersetzen es mit dem hier und passen es an
+
+s.contentstrikethrough {
+}
+';
 
 $BASE_DIR = substr($_SERVER["SCRIPT_FILENAME"],0,strrpos($_SERVER["SCRIPT_FILENAME"],'update/update.php'));
 $CMS_DIR_NAME = "cms";
@@ -64,11 +178,15 @@ $messages_error = "!!! ACHTUNG !!! hier gibts anscheinend ein Rechte Problem mit
 $messages_error_lengt = strlen($messages_error);
 $messages_rename = "Dateien umbennen\n";
 $messages_to_utf8 = "Inhalt wandeln nach UTF-8\n";
-$messages_css = "Ändere css Dateien\n";
+$messages_css = "Ergänze css Style in Dateien\n";
+$messages_css_replace = "Ändere css Style\n";
+$messages_css_messages = "";
 $messages_html = "Ändere Template Dateien\n";
 $messages_cp = "Kopiere Dateien\n";
 $messages_conf = "Ändere conf Dateien\n";
 $messages_newconf = "Erstelle conf Dateien\n";
+$messages_more_css = "Es gibt im Template mehrere css Dateien\nLagern sie bitte die css Dateien wo keine moziloCMS Syntax\nenthalten oder zu Backup zwecken Angelegten Dateien aus\nund rufen das Update Script noch mal auf\n";
+
 $convert = false;
 if(isset($_GET['convert']) and $_GET['convert'] == "true") {
     $convert = true;
@@ -282,7 +400,11 @@ function inhaltChange($file,$dir) {
     global $messages_css;
     global $messages_html;
     global $messages_error;
+    global $messages_css_replace;
+    global $messages_css_messages;
     global $css_new;
+    global $css_replace;
+    global $css_messages;
     $change = false;
     $inhalt = "";
     if($fp = @fopen ($BASE_DIR.$dir.'/'.$file, "r")) {
@@ -316,7 +438,7 @@ function inhaltChange($file,$dir) {
         }
     }
     if(substr($file,-(strlen(".css"))) == ".css") {
-    $css_new_inhalt = false;
+        $css_new_inhalt = false;
         foreach($css_new as $search => $css_inhalt) {
             if(strpos($inhalt,$search) < 1) {
                 if(!$css_new_inhalt) {
@@ -326,12 +448,35 @@ function inhaltChange($file,$dir) {
                 $inhalt .= $css_inhalt;
             }
         }
+        $first = true;
+        foreach($css_replace as $search => $replace) {
+            if(strpos($inhalt,$search) > 0) {
+                if($first) {
+                    $messages_css_replace .= "\tErsetze in Datei ".$dir."/".$file."\n";
+                    $first = false;
+                }
+                $inhalt = str_replace($search,$replace,$inhalt);
+                $messages_css_replace .= "\t\t\"".trim($search)."\" durch \"".trim($replace)."\"\n";
+                $change = true;
+            }
+        }
+        foreach($css_messages as $search => $messages) {
+            $messages = str_replace("{datei}",$dir."/".$file,$messages);
+            if(substr($search,0,1) == "!") {
+                if(strpos($inhalt,substr($search,1)) < 1) {
+                    $messages_css_messages .= $messages."\n";
+                }
+            } else {
+                if(strpos($inhalt,$search) > 0) {
+                    $messages_css_messages .= $messages."\n";
+                }
+            }
+        }
         if($css_new_inhalt) {
             $change = true;
             $messages_css .= "\t".$dir."/".$file."\n";
         }
     }
-
     if($convert and $change) {
         if($fp_neu = @fopen($BASE_DIR.$dir.'/'.$file, "w")) {
             fputs ($fp_neu, $inhalt);
@@ -348,6 +493,7 @@ function changeToRawurl($dir = false) {
     global $convert;
     global $messages_rename;
     global $messages_error;
+    global $messages_more_css;
 
     if($dir === false) {
         $ordner = array("kategorien","galerien","layouts");
@@ -357,39 +503,55 @@ function changeToRawurl($dir = false) {
         return;
     }
     $handle = opendir($BASE_DIR.$dir);
+    $files = array();
     while($file = readdir($handle)) {
+        if(!isValidDirOrFile($file))
+            continue;
+        if(substr($file,-4) == ".css")
+            $css_file[] = $file;
+        $files[] = $file;
+    }
+    foreach($files as $file) {
         $error = false;
-        if(isValidDirOrFile($file)) {
-            $new_name = $specialchars->replaceSpecialChars(rebuildOldSpecialChars($file),false);
-            if(is_dir($BASE_DIR.$dir.'/'.$file)) {
-                changeToRawurl($dir.'/'.$file);
-                if($new_name != $file and $specialchars->replaceSpecialChars($new_name,false) != $file) {
-                    $messages_rename .= "\t$dir/$file -> $dir/$new_name\n";
-                    if($convert)
-                        @rename($BASE_DIR.$dir.'/'.$file, $BASE_DIR.$dir.'/'.$new_name);
-                    if($convert and !is_dir($BASE_DIR.$dir.'/'.$new_name)) {
-                        $messages_error .= "\t".$BASE_DIR.$dir.'/'.$file."\n";
-                        $error = true;
-                    }
+        $new_name = $specialchars->replaceSpecialChars(rebuildOldSpecialChars($file),false);
+        if(is_dir($BASE_DIR.$dir.'/'.$file)) {
+            changeToRawurl($dir.'/'.$file);
+            if($new_name != $file and $specialchars->replaceSpecialChars($new_name,false) != $file) {
+                $messages_rename .= "\t$dir/$file -> $dir/$new_name\n";
+                if($convert)
+                    @rename($BASE_DIR.$dir.'/'.$file, $BASE_DIR.$dir.'/'.$new_name);
+                if($convert and !is_dir($BASE_DIR.$dir.'/'.$new_name)) {
+                    $messages_error .= "\t".$BASE_DIR.$dir.'/'.$file."\n";
+                    $error = true;
                 }
-            } elseif(is_file($BASE_DIR.$dir.'/'.$file)) {
-                $change_file = $new_name;
-                if($new_name != $file and $specialchars->replaceSpecialChars($new_name,false) != $file) {
-                    $messages_rename .= "\t$dir/$file -> $dir/$new_name\n";
-                    if($convert)
-                        @rename($BASE_DIR.$dir.'/'.$file, $BASE_DIR.$dir.'/'.$new_name);
-                    if($convert and !is_file($BASE_DIR.$dir.'/'.$new_name)) {
-                        $messages_error .= "\t".$BASE_DIR.$dir.'/'.$file."\n";
-                        $error = true;
+            }
+        } elseif(is_file($BASE_DIR.$dir.'/'.$file)) {
+            $change_file = $new_name;
+            if($new_name != $file and $specialchars->replaceSpecialChars($new_name,false) != $file) {
+                $messages_rename .= "\t$dir/$file -> $dir/$new_name\n";
+                if($convert)
+                    @rename($BASE_DIR.$dir.'/'.$file, $BASE_DIR.$dir.'/'.$new_name);
+                if($convert and !is_file($BASE_DIR.$dir.'/'.$new_name)) {
+                    $messages_error .= "\t".$BASE_DIR.$dir.'/'.$file."\n";
+                    $error = true;
+                }
+            } else $change_file = $file;
+            if(!$convert)
+                $change_file = $file;
+            foreach($files_to_utf8 as $ext) {
+                if(!$error and substr($new_name,-(strlen($ext))) == $ext) {
+                    if(isset($css_file) and count($css_file) > 1 and in_array($change_file,$css_file)) {
+                        $messages_more_css .= "\t$dir/$change_file\n";
+                        continue;
+/*
+if(in_array($change_file,$css_file))
+    echo "css datei drin $dir<br>\n";
+echo "<pre>";
+print_r($css_file);
+echo "</pre><br>\n";*/
                     }
-                } else $change_file = $file;
-                if(!$convert)
-                    $change_file = $file;
-                foreach($files_to_utf8 as $ext) {
-                    if(!$error and substr($new_name,-(strlen($ext))) == $ext) {
-                        inhaltChange($change_file,$dir);
-                        break;
-                    }
+                    inhaltChange($change_file,$dir);
+                    break;
                 }
             }
         }
@@ -419,6 +581,8 @@ if($messages_error_lengt != strlen($messages_error)) {
         $logtext .= $messages_to_utf8."\n";
     if(strpos($messages_css,"\t") > 0)
         $logtext .= $messages_css."\n";
+    if(strpos($messages_css_replace,"\t") > 0)
+        $logtext .= $messages_css_replace."\n";
     if(strpos($messages_html,"\t") > 0)
         $logtext .= $messages_html."\n";
     if(strpos($messages_cp,"\t") > 0)
@@ -429,6 +593,15 @@ if($messages_error_lengt != strlen($messages_error)) {
         $logtext .= $messages_conf."\n";
     if(strpos($messages_rename,"\t") > 0)
         $logtext .= $messages_rename."\n";
+    if(strpos($messages_more_css,"\t") > 0)
+        $logtext .= $messages_more_css."\n";
+    if(!empty($messages_css_messages)) {
+        $logtext .= "\n\n".'!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ACHTUNG ab Hier gehtz von Hand weiter
+Die volgenden aussagen müssen nicht zutreffen
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'."\n\n";
+        $logtext .= $messages_css_messages."\n";
+    }
 }
 if(empty($logtext))
     $logtext = "Es braucht nichts Aktualiesiert werden";
