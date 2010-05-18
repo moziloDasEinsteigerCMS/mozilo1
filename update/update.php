@@ -566,6 +566,9 @@ $html .= "<body>";
 $html .= 'Scheint bis hierhin alles gut zu sein.<br>Unten Steht was alles gemacht wierd<br><br>';
 $html .= '<a href="?convert=true">Update Starten</a>';
 $html .= '<br><br><pre style="font-size:12px;">';
+if($convert) {
+    $html .= 'Alle änderungen stehen auch in der log.txt'."\n\n";
+}
 $logtext = "";
 if($messages_error_lengt != strlen($messages_error)) {
     $logtext = $messages_error."\n";
