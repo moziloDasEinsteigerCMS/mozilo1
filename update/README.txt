@@ -3,6 +3,8 @@ Update-Scripte für moziloCMS ??? auf 1.12
 Diese Anleitung bezieht sich nur auf ein Standard-moziloCMS; 
 eigene Erweiterungen müssen u.U. per Hand nachgezogen werden.
 
+Es werden volgende Ordner behandelt kategorien, layouts und galerien
+
 1.  auf dem Webserver ein neues Verzeichnis erstellen 
     (z.B "neumozilo").
 
