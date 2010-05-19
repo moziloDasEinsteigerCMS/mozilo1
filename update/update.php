@@ -605,19 +605,32 @@ $html .= '<meta http-equiv="Content-Type" content="text/html;charset='.$CHARSET.
 $html .= "<title>Update moziloCMS 1.11.2 nach 1.12</title>";
 $html .= "</head>";
 $html .= "<body>";
-$html .= '<p style="font-size:12px;">Haben sie die <a href="README.txt" target="_blank">README.txt</a> gelesen? gut dann kanns weiter gehen<br>
-<br>
-Die unten stehende Liste zeigt alle Änderungen an bitte überprüfen bei Fehlern diese vorher beheben.<br>
-<br>
-Dann kanns jetzt los gehen <a href="?convert=true">Update Starten</a><br><br>';
+$html .= '<pre style="font-size:12px;">Haben sie die <a href="README.txt" target="_blank">README.txt</a> gelesen? gut dann kanns weiter gehen
+
+Die unten stehende Liste zeigt alle Änderungen an bitte überprüfen bei Fehlern diese vorher beheben.
+
+Dann kanns jetzt los gehen <a href="?convert=true">Update Starten</a>
+
+TIP: Das Update Script kann so oft gestartet werden wie nötig.
+     Also wenn man später noch eine Inhaltseite oder ??? hat die man Updaten möchte
+     einfach in die Kategorie oder ??? Kopieren und das Update Script aufrufen
+
+';
 if(is_file($BASE_DIR.'/update/log.txt'))
-    $html .= 'Das ist die <a href="log.txt" target="_blank">log.txt</a> wo alle gemachten Änderungen stehen';
-$html .= '<br><br>--- Ab hier kommen die Meldungen ----------------------------------------------------</p>';
-$html .= '<br><pre style="font-size:12px;">';
+    $html .= 'Das ist die <a href="log.txt" target="_blank">log.txt</a> wo alle gemachten Änderungen stehen
+
+';
+else $html .= '
+
+';
+$html .= '--- Ab hier kommen die Meldungen ----------------------------------------------------
+
+';
+#$html .= '<br><pre style="font-size:12px;">';
 
 $html .= $logtext."\n";
 
-$html .= "&nbsp;</pre></body></html>";
+$html .= "</pre></body></html>";
 
 echo $html;
 
