@@ -1,4 +1,4 @@
-Update-Scripte für moziloCMS 1.11.2 auf 1.12
+Update-Scripte für moziloCMS ??? auf 1.12
 
 Diese Anleitung bezieht sich nur auf ein Standard-moziloCMS; 
 eigene Erweiterungen müssen u.U. per Hand nachgezogen werden.

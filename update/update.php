@@ -555,20 +555,7 @@ function changeToRawurl($dir = false) {
 
 
 changeToRawurl();
-$html = "";
-$html .= '<!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN">'."\n";
-$html .= "<html>\n";
-$html .= "<head>";
-$html .= '<meta http-equiv="Content-Type" content="text/html;charset='.$CHARSET.'">';
-$html .= "<title>Update moziloCMS 1.11.2 nach 1.12</title>";
-$html .= "</head>";
-$html .= "<body>";
-$html .= 'Scheint bis hierhin alles gut zu sein.<br>Unten Steht was alles gemacht wierd<br><br>';
-$html .= '<a href="?convert=true">Update Starten</a>';
-$html .= '<br><br><pre style="font-size:12px;">';
-if($convert) {
-    $html .= 'Alle änderungen stehen auch in der log.txt'."\n\n";
-}
+
 $logtext = "";
 if($messages_error_lengt != strlen($messages_error)) {
     $logtext = $messages_error."\n";
@@ -602,14 +589,34 @@ Die volgenden aussagen müssen nicht zutreffen
 }
 if(empty($logtext))
     $logtext = "Es braucht nichts Aktualiesiert werden";
-$html .= $logtext."\n";
-
 if($convert) {
     $log = fopen($BASE_DIR.'/update/log.txt', "a+");
-    fputs ($log, date('j.n.Y H:i:s')." ###################\n".$logtext."\n\n");
+    fputs ($log, "### ".date('j.n.Y H:i:s')." ###################################\n\n".$logtext."\n\n##########################################################\n");
     fclose($log);
 }
 @unlink($BASE_DIR.'/update/old.conf');
+
+
+$html = "";
+$html .= '<!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN">'."\n";
+$html .= "<html>\n";
+$html .= "<head>";
+$html .= '<meta http-equiv="Content-Type" content="text/html;charset='.$CHARSET.'">';
+$html .= "<title>Update moziloCMS 1.11.2 nach 1.12</title>";
+$html .= "</head>";
+$html .= "<body>";
+$html .= '<p style="font-size:12px;">Haben sie die <a href="README.txt" target="_blank">README.txt</a> gelesen? gut dann kanns weiter gehen<br>
+<br>
+Die unten stehende Liste zeigt alle Änderungen an bitte überprüfen bei Fehlern diese vorher beheben.<br>
+<br>
+Dann kanns jetzt los gehen <a href="?convert=true">Update Starten</a><br><br>';
+if(is_file($BASE_DIR.'/update/log.txt'))
+    $html .= 'Das ist die <a href="log.txt" target="_blank">log.txt</a> wo alle gemachten Änderungen stehen';
+$html .= '<br><br>--- Ab hier kommen die Meldungen ----------------------------------------------------</p>';
+$html .= '<br><pre style="font-size:12px;">';
+
+$html .= $logtext."\n";
+
 $html .= "&nbsp;</pre></body></html>";
 
 echo $html;
