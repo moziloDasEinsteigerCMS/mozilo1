@@ -30,7 +30,7 @@ Es werden volgende Ordner behandelt kategorien, layouts und galerien
 6.  im Browser [neumozilo]/update/update.php aufrufen und den 
     Anweisungen folgen.
 
-7.  prüfen, ob die neue Installation sauber funktioniert
+7.  prüfen, ob die neue Installation sauber funktionierte siehe log.txt
 
 8.  alte Installation löschen und durch die neue ersetzen
 
