@@ -288,16 +288,18 @@ if($convert or is_file($BASE_DIR.$CMS_DIR_NAME.'/conf/downloads.conf')) {
 }
 if(!is_file($BASE_DIR.$CMS_DIR_NAME.'/conf/downloads.conf'))
     $messages_newconf .= "\t".$CMS_DIR_NAME.'/conf/downloads.conf'."\n";
-$DOWNLOAD_COUNTS_OLD = new Properties($BASE_DIR.'/update/downloads.conf',true);
-foreach($DOWNLOAD_COUNTS_OLD->properties as $key => $value) {
-    if($key == 'error' or $key == 'readonly')
-        continue;
-    $key = $specialchars->replaceSpecialChars(rebuildOldSpecialChars($key),false);
-    $key = str_replace('%3A',':',$key);
-    if(!isset($conf_tmp[$key])) {
-        $messages_conf .= "\tDOWNLOAD_COUNTS->set(".$key.",".$value.")\n";
-        if($convert)
-            $DOWNLOAD_COUNTS->set($key,$value);
+if(is_file($BASE_DIR.'/update/downloads.conf')) {
+    $DOWNLOAD_COUNTS_OLD = new Properties($BASE_DIR.'/update/downloads.conf',true);
+    foreach($DOWNLOAD_COUNTS_OLD->properties as $key => $value) {
+        if($key == 'error' or $key == 'readonly')
+            continue;
+        $key = $specialchars->replaceSpecialChars(rebuildOldSpecialChars($key),false);
+        $key = str_replace('%3A',':',$key);
+        if(!isset($conf_tmp[$key])) {
+            $messages_conf .= "\tDOWNLOAD_COUNTS->set(".$key.",".$value.")\n";
+            if($convert)
+                $DOWNLOAD_COUNTS->set($key,$value);
+        }
     }
 }
 
