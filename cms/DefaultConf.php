@@ -116,7 +116,6 @@ function makeDefaultConf($conf_datei) {
                         'cmslanguage' => 'deDE',
                         'cmslayout' => 'moziloCMS',
                         'defaultcat' => '10_Willkommen',
-#                        'menu2' => 'no_menu2',
                         'titlebarformat' => '%7BWEBSITE%7D'),
                     'checkbox' => array(
                         'hidecatnamedpages' => 'false',
