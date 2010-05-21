@@ -1,9 +1,10 @@
-Update-Scripte für moziloCMS ??? auf 1.12
+Update-Script für moziloCMS 1.10.x bzw. 1.11.x auf 1.12
 
 Diese Anleitung bezieht sich nur auf ein Standard-moziloCMS; 
 eigene Erweiterungen müssen u.U. per Hand nachgezogen werden.
 
-Es werden volgende Ordner behandelt kategorien, layouts und galerien
+Es werden folgende Verzeichnisse behandelt: kategorien, layouts 
+und galerien
 
 1.  auf dem Webserver ein neues Verzeichnis erstellen 
     (z.B "neumozilo").
@@ -39,11 +40,14 @@ Es werden volgende Ordner behandelt kategorien, layouts und galerien
 10. viel Spass mit moziloCMS 1.12 :-)
 
 
-Sachen die zu beachten sind !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-Aufbau eines Templates:
+---------------------------
+Was zu beachten ist:
+---------------------------
 
-    Template name/
+- Aufbau eines Templates:
+
+    Template-Name/
                 css/
                 grafiken/
                 template.html
@@ -51,11 +55,14 @@ Aufbau eines Templates:
                 favicon.ico
                 layoutsettings.conf
 
-    Es solten nur die Dateien und Ordner die zum Aufbau des Templates gehören enthalten sein.
-    Wenn im grafiken/ Ordner Bilder mit Sonderzeichen enthalten sind mus nach dem Update
-    das Template entsprechend angepast werden.
+    Es sollten nur die Verzeichnisse und Dateien im Template-
+    Verzeichnis enthalten sein, die zum Aufbau des Templates 
+    gehören.
+    Sonderzeichen in Datei- bzw. Verzeichnisnamen sind mithilfe 
+    des Sonderzeichenkonverters (www.adresse.de/sonderzeichen/)
+    in URL-kodierter Schreibweise anzugeben.
 
-Styles die in den css Dateien geändert werden:
+- Änderungen im CSS:
 
     Neu hinzugekommen in Version 1.12:
         /* -------------------------------------------------------- */
@@ -135,85 +142,14 @@ Styles die in den css Dateien geändert werden:
         }
 
 
-    Styles die sich ab Version 1.11 geändert haben:
+    CSS-Änderungen 1.11 -> 1.12:
 
         div.imagesubtitle       nach    span.imagesubtitle
         div.leftcontentimage    nach    span.leftcontentimage
         div.rightcontentimage   nach    span.rightcontentimage
         em.deadlink             nach    span.deadlink
         em.highlight            nach    span.highlight
-        b {                     nach    b.contentbold {
-        i {                     nach    i.contentitalic {
-        u {                     nach    u.contentunderlined {
-        s {                     nach    s.contentstrikethrough {
-
-    ACHTUNG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    Styles die von Hand geändert werden müssen betrieft sehr alte Versionen:
-
-        Suchen sie bitte in ihrer css Datei
-        nach [bild|...], [bildlinks|...] und [bildrechts|...]
-        und Ersetzen es mit dem hier und passen es an
-            /* -------------------------------------------------------- */
-            /* [bild|...] */
-            /* ---------- */
-            img {
-                border:none;
-            }
-
-            span.imagesubtitle {
-                margin:3px 3px;
-                text-align:justify;
-                font-size:87%;
-            }
-
-            /* -------------------------------------------------------- */
-            /* [bildlinks|...] */
-            /* --------------- */
-            span.leftcontentimage {
-                margin:6px 20px 6px 0px;
-                float:left;
-            }
-
-            img.leftcontentimage {
-            }
-
-            /* -------------------------------------------------------- */
-            /* [bildrechts|...] */
-            /* ---------------- */
-            span.rightcontentimage {
-                margin:6px 0px 6px 20px;
-                float:right;
-            }
-
-            img.rightcontentimage {
-            }
-
-
-        Suchen sie bitte in ihrer css Datei nach den volgenden Styles
-        und Ersetzen es mit dem volgenden und passen es an
-
-        für em.bold das
-            b.contentbold {
-            }
-
-        für em.italic das
-            i.contentitalic {
-            }
-
-        für em.underlined das
-            u.contentunderlined {
-            }
-
-        für em.crossed das
-            s.contentstrikethrough {
-            }
-
-        Achtung em.bolditalic gibt es nicht mehr sie müssen in den Inhaltseiten [fettkursiv|]
-        durch [fett|[kursiv|]] ersetzen und den style em.bolditalic { ???? }
-        in css Datei entfernen
-
-
-
-
-
-
+        b                       nach    b.contentbold 
+        i                       nach    i.contentitalic 
+        u                       nach    u.contentunderlined 
+        s                       nach    s.contentstrikethrough 
