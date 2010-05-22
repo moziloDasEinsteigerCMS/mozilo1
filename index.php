@@ -429,9 +429,13 @@ $_POST = cleanREQUEST($_POST);
     function nameToPage($pagename, $currentcat, $ext = true) {
         global $CONTENT_DIR_REL;
         global $EXT_PAGE;
+        global $ACTION_REQUEST;
 
+        $showdraft = false;
+        if($ACTION_REQUEST == "draft")
+            $showdraft = true;
         // Kategorie-Verzeichnis einlesen
-        $dircontent = getDirContentAsArray($CONTENT_DIR_REL.$currentcat, true, true);
+        $dircontent = getDirContentAsArray($CONTENT_DIR_REL.$currentcat, true, true, $showdraft);
         // alle vorhandenen Inhaltsdateien durchgehen...
         foreach ($dircontent as $currentelement) {
             // ...und wenn eine auf den Namen paßt...
@@ -532,7 +536,7 @@ $_POST = cleanREQUEST($_POST);
 // Auslesen des Content-Verzeichnisses unter Beruecksichtigung
 // des auszuschließenden File-Verzeichnisses, Rueckgabe als Array
 // ------------------------------------------------------------------------------
-    function getDirContentAsArray($dir, $iscatdir, $showhidden) {
+    function getDirContentAsArray($dir, $iscatdir, $showhidden, $showdraft = false) {
         global $CONTENT_FILES_DIR_NAME;
         global $EXT_DRAFT;
         global $EXT_HIDDEN;
@@ -552,6 +556,7 @@ $_POST = cleanREQUEST($_POST);
                         || (substr($file, strlen($file)-4, strlen($file)) == $EXT_PAGE)
                         || (substr($file, strlen($file)-4, strlen($file)) == $EXT_LINK)
                         || ($showhidden && (substr($file, strlen($file)-4, strlen($file)) == $EXT_HIDDEN))
+                        || ($showdraft && (substr($file, strlen($file)-4, strlen($file)) == $EXT_DRAFT))
                     )
                     // ...und nicht $CONTENT_FILES_DIR_NAME
                     && (($file <> $CONTENT_FILES_DIR_NAME) || (!$iscatdir))

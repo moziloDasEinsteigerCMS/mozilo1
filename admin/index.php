@@ -932,11 +932,18 @@ function page($post) {
                 $page = $post['action_data']['editsite'][$cat];
                 global $CMS_CONF;
                 global $URL_BASE;
+
+                $page_draft = "?action=draft";
                 $link = $URL_BASE.substr($cat,3).'/'.substr($page,3,-(strlen($EXT_PAGE))).".html";
                 if($CMS_CONF->get("modrewrite") != "true") {
                     $link = $URL_BASE."index.php?cat=".substr($cat,3)."&amp;page=".substr($page,3,-(strlen($EXT_PAGE)));
+                    $page_draft = "&amp;action=draft";
                 }
-                $pagecontent .= '<span class="titel">'.getLanguageValue("page_edit").' → </span><a href="'.$link.'" target="_blank">'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen($EXT_PAGE))), true, true).'</a><br /><br />';
+
+                if(substr($page,-(strlen($EXT_DRAFT))) != $EXT_DRAFT)
+                    $page_draft = NULL;
+
+                $pagecontent .= '<span class="titel">'.getLanguageValue("page_edit").' → </span><a href="'.$link.$page_draft.'" target="_blank">'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen($EXT_PAGE))), true, true).'</a><br /><br />';
                 $pagecontent .= $post['content'];
                 $pagecontent .= '<input type="hidden" name="checkpara" value="no">';
                 return array(getLanguageValue("page_button"), $pagecontent);
@@ -1106,16 +1113,19 @@ function page($post) {
                 $text = NULL;
             }
             $tooltip_url = $tooltip_page_page_help_show;
-            $url = "index.php?cat=".$cat."page=".$post['categories'][$cat]['name'][$pos];
+            $page_draft = "&amp;action=draft";
+            $url = "index.php?cat=".$cat."&amp;page=".$post['categories'][$cat]['name'][$pos];
             if($CMS_CONF->get("modrewrite") == "true") {
                 $url = $URL_BASE.$cat."/".$post['categories'][$cat]['name'][$pos].".html";
+                $page_draft = "?action=draft";
             }
+            if($post['categories'][$cat]['ext'][$pos] != $EXT_DRAFT)
+                $page_draft = NULL;
             if(isset($post['categories'][$cat]['url'][$pos])) {
                 $url = "http://".$post['categories'][$cat]['url'][$pos];
                 $tooltip_url = $tooltip_page_link_help_show;
             }
-            $pagecontent .= '<span '.$post['categories'][$cat]['error_html']['name'][$pos].'class="text_cat_page"><a class="page_link" href="'.$url.'" target="_blank"'.$tooltip_url.'>'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['name'][$pos],true,true).'</a></span>';
-#            $pagecontent .= '<span '.$post['categories'][$cat]['error_html']['name'][$pos].'class="text_cat_page">'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['name'][$pos],true,true).'</span>';
+            $pagecontent .= '<span '.$post['categories'][$cat]['error_html']['name'][$pos].'class="text_cat_page"><a class="page_link" href="'.$url.$page_draft.'" target="_blank"'.$tooltip_url.'>'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['name'][$pos],true,true).'</a></span>';
             $pagecontent .= '<input type="hidden" name="categories['.$cat.'][name]['.$pos.']" value="'.$post['categories'][$cat]['name'][$pos].'"><input type="hidden" name="categories['.$cat.'][ext]['.$pos.']" value="'.substr($post['categories'][$cat]['ext'][$pos],-(strlen($EXT_PAGE))).'"></td>';
             $pagecontent .= '<td width="12%" class="td_left_title" nowrap><span class="text_info">'.$text.'</span></td>';
             $pagecontent .= '<td width="17%" class="td_left_title" nowrap>'.$select_box.'</td>';
