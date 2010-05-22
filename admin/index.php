@@ -911,6 +911,8 @@ function page($post) {
     global $EXT_HIDDEN;
     global $EXT_LINK;
     global $ADMIN_CONF;
+    global $CMS_CONF;
+    global $URL_BASE;
     global $PASSWORDS;
     global $icon_size;
 
@@ -991,7 +993,7 @@ function page($post) {
 
     $array_getTooltipValue = array("help_new_url","help_target_blank","help_target_self","help_target","help_url",
         "page_help_edit","page_help_position","page_help_new_position","page_help_name","page_help_new_name",
-        "page_help_move","page_help_editieren","page_help_edit_pages","page_help_delete","page_help_copy","page_help_password","page_help_password_del");
+        "page_help_move","page_help_editieren","page_help_edit_pages","page_help_delete","page_help_copy","page_help_password","page_help_password_del","page_page_help_show","page_link_help_show");
 
     # Variable erzeugen z.B. pages = $text_pages
     foreach($array_getTooltipValue as $language) {
@@ -1103,8 +1105,17 @@ function page($post) {
             } else {
                 $text = NULL;
             }
-            $pagecontent .= '<span '.$post['categories'][$cat]['error_html']['name'][$pos].'class="text_cat_page">'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['name'][$pos],true,true).'</span>';
-
+            $tooltip_url = $tooltip_page_page_help_show;
+            $url = "index.php?cat=".$cat."page=".$post['categories'][$cat]['name'][$pos];
+            if($CMS_CONF->get("modrewrite") == "true") {
+                $url = $URL_BASE.$cat."/".$post['categories'][$cat]['name'][$pos].".html";
+            }
+            if(isset($post['categories'][$cat]['url'][$pos])) {
+                $url = "http://".$post['categories'][$cat]['url'][$pos];
+                $tooltip_url = $tooltip_page_link_help_show;
+            }
+            $pagecontent .= '<span '.$post['categories'][$cat]['error_html']['name'][$pos].'class="text_cat_page"><a class="page_link" href="'.$url.'" target="_blank"'.$tooltip_url.'>'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['name'][$pos],true,true).'</a></span>';
+#            $pagecontent .= '<span '.$post['categories'][$cat]['error_html']['name'][$pos].'class="text_cat_page">'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['name'][$pos],true,true).'</span>';
             $pagecontent .= '<input type="hidden" name="categories['.$cat.'][name]['.$pos.']" value="'.$post['categories'][$cat]['name'][$pos].'"><input type="hidden" name="categories['.$cat.'][ext]['.$pos.']" value="'.substr($post['categories'][$cat]['ext'][$pos],-(strlen($EXT_PAGE))).'"></td>';
             $pagecontent .= '<td width="12%" class="td_left_title" nowrap><span class="text_info">'.$text.'</span></td>';
             $pagecontent .= '<td width="17%" class="td_left_title" nowrap>'.$select_box.'</td>';
