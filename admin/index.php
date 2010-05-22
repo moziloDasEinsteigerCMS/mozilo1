@@ -3087,7 +3087,7 @@ function config($post) {
         if ($element == $CMS_CONF->get("defaultcat")) {
             $selected = "selected ";
         }
-        $pagecontent .= "<option ".$selected."value=\"".$element."\">".$specialchars->rebuildSpecialChars($element, true, true)."</option>";
+        $pagecontent .= "<option ".$selected."value=\"".$element."\">".$specialchars->rebuildSpecialChars(substr($element,3), true, true)."</option>";
     }
     $pagecontent .= "</select></td>";
     $pagecontent .= "</tr>";
