@@ -1386,8 +1386,7 @@ $_POST = cleanREQUEST($_POST);
                             $replacement = $currentpluginobject->getPluginContent($plugin_parameter);
                         }
                     } else {
-                    $dead = str_replace(array('{','}','|'),array('~plugin_dead_start-','-plugin_dead_end~','-plugin_dead_grade~'),$match);
-                        $replacement = $syntax->createDeadlink($dead, $language->getLanguageValue1("plugin_error_1", $plugin));
+                        $replacement = str_replace(array('{','}','|'),array('~noplugin_start-','-noplugin_end~','-noplugin_grade~'),$match);
                     }
                     // Variable durch Plugin-Inhalt (oder Fehlermeldung) ersetzen
                     $content = str_replace($match,$replacement,$content);
@@ -1403,9 +1402,8 @@ $_POST = cleanREQUEST($_POST);
                     $content = str_replace($match,"",$content);
                 } else {
                     # Platzhalter nicht bekant
-                    $dead = str_replace(array('{','}','|'),array('~plugin_dead_start-','-plugin_dead_end~','-plugin_dead_grade~'),$match);
-                        $replacement = $syntax->createDeadlink($dead, $language->getLanguageValue1("plugin_error_1", $plugin));
-                    $content = str_replace($match,$replacement,$content);
+                    $noplugin = str_replace(array('{','}','|'),array('~noplugin_start-','-noplugin_end~','-noplugin_grade~'),$match);
+                    $content = str_replace($match,$noplugin,$content);
                 }
 
                 # alle script sachen rausnemen da könten verschachtelungen mit {} drin sein
@@ -1439,6 +1437,8 @@ $_POST = cleanREQUEST($_POST);
                 $content = str_replace(key($script_tmp),$script_tmp[key($script_tmp)],$content);
             }
         }
+        # alle nicht bekanten wieder herstellen
+        $content = str_replace(array('~noplugin_start-','-noplugin_end~','-noplugin_grade~'),array('{','}','|'),$content);
         return array($content,$css);
     }
 
