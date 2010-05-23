@@ -3634,6 +3634,7 @@ function plugins($post) {
     $pagecontent .= '<tr><td width="100%" class="td_toggle"><input type="submit" class="input_submit" name="apply" value="'.getLanguageValue("plugins_submit").'"/></td></tr>';
 
     $dircontent = getDirs($PLUGIN_DIR_REL, true);
+    natcasesort($dircontent);
     $toggle_pos = 0;
     foreach ($dircontent as $currentelement) {
         if (file_exists($PLUGIN_DIR_REL.$currentelement."/index.php")) {
