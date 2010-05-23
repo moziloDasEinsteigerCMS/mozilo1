@@ -166,7 +166,7 @@ s.contentstrikethrough {
 }
 ';
 
-$BASE_DIR = substr($_SERVER["SCRIPT_FILENAME"],0,strrpos($_SERVER["SCRIPT_FILENAME"],'update/update.php'));
+$BASE_DIR = strrev(substr(strrev($_SERVER["SCRIPT_FILENAME"]),strlen('update/update.php')));
 $CMS_DIR_NAME = "cms";
 $ADMIN_DIR_NAME = "admin";
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
