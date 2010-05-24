@@ -4069,9 +4069,10 @@ function returnSmileyBar() {
         if($icon == "readonly" or $icon == "error") {
             continue;
         }
-        $content .= "<img class=\"jss\" title=\":$icon:\" alt=\"$emoticon\" src=\"".$URL_BASE.$CMS_DIR_NAME."/smileys/$icon.gif\" onClick=\"insert(' :$icon: ', '', false)\" />";
+        $content .= '<img class="jss" title=":'.$icon.':" alt="'.$emoticon.'" src="'.$URL_BASE.$CMS_DIR_NAME.'/smileys/'.$icon.'.gif" onClick="insert(\' :'.$icon.': \', \'\', false)"'.createUserTooltipWZ($emoticon,':'.$icon.':').' />';
     }
     return $content;
+
 }
 
 // Selectbox mit allen benutzerdefinierten Syntaxelementen
@@ -4186,8 +4187,8 @@ function returnFormatToolbar($currentcat) {
     .returnFormatToolbarIcon("absatz")
     .returnFormatToolbarIcon("liste")
     .returnFormatToolbarIcon("numliste")
-    ."<img class=\"js\" alt=\"Tabelle\" title=\"[tabelle| ... ] - ".getLanguageValue("toolbar_desc_tabelle")."\" src=\"gfx/jsToolbar/tabelle.png\" onClick=\"insert('[tabelle|\\n<< ', ' |  >>\\n<  |  >\\n]', true)\">"
-    ."<img class=\"js\" alt=\"Horizontale Linie\" title=\"[----] - ".getLanguageValue("toolbar_desc_linie")."\" src=\"gfx/jsToolbar/linie.png\" onClick=\"insert('[----]', '', false)\">"
+    ."<img class=\"js\" alt=\"Tabelle\" title=\"[tabelle| ... ] - ".getLanguageValue("toolbar_desc_tabelle")."\" src=\"gfx/jsToolbar/tabelle.png\" onClick=\"insert('[tabelle|\\n<< ', ' |  >>\\n<  |  >\\n]', true)\"".createUserTooltipWZ(getLanguageValue("toolbar_desc_tabelle"),"[tabelle|<<  |  >> <  |  >]").">"
+    ."<img class=\"js\" alt=\"Horizontale Linie\" title=\"[----] - ".getLanguageValue("toolbar_desc_linie")."\" src=\"gfx/jsToolbar/linie.png\" onClick=\"insert('[----]', '', false)\"".createUserTooltipWZ(getLanguageValue("toolbar_desc_linie"),'[----]').">"
     .returnFormatToolbarIcon("html")
     .returnFormatToolbarIcon("include")
     ."</td>"
@@ -4205,7 +4206,7 @@ function returnFormatToolbar($currentcat) {
     // Farben
     ."<td nowrap>"
     .'<table summary="" cellspacing="0" border="0" cellpadding="0"><tr><td>'
-    ."<img class=\"js\" style=\"background-color:#AA0000\" alt=\"Farbe\" id=\"farbicon\" title=\"[farbe=RRGGBB| ... ] - ".getLanguageValue("toolbar_desc_farbe")."\" src=\"gfx/jsToolbar/farbe.png\" onClick=\"insert('[farbe=' + document.getElementById('farbcode').value + '|', ']', true)\">"
+    ."<img class=\"js\" style=\"background-color:#AA0000\" alt=\"Farbe\" id=\"farbicon\" title=\"[farbe=RRGGBB| ... ] - ".getLanguageValue("toolbar_desc_farbe")."\" src=\"gfx/jsToolbar/farbe.png\" onClick=\"insert('[farbe=' + document.getElementById('farbcode').value + '|', ']', true)\"".createUserTooltipWZ(getLanguageValue("toolbar_desc_farbe"),'[farbe=RRGGBB| ... ]').">"
     ."</td><td nowrap>"
     ."<div class=\"colordiv\">"
     ."<input type=\"text\" readonly=\"readonly\" maxlength=\"6\" value=\"AA0000\" class=\"colorinput\" id=\"farbcode\" size=\"0\">"
@@ -4262,7 +4263,8 @@ function returnFormatToolbar($currentcat) {
 
 // Rueckgabe eines Standard-Formatsymbolleisten-Icons
 function returnFormatToolbarIcon($tag) {
-    return "<img class=\"js\" alt=\"$tag\" title=\"[$tag| ... ] - ".getLanguageValue("toolbar_desc_".$tag)."\" src=\"gfx/jsToolbar/".$tag.".png\" onClick=\"insert('[".$tag."|', ']', true)\">";
+    return '<img class="js" alt="'.$tag.'" title="['.$tag.'| ... ] - '.getLanguageValue("toolbar_desc_".$tag).'" src="gfx/jsToolbar/'.$tag.'.png" onClick="insert(\'['.$tag.'|\', \']\', true)"'.createUserTooltipWZ(getLanguageValue("toolbar_desc_".$tag),'['.$tag.'| ... ]').'>';
+
 }
 
 
