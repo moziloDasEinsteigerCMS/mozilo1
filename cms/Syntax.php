@@ -83,6 +83,8 @@ class Syntax {
             $this->headlineinfos = $this->getHeadlineInfos($content);
         }
 
+        // Immer ersetzen: Horizontale Linen
+        $content = preg_replace('/\[----\]/', '<hr />', $content);
         // Nach Texten in eckigen Klammern suchen
         preg_match_all("/\[([^\[\]]+)\|([^\[\]]*)\]/Um", $content, $matches);
         $i = 0;
@@ -553,11 +555,23 @@ class Syntax {
 
             // Tabellen
             elseif ($attribute == "tabelle") {
+                // Nach Plugins suchen die ein | haben da der | als trennung in tabelle genutz wird
+                preg_match_all("/\{([^\{\}]+)\|([^\{\}]*)\}/Um", $match, $plugins);
+                if(isset($plugins[0])) {
+                    foreach($plugins[0] as $pos => $plugin) {
+                        $replace_tmp[$pos] = '~plugin '.$pos.'-';
+                        $replace_plugin[$pos] = $plugin;
+                    }
+                }
+                if(isset($replace_tmp))
+                    $value_tmp = str_replace ($replace_plugin, $replace_tmp, $value);
+                else
+                    $value_tmp = $value;
                 // Tabelleninhalt aufbauen
                 $tablecontent = "";
                 $j = 0;
                 // Tabellenzeilen
-                preg_match_all("/(&lt;|&lt;&lt;)(.*)(&gt;|&gt;&gt;)/Umsie", $value, $tablelines);
+                preg_match_all("/(&lt;|&lt;&lt;)(.*)(&gt;|&gt;&gt;)/Umsie", $value_tmp, $tablelines);
                 foreach ($tablelines[0] as $tablematch) {
                     // Kopfzeilen
                     if (preg_match("/&lt;&lt;([^&gt;]*)/Umsi", $tablematch)) {
@@ -583,6 +597,8 @@ class Syntax {
                     $j++;
                 }
                 $content = str_replace ("$match", "<table class=\"contenttable\" cellspacing=\"0\" border=\"0\" cellpadding=\"0\" summary=\"\">$tablecontent</table>", $content);
+                if(isset($replace_tmp))
+                    $content = str_replace ($replace_tmp,$replace_plugin, $content );
             }
 
             // Includes
@@ -709,7 +725,7 @@ class Syntax {
             $content = $this->convertContent($content, $cat, false);
         else {
             // Immer ersetzen: Horizontale Linen
-            $content = preg_replace('/\[----\]/', '<hr />', $content);
+#            $content = preg_replace('/\[----\]/', '<hr />', $content);
             // Zeilenwechsel setzen
             $content = preg_replace('/(\r\n|\r|\n)/', '$1<br />', $content);
             // Zeilenwechsel nach Blockelementen entfernen
