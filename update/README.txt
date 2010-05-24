@@ -153,3 +153,107 @@ Was zu beachten ist:
         i                       nach    i.contentitalic 
         u                       nach    u.contentunderlined 
         s                       nach    s.contentstrikethrough 
+
+
+    ACHTUNG !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        Die Galerie ist ein Plugin geworden deshalb müssen die volgenden sachen von hand umgestelt werden
+
+        Das erscheinungs bild wird im Galerie Plugin configuriert
+
+        für embedete Galerie einfach in der Inhaltsseite {Galerie|MEINE GALERIE} einsetzten
+        und im admin Plugins Standart Galerie die entsprechenden Platzhalter anordnen HTML code ist
+        erlaubt.
+        ACHTUNG hier ist zu beachten das alle Lehr und Zeilen umbrüche ersetztwerden mit &nbsp; und <br>
+        deshalb überall wo das nicht erwünscht ist einfach nicht machen :)
+
+
+        für nicht embedete Galerie in der gallerytemplate.html ein {Galerie} an die Passende stelle setzen
+        und alle Platzhalter {CURRENTGALLERY} {GALLERYMENU} {NUMBERMENU} {CURRENTPIC} {CURRENTDESCRIPTION}
+        {XOUTOFY} {CURRENT_INDEX} {PREVIOUS_INDEX} {NEXT_INDEX} entfernen und im Plugin configurieren
+
+        z.B. Auszug aus einer gallerytemplate.html
+
+            <body>
+              <div id="container">
+                <div id="header">
+                  <h1>
+                    <a href="index.php" title="Zur Startseite">{WEBSITE_TITLE}</a>
+                  </h1>
+                </div>
+                <div id="sub_header">
+                          {CURRENTGALLERY}
+                </div>
+                <div id="main_content_top"></div>
+                <div id="main_content">
+                  <div class="gallerycontent">
+                    <h2>
+                      {CURRENTGALLERY}
+                    </h2>
+                    <div class="gallerymenu">
+                      {GALLERYMENU}
+                    </div>
+
+                    <div class="gallerynumbermenu">
+                      {NUMBERMENU}
+                    </div>
+                    <div style="text-align:center;">
+                      {CURRENTPIC}<br />
+                      <br />
+                      {CURRENTDESCRIPTION}<br />
+                      <br />
+
+                      {XOUTOFY}
+                    </div>
+                  </div>
+                  <div id="clear"></div>
+                </div>
+                <div id="main_content_bottom"></div>
+                <div id="footer">
+                  <b>Design by</b> <a href="http://www.pikanai.com">Pikanai.com</a>
+                </div>
+              </div>
+            </body>
+
+        Da holen wir uns den Relewanten Teil raus und ersetzen in mit {Galerie}
+
+            <div id="sub_header">
+                      {CURRENTGALLERY}
+            </div>
+            <div id="main_content_top"></div>
+            <div id="main_content">
+              <div class="gallerycontent">
+                <h2>
+                  {CURRENTGALLERY}
+                </h2>
+                <div class="gallerymenu">
+                  {GALLERYMENU}
+                </div>
+
+                <div class="gallerynumbermenu">
+                  {NUMBERMENU}
+                </div>
+                <div style="text-align:center;">
+                  {CURRENTPIC}<br />
+                  <br />
+                  {CURRENTDESCRIPTION}<br />
+                  <br />
+
+                  {XOUTOFY}
+                </div>
+              </div>
+              <div id="clear"></div>
+            </div>
+
+        und setzen in im admin Plugin Standart Galerie im Textfeld ein
+
+            <div id="sub_header">{CURRENTGALLERY}</div><div id="main_content_top"></div>
+            <div id="main_content"><div class="gallerycontent"><h2>{CURRENTGALLERY}</h2>
+            <div class="gallerymenu">{GALLERYMENU}</div><div class="gallerynumbermenu">{NUMBERMENU}</div>
+            <div style="text-align:center;">
+            {CURRENTPIC}
+            {CURRENTDESCRIPTION}
+            {XOUTOFY}</div></div><div id="clear"></div></div>
+
+        ACHTUNG hier ist zu beachten das alle Lehr und Zeilen umbrüche ersetztwerden mit &nbsp; und <br>
+        deshalb überall wo das nicht erwünscht ist einfach nicht machen :)
+
