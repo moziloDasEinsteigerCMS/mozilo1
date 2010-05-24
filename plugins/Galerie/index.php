@@ -196,20 +196,6 @@ class Galerie extends Plugin {
 	        }
 	    
 	        // ------------------------------------------------------------------------------
-	        // Hilfsfunktion: Extrahiert das Embedded-Template aus dem Gesamt-Template
-	        // ------------------------------------------------------------------------------
-	/*
-	        function extractEmbeddedTemplate($template) {
-	            global $GALLERY_CONF;
-	            preg_match("/\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_START\}[\s|\t]*--\>(.*)\<!--[\s|\t]*\{EMBEDDED_TEMPLATE_END\}[\s|\t]*--\>/Umsi", $template, $matches);
-	            if (sizeof($matches) > 1) {
-	                return "<div class=\"embeddedgallery\">".$matches[1]."</div>";
-	            }
-	            else {
-	                return false;
-	            }
-	        }*/
-	        // ------------------------------------------------------------------------------
 	        // Hilfsfunktion: "title"-Attribut zusammenbauen (oder nicht, wenn nicht konfiguriert)
 	        // ------------------------------------------------------------------------------
 	/*
