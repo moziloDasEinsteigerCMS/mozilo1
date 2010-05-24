@@ -943,7 +943,7 @@ function page($post) {
                 if(substr($page,-(strlen($EXT_DRAFT))) != $EXT_DRAFT)
                     $page_draft = NULL;
 
-                $pagecontent .= '<span class="titel">'.getLanguageValue("page_edit").' → </span><a href="'.$link.$page_draft.'" target="_blank">'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen($EXT_PAGE))), true, true).'</a><br /><br />';
+                $pagecontent .= '<span class="titel">'.getLanguageValue("page_edit").' → </span><a href="'.$link.$page_draft.'" target="_blank"'.createTooltipWZ("","page_page_help_show",",WIDTH,200,CLICKCLOSE,true").'>'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen($EXT_PAGE))), true, true).'</a><br /><br />';
                 $pagecontent .= $post['content'];
                 $pagecontent .= '<input type="hidden" name="checkpara" value="no">';
                 return array(getLanguageValue("page_button"), $pagecontent);
