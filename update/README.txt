@@ -37,7 +37,9 @@ und galerien
 
 9.  das Verzeichnis "update" in der neuen Installation löschen
 
-10. viel Spass mit moziloCMS 1.12 :-)
+10. Wenn der Neue amin Zerschossen aussieht einfach nur den Browser-Cache lehren
+
+11. viel Spass mit moziloCMS 1.12 :-)
 
 
 
