@@ -439,7 +439,7 @@ function inhaltChange($file,$dir) {
             $inhalt = str_replace($search,$replace,$inhalt);
         }
     }
-    if(substr($file,-(strlen(".css"))) == ".css") {
+    if(substr($file,-(strlen(".css"))) == ".css" and strstr($dir,"layouts/")) {
         $css_new_inhalt = false;
         foreach($css_new as $search => $css_inhalt) {
             if(strpos($inhalt,$search) < 1) {
