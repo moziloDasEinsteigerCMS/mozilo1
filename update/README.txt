@@ -156,6 +156,72 @@ Was zu beachten ist:
         u                       nach    u.contentunderlined 
         s                       nach    s.contentstrikethrough 
 
+     ACHTUNG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     Styles die von Hand geändert werden müssen betrieft nur sehr alte Versionen:
+
+         Suchen sie bitte in ihrer css Datei
+         nach [bild|...], [bildlinks|...] und [bildrechts|...]
+         und Ersetzen es mit dem hier und passen es an
+             /* -------------------------------------------------------- */
+             /* [bild|...] */
+             /* ---------- */
+             img {
+                 border:none;
+             }
+
+             span.imagesubtitle {
+                 margin:3px 3px;
+                 text-align:justify;
+                 font-size:87%;
+             }
+
+             /* -------------------------------------------------------- */
+             /* [bildlinks|...] */
+             /* --------------- */
+             span.leftcontentimage {
+                 margin:6px 20px 6px 0px;
+                 float:left;
+             }
+
+             img.leftcontentimage {
+             }
+
+             /* -------------------------------------------------------- */
+             /* [bildrechts|...] */
+             /* ---------------- */
+             span.rightcontentimage {
+                 margin:6px 0px 6px 20px;
+                 float:right;
+             }
+
+             img.rightcontentimage {
+             }
+
+
+         Suchen sie bitte in ihrer css Datei nach den volgenden Styles
+         und Ersetzen es mit dem volgenden und passen es an
+
+         für em.bold das
+             b.contentbold {
+             }
+
+         für em.italic das
+             i.contentitalic {
+             }
+
+         für em.underlined das
+             u.contentunderlined {
+             }
+
+         für em.crossed das
+             s.contentstrikethrough {
+             }
+
+         Achtung em.bolditalic gibt es nicht mehr sie müssen in den Inhaltseiten [fettkursiv|]
+         durch [fett|[kursiv|]] ersetzen und den style em.bolditalic { ???? }
+         in css Datei entfernen
+
+
 
     ACHTUNG !!!!!!!!!!!!!!!!!!!!!!!!!!!!
         Die Galerie ist ein Plugin geworden deshalb müssen die volgenden sachen von hand umgestelt werden
