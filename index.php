@@ -301,7 +301,7 @@ $_POST = cleanREQUEST($_POST);
 
     $HTML = $template;
     # erst alle Plugin Platzhalter des Content ersetzen
-    list($tmp,$css) = replacePluginVariables($pagecontent,$activ_plugins,$deactiv_plugins);
+    list($tmp,$css1) = replacePluginVariables($pagecontent,$activ_plugins,$deactiv_plugins);
 
     // Gesuchte Phrasen hervorheben
     if ($HIGHLIGHT_REQUEST <> "") {
@@ -310,15 +310,23 @@ $_POST = cleanREQUEST($_POST);
     }
 
     $HTML = preg_replace('/{CONTENT}/', $tmp, $HTML);
-    $HTML = str_replace(array("</head>","</HEAD>"),$css."</head>",$HTML);
     # und dann die Restlichen Plugin Platzhalter ersetzen so können aus dem Content GLOBALS
     # gesetzt werden die dann mit denn Restlichen Plugin Platzhalter (Template) ersetzen werden
     // Benutzer-Variablen ersetzen
-    list($HTML,$css) = replacePluginVariables($HTML,$activ_plugins,$deactiv_plugins);
-    $HTML = str_replace(array("</head>","</HEAD>"),$css."</head>",$HTML);
+    list($HTML,$css2) = replacePluginVariables($HTML,$activ_plugins,$deactiv_plugins);
     # und wenn durch die Plugins wieder Pluginplatzhalter enstanden sind
-    list($HTML,$css) = replacePluginVariables($HTML,$activ_plugins,$deactiv_plugins);
-    $HTML = str_replace(array("</head>","</HEAD>"),$css."</head>",$HTML);
+    list($HTML,$css3) = replacePluginVariables($HTML,$activ_plugins,$deactiv_plugins);
+    # alle plugin.css dateien in ein array
+    $css = array_merge($css1,$css2,$css3);
+    $neu_css = array();
+    foreach($css as $style) {
+        # nur die die noch nicht enthalten sind in $neu_css
+        if(!in_array($style,$neu_css))
+            $neu_css[] = $style;
+    }
+    $css_replace = implode("\n", $neu_css);
+    # und zum schluss ins Template einbauen
+    $HTML = str_replace(array("</head>","</HEAD>"),$css_replace."\n</head>",$HTML);
 
     # alle Plugins die nicht existieren oder einen Fehler haben
     $HTML = str_replace(array('~plugin_dead_start-','-plugin_dead_end~','-plugin_dead_grade~'),array('{','}','|'),$HTML);
@@ -1365,7 +1373,7 @@ $_POST = cleanREQUEST($_POST);
             preg_match_all("/\{([^\|\{]+)\}/Umsi", $content, $matches);
         }
         $notexit = 0;
-        $css = "";
+        $css = array();
         while (count($matches[0]) > 0 and $notexit < 10) {
             # $matches[0] = {Plugin|Parameter}
             # $matches[1] = Plugin name
@@ -1397,10 +1405,8 @@ $_POST = cleanREQUEST($_POST);
                     $content = str_replace($match,$replacement,$content);
                     if(!in_array($plugin, $deactiv_plugins)
                         and file_exists($PLUGIN_DIR_REL.$plugin."/plugin.css")
-                        and strpos($css,$plugin.'/plugin.css') < 1
-                        and strpos($content,$plugin.'/plugin.css') < 1)
-                        {
-                        $css .= '<style type="text/css"> @import "'.$URL_BASE.$PLUGIN_DIR_NAME.'/'.$plugin.'/plugin.css"; </style>';
+                        ) {
+                        $css[] = '<style type="text/css"> @import "'.$URL_BASE.$PLUGIN_DIR_NAME.'/'.$plugin.'/plugin.css"; </style>';
                     }
                 } elseif(in_array($plugin, $deactiv_plugins)) {
                     # Deactiviertes Plugin mit nichts ersetzen
