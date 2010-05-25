@@ -3153,7 +3153,7 @@ function config($post) {
         $usersyntaxdefs = @fread($handle, @filesize($USER_SYNTAX_FILE));
         @fclose($handle);
         $pagecontent .= "<tr><td class=\"td_cms_colspan2\" colspan=\"2\">".getLanguageValue("config_text_usersyntax")."</td>";
-        $pagecontent .= "<tr><td class=\"td_cms_left\" colspan=\"2\"><textarea class=\"textarea_cms\" cols=\"116\" rows=\"6\" name=\"usersyntax\" ".$error_color['usersyntax'].">".$specialchars->rebuildSpecialChars($usersyntaxdefs,false,true)."</textarea></td></tr>";
+        $pagecontent .= "<tr><td class=\"td_cms_left\" colspan=\"2\"><textarea class=\"textarea_cms\" cols=\"116\" rows=\"6\" name=\"usersyntax\" ".$error_color['usersyntax'].">".$usersyntaxdefs."</textarea></td></tr>";
         // Zeile "ERSETZE EMOTICONS"
         if($ADMIN_CONF->get('showexpert') == "true") {
             $pagecontent .= "<tr><td class=\"td_cms_left\">".getLanguageValue("config_text_replaceemoticons")."</td>";
