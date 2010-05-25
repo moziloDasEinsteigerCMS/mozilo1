@@ -1114,7 +1114,7 @@ function page($post) {
             }
             $tooltip_url = $tooltip_page_page_help_show;
             $page_draft = "&amp;action=draft";
-            $url = "index.php?cat=".$cat."&amp;page=".$post['categories'][$cat]['name'][$pos];
+            $url = $URL_BASE."index.php?cat=".$cat."&amp;page=".$post['categories'][$cat]['name'][$pos];
             if($CMS_CONF->get("modrewrite") == "true") {
                 $url = $URL_BASE.$cat."/".$post['categories'][$cat]['name'][$pos].".html";
                 $page_draft = "?action=draft";
