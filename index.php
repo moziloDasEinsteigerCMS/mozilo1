@@ -338,6 +338,7 @@ $_POST = cleanREQUEST($_POST);
     $HTML = preg_replace('/{CHARSET}/', $CHARSET, $HTML);
     $HTML = preg_replace('/{FAVICON_FILE}/', $FAVICON_FILE, $HTML);
     $HTML = preg_replace('/{LAYOUT_DIR}/', $LAYOUT_DIR_URL, $HTML);
+    $HTML = preg_replace('/{BASE_URL}/', $URL_BASE, $HTML);
 
     // Platzhalter ersetzen
     $HTML = replacePlaceholders($HTML, $cattitle, $pagetitle);

@@ -37,6 +37,7 @@ function cleanREQUEST($post_return) {
 function makePlatzhalter($all = false) {
     # Alle Platzhalter für die Selctbox im Editor als array
     $platzhalter = array(
+                        '{BASE_URL}',
                         '{CATEGORY_NAME}',
                         '{CATEGORY}',
                         '{CATEGORY_URL}',
