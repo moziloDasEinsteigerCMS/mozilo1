@@ -83,7 +83,7 @@ class Syntax {
             $this->headlineinfos = $this->getHeadlineInfos($content);
         }
 
-        // Erstmal dummy ersetzen: Horizontale Linen
+        // Erstmal mit dummy ersetzen: Horizontale Linen
         $content = preg_replace('/\[----\]/', '~hr-', $content);
         // Nach Texten in eckigen Klammern suchen
         preg_match_all("/\[([^\[\]]+)\|([^\[\]]*)\]/Um", $content, $matches);
@@ -724,7 +724,7 @@ class Syntax {
         if ($i > 0)
             $content = $this->convertContent($content, $cat, false);
         else {
-            // Immer ersetzen: Horizontale Linen
+            // dummy mit Horizontale Linen ersetzen
             $content = preg_replace('/\~hr-/', '<hr />', $content);
             // Zeilenwechsel setzen
             $content = preg_replace('/(\r\n|\r|\n)/', '$1<br />', $content);
