@@ -2916,8 +2916,7 @@ function config($post) {
                             }
                         }
                     }
-                } else
-                    $usersyntax_text .= "\n";
+                }
             }
             if($handle = @fopen($USER_SYNTAX_FILE, "a+")) {
                 $test = fread($handle,filesize($USER_SYNTAX_FILE));
