@@ -554,7 +554,11 @@ class Syntax {
 
 
             // Tabellen
-            elseif ($attribute == "tabelle") {
+            elseif (($attribute == "tabelle") or (substr($attribute,0,8) == "tabelle=")) {
+                $tabellecss = "contenttable";
+                if(substr($attribute,0,8) == "tabelle=")
+                    # was nach dem = steht wird als class name verwendet
+                    $tabellecss = substr($attribute,8,strlen($attribute)-8);
                 // Nach Plugins suchen die ein | haben da der | als trennung in tabelle genutz wird
                 preg_match_all("/\{([^\{\}]+)\|([^\{\}]*)\}/Um", $match, $plugins);
                 if(isset($plugins[0])) {
@@ -569,34 +573,33 @@ class Syntax {
                     $value_tmp = $value;
                 // Tabelleninhalt aufbauen
                 $tablecontent = "";
-                $j = 0;
                 // Tabellenzeilen
                 preg_match_all("/(&lt;|&lt;&lt;)(.*)(&gt;|&gt;&gt;)/Umsie", $value_tmp, $tablelines);
-                foreach ($tablelines[0] as $tablematch) {
+                foreach ($tablelines[0] as $j => $tablematch) {
                     // Kopfzeilen
                     if (preg_match("/&lt;&lt;([^&gt;]*)/Umsi", $tablematch)) {
-                        $linecontent = preg_replace('/\|/', '</th><th class="contenttable">', $tablelines[2][$j]);
-# Table Hack recursive Table siehe weiter unten
-#                        $linecontent = preg_replace('/&#38;/', '&', $linecontent);
+                        $linecontent = preg_replace('/\|/', '</th><th class="'.$tabellecss.'">', $tablelines[2][$j]);
                         $linecontent = preg_replace('/&lt;(.*)/', "$1", $linecontent);
-                        $tablecontent .= "<tr><th class=\"contenttable\">$linecontent</th></tr>";
+                        $tablecontent .= '<tr><th class="'.$tabellecss.'">'.$linecontent.'</th></tr>';
                     }
                     // normale Tabellenzeilen
                     else {
                         // CSS-Klasse immer im Wechsel
-                        $css = "contenttable1";
+                        $cssline = $tabellecss."1";
                         if ($j%2 == 0) {
-                            $css = "contenttable2";
+                            $cssline = $tabellecss."2";
                         }
                         // Pipes durch TD-Wechsel ersetzen
-                        $linecontent = preg_replace('/\|/', '</td><td class="'.$css.'">', $tablelines[2][$j]);
-# Table Hack recursive Table siehe weiter unten
-#                        $linecontent = preg_replace('/&#38;/', '&', $linecontent);
-                        $tablecontent .= "<tr><td class=\"$css\">$linecontent</td></tr>";
+                        $linecontent = explode("|",$tablelines[2][$j]);
+                        $tablecontent .= "<tr>";
+                        foreach($linecontent as $pos => $td_content) {
+                            # td css vortlaufend nummerieren mit 1 anfangen
+                            $tablecontent .= '<td class="'.$cssline.' '.$tabellecss."cell".($pos + 1).'">'.$td_content.'</td>';
+                        }
+                        $tablecontent .= "</tr>";
                     }
-                    $j++;
                 }
-                $content = str_replace ("$match", "<table class=\"contenttable\" cellspacing=\"0\" border=\"0\" cellpadding=\"0\" summary=\"\">$tablecontent</table>", $content);
+                $content = str_replace ("$match", '<table class="'.$tabellecss.'" cellspacing="0" border="0" cellpadding="0" summary="">'.$tablecontent.'</table>', $content);
                 if(isset($replace_tmp))
                     $content = str_replace ($replace_tmp,$replace_plugin, $content );
             }
