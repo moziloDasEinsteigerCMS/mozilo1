@@ -13,7 +13,7 @@ session_start();
 /*
 echo "<pre style=\"position:fixed;background-color:#000;color:#0f0;padding:5px;font-family:monospace;border:2px solid #777;\">";
 print_r($_REQUEST);
-echo "</pre>";
+echo "</pre>"; 
 */
 
 $BASE_DIR = substr($_SERVER["SCRIPT_FILENAME"],0,strpos($_SERVER["SCRIPT_FILENAME"],'index.php'));
