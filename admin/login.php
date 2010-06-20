@@ -177,9 +177,9 @@ function login_formular($enabled) {
       ."</td>"
       ."<td>";
   if ($enabled)
-        $form .= "<input type=\"text\" name=\"username\" size=\"15\" maxlength=\"20\" class=\"login_input\">";
+        $form .= "<input type=\"text\" name=\"username\" size=\"15\" maxlength=\"20\" class=\"login_input\" autocomplete=\"off\">";
     else
-        $form .= "<input class=\"login_input\" type=\"text\" size=\"15\" name=\"username\" readonly=\"readonly\">";
+        $form .= "<input class=\"login_input\" type=\"text\" size=\"15\" name=\"username\" readonly=\"readonly\" autocomplete=\"off\">";
   $form .= "</td>"
       ."</tr>"
       ."<tr>"
@@ -188,9 +188,9 @@ function login_formular($enabled) {
       ."</td>"
       ."<td>";
   if ($enabled)
-        $form .= "<input class=\"login_input\" size=\"15\" maxlength=\"20\" type=\"password\" name=\"password\">";
+        $form .= "<input class=\"login_input\" size=\"15\" maxlength=\"20\" type=\"password\" name=\"password\" autocomplete=\"off\">";
     else
-        $form .= "<input class=\"login_input\" size=\"15\" type=\"password\" name=\"password\" readonly=\"readonly\">";
+        $form .= "<input class=\"login_input\" size=\"15\" type=\"password\" name=\"password\" readonly=\"readonly\" autocomplete=\"off\">";
   $form .= "</td>"
       ."</tr>"
       ."<tr>"
