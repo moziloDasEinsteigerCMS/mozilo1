@@ -26,6 +26,14 @@ if(is_file($BASE_DIR_CMS."DefaultConf.php")) {
     die("Fatal Error ".$BASE_DIR_CMS."DefaultConf.php Datei existiert nicht");
 }
 
+# Um Cross-Site Scripting-Schwachstellen zu verhindern
+$_SERVER["PHP_SELF"] = htmlspecialchars($_SERVER["PHP_SELF"], ENT_QUOTES, $CHARSET);
+$_SERVER["REQUEST_URI"] = htmlspecialchars($_SERVER["REQUEST_URI"], ENT_QUOTES, $CHARSET);
+if(isset($_SERVER["SCRIPT_URL"]))
+    $_SERVER["SCRIPT_URL"] = htmlspecialchars($_SERVER["SCRIPT_URL"], ENT_QUOTES, $CHARSET);
+if(isset($_SERVER["SCRIPT_URI"]))
+    $_SERVER["SCRIPT_URI"] = htmlspecialchars($_SERVER["SCRIPT_URI"], ENT_QUOTES, $CHARSET);
+
 $_GET = cleanREQUEST($_GET);
 $_REQUEST = cleanREQUEST($_REQUEST);
 $_POST = cleanREQUEST($_POST);
@@ -41,11 +49,7 @@ $_POST = cleanREQUEST($_POST);
     $VERSION_CONF  = new Properties($BASE_DIR_CMS."conf/version.conf",true);
     $GALLERY_CONF  = new Properties($BASE_DIR_CMS."conf/gallery.conf",true);
     $USER_SYNTAX  = new Properties($BASE_DIR_CMS."conf/syntax.conf",true);
-    $URL_BASE = substr($_SERVER['PHP_SELF'],0,-(strlen("index.php")));
-#    $URL_BASE = NULL;
-#    if($CMS_CONF->get("modrewrite") == "true") {
-#        $URL_BASE = substr($_SERVER['PHP_SELF'],0,-(strlen("index.php")));
-#    }
+    $URL_BASE = substr($_SERVER['PHP_SELF'],0,strpos($_SERVER['PHP_SELF'],"index.php"));
 
     require_once($BASE_DIR_CMS."Language.php");
     $language       = new Language();
@@ -604,7 +608,7 @@ $_POST = cleanREQUEST($_POST);
         // Jedes Element des Arrays ans Menue anhaengen
         foreach ($categoriesarray as $currentcategory) {
             # Mod Rewrite
-            $url = "index.php?cat=".substr($currentcategory,3);
+            $url = $URL_BASE."index.php?cat=".substr($currentcategory,3);
             if($CMS_CONF->get("modrewrite") == "true") {
                 $url = $URL_BASE.substr($currentcategory,3).".html";
             }
@@ -667,7 +671,7 @@ $_POST = cleanREQUEST($_POST);
             $cssprefix = "detailmenu";
 
         # Mod Rewrite
-        $url_draft = "index.php?cat=".substr($cat,3)."&amp;page=".substr($PAGE_REQUEST, 3)."&amp;";
+        $url_draft = $URL_BASE."index.php?cat=".substr($cat,3)."&amp;page=".substr($PAGE_REQUEST, 3)."&amp;";
         $modrewrite_dumy = NULL;
         if($CMS_CONF->get("modrewrite") == "true") {
             $url_draft = $URL_BASE.substr($cat,3)."/".substr($PAGE_REQUEST, 3).".html?";
@@ -710,7 +714,7 @@ $_POST = cleanREQUEST($_POST);
                     }
                 }
                 # Mod Rewrite
-                $url = "index.php?cat=".substr($cat,3)."&amp;page=".substr($currentcontent, 3, strlen($currentcontent) - 7);
+                $url = $URL_BASE."index.php?cat=".substr($cat,3)."&amp;page=".substr($currentcontent, 3, strlen($currentcontent) - 7);
                 if($CMS_CONF->get("modrewrite") == "true") {
                     $url = $URL_BASE.substr($cat,3)."/".substr($currentcontent, 3, strlen($currentcontent) - 7).".html";
                 }
