@@ -244,8 +244,8 @@ class Galerie extends Plugin {
 
         // Übergebene Parameter überprüfen
         $gal_request = $specialchars->replacespecialchars($specialchars->getHtmlEntityDecode($values[0]),false);
-        if (getRequestParam("gal", true))
-            $gal_request = $specialchars->replacespecialchars(getRequestParam("gal", true),false);
+        if (getRequestParam("gal", false))
+            $gal_request = $specialchars->replacespecialchars(getRequestParam("gal", false),false);
         $dir_gallery        = $GALLERIES_DIR_NAME."/".$gal_request."/";
         $dir_thumbs         = $dir_gallery.$PREVIEW_DIR_NAME."/";
         $dir_thumbs_src     = $dir_gallery.$PREVIEW_DIR_NAME."/";
@@ -356,10 +356,10 @@ class Galerie extends Plugin {
             }
             $gal_name = NULL;
             if(isset($values[0])) {
-                $gal_name = $specialchars->rebuildSpecialChars($values[0], false, true);
+                $gal_name = $specialchars->rebuildSpecialChars($values[0], false, false);
             }
             if(isset($values[1])) {
-                $gal_name = $specialchars->rebuildSpecialChars($values[1], false, true);
+                $gal_name = $specialchars->rebuildSpecialChars($values[1], false, false);
             }
             return "<a class=\"gallery\" href=\"".$linkprefix."gal=".$gal_request."\" ".getTitleAttribute($language->getLanguageValue2("tooltip_link_gallery_2", $specialchars->rebuildSpecialChars($values[0], false, true), $j))."target=\"".$GALLERY_CONF->get("target")."\">".$gal_name."</a>";
         }
