@@ -46,6 +46,12 @@ if($debug != "ja")
     $_SESSION['PHPSESSID'] = true;
  }
 
+// Login ueberpruefen
+if (!isset($_SESSION['login_okay']) or !$_SESSION['login_okay']) {
+    header("location:login.php?logout=true");
+    die("");
+}
+
 if($debug == "ja") {
     ob_start();
     echo "SESSION -------------------\n";
@@ -128,12 +134,6 @@ $PASSWORDS = new Properties($BASE_DIR_CMS."conf/passwords.conf",true);
 # die muss schreiben geöffnet werden können
 if(isset($PASSWORDS->properties['error'])) {
     die($PASSWORDS->properties['error']);
-}
-
-// Login ueberpruefen
-if (!isset($_SESSION['login_okay']) or !$_SESSION['login_okay']) {
-    header("location:login.php?logout=true");
-    die("");
 }
 
 
