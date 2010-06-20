@@ -1187,6 +1187,10 @@ $_POST = cleanREQUEST($_POST);
         global $URL_BASE;
         global $CMS_CONF;
 
+        # wenn in der url z.B. cat[]=Kategorie übergeben wurde
+        if(isset($_REQUEST[$param]) and is_array($_REQUEST[$param]))
+            return NULL;
+
         if(($CMS_CONF->get("modrewrite") == "true") and ($param == "cat" or $param == "page")) {
             $request = NULL;
             # ein hack für alte links
