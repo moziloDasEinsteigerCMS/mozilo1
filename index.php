@@ -417,6 +417,7 @@ $_POST = cleanREQUEST($_POST);
 // ------------------------------------------------------------------------------
     function nameToCategory($catname) {
         global $CONTENT_DIR_REL;
+
         // Content-Verzeichnis einlesen
         $dircontent = getDirContentAsArray($CONTENT_DIR_REL, false, false);
         // alle vorhandenen Kategorien durchgehen...
@@ -1184,6 +1185,29 @@ $_POST = cleanREQUEST($_POST);
         return $input;
     }
 
+// ------------------------------------------------------------------------------    
+// Alte Url wandeln
+// ------------------------------------------------------------------------------
+    function rebuildOldSpecialChars($oldurl) {
+        global $specialchars;
+        global $CMS_CONF;
+
+        # wenn die numeriung im cat page ist weg damit
+        if(preg_match("/\d\d_/", substr($oldurl,0,3)))
+            $oldurl = substr($oldurl,3);
+        # wenn keine alte -????~ sachen im cat page sind gleich raus hier
+        if(!preg_match("/-\D+~/", $oldurl))
+            return rawurldecode($oldurl);
+        // Leerzeichen
+        $oldurl = preg_replace("/-nbsp~/", " ", $oldurl);
+        // @, ?
+        $oldurl = preg_replace("/-at~/", "@", $oldurl);
+        $oldurl = preg_replace("/-ques~/", "?", $oldurl);
+        // Alle mozilo-Entities in HTML-Entities umwandeln!
+        $oldurl = preg_replace("/-([^-~]+)~/U", "&$1;", $oldurl);
+        $oldurl = rawurldecode($specialchars->getHtmlEntityDecode($oldurl));
+        return $oldurl;
+    }
 // ------------------------------------------------------------------------------
 // Hilfsfunktion: Prueft einen Requestparameter
 // ------------------------------------------------------------------------------
@@ -1195,31 +1219,21 @@ $_POST = cleanREQUEST($_POST);
         if(isset($_REQUEST[$param]) and is_array($_REQUEST[$param]))
             return NULL;
 
+        # auf Alte Url testen und gewandelt zurück geben
+        if((isset($_REQUEST[$param])) and ($param == "cat" or $param == "page"))
+            $_REQUEST[$param] = rebuildOldSpecialChars($_REQUEST[$param]);
+
         if(($CMS_CONF->get("modrewrite") == "true") and ($param == "cat" or $param == "page")) {
             $request = NULL;
             # ein hack für alte links
             if (isset($_REQUEST[$param])) {
-                # wenn in der url ein ~ drin ist solte das eine sehr alte url sein
-                if(strpos($_REQUEST[$param],'~') > 0) {
-                    global $specialchars;
-                    // Leerzeichen
-                    $old_url = preg_replace("/-nbsp~/", " ", $_REQUEST[$param]);
-                    // @, ?
-                    $old_url = preg_replace("/-at~/", "@", $old_url);
-                    $old_url = preg_replace("/-ques~/", "?", $old_url);
-                    // Alle mozilo-Entities in HTML-Entities umwandeln!
-                    $old_url = preg_replace("/-([^-~]+)~/U", "&$1;", $old_url);
-                    // & escapen 
-                    //$text = preg_replace("/&+(?!(.+);)/U", "&amp;", $text);
-                    return $specialchars->getHtmlEntityDecode($old_url);
-                } else {
-                    return rawurldecode($_REQUEST[$param]);
-                }
+                return $_REQUEST[$param];
             }
+
+            # ein tmp dafor weil wenn $URL_BASE = / ist werden alle / ersetzt durch nichts
+            $url_get = str_replace("tmp".$URL_BASE,"","tmp".$_SERVER['REQUEST_URI']);
+            $url_get = str_replace("?".$_SERVER['QUERY_STRING'],"",$url_get);
             if($param == "cat") {
-                # ein tmp dafor weil wenn $URL_BASE = / ist werden alle / ersetzt durch nichts
-                $url_get = str_replace("tmp".$URL_BASE,"","tmp".$_SERVER['REQUEST_URI']);
-                $url_get = str_replace("?".$_SERVER['QUERY_STRING'],"",$url_get);
                 $url_para = explode("/",$url_get);
                 if(count($url_para) > 1) {
                     $request = $url_para[0];
@@ -1227,9 +1241,6 @@ $_POST = cleanREQUEST($_POST);
                     $request = substr($url_get,0,-5);
                 }
             } elseif($param == "page") {
-                # ein tmp dafor weil wenn $URL_BASE = / ist werden alle / ersetzt durch nichts
-                $url_get = str_replace("tmp".$URL_BASE,"","tmp".$_SERVER['REQUEST_URI']);
-                $url_get = str_replace("?".$_SERVER['QUERY_STRING'],"",$url_get);
                 $url_para = explode("/",$url_get);
                 if(count($url_para) > 1) {
                     $request = substr($url_para[1],0,-5);
