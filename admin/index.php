@@ -4373,8 +4373,11 @@ function returnOverviewSelectbox($type, $currentcat) {
     }
     // Elemente der Selectbox
     foreach ($elements as $element) {
-        if (substr($element[1], 0, 1) == ":") {
-            $select .= "<option class=\"noaction\" value=\"\">".$element[0]."</option>";
+        $tmp_element = NULL;
+        if($type == 1)
+            $tmp_element = substr($element[1], 1);
+        if(substr($element[1], 0, 1) == ":") {
+            $select .= "<option class=\"noaction\" value=\"".$tmp_element."\">".$element[0]."</option>";
         } else {
             if(strstr($element[1],"[") or strstr($element[1],"]"))
                 $element[1] = str_replace(array("[","]"),array("&#94;[","&#94;]"),$element[1]);
