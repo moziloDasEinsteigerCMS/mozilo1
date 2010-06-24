@@ -1479,9 +1479,6 @@ $_POST = cleanREQUEST($_POST);
             $tmp_link = explode("-_self-",$link);
             $target = "_self";
         }
-        if(substr($tmp_link[1], 0, 13) != "http%3A%2F%2F") {
-            $tmp_link[1] = "http%3A%2F%2F".$tmp_link[1];
-        }
 
         $tmp_link[1] = substr($tmp_link[1],0,-(strlen($EXT_LINK)));
         $titel = $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1",$specialchars->rebuildSpecialChars($tmp_link[1], true, true)));

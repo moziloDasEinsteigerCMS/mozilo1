@@ -2,6 +2,7 @@
 
 $error_color = array('check_name' => '#CCFFCC',
                 'check_url' => '#CCE9F9',
+                'check_url_full' => '#C9E9F9',
                 'check_digit' => '#CCE6FF',
                 'check_new_position_empty' => '#E6CCFF',
                 'check_is_file' => '#FFCC99',
@@ -372,6 +373,11 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
                     if(!preg_match($ALLOWED_SPECIALCHARS_REGEX, $post[$cat]['new_url'][$pos]) or stristr($post[$cat]['new_url'][$pos],"%5E")) {
                         $post['error_messages']['check_url']['color'] = $error_color['check_url'];
                         $post['error_messages']['check_url'][] = NULL;
+                        $post[$cat]['error_html']['new_url'][$pos] = 'style="background-color:'.$error_color['check_url'].';" ';
+                    }
+                    if(strpos($post[$cat]['new_url'][$pos],"%3A%2F%2F") < 1) {
+                        $post['error_messages']['check_url_full']['color'] = $error_color['check_url_full'];
+                        $post['error_messages']['check_url_full'][] = NULL;
                         $post[$cat]['error_html']['new_url'][$pos] = 'style="background-color:'.$error_color['check_url'].';" ';
                     }
                 }

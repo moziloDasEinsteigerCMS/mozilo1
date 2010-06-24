@@ -1122,7 +1122,7 @@ function page($post) {
             if($post['categories'][$cat]['ext'][$pos] != $EXT_DRAFT)
                 $page_draft = NULL;
             if(isset($post['categories'][$cat]['url'][$pos])) {
-                $url = "http://".$post['categories'][$cat]['url'][$pos];
+                $url = str_replace("%3A%2F%2F","://",$post['categories'][$cat]['url'][$pos]);
                 $tooltip_url = $tooltip_page_link_help_show;
             }
             $pagecontent .= '<span '.$post['categories'][$cat]['error_html']['name'][$pos].'class="text_cat_page"><a class="page_link" href="'.$url.$page_draft.'" target="_blank"'.$tooltip_url.'>'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['name'][$pos],true,true).'</a></span>';
