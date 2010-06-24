@@ -3151,6 +3151,8 @@ function config($post) {
         $handle = @fopen($USER_SYNTAX_FILE, "r");
         $usersyntaxdefs = @fread($handle, @filesize($USER_SYNTAX_FILE));
         @fclose($handle);
+        # die textarea wandelt automatisch &amp; nach & deshalb &amp;amp;
+        $usersyntaxdefs = str_replace("&","&amp;",$usersyntaxdefs);
         $pagecontent .= "<tr><td class=\"td_cms_colspan2\" colspan=\"2\">".getLanguageValue("config_text_usersyntax")."</td>";
         $pagecontent .= "<tr><td class=\"td_cms_left\" colspan=\"2\"><textarea class=\"textarea_cms\" cols=\"116\" rows=\"6\" name=\"usersyntax\" ".$error_color['usersyntax'].">".$usersyntaxdefs."</textarea></td></tr>";
         // Zeile "ERSETZE EMOTICONS"
