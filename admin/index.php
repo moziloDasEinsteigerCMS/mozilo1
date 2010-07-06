@@ -1451,7 +1451,16 @@ function copymoveSite($post) {
     # Rename
     if(isset($rename_newname)) {
         foreach($rename_newname as $cat => $tmp) {
-            foreach($rename_newname[$cat] as $z => $tmp) {
+            $array = $rename_newname[$cat];
+            $notaus = 0;
+            end($array);
+            $last_key = key($array);
+            reset($array);
+            $count_merker = count($array);
+            while(list($z,$tmp) = each($array) and $notaus != "300") {
+            if(!is_file($CONTENT_DIR_REL.$cat."/".$rename_newname[$cat][$z])) {
+#echo "rename = ".$CONTENT_DIR_REL.$cat."/".$rename_newname[$cat][$z]."<br>\n";
+#            foreach($rename_newname[$cat] as $z => $tmp) {
                 @rename($CONTENT_DIR_REL.$cat."/".$rename_orgname[$cat][$z],$CONTENT_DIR_REL.$cat."/".$rename_newname[$cat][$z]);
                 $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
                 $last_error['line'] = NULL;
@@ -1495,7 +1504,17 @@ function copymoveSite($post) {
                         }
                     }
                 }
-            }
+
+                    unset($array[$z]);
+                }
+                if($last_key == $z and count($array) != $count_merker) {
+                    end($array);
+                    $last_key = key($array);
+                    reset($array);
+                    $count_merker = count($array);
+                }
+                $notaus++;
+            } #end
         }
     }
     # Copy Move
@@ -1559,7 +1578,7 @@ function copymoveSite($post) {
                     $post['display'][dirname($move_orgname[$cat][$z])]['error_html']['display_cat'] = 'style="display:block;" ';
                     $post['makepara'] = "yes"; # makePostCatPageReturnVariable()
                 }
-            }
+            } #end
         }
     }
     # Neue Inhaltseite
