@@ -474,8 +474,6 @@ function home($post) {
 #$URL_BASE $BASE_DIR
     $path = $BASE_DIR;
     $cmssize = convertFileSizeUnit(dirsize($path));
-    // Revisionsnummer auslesen: "$Revision$" -> nur die Ziffern rausfiltern
-    $revision = preg_replace('/([^0-9]+)/s', '', $VERSION_CONF->get("revision"));
     $pagecontent .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">'
     // CMS-INFOS
     ."<tr>"
@@ -484,7 +482,7 @@ function home($post) {
     // Zeile "CMS-VERSION"
     ."<tr>"
     .'<td width="50%" class="td_cms_left">'.getLanguageValue("cmsversion_text")."</td>"
-    .'<td width="50%" class="td_cms_left">'.$VERSION_CONF->get("cmsversion").' ("'.$VERSION_CONF->get("cmsname").'")<br />'.getLanguageValue("cmsrevision_text").' '.$revision.'</td>'
+    .'<td width="50%" class="td_cms_left">'.$VERSION_CONF->get("cmsversion").' ("'.$VERSION_CONF->get("cmsname").'")<br />'.getLanguageValue("cmsrevision_text").' '.$VERSION_CONF->get("revision").'</td>'
     ."</tr>"
     // Zeile "Gesamtgröße des CMS"
     ."<tr>"
