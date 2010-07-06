@@ -3,3 +3,4 @@ Disallow: /admin/
 Disallow: /kategorien/
 Disallow: /plugins/
 Disallow: /update/
+
