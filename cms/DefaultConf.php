@@ -1,5 +1,13 @@
 <?php
 
+/* 
+* 
+* $Revision$
+* $LastChangedDate$
+* $Author$
+*
+*/
+
 $CHARSET = 'UTF-8';
 
 $CONTENT_DIR_NAME        = "kategorien";
@@ -171,7 +179,7 @@ function makeDefaultConf($conf_datei) {
 
     $version = array('cmsversion' => '1.12.beta3',
                         'cmsname' => 'Amalia',
-                        'revision' => '758');
+                        'revision' => '$Revision$');
 
     $gallery = array('digit' => array(
                         'maxheight' => '',
