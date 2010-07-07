@@ -35,19 +35,19 @@ require_once($BASE_DIR_ADMIN."filesystem.php");
 
 
 // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
-#@ini_set("display_errors", 0);
+@ini_set("display_errors", 0);
 
 // Initialisierungen
-$logindataconf = new Properties($BASE_DIR_ADMIN."conf/logindata.conf");
+$logindataconf = new Properties($BASE_DIR_ADMIN."conf/logindata.conf",true);
 if(!isset($logindataconf->properties['readonly'])) {
     die($logindataconf->properties['error']);
 }
-$VERSION_CONF    = new Properties($BASE_DIR_CMS."conf/version.conf");
+$VERSION_CONF    = new Properties($BASE_DIR_CMS."conf/version.conf",true);
 if(!isset($VERSION_CONF->properties['readonly'])) {
     die($VERSION_CONF->properties['error']);
 }
 
-$ADMIN_CONF = new Properties($BASE_DIR_ADMIN."conf/basic.conf");
+$ADMIN_CONF = new Properties($BASE_DIR_ADMIN."conf/basic.conf",true);
 if(!isset($ADMIN_CONF->properties['readonly'])) {
     die($ADMIN_CONF->properties['error']);
 }
