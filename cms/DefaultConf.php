@@ -179,7 +179,7 @@ function makeDefaultConf($conf_datei) {
 
     $version = array('cmsversion' => '1.12.beta3',
                         'cmsname' => 'Amalia',
-                        'revision' => '761');
+                        'revision' => '764');
 
     $gallery = array('digit' => array(
                         'maxheight' => '',
