@@ -152,9 +152,11 @@ class Galerie extends Plugin {
 	        function getCurrentDescription($picname,$picarray,$alldescriptions) {
 	            global $specialchars;
 	            
+                if(!$alldescriptions)
+                   return "&nbsp;";
 	            // Keine Bilder im Galerieverzeichnis?
 	            if (count($picarray) == 0)
-	            return "&nbsp;";
+	               return "&nbsp;";
 	            // Bildbeschreibung einlesen
 	            $description = $alldescriptions->get($picname);
 	            if(strlen($description) > 0) {
@@ -270,7 +272,9 @@ class Galerie extends Plugin {
         # Galerie erzeugen
         if (($embedded == "_self") or (getRequestParam('gal', false))) {
 
-            $alldescriptions = new Properties($dir_gallery."texte.conf");
+            $alldescriptions = false;
+            if(is_file($dir_gallery."texte.conf"))
+                $alldescriptions = new Properties($dir_gallery."texte.conf");
 
             // Galerieverzeichnis einlesen
             $picarray = getPicsAsArray($dir_gallery, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
