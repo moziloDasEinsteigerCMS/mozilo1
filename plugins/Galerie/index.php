@@ -109,9 +109,9 @@ class Galerie extends Plugin {
 	                $thumbs .= "<td class=\"gallerytd\" style=\"width:".floor(100 / $picsperrow)."%;\">";
 
                     if (file_exists($specialchars->replaceSpecialChars($dir_thumbs.$picarray[$i],false))) {
-                        $thumbs .= "<a href=\"".$specialchars->replaceSpecialChars($dir_gallery_src.$picarray[$i],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$i],true,true))."\"><img src=\"".$specialchars->replaceSpecialChars($dir_thumbs_src.$picarray[$i],true)."\" alt=\"".$specialchars->rebuildSpecialChars($picarray[$i],true,true)."\" class=\"thumbnail\" /></a><br />";
+                        $thumbs .= "<a href=\"".$dir_gallery_src.$specialchars->replaceSpecialChars($picarray[$i],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$i],true,true))."\"><img src=\"".$dir_thumbs_src.$specialchars->replaceSpecialChars($picarray[$i],true)."\" alt=\"".$specialchars->rebuildSpecialChars($picarray[$i],true,true)."\" class=\"thumbnail\" /></a><br />";
                     } else {
-                         $thumbs .= '<div style="text-align:center;"><a style="color:red;" href="'.$specialchars->replaceSpecialChars($dir_gallery_src.$picarray[$i],true).'" target="_blank" title="'.$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$i],true,true)).'"><b>'.$language->getLanguageValue0('message_gallery_no_preview').'</b></a></div>';
+                         $thumbs .= '<div style="text-align:center;"><a style="color:red;" href="'.$dir_gallery_src.$specialchars->replaceSpecialChars($picarray[$i],true).'" target="_blank" title="'.$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$i],true,true)).'"><b>'.$language->getLanguageValue0('message_gallery_no_preview').'</b></a></div>';
                     }
 	                $thumbs .= $description
 	                ."</td>";
@@ -136,10 +136,8 @@ class Galerie extends Plugin {
 	            if (count($picarray) == 0)
 	                return "&nbsp;";
 	            // Link zur Vollbildansicht öffnen
-	            $currentpic = "<a href=\"".$specialchars->replaceSpecialChars($dir_gallery_src.$picarray[$index-1],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$index-1],true,true))."\">";
-	            // Bilder für die Anzeige skalieren
-	            $size = getimagesize($dir_gallery.$picarray[$index-1]);
-	            $currentpic .= "<img width=\"$size[0]\" height=\"$size[1]\" src=\"".$specialchars->replaceSpecialChars($dir_gallery_src.$picarray[$index-1],true)."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $specialchars->rebuildSpecialChars($picarray[$index-1],true,true))."\" />";
+	            $currentpic = "<a href=\"".$dir_gallery_src.$specialchars->replaceSpecialChars($picarray[$index-1],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$index-1],true,true))."\">";
+                $currentpic .= "<img src=\"".$dir_gallery_src.$specialchars->replaceSpecialChars($picarray[$index-1],true)."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $specialchars->rebuildSpecialChars($picarray[$index-1],true,true))."\" />";
 	            // Link zur Vollbildansicht schliessen
 	            $currentpic .= "</a>";
 	            // Rückgabe des Bildes
@@ -250,12 +248,12 @@ class Galerie extends Plugin {
             $gal_request = $specialchars->replacespecialchars(getRequestParam("gal", false),false);
         $dir_gallery        = $GALLERIES_DIR_NAME."/".$gal_request."/";
         $dir_thumbs         = $dir_gallery.$PREVIEW_DIR_NAME."/";
-        $dir_thumbs_src     = $dir_gallery.$PREVIEW_DIR_NAME."/";
-        $dir_gallery_src    = $GALLERIES_DIR_NAME."/".$gal_request."/";
+        $dir_thumbs_src     = str_replace("%","%25",$dir_gallery.$PREVIEW_DIR_NAME."/");
+        $dir_gallery_src    = str_replace("%","%25",$GALLERIES_DIR_NAME."/".$gal_request."/");
 
         if($CMS_CONF->get("modrewrite") == "true") {
-            $dir_gallery_src    = $URL_BASE.$GALLERIES_DIR_NAME."/".$gal_request."/";
-            $dir_thumbs_src     = $dir_gallery_src.$PREVIEW_DIR_NAME."/";
+            $dir_gallery_src    = str_replace("%","%25",$URL_BASE.$GALLERIES_DIR_NAME."/".$gal_request."/");
+            $dir_thumbs_src     = str_replace("%","%25",$dir_gallery_src.$PREVIEW_DIR_NAME."/");
             $dir_gallery        = $BASE_DIR.$GALLERIES_DIR_NAME."/".$gal_request."/";
             $dir_thumbs         = $dir_gallery.$PREVIEW_DIR_NAME."/";
         }
