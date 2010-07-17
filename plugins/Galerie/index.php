@@ -87,10 +87,11 @@ class Galerie extends Plugin {
 	        // ------------------------------------------------------------------------------
 	        // Nummernmenü erzeugen
 	        // ------------------------------------------------------------------------------
-	        function getThumbnails($picarray,$dir_thumbs_src,$dir_thumbs,$dir_gallery_src,$alldescriptions) {
+	        function getThumbnails($picarray,$alldescriptions,$GALERIE_DIR,$GALERIE_DIR_SRC) {
 	            global $GALLERY_CONF;
 	            global $specialchars;
 	            global $language;
+                global $PREVIEW_DIR_NAME;
 	            // Aus Config auslesen: Wieviele Bilder pro Tabellenzeile?
 	            $picsperrow = $GALLERY_CONF->get("gallerypicsperrow");
 	                if (($picsperrow == "") || ($picsperrow == 0))
@@ -108,10 +109,10 @@ class Galerie extends Plugin {
 	                    $thumbs .= "</tr><tr>";
 	                $thumbs .= "<td class=\"gallerytd\" style=\"width:".floor(100 / $picsperrow)."%;\">";
 
-                    if (file_exists($specialchars->replaceSpecialChars($dir_thumbs.$picarray[$i],false))) {
-                        $thumbs .= "<a href=\"".$dir_gallery_src.$specialchars->replaceSpecialChars($picarray[$i],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$i],true,true))."\"><img src=\"".$dir_thumbs_src.$specialchars->replaceSpecialChars($picarray[$i],true)."\" alt=\"".$specialchars->rebuildSpecialChars($picarray[$i],true,true)."\" class=\"thumbnail\" /></a><br />";
+                    if (file_exists($GALERIE_DIR.$PREVIEW_DIR_NAME."/".$specialchars->replaceSpecialChars($picarray[$i],false))) {
+                        $thumbs .= "<a href=\"".$GALERIE_DIR_SRC.$specialchars->replaceSpecialChars($picarray[$i],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$i],true,true))."\"><img src=\"".$GALERIE_DIR_SRC.$PREVIEW_DIR_NAME."/".$specialchars->replaceSpecialChars($picarray[$i],true)."\" alt=\"".$specialchars->rebuildSpecialChars($picarray[$i],true,true)."\" class=\"thumbnail\" /></a><br />";
                     } else {
-                         $thumbs .= '<div style="text-align:center;"><a style="color:red;" href="'.$dir_gallery_src.$specialchars->replaceSpecialChars($picarray[$i],true).'" target="_blank" title="'.$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$i],true,true)).'"><b>'.$language->getLanguageValue0('message_gallery_no_preview').'</b></a></div>';
+                         $thumbs .= '<div style="text-align:center;"><a style="color:red;" href="'.$GALERIE_DIR_SRC.$PREVIEW_DIR_NAME."/".$specialchars->replaceSpecialChars($picarray[$i],true).'" target="_blank" title="'.$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$i],true,true)).'"><b>'.$language->getLanguageValue0('message_gallery_no_preview').'</b></a></div>';
                     }
 	                $thumbs .= $description
 	                ."</td>";
@@ -128,7 +129,7 @@ class Galerie extends Plugin {
 	        // ------------------------------------------------------------------------------
 	        // Aktuelles Bild anzeigen
 	        // ------------------------------------------------------------------------------
-	        function getCurrentPic($picarray,$dir_gallery_src,$dir_gallery,$index) {
+	        function getCurrentPic($picarray,$index,$GALERIE_DIR_SRC) {
 	            global $specialchars;
 	            global $language;
 	        
@@ -136,8 +137,8 @@ class Galerie extends Plugin {
 	            if (count($picarray) == 0)
 	                return "&nbsp;";
 	            // Link zur Vollbildansicht öffnen
-	            $currentpic = "<a href=\"".$dir_gallery_src.$specialchars->replaceSpecialChars($picarray[$index-1],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$index-1],true,true))."\">";
-                $currentpic .= "<img src=\"".$dir_gallery_src.$specialchars->replaceSpecialChars($picarray[$index-1],true)."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $specialchars->rebuildSpecialChars($picarray[$index-1],true,true))."\" />";
+	            $currentpic = "<a href=\"".$GALERIE_DIR_SRC.$specialchars->replaceSpecialChars($picarray[$index-1],true)."\" target=\"_blank\" title=\"".$language->getLanguageValue1("tooltip_gallery_fullscreen_1", $specialchars->rebuildSpecialChars($picarray[$index-1],true,true))."\">";
+                $currentpic .= "<img src=\"".$GALERIE_DIR_SRC.$specialchars->replaceSpecialChars($picarray[$index-1],true)."\" alt=\"".$language->getLanguageValue1("alttext_galleryimage_1", $specialchars->rebuildSpecialChars($picarray[$index-1],true,true))."\" />";
 	            // Link zur Vollbildansicht schliessen
 	            $currentpic .= "</a>";
 	            // Rückgabe des Bildes
@@ -246,20 +247,12 @@ class Galerie extends Plugin {
         $gal_request = $specialchars->replacespecialchars($specialchars->getHtmlEntityDecode($values[0]),false);
         if (getRequestParam("gal", false))
             $gal_request = $specialchars->replacespecialchars(getRequestParam("gal", false),false);
-        $dir_gallery        = $GALLERIES_DIR_NAME."/".$gal_request."/";
-        $dir_thumbs         = $dir_gallery.$PREVIEW_DIR_NAME."/";
-        $dir_thumbs_src     = str_replace("%","%25",$dir_gallery.$PREVIEW_DIR_NAME."/");
-        $dir_gallery_src    = str_replace("%","%25",$GALLERIES_DIR_NAME."/".$gal_request."/");
 
-        if($CMS_CONF->get("modrewrite") == "true") {
-            $dir_gallery_src    = str_replace("%","%25",$URL_BASE.$GALLERIES_DIR_NAME."/".$gal_request."/");
-            $dir_thumbs_src     = str_replace("%","%25",$dir_gallery_src.$PREVIEW_DIR_NAME."/");
-            $dir_gallery        = $BASE_DIR.$GALLERIES_DIR_NAME."/".$gal_request."/";
-            $dir_thumbs         = $dir_gallery.$PREVIEW_DIR_NAME."/";
-        }
+        $GALERIE_DIR = $BASE_DIR.$GALLERIES_DIR_NAME."/".$gal_request."/";
+        $GALERIE_DIR_SRC = str_replace("%","%25",$URL_BASE.$GALLERIES_DIR_NAME."/".$gal_request."/");
 
         # keine Galerie angegeben oder Galerie gibts nicht
-        if (($gal_request == "") || (!file_exists($dir_gallery))) {
+        if (($gal_request == "") || (!file_exists($GALERIE_DIR))) {
             if($gal_request == "") {
                 return createDeadlink($language->getLanguageValue0("message_gallerydir_error_0"),$language->getLanguageValue0("message_gallerydir_error_0"));
             } else {
@@ -271,11 +264,11 @@ class Galerie extends Plugin {
         if (($embedded == "_self") or (getRequestParam('gal', false))) {
 
             $alldescriptions = false;
-            if(is_file($dir_gallery."texte.conf"))
-                $alldescriptions = new Properties($dir_gallery."texte.conf");
+            if(is_file($GALERIE_DIR."texte.conf"))
+                $alldescriptions = new Properties($GALERIE_DIR."texte.conf");
 
             // Galerieverzeichnis einlesen
-            $picarray = getPicsAsArray($dir_gallery, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
+            $picarray = getPicsAsArray($GALERIE_DIR, array("jpg", "jpeg", "jpe", "gif", "png", "svg"));
             $allindexes = array();
             for ($i=1; $i<=count($picarray); $i++) {
                 array_push($allindexes, $i);
@@ -322,14 +315,14 @@ class Galerie extends Plugin {
             $html = preg_replace('/{CURRENTGALLERY}/', $specialchars->rebuildSpecialChars($gal_request,false,true), $html);
             if ($usethumbs) {
                 $html = preg_replace('/{GALLERYMENU}/', "&nbsp;", $html);
-                $html = preg_replace('/{NUMBERMENU}/', getThumbnails($picarray,$dir_thumbs_src,$dir_thumbs,$dir_gallery_src,$alldescriptions), $html);
+                $html = preg_replace('/{NUMBERMENU}/', getThumbnails($picarray,$alldescriptions,$GALERIE_DIR,$GALERIE_DIR_SRC), $html);
                 $html = preg_replace('/{CURRENTPIC}/', "&nbsp;", $html);
                 $html = preg_replace('/{CURRENTDESCRIPTION}/', "&nbsp;", $html);
                 $html = preg_replace('/{XOUTOFY}/', "&nbsp;", $html);
             } else {
                 $html = preg_replace('/{GALLERYMENU}/', getGalleryMenu($picarray,$linkprefix,$gal_request,$index,$first,$previous,$next,$last), $html);
                 $html = preg_replace('/{NUMBERMENU}/', getNumberMenu($picarray,$linkprefix,$index,$gal_request,$first,$last), $html);
-                $html = preg_replace('/{CURRENTPIC}/', getCurrentPic($picarray,$dir_gallery_src,$dir_gallery,$index), $html);
+                $html = preg_replace('/{CURRENTPIC}/', getCurrentPic($picarray,$index,$GALERIE_DIR_SRC), $html);
                 if (count($picarray) > 0) {
                     $html = preg_replace('/{CURRENTDESCRIPTION}/', getCurrentDescription($picarray[$index-1],$picarray,$alldescriptions), $html);
                 } else {
@@ -344,10 +337,10 @@ class Galerie extends Plugin {
         # Galerie Link erzeugen
         } else {
             $j=0;
-            if(file_exists($dir_gallery)) {
-                $handle = opendir($dir_gallery);
+            if(file_exists($GALERIE_DIR)) {
+                $handle = opendir($GALERIE_DIR);
                 while ($file = readdir($handle)) {
-                    if (is_file($dir_gallery.$file) and ($file <> "texte.conf")) {
+                    if (is_file($GALERIE_DIR.$file) and ($file <> "texte.conf")) {
                         $j++;
                     }
                 }
