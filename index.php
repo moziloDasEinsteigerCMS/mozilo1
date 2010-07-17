@@ -1232,7 +1232,9 @@ $_POST = cleanREQUEST($_POST);
 
             # ein tmp dafor weil wenn $URL_BASE = / ist werden alle / ersetzt durch nichts
             $url_get = str_replace("tmp".$URL_BASE,"","tmp".$_SERVER['REQUEST_URI']);
-            $url_get = str_replace("?".$_SERVER['QUERY_STRING'],"",$url_get);
+            $url_get = str_replace("&amp;","&",$url_get);
+            $QUERY_STRING = str_replace("&amp;","&",$_SERVER['QUERY_STRING']);
+            $url_get = str_replace("?".$QUERY_STRING,"",$url_get);
             if($param == "cat") {
                 $url_para = explode("/",$url_get);
                 if(count($url_para) > 1) {
