@@ -484,27 +484,27 @@ class Syntax {
 
             // Überschrift groß
             elseif ($attribute == "ueber1"){
-                $content = preg_replace("/".preg_quote($match, '/')."/", "<h1 id=\"a".$this->anchorcounter++."\">$value</h1>", $content,1);
+                $content = preg_replace("/".preg_quote($match, '/')."/", "<h1 id=\"a".$this->anchorcounter++."\" class=\"heading1\">$value</h1>", $content,1);
             }
 
             // Überschrift mittel
             elseif ($attribute == "ueber2"){
-                $content = preg_replace("/".preg_quote($match, '/')."/", "<h2 id=\"a".$this->anchorcounter++."\">$value</h2>", $content,1);
+                $content = preg_replace("/".preg_quote($match, '/')."/", "<h2 id=\"a".$this->anchorcounter++."\" class=\"heading2\">$value</h2>", $content,1);
             }
 
             // Überschrift normal
             elseif ($attribute == "ueber3"){
-                $content = preg_replace("/".preg_quote($match, '/')."/", "<h3 id=\"a".$this->anchorcounter++."\">$value</h3>", $content,1);
+                $content = preg_replace("/".preg_quote($match, '/')."/", "<h3 id=\"a".$this->anchorcounter++."\" class=\"heading3\">$value</h3>", $content,1);
             }
 
-            // Listenpunkt
+            // Listenpunkt unorderedlist listitem
             elseif ($attribute == "liste"){
-                $content = str_replace ("$match", "<ul><li>$value</li></ul>", $content);
+                $content = str_replace ("$match", '<ul class="unorderedlist"><li class="listitem">'.$value.'</li></ul>', $content);
             }
 
-            // numerierter Listenpunkt
+            // numerierter Listenpunkt orderedlist
             elseif ($attribute == "numliste"){
-                $content = str_replace ("$match", "<ol><li>$value</li></ol>", $content);
+                $content = str_replace ("$match", '<ol class="orderedlist"><li class="listitem">'.$value.'</li></ol>', $content);
             }
 
             // Liste, einfache Einrückung
@@ -728,7 +728,7 @@ class Syntax {
             $content = $this->convertContent($content, $cat, false);
         else {
             // dummy mit Horizontale Linen ersetzen
-            $content = preg_replace('/\~hr-/', '<hr />', $content);
+            $content = preg_replace('/\~hr-/', '<hr class="horizontalrule" />', $content);
             // Zeilenwechsel setzen
             $content = preg_replace('/(\r\n|\r|\n)/', '$1<br />', $content);
             // Zeilenwechsel nach Blockelementen entfernen
@@ -741,9 +741,9 @@ class Syntax {
             // <br /> mit oder ohne Slash (das, was raus muß!)  <br \/? >
             $content = preg_replace('/<(\/?)(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)([^>]*)>(\r\n|\r|\n)?<br \/?>/', "<$1$2$3>$4",$content);
             // direkt aufeinanderfolgende Listen zusammenführen
-            $content = preg_replace('/<\/ul>(\r\n|\r|\n)?<ul>/', '', $content);
+            $content = preg_replace('/<\/ul>(\r\n|\r|\n)?<ul class="unorderedlist">/', '', $content);
             // direkt aufeinanderfolgende numerierte Listen zusammenf�hren
-            $content = preg_replace('/<\/ol>(\r\n|\r|\n)?<ol>/', '', $content);
+            $content = preg_replace('/<\/ol>(\r\n|\r|\n)?<ol class="orderedlist>/', '', $content);
             # Table Hack recursive Table
             $content = preg_replace('/&#38;/', '&', $content);
         }
