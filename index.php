@@ -558,7 +558,6 @@ $_POST = cleanREQUEST($_POST);
         global $EXT_LINK;
 
         $currentdir = opendir($dir);
-        $i=0;
         $files = "";
         // Einlesen des gesamten Content-Verzeichnisses außer dem
         // auszuschließenden Verzeichnis und den Elementen . und ..
@@ -577,8 +576,7 @@ $_POST = cleanREQUEST($_POST);
                     // nicht "." und ".."
                     && isValidDirOrFile($file)
                     ) {
-            $files[$i] = $file;
-            $i++;
+            $files[] = $file;
             }
         }
         closedir($currentdir);
@@ -1372,8 +1370,12 @@ $_POST = cleanREQUEST($_POST);
         global $URL_BASE;
         global $PLUGIN_DIR_NAME;
 
+        # ab php > 5.2.0 hat preg_* ein default pcre.backtrack_limit von 100000 zeichen
+        # deshalb der versuch mit ini_set
+        @ini_set('pcre.backtrack_limit', 1000000);
         # alle script sachen rausnemen da könten verschachtelungen mit {} drin sein
         preg_match_all("/\<script(.*)\<\/script>/Umsi", $content, $java_script);
+
         if(count($java_script[0]) > 0) {
             foreach($java_script[0] as $pos => $script_match) {
                 $content = str_replace($script_match,'<!-- plugin script '.$pos.'start -->',$content);
