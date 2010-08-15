@@ -9,9 +9,8 @@ heißt, es darf beliebig genutzt, verändert und verbreitet
 werden, unterliegt in veränderten Versionen aber wieder der 
 GPL.
 moziloCMS nutzt andere, ebenfalls freie Software und Grafiken, 
-die teilweise unter GPL bzw. LGPL lizensiert sind. Eine 
-Übersicht finden Sie auf 
-http://cms.mozilo.de/hilfe/?thema=lizenz .
+die unter verschiendenen Lizenzen stehen. Sie sind unter 
+http://cms.mozilo.de/hilfe/?thema=lizenz aufgelistet.
 Der Wortlaut der GPL bzw. LGPL liegt als gpl.txt bzw. lgpl.txt 
 im moziloCMS-Hauptverzeichnis.
 
