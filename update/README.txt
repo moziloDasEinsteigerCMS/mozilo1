@@ -1,25 +1,30 @@
+---------------------------
 Update-Script für moziloCMS 1.10.x bzw. 1.11.x auf 1.12
+---------------------------
 
-Diese Anleitung bezieht sich nur auf ein Standard-moziloCMS; 
+Diese Anleitung bezieht sich auf ein Standard-moziloCMS; 
 eigene Erweiterungen müssen u.U. per Hand nachgezogen werden.
 
-Es werden folgende Verzeichnisse behandelt: kategorien, layouts 
-und galerien
+Es werden folgende Verzeichnisse behandelt: 
+- kategorien
+- layouts 
+- galerien
 
-1.  auf dem Webserver ein neues Verzeichnis erstellen 
+
+1.  Auf dem Webserver ein neues Verzeichnis erstellen 
     (z.B "neumozilo").
 
 2.  moziloCMS 1.12 herunterladen, entpacken und den Inhalt nach 
     "neumozilo" übertragen.
 
-3.  im Verzeichnis "neumozilo" die Verzeichnisse "kategorien" 
+3.  Im Verzeichnis "neumozilo" die Verzeichnisse "kategorien" 
     und "galerien" mit diesen Verzeichnissen aus der alten 
     moziloCMS-Installation ersetzen.
 
-4.  das Verzeichnis des bisher verwendeten Layouts in das 
+4.  Das Verzeichnis des bisher verwendeten Layouts in das 
     Verzeichnis "layouts" der neuen CMS-Installation kopieren.
 
-5.  aus dem alten moziloCMS folgende Dateien direkt ins 
+5.  Aus dem alten moziloCMS folgende Dateien direkt ins 
     Verzeichnis "neumozilo/update" kopieren:
     - admin/conf/basic.conf
     - admin/conf/logindata.conf
@@ -28,23 +33,33 @@ und galerien
     - conf/syntax.conf
     - formular/formular.conf
 
-6.  im Browser [neumozilo]/update/update.php aufrufen und den 
+6.  Im Browser [neumozilo]/update/update.php aufrufen und den 
     Anweisungen folgen.
 
-7.  prüfen, ob die neue Installation sauber funktionierte siehe log.txt
+7.  Prüfen, ob das aktualisierte CMS sauber funktioniert.
+    Ggfs. Meldungen in der Datei update/log.txt prüfen.
 
-8.  alte Installation löschen und durch die neue ersetzen
+8.  Alte CMS-Installation löschen und durch die aktualisierte 
+    ersetzen.
 
-9.  das Verzeichnis "update" in der neuen Installation löschen
+9.  Das Verzeichnis "update" im aktualisierten CMS löschen.
 
-10. Wenn der Neue amin Zerschossen aussieht einfach nur den Browser-Cache lehren
+10. Wenn es zu Darstellungsfehlern im neuen moziloAdmin kommt:
+    Den Browser-Cache leeren oder Admin mit Strg+F5 neu laden.
+    
 
-11. viel Spass mit moziloCMS 1.12 :-)
+Tauchen während des Updates Probleme auf, steht das mozilo-
+Supportforum unter http://forum.mozilo.de zur Verfügung.
+
+Viel Spaß mit moziloCMS 1.12 :-)
+
+
 
 
 
 ---------------------------
-Was zu beachten ist:
+Technische Details von moziloCMS 1.12
+(für Fortgeschrittene)
 ---------------------------
 
 - Aufbau eines Templates:
@@ -67,6 +82,7 @@ Was zu beachten ist:
 - Änderungen im CSS:
 
     Neu hinzugekommen in Version 1.12:
+    
         /* -------------------------------------------------------- */
         /* [zentriert|...] */
         /* --------------- */
@@ -114,6 +130,7 @@ Was zu beachten ist:
 
 
     Neu hinzugekommen in Version 1.11:
+    
         /* -------------------------------------------------------- */
         /* Kontaktformular */
         /* --------------- */
@@ -156,104 +173,92 @@ Was zu beachten ist:
         u                       nach    u.contentunderlined 
         s                       nach    s.contentstrikethrough 
 
-     ACHTUNG !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     Styles die von Hand geändert werden müssen betrieft nur sehr alte Versionen:
 
-         Suchen sie bitte in ihrer css Datei
-         nach [bild|...], [bildlinks|...] und [bildrechts|...]
-         und Ersetzen es mit dem hier und passen es an
-             /* -------------------------------------------------------- */
-             /* [bild|...] */
-             /* ---------- */
-             img {
-                 border:none;
-             }
+    ACHTUNG BEI UPDATE VON SEHR ALTEN VERSIONEN:
+    Einige CSS-Elemente müssen u.U. manuell editiert werden.
 
-             span.imagesubtitle {
-                 margin:3px 3px;
-                 text-align:justify;
-                 font-size:87%;
-             }
+        Im Stylesheet suchen: [bild|...], [bildlinks|...] und [bildrechts|...]
+        ...und ersetzen durch:
 
-             /* -------------------------------------------------------- */
-             /* [bildlinks|...] */
-             /* --------------- */
-             span.leftcontentimage {
-                 margin:6px 20px 6px 0px;
-                 float:left;
-             }
+            /* -------------------------------------------------------- */
+            /* [bild|...] */
+            /* ---------- */
+            img {
+                border:none;
+            }
 
-             img.leftcontentimage {
-             }
+            span.imagesubtitle {
+                margin:3px 3px;
+                text-align:justify;
+                font-size:87%;
+            }
 
-             /* -------------------------------------------------------- */
-             /* [bildrechts|...] */
-             /* ---------------- */
-             span.rightcontentimage {
-                 margin:6px 0px 6px 20px;
-                 float:right;
-             }
+            /* -------------------------------------------------------- */
+            /* [bildlinks|...] */
+            /* --------------- */
+            span.leftcontentimage {
+                margin:6px 20px 6px 0px;
+                float:left;
+            }
 
-             img.rightcontentimage {
-             }
+            img.leftcontentimage {
+            }
 
+            /* -------------------------------------------------------- */
+            /* [bildrechts|...] */
+            /* ---------------- */
+            span.rightcontentimage {
+                margin:6px 0px 6px 20px;
+                float:right;
+            }
 
-         Suchen sie bitte in ihrer css Datei nach den volgenden Styles
-         und Ersetzen es mit dem volgenden und passen es an
+            img.rightcontentimage {
+            }
 
-         für em.bold das
-             b.contentbold {
-             }
+            
+        In der CSS-Datei anpassen:
 
-         für em.italic das
-             i.contentitalic {
-             }
+            statt em.bold:
+                b.contentbold {
+				}
 
-         für em.underlined das
-             u.contentunderlined {
-             }
+            statt em.italic:
+				i.contentitalic {
+				}
 
-         für em.crossed das
-             s.contentstrikethrough {
-             }
+            statt em.underlined:
+                u.contentunderlined {
+                }
 
-         Achtung em.bolditalic gibt es nicht mehr sie müssen in den Inhaltseiten [fettkursiv|]
-         durch [fett|[kursiv|]] ersetzen und den style em.bolditalic { ???? }
-         in css Datei entfernen
+            statt em.crossed:
+                s.contentstrikethrough {
+                }
 
 
+    ACHTUNG BEI VERWENDUNG VON GALERIEN:
+    Die Galerie ist jetzt ein Plugin; folgendes ist zu beachten:
 
-    ACHTUNG !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        Die Galerie ist ein Plugin geworden deshalb müssen die volgenden sachen von hand umgestelt werden
+		Das Erscheinungsbild der Galerien kann in der Plugin-
+		Konfiguration beeinflusst werden.
+        Dabei zu beachten: Leerzeichen werden mit &nbsp; und 
+		Zeilenumbrüche mit <br> ersetzt.
 
-        Das erscheinungs bild wird im Galerie Plugin configuriert
+		Galerien lassen sich nun direkt in Inhaltsseiten 
+		einbetten. Dazu einfach in der Inhaltsseite notieren:
+        {Galerie|Name der Galerie}
+		
+		Galerien können aber trotzdem noch "Standalone" 
+		betrieben werden; dazu gibt es wie gehabt die Datei
+		gallerytemplate.html. Diese enthält aber nicht mehr die
+		einzelnen Platzhalter (die sind ja in die Plugin-
+		Konfiguration ausgelagert), sondern nur noch den 
+		Platzhalter {Galerie}.
 
-        für embedete Galerie einfach in der Inhaltsseite {Galerie|MEINE GALERIE} einsetzten
-        und im admin Plugins Standart Galerie die entsprechenden Platzhalter anordnen HTML code ist
-        erlaubt.
-        ACHTUNG hier ist zu beachten das alle Lehr und Zeilen umbrüche ersetztwerden mit &nbsp; und <br>
-        deshalb überall wo das nicht erwünscht ist einfach nicht machen :)
-
-
-        für nicht embedete Galerie in der gallerytemplate.html ein {Galerie} an die Passende stelle setzen
-        und alle Platzhalter {CURRENTGALLERY} {GALLERYMENU} {NUMBERMENU} {CURRENTPIC} {CURRENTDESCRIPTION}
-        {XOUTOFY} {CURRENT_INDEX} {PREVIOUS_INDEX} {NEXT_INDEX} entfernen und im Plugin configurieren
-
-        z.B. Auszug aus einer gallerytemplate.html
+        Beispielhafter Auszug aus einer gallerytemplate.html...
+		- ...vor 1.12:
 
             <body>
-              <div id="container">
-                <div id="header">
-                  <h1>
-                    <a href="index.php" title="Zur Startseite">{WEBSITE_TITLE}</a>
-                  </h1>
-                </div>
-                <div id="sub_header">
-                          {CURRENTGALLERY}
-                </div>
-                <div id="main_content_top"></div>
-                <div id="main_content">
-                  <div class="gallerycontent">
+                <div class="gallerycontent">
                     <h2>
                       {CURRENTGALLERY}
                     </h2>
@@ -272,56 +277,13 @@ Was zu beachten ist:
 
                       {XOUTOFY}
                     </div>
-                  </div>
-                  <div id="clear"></div>
                 </div>
-                <div id="main_content_bottom"></div>
-                <div id="footer">
-                  <b>Design by</b> <a href="http://www.pikanai.com">Pikanai.com</a>
-                </div>
-              </div>
             </body>
 
-        Da holen wir uns den Relewanten Teil raus und ersetzen in mit {Galerie}
-
-            <div id="sub_header">
-                      {CURRENTGALLERY}
-            </div>
-            <div id="main_content_top"></div>
-            <div id="main_content">
-              <div class="gallerycontent">
-                <h2>
-                  {CURRENTGALLERY}
-                </h2>
-                <div class="gallerymenu">
-                  {GALLERYMENU}
+		- ...seit 1.12:
+		
+		    <body>
+                <div class="gallerycontent">
+                    {Galerie}
                 </div>
-
-                <div class="gallerynumbermenu">
-                  {NUMBERMENU}
-                </div>
-                <div style="text-align:center;">
-                  {CURRENTPIC}<br />
-                  <br />
-                  {CURRENTDESCRIPTION}<br />
-                  <br />
-
-                  {XOUTOFY}
-                </div>
-              </div>
-              <div id="clear"></div>
-            </div>
-
-        und setzen in im admin Plugin Standart Galerie im Textfeld ein
-
-            <div id="sub_header">{CURRENTGALLERY}</div><div id="main_content_top"></div>
-            <div id="main_content"><div class="gallerycontent"><h2>{CURRENTGALLERY}</h2>
-            <div class="gallerymenu">{GALLERYMENU}</div><div class="gallerynumbermenu">{NUMBERMENU}</div>
-            <div style="text-align:center;">
-            {CURRENTPIC}
-            {CURRENTDESCRIPTION}
-            {XOUTOFY}</div></div><div id="clear"></div></div>
-
-        ACHTUNG hier ist zu beachten das alle Lehr und Zeilen umbrüche ersetztwerden mit &nbsp; und <br>
-        deshalb überall wo das nicht erwünscht ist einfach nicht machen :)
-
+            </body>
