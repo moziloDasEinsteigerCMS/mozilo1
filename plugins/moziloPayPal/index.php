@@ -50,7 +50,7 @@ class moziloPayPal extends Plugin {
             "type" => "textarea",                       // Pflicht:  Eingabetyp 
             "cols" => "50",                             // Pflicht:  Spaltenanzahl 
             "rows" => "7",                              // Pflicht:  Zeilenanzahl
-            "description" => "Hier können sie um denn {PAYPALBUTTON} HTML Code erzeugen",     // Pflicht:  Beschreibung
+            "description" => "Optional: PayPal-Button (Platzhalter {PAYPALBUTTON}) in eigenen HTML-Code einbetten",     // Pflicht:  Beschreibung
         );
         // Nicht vergessen: Das gesamte Array zurückgeben
         if(isset($config[$language])) {
