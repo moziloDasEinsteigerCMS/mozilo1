@@ -566,8 +566,9 @@ td
     padding:0px;
 }
 
-.input_submit
-{
+.input_submit {
+    overflow: visible;
+    width: auto;
     vertical-align:middle;
     margin:0px;
     padding:0px 4px;
