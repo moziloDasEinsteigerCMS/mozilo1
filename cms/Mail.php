@@ -16,16 +16,23 @@ function sendMailToAdmin($subject, $content) {
 }
 
 // Sendet eine Mail an die konfigurierte Kontakt-Adresse oder eine Kopie an die Usermail-Adresse
-function sendMail($subject, $content, $from, $to) {
+function sendMail($subject, $content, $from, $to, $replyto) {
     global $CHARSET;
     global $specialchars;
-    @mail($specialchars->getHtmlEntityDecode($to), $specialchars->getHtmlEntityDecode($subject), $specialchars->getHtmlEntityDecode($content), getHeader($specialchars->getHtmlEntityDecode($to), $specialchars->getHtmlEntityDecode($from)));
+    @mail(
+           $specialchars->getHtmlEntityDecode($to),
+           $specialchars->getHtmlEntityDecode($subject),
+           $specialchars->getHtmlEntityDecode($content),
+           getHeader ($specialchars->getHtmlEntityDecode($from), $specialchars->getHtmlEntityDecode($replyto))
+         );
 }
 
 // Baut den Mail-Header zusammen
 function getHeader($from, $replyto) {
     global $CHARSET;
     global $VERSION_CONF;
+    if (empty($replyto))
+        $replyto = $from;
     return "From: ".$from."\r\n"
         ."MIME-Version: 1.0\r\n"
         ."Content-type: text/plain; charset=$CHARSET\r\n"
