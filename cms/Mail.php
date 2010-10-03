@@ -12,7 +12,7 @@
 function sendMailToAdmin($subject, $content) {
     global $ADMIN_CONF;
     $from = $ADMIN_CONF->get("adminmail");
-    sendMail($subject, $content, $from, $from);
+    sendMail($subject, $content, $from, $from, $from);
 }
 
 // Sendet eine Mail an die konfigurierte Kontakt-Adresse oder eine Kopie an die Usermail-Adresse
