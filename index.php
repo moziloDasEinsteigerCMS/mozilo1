@@ -1074,9 +1074,11 @@ $_POST = cleanREQUEST($_POST);
                     $mailcontent .= "\r\n".$language->getLanguageValue0("contactform_message_0").":\r\n".$message."\r\n";
                 }
                 $mailsubject = $language->getLanguageValue1("contactform_mailsubject_1", $specialchars->getHtmlEntityDecode($WEBSITE_NAME));
+                $mailsubject_confirm = $language->getLanguageValue1("contactform_mailsubject_confirm_1", $specialchars->getHtmlEntityDecode($WEBSITE_NAME));
+                
                 // Wenn Mail-Adresse im Formular gesetzt ist - versuchen Kopie dorthin zu senden
                 if ($mail <> "") {
-                    sendMail("cc: ".$mailsubject, $mailcontent, $contactformconfig->get("formularmail"), $mail, $contactformconfig->get("formularmail"));
+                    sendMail($mailsubject_confirm, $mailcontent, $contactformconfig->get("formularmail"), $mail, $contactformconfig->get("formularmail"));
                 }
                 // Mail an eingestellte Mail-Adresse (Mail-Absender muss auch diese Adresse sein,
                 // sonst gibts kein Mail wenn der keine oder ungültige Adresse eingibt..
