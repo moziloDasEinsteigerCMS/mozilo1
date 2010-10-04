@@ -21,7 +21,7 @@ function sendMail($subject, $content, $from, $to, $replyto) {
     global $specialchars;
     @mail(
            $specialchars->getHtmlEntityDecode($to),
-           $specialchars->getHtmlEntityDecode($subject),
+           "=?UTF-8?B?".base64_encode($specialchars->getHtmlEntityDecode($subject))."?=",
            $specialchars->getHtmlEntityDecode($content),
            getHeader ($specialchars->getHtmlEntityDecode($from), $specialchars->getHtmlEntityDecode($replyto))
          );
