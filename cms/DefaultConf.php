@@ -198,7 +198,7 @@ function makeDefaultConf($conf_datei) {
                         'gallerypicsperrow')
                     );
 
-    $aufgaben = array('3 + 7' => '10',
+    $aufgaben_deDE = array('3 + 7' => '10',
                         '5 - 3' => '2',
                         '1 plus 1' => '2',
                         '17 minus 7' => '10',

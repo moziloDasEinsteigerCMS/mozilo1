@@ -80,8 +80,13 @@ $_POST = cleanREQUEST($_POST);
     $FAVICON_FILE   = $LAYOUT_DIR_URL."/favicon.ico";
     // Einstellungen fuer Kontaktformular
     $contactformconfig  = new Properties($BASE_DIR_CMS."formular/formular.conf",true);
-    $contactformcalcs   = new Properties($BASE_DIR_CMS."formular/aufgaben.conf",true);
-
+    
+    // Spamschutz-Aufgaben lt. frontend Sprache laden, wenn nich vorhanden deDE laden
+    if (file_exists($BASE_DIR_CMS."formular/aufgaben_".$CMS_CONF->get("cmslanguage").".conf")) {
+        $contactformcalcs = new Properties($BASE_DIR_CMS."formular/aufgaben_".$CMS_CONF->get("cmslanguage").".conf",true);    
+    } else {
+        $contactformcalcs = new Properties($BASE_DIR_CMS."formular/aufgaben_deDE.conf",true);
+    }
 
     $WEBSITE_NAME = $specialchars->rebuildSpecialChars($CMS_CONF->get("websitetitle"),false,true);
     if ($WEBSITE_NAME == "")
