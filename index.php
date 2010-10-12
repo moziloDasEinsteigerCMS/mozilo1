@@ -80,12 +80,16 @@ $_POST = cleanREQUEST($_POST);
     $FAVICON_FILE   = $LAYOUT_DIR_URL."/favicon.ico";
     // Einstellungen fuer Kontaktformular
     $contactformconfig  = new Properties($BASE_DIR_CMS."formular/formular.conf",true);
-    
-    // Spamschutz-Aufgaben lt. frontend Sprache laden, wenn nich vorhanden deDE laden
-    if (file_exists($BASE_DIR_CMS."formular/aufgaben_".$CMS_CONF->get("cmslanguage").".conf")) {
+
+    // Spamschutz-Aufgaben lt. frontend sprache laden
+    if (is_file($BASE_DIR_CMS."formular/aufgaben_".$CMS_CONF->get("cmslanguage").".conf")) {
         $contactformcalcs = new Properties($BASE_DIR_CMS."formular/aufgaben_".$CMS_CONF->get("cmslanguage").".conf",true);    
+    } elseif (is_file($BASE_DIR_CMS."formular/aufgaben_enEN.conf")) {
+    // wenn nicht vorhanden als default enEN laden
+        $contactformcalcs = new Properties($BASE_DIR_CMS."formular/aufgaben_enEN.conf",true);
     } else {
-        $contactformcalcs = new Properties($BASE_DIR_CMS."formular/aufgaben_deDE.conf",true);
+    // wenn enEN auch nicht vorhanden - die()
+        die("Fatal Error: ".$BASE_DIR_CMS."formular/aufgaben_enEN.conf existiert nicht!");
     }
 
     $WEBSITE_NAME = $specialchars->rebuildSpecialChars($CMS_CONF->get("websitetitle"),false,true);

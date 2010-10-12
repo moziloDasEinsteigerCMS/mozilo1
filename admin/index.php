@@ -148,14 +148,6 @@ if(!isset($CONTACT_CONF->properties['readonly'])) {
     die($CONTACT_CONF->properties['error']);
 }
 
-if(!is_file($BASE_DIR_CMS."formular/aufgaben_deDE.conf")) {
-    $AUFGABEN_CONF = new Properties($BASE_DIR_CMS."formular/aufgaben_deDE.conf",true);
-    if(!isset($AUFGABEN_CONF->properties['readonly'])) {
-        die($AUFGABEN_CONF->properties['error']);
-    }
-    unset($AUFGABEN_CONF);
-}
-
 // Abwärtskompatibilität: Downloadcounter initalisieren
 if ($DOWNLOAD_COUNTS->get("_downloadcounterstarttime") == "" and !isset($DOWNLOAD_COUNTS->properties['error']))
     $DOWNLOAD_COUNTS->set("_downloadcounterstarttime", time());
