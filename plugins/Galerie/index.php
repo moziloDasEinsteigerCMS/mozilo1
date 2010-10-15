@@ -407,7 +407,7 @@ class Galerie extends Plugin {
 
         $info['deDE'] = array(
             // Plugin-Name
-            "<b>moziloCMS-Standardgalerie</b> 0.1",
+            "<b>moziloCMS-Standardgalerie</b> 1.0",
             // CMS-Version
             "1.12",
             // Kurzbeschreibung

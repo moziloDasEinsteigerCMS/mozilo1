@@ -72,7 +72,7 @@ class moziloPayPal extends Plugin {
 
         $info['deDE'] = array(
             // Plugin-Name
-            "<b>PayPal-Button</b> 0.1",
+            "<b>PayPal-Button</b> 1.0",
             // CMS-Version
             "1.12",
             // Kurzbeschreibung

@@ -170,7 +170,7 @@ class LASTCHANGE extends Plugin {
                
         $info['deDE'] = array(
             // Plugin-Name
-            "<b>LastChange</b> 0.1",
+            "<b>LastChange</b> 1.0",
             // CMS-Version
             "1.12",
             // Kurzbeschreibung
