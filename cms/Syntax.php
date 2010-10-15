@@ -742,8 +742,8 @@ class Syntax {
             $content = preg_replace('/<(\/?)(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)([^>]*)>(\r\n|\r|\n)?<br \/?>/', "<$1$2$3>$4",$content);
             // direkt aufeinanderfolgende Listen zusammenführen
             $content = preg_replace('/<\/ul>(\r\n|\r|\n)?<ul class="unorderedlist">/', '', $content);
-            // direkt aufeinanderfolgende numerierte Listen zusammenf�hren
-            $content = preg_replace('/<\/ol>(\r\n|\r|\n)?<ol class="orderedlist>/', '', $content);
+            // direkt aufeinanderfolgende numerierte Listen zusammenführen
+            $content = preg_replace('/<\/ol>(\r\n|\r|\n)?<ol class="orderedlist">/', '', $content);
             # Table Hack recursive Table
             $content = preg_replace('/&#38;/', '&', $content);
         }
