@@ -8,13 +8,13 @@
 *
 */
 
-$CHARSET = 'UTF-8';
+$CHARSET                = 'UTF-8';
 
-$CONTENT_DIR_NAME        = "kategorien";
-$CONTENT_FILES_DIR_NAME      = "dateien";
-$PLUGIN_DIR_NAME         = "plugins";
-$GALLERIES_DIR_NAME    = "galerien";
-$PREVIEW_DIR_NAME        = "vorschau";
+$CONTENT_DIR_NAME       = "kategorien";
+$CONTENT_FILES_DIR_NAME = "dateien";
+$PLUGIN_DIR_NAME        = "plugins";
+$GALLERIES_DIR_NAME     = "galerien";
+$PREVIEW_DIR_NAME       = "vorschau";
 
 function cleanREQUEST($post_return) {
     foreach($post_return as $key => $value) {
@@ -177,9 +177,9 @@ function makeDefaultConf($conf_datei) {
 
     $downloads = array('_downloadcounterstarttime' => time());
 
-    $version = array('cmsversion' => '1.12.beta3',
+    $version = array('cmsversion' => '1.12.beta4',
                         'cmsname' => 'Amalia',
-                        'revision' => '764');
+                        'revision' => '791');
 
     $gallery = array('digit' => array(
                         'maxheight' => '',
