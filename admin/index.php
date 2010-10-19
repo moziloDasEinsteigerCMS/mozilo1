@@ -3783,7 +3783,7 @@ function plugins($post) {
                            }
                             # Beschreibung und inputs der Konfiguration Bauen und ausgeben
                             $value = NULL;
-                            if($conf_plugin->get($name)) {
+                            if(strlen($conf_plugin->get($name)) > 0) {
                                 $value = ' value="'.$conf_plugin->get($name).'"';
                                 if($config[$name]['type'] == "textarea") {
                                     $value = str_replace("<br />","\n",$conf_plugin->get($name));
