@@ -20,6 +20,7 @@ class Smileys {
     function replaceEmoticons($content) {
         global $URL_BASE;
         global $CMS_DIR_NAME;
+
         foreach ($this->smileysarray as $icon => $emoticon) {
             if($icon == "readonly" or $icon == "error") {
                 continue;
@@ -29,17 +30,18 @@ class Smileys {
             $regex =     "/(".
                                     "(".
                                         // nicht zwischen <a ...> und </a> (Links)
-                                        "(<a\s[^<>]*>[^<>]*(\:".$icon."\:|".$emoticon.")[^<>]*<\/a>)".
+                                        "(<a\s[^<>]*>[^<>]*(\:".$icon."\:)[^<>]*<\/a>)".
                                         // nicht zwischen <em class="deadlink"> and </em> (Deadlinks)
-                                        "|(<em\sclass=\"deadlink\"[^<>]*>[^<>]*(\:".$icon."\:|".$emoticon.")[^<>]*<\/em>)".
+                                        "|(<em\sclass=\"deadlink\"[^<>]*>[^<>]*(\:".$icon."\:)[^<>]*<\/em>)".
                                         // nicht zwischen < und > (HTML-Tags)
-                                        "|(<[^>]*(\:".$icon."\:|".$emoticon.").*>)".
+                                        "|(<[^>]*(\:".$icon."\:).*>)".
                                         // nicht bei HTML-Entities gefolgt von Klammer - z.B. &quot;) oderr &#93;)
-                                        "|([\&\w{2,7}|\&\#\d?](\:".$icon."\:|".$emoticon."))".
+                                        "|([\&\w{2,7}|\&\#\d?](\:".$icon."\:))".
                                     ")".
-                                    "|(\:".$icon."\:|".$emoticon.")".
+                                    "|(\:".$icon."\:)".
                                 ")/Uie";
-            $content = preg_replace($regex, '"\2"=="\1"? "\1":"$12<img src=\"".$URL_BASE.$CMS_DIR_NAME."/smileys/".$icon.".gif\" class=\"noborder\" alt=\"".stripslashes($emoticon)."\" />$14"', $content);
+            # ACHTUNG der Modifikator e maskiert alle ', ", \ und NULL deshalb stripslashes("\1")
+            $content = preg_replace($regex, '"\2"=="\1"? stripslashes("\1"):"$12<img src=\"".$URL_BASE.$CMS_DIR_NAME."/smileys/".$icon.".gif\" class=\"noborder\" alt=\"".stripslashes($emoticon)."\" />$14"', $content);
         }
         return $content;
     }

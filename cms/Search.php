@@ -103,7 +103,7 @@ function searchPage($cat,$page) {
     if (filesize($filepath) > 0) {
         $pagecontent = implode(file($CONTENT_DIR_REL.$cat."/".$page));
         $pagecontent = $syntax->convertContent($pagecontent, $cat, true);
-        list($pagecontent,$css) = replacePluginVariables($pagecontent,$activ_plugins,$deactiv_plugins);
+#        list($pagecontent,$css) = replacePluginVariables($pagecontent,$activ_plugins,$deactiv_plugins);
         # alle Komentare raus
         $pagecontent = preg_replace("/\<!--(.*)-->/Umsi"," ", $pagecontent);
         # alle script, select, object, embed sachen raus
