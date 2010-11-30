@@ -56,7 +56,7 @@ function makePlatzhalter($all = false) {
                         '{SEARCH}',
                         '{SITEMAPLINK}',
                         '{CMSINFO}',
-                        '{CONTACT}',
+#                        '{CONTACT}',
                         '{TABLEOFCONTENTS}'
     );
     # Die Rstlichen Platzhalter
@@ -158,7 +158,7 @@ function makeDefaultConf($conf_datei) {
                     );
 
     $syntax = array('wikipedia' => '[link={DESCRIPTION}|http://de.wikipedia.org/wiki/{VALUE}]');
-
+/*
     $formular = array('formularmail' => '',
                         'contactformusespamprotection' => 'true',
                         'contactformwaittime' => '15',
@@ -166,7 +166,7 @@ function makeDefaultConf($conf_datei) {
                         'message' => ',true,true',
                         'name' => ',true,true',
                         'website' => ',true,false');
-
+*/
     $logindata = array('falselogincount' => '0',
                         'falselogincounttemp' => '0',
                         'initialpw' => 'true',

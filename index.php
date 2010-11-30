@@ -91,7 +91,7 @@ $_POST = cleanREQUEST($_POST);
     $CSS_FILE       = $LAYOUT_DIR_URL."/css/style.css";
     $FAVICON_FILE   = $LAYOUT_DIR_URL."/favicon.ico";
     // Einstellungen fuer Kontaktformular
-    $contactformconfig  = new Properties($BASE_DIR_CMS."formular/formular.conf",true);
+/*    $contactformconfig  = new Properties($BASE_DIR_CMS."formular/formular.conf",true);
 
     // Spamschutz-Aufgaben lt. frontend sprache laden
     if (is_file($BASE_DIR_CMS."formular/aufgaben_".$CMS_CONF->get("cmslanguage").".conf")) {
@@ -103,7 +103,7 @@ $_POST = cleanREQUEST($_POST);
     // wenn enEN auch nicht vorhanden - die()
         die("Fatal Error: ".$BASE_DIR_CMS."formular/aufgaben_enEN.conf existiert nicht!");
     }
-
+*/
     $WEBSITE_NAME = $specialchars->rebuildSpecialChars($CMS_CONF->get("websitetitle"),false,true);
     if ($WEBSITE_NAME == "")
         $WEBSITE_NAME = "Titel der Website";
@@ -361,11 +361,11 @@ $_POST = cleanREQUEST($_POST);
     // CMS-Info-Link
     if(strpos($HTML,'{CMSINFO}') !== false)
         $HTML = str_replace('{CMSINFO}', getCmsInfo(), $HTML);
-      
+/*      
     // Kontaktformular
     if(strpos($HTML,'{CONTACT}') !== false)
         $HTML = str_replace('{CONTACT}', buildContactForm(), $HTML);
-
+*/
     // Kontaktformular
     if(strpos($HTML,'{TABLEOFCONTENTS}') !== false)
         $HTML = str_replace('{TABLEOFCONTENTS}', $syntax->getToC($pagecontent), $HTML);
@@ -984,7 +984,7 @@ $_POST = cleanREQUEST($_POST);
 	    }
 	    return true;
     }
-
+/*
 // ------------------------------------------------------------------------------
 // Gibt das Kontaktformular zurueck
 // ------------------------------------------------------------------------------
@@ -1186,7 +1186,7 @@ $_POST = cleanREQUEST($_POST);
         
         return $form;
     }
-
+*/
 // ------------------------------------------------------------------------------
 // Hilfsfunktion: Sichert einen Input-Wert
 // ------------------------------------------------------------------------------
@@ -1326,7 +1326,7 @@ $_POST = cleanREQUEST($_POST);
         return $neighbourPages;
     }
 
-
+/*
 // ------------------------------------------------------------------------------
 // Hilfsfunktion: Zufaellige Spamschutz-Rechenaufgabe und deren Ergebnis zurueckgeben
 // ------------------------------------------------------------------------------
@@ -1348,7 +1348,7 @@ $_POST = cleanREQUEST($_POST);
         $_SESSION['contactform_message'] = time()-rand(40, 50);
         $_SESSION['contactform_calculation'] = time()-rand(50, 60);
     }
-
+*/
     function findPlugins() {
         global $PLUGIN_DIR_REL;
         # Damit ein Platzhalter der als erste kommt erkant wierd

@@ -98,9 +98,9 @@ if(!is_dir($BASE_DIR."layouts")) {
 if(!is_dir($BASE_DIR_CMS."sprachen")) {
     die(getLanguageValue("error_dir")." ".$BASE_DIR_CMS."sprachen/");
 }
-if(!is_dir($BASE_DIR_CMS."formular")) {
+/*if(!is_dir($BASE_DIR_CMS."formular")) {
     die(getLanguageValue("error_dir")." ".$BASE_DIR_CMS."formular/");
-}
+}*/
 if(!is_dir($BASE_DIR."galerien")) {
     die(getLanguageValue("error_dir")." ".$BASE_DIR.$GALLERIES_DIR_NAME."/");
 }
@@ -142,11 +142,11 @@ $USER_SYNTAX = new Properties($USER_SYNTAX_FILE,true);
 if($CMS_CONF->properties['usecmssyntax'] == "true" and !isset($USER_SYNTAX->properties['readonly'])) {
     die($USER_SYNTAX->properties['error']);
 }
-
+/*
 $CONTACT_CONF = new Properties($BASE_DIR_CMS."formular/formular.conf",true);
 if(!isset($CONTACT_CONF->properties['readonly'])) {
     die($CONTACT_CONF->properties['error']);
-}
+}*/
 
 // Abwärtskompatibilität: Downloadcounter initalisieren
 if ($DOWNLOAD_COUNTS->get("_downloadcounterstarttime") == "" and !isset($DOWNLOAD_COUNTS->properties['error']))
@@ -2768,14 +2768,14 @@ function config($post) {
         }
     }
     $error_color['usersyntax'] = NULL;
-    $input_mail = makeDefaultConf("formular");
+/*    $input_mail = makeDefaultConf("formular");
     $error_color['formularmail'] = NULL;
     $error_color['contactformwaittime'] = NULL;
     foreach($input_mail as $syntax_name => $dumy) {
         if($syntax_name == 'formularmail') continue;
         $error_color['titel_'.$syntax_name] = NULL;
     }
-
+*/
     $language_array = getFiles($BASE_DIR_CMS.'sprachen',true);
     $cat_array = getDirs($CONTENT_DIR_REL,true,true);
     $layout_array = getDirs($BASE_DIR."layouts",true);
@@ -2856,7 +2856,7 @@ function config($post) {
             }
         }
         # Mail daten speichern
-        foreach($input_mail as $syntax_name => $dumy) {
+/*        foreach($input_mail as $syntax_name => $dumy) {
             if($syntax_name == "contactformwaittime") {
                 # wenn eingabe keine Zahl oder mehr wie 4stelig ist
                 if(!ctype_digit($post[$syntax_name]) or strlen($post[$syntax_name]) > 4) {
@@ -2890,7 +2890,7 @@ function config($post) {
             $mail_titel = $specialchars->replaceSpecialChars($post['titel_'.$syntax_name],false);
             $CONTACT_CONF->set($syntax_name, $mail_titel.",".checkBoxChecked('show_'.$syntax_name).",".checkBoxChecked('mandatory_'.$syntax_name));
         }
-
+*/
         // Speichern der benutzerdefinierten Syntaxelemente -> ERWEITERN UM PRÜFUNG!
         # nur Speichern wenn auch benutzt wird
         if($CMS_CONF->get('usecmssyntax') == "true") {
@@ -3173,7 +3173,7 @@ function config($post) {
             $pagecontent .= "</tr>";
         }
     }
-
+/*
             // KONTAKTFORMULAR-EINSTELLUNGEN formularmail
     $pagecontent .= "<tr>";
     $pagecontent .= '<td class="td_cms_titel" colspan="2">'.getLanguageValue("config_titel_contact").'</td>';
@@ -3204,7 +3204,7 @@ function config($post) {
     .'<tr><td>'.getLanguageValue("config_input_contact_textarea").'</td><td><input type="text" class="input_cms_text" name="titel_message" value="'.$specialchars->rebuildSpecialChars($config_message[0],true,true).'"'.$error_color['titel_message'].' /></td><td align="center">'.buildCheckBox("show_message", ($config_message[1] == "true")).'</td><td align="center">'.buildCheckBox("mandatory_message", ($config_message[2] == "true")).'</td></tr>'
     ."</table></td>";
     $pagecontent .= "</tr>";
-
+*/
     if($ADMIN_CONF->get('showexpert') == "true") {
         $pagecontent .= '<tr><td class="td_cms_titel" colspan="2">'.getLanguageValue("config_titel_expert").'</td></tr>';
         // Zeile "showhiddenpagesin"
