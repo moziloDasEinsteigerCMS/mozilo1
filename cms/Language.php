@@ -16,16 +16,19 @@ class Language {
 // ------------------------------------------------------------------------------    
 // Konstruktor
 // ------------------------------------------------------------------------------
-    function Language() {
+    function Language($lang_dir = false) {
         global $CMS_CONF;
         global $BASE_DIR_CMS;
-
-        $currentlanguage = $CMS_CONF->get("cmslanguage");
-        // Standardsprache Deutsch verwenden, wenn konfigurierte Sprachdatei nicht vorhanden
-        if (($currentlanguage == "") || (!file_exists($BASE_DIR_CMS."sprachen/language_$currentlanguage.conf"))) {
-            $currentlanguage = "Deutsch";
+        if(!$lang_dir) {
+            $currentlanguage = $CMS_CONF->get("cmslanguage");
+            // Standardsprache Deutsch verwenden, wenn konfigurierte Sprachdatei nicht vorhanden
+            if (($currentlanguage == "") || (!file_exists($BASE_DIR_CMS."sprachen/language_$currentlanguage.conf"))) {
+                $currentlanguage = "deDE";
+            }
+            $this->LANG_CONF = new Properties($BASE_DIR_CMS."sprachen/language_$currentlanguage.conf");
+        } else {
+            $this->LANG_CONF = new Properties($lang_dir);
         }
-        $this->LANG_CONF = new Properties($BASE_DIR_CMS."sprachen/language_$currentlanguage.conf");
     }
     
 
