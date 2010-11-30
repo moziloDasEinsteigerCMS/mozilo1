@@ -20,7 +20,7 @@ class CONTACT extends Plugin {
 
         // existiert eine Mailadresse? Wenn nicht: Das Kontaktformular gar nicht anzeigen!
         if(strlen($this->settings->get("formularmail")) < 1) {
-            return "<span class=\"deadlink\"".getTitleAttribute($lang_contact->getLanguageValue0("tooltip_no_mail_error_0")).">{CONTACT}</span>";
+            return "<span class=\"deadlink\"".getTitleAttribute($lang_contact->getLanguageValue0("tooltip_no_mail_error_0")).">&#123;CONTACT&#125;</span>";
         }
 
         $default_contactformcalcs = '3 + 7 = 10<br />'
