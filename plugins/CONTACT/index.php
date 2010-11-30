@@ -84,7 +84,7 @@ class CONTACT extends Plugin {
             "type" => "textarea",
             "cols" => "60",
             "rows" => "10",
-            "description" => "Spam Aufgaben"
+            "description" => $lang_contact_admin->get("config_titel_spam_question")
         );
         # name
         $config['titel_name']  = array(
