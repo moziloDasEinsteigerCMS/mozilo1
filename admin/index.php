@@ -1263,6 +1263,7 @@ function copymoveSite($post) {
     global $CONTENT_DIR_REL;
     global $EXT_LINK;
     global $EXT_PAGE;
+    global $EXT_DRAFT;
     global $PASSWORDS;
     global $BASE_DIR_ADMIN;
     $max_cat_page = 100;
@@ -1434,7 +1435,7 @@ function copymoveSite($post) {
         # die neue Inhaltseite
         if(!empty($post['categories'][$cat]['new_position'][$max_cat_page])) {
             $new_position = $post['categories'][$cat]['new_position'][$max_cat_page];
-            $new_page[$cat] = $new_position."_".$post['categories'][$cat]['new_name'][$max_cat_page].$EXT_PAGE;
+            $new_page[$cat] = $new_position."_".$post['categories'][$cat]['new_name'][$max_cat_page].$EXT_DRAFT;
             if(!empty($post['categories'][$cat]['new_url'][$max_cat_page])) {
                 $new_page[$cat] = $new_position."_".$post['categories'][$cat]['new_name'][$max_cat_page].$post['categories'][$cat]['new_target'][$max_cat_page].$post['categories'][$cat]['new_url'][$max_cat_page].$EXT_LINK;
             }
