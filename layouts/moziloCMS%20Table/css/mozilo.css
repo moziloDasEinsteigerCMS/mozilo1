@@ -49,15 +49,21 @@ a.gallery {
 /* -------------------------------------------------------- */
 /* [bild|...] */
 /* ---------- */
-img {
-	border:none;
-}
-
 span.imagesubtitle {
 	margin:3px 3px;
 	text-align:justify;
 	font-size:87%;
+    border:none;
 	/*line-height:120%;*/
+}
+
+img.contentimage {
+    border:none;
+}
+
+span.contentimage {
+    border:none;
+    display:inline-block;
 }
 
 /*1=oben, 2=rechts, 3=unten, 4=links*/
@@ -187,11 +193,11 @@ h3 {
 /* [liste|...] */
 /* [numliste|...] */
 /* ------------ */
-ul, ol {
+.unorderedlist, .orderedlist {
 	margin-top:0px;
 	margin-bottom:0px;
 }
-li {
+.listitem {
 	margin-top:0px;
 	margin-bottom:0px;
 }
