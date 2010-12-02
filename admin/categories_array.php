@@ -436,11 +436,16 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
                     if(isset($post[$cat]['url'][$pos])) {
                         $post['move_copy']['source']['name'][$pos] .= $post[$cat]['target'][$pos].$post[$cat]['url'][$pos];
 
-                        $new_url = $post[$cat]['new_target'][$pos].$post[$cat]['url'][$pos];
-                        if(!empty($post[$cat]['new_url'][$pos])) {
-                            $new_url = $post[$cat]['new_target'][$pos].$post[$cat]['new_url'][$pos];
+                        $new_target = $post[$cat]['target'][$pos];
+                        if(!empty($post[$cat]['new_target'][$pos])) {
+                            $new_target = $post[$cat]['new_target'][$pos];
                         }
-                        $post['move_copy']['desti']['name'][$pos] .= $new_url;
+
+                        $new_url = $post[$cat]['url'][$pos];
+                        if(!empty($post[$cat]['new_url'][$pos])) {
+                            $new_url = $post[$cat]['new_url'][$pos];
+                        }
+                        $post['move_copy']['desti']['name'][$pos] .= $new_target.$new_url;
                     }
                 }
             }
