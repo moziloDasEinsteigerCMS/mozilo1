@@ -198,6 +198,8 @@ function makeDefaultConf($conf_datei) {
                         'gallerypicsperrow')
                     );
 
+    $plugin = array('active' => 'true');
+
     $passwords = array('# Kategorie/Inhaltsseite' => 'password');
 
     # ist eine *.conf datei angegeben wird das jeweilige array ohne expert und nur der inhalt der subarrays zurückgegeben

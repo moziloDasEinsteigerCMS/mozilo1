@@ -3651,13 +3651,11 @@ function plugins($post) {
             require_once($PLUGIN_DIR_REL.$currentelement."/index.php");
             $plugin = new $currentelement();
             $plugin_error = false;
-            if(file_exists($PLUGIN_DIR_REL.$currentelement."/plugin.conf")) {
-                $conf_plugin = new Properties($PLUGIN_DIR_REL.$currentelement."/plugin.conf",true);
-                $plugin_error_conf = NULL;
-                if(isset($conf_plugin->properties['error'])) {
-                    $plugin_error_conf = returnMessage(false, getLanguageValue("properties_write").'&nbsp;&nbsp;<span style="font-weight:normal;">'.$currentelement.'/plugin.conf</span>');
-                    $plugin_error = true;
-                }
+            $conf_plugin = new Properties($PLUGIN_DIR_REL.$currentelement."/plugin.conf",true);
+            $plugin_error_conf = NULL;
+            if(isset($conf_plugin->properties['error'])) {
+                $plugin_error_conf = returnMessage(false, getLanguageValue("properties_write").'&nbsp;&nbsp;<span style="font-weight:normal;">'.$currentelement.'/plugin.conf</span>');
+                $plugin_error = true;
             }
             if(getRequestParam('apply', true)) {
                 $check_activ = "false";
