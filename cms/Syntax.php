@@ -67,6 +67,8 @@ class Syntax {
         foreach($this->syntax_user as $user => $inhalt) {
             $syntax_array[] = $user;
         }
+        # Damit zuerst z.B. nach links und dann nach link gesucht wird sonst wird links als link gefunden
+        rsort($syntax_array);
 
         $syntax_such = "/\[(".implode("=|",$syntax_array)."=|".implode("|",$syntax_array).")([^\[\]\{\}]*)\|([^\[\]\{\}]*)\]/Um";
         $syntax_such_rest = "/\[(".implode("=|",$syntax_array)."=|".implode("|",$syntax_array).")([^\|]*)\|(.*)\]/m";
@@ -74,6 +76,8 @@ class Syntax {
         $this->activ_plugins = $activ_plugins;
         $this->deactiv_plugins = $deactiv_plugins;
         $plugin = array_merge($this->activ_plugins, $this->deactiv_plugins);
+        # Das gleiche hier mit Plugins siehe rsort weiter oben
+        rsort($plugin);
 
         $plugin_such = "/\{(".implode("|",$plugin).")\|([^\[\]\{\}]*)\}/Um";
         $plugin_such_rest = "/\{(".implode("|",$plugin).")\|(.*)\}/m";
