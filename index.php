@@ -302,6 +302,8 @@ $_POST = cleanREQUEST($_POST);
             }
         }
     }
+    if(strstr($TEMPLATE_FILE,"gallerytemplate.html"))
+        $is_syntax = false;
 
     $HTML = str_replace('{CONTENT}','---content~~~'.$pagecontent.'~~~content---',$template);
     $HTML = $syntax->convertContent($HTML, $CAT_REQUEST, $is_syntax);
