@@ -1928,41 +1928,39 @@ function gallery($post) {
     $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_scale.'><b>'.$text_gallery_scale.'</b></td>';
     $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxwidth]" value="'.$GALLERY_CONF->get("maxwidth").'"'.$post['gallery']['error_html']['maxwidth'].$tooltip_gallery_help_input_scale.' />&nbsp;x&nbsp;<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxheight]" value="'.$GALLERY_CONF->get("maxheight").'"'.$post['gallery']['error_html']['maxheight'].$tooltip_gallery_help_input_scale.' />&nbsp;'.getLanguageValue("pixels").'</td>';
 
-    $checket_self = NULL;
-    $checket_blank = ' checked="checked"';
-    if($GALLERY_CONF->get("target") == "_self") {
-        $checket_self = ' checked="checked"';
-        $checket_blank = NULL;
-    }
 
-    $pagecontent .= '</tr><tr>';
-    $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_target.'><b>'.$text_gallery_target.'</b></td>';
-    $pagecontent .= '<td width="20%" class="td_left_title_padding_bottom">
-    <table summary="" width="100%" cellspacing="0" border="0" cellpadding="0">
-    <tr>
-    <td width="33%">&nbsp;</td>
-    <td width="33%" class="td_center_title">&nbsp;&nbsp;'.getLanguageValue("blank").'&nbsp;&nbsp;</td>
-    <td width="33%" class="td_center_title">&nbsp;&nbsp;'.getLanguageValue("self").'&nbsp;&nbsp;</td>
-    </tr><tr>
-    <td class="td_center_title"><b'.$tooltip_help_target.'>'.$text_target.'</b></td>
-    <td class="td_center_title"><input type="radio" name="gallery[setings][target]" value="_blank"'.$tooltip_help_target_blank.$checket_blank.'></td>
-    <td class="td_center_title"><input type="radio" name="gallery[setings][target]" value="_self"'.$tooltip_help_target_self.$checket_self.'></td>
-    </tr>
-    </table></td>';
+  $checket_self = NULL;
+  $checket_blank = ' checked="checked"';
+  if($GALLERY_CONF->get("target") == "_self") {
+      $checket_self = ' checked="checked"';
+      $checket_blank = NULL;
+  }
+
+  $pagecontent .= '</tr><tr>';
+  $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_target.'><b>'.$text_gallery_target.'</b></td>';
+  $pagecontent .= '<td width="20%" class="td_left_title_padding_bottom">
+  <table summary="" width="100%" cellspacing="0" border="0" cellpadding="0">
+  <tr>
+  <td width="33%">&nbsp;</td>
+  <td width="33%" class="td_center_title">&nbsp;&nbsp;'.getLanguageValue("blank").'&nbsp;&nbsp;</td>
+  <td width="33%" class="td_center_title">&nbsp;&nbsp;'.getLanguageValue("self").'&nbsp;&nbsp;</td>
+  </tr><tr>
+  <td class="td_center_title"><b'.$tooltip_help_target.'>'.$text_target.'</b></td>
+  <td class="td_center_title"><input type="radio" name="gallery[setings][target]" value="_blank"'.$tooltip_help_target_blank.$checket_blank.'></td>
+  <td class="td_center_title"><input type="radio" name="gallery[setings][target]" value="_self"'.$tooltip_help_target_self.$checket_self.'></td>
+  </tr>
+  </table></td>';
+    
     if($ADMIN_CONF->get('showexpert') == "true") {
-        $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_use_thumbs.'><b>'.$text_gallery_usethumbs.'</b></td>';
-        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"'.$tooltip_gallery_help_use_thumbs.'>'.buildCheckBox("gallery[setings][usethumbs]", $GALLERY_CONF->get("usethumbs")).'</td>';
+      $pagecontent .= '</tr><tr>';
+      $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_use_thumbs.'><b>'.$text_gallery_usethumbs.'</b></td>';
+      $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"'.$tooltip_gallery_help_use_thumbs.'>'.buildCheckBox("gallery[setings][usethumbs]", $GALLERY_CONF->get("usethumbs")).'</td>';
 
-        $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_scale_thumbs.'><b>'.$text_gallery_scale_thumbs.'</b></td>';
-        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxthumbwidth]" value="'.$GALLERY_CONF->get("maxthumbwidth").'"'.$post['gallery']['error_html']['maxthumbwidth'].$tooltip_gallery_help_input_scale.' />&nbsp;x&nbsp;<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxthumbheight]" value="'.$GALLERY_CONF->get("maxthumbheight").'"'.$post['gallery']['error_html']['maxthumbheight'].$tooltip_gallery_help_input_scale.' />&nbsp;'.getLanguageValue("pixels").'</td>';
-
-
-        $pagecontent .= '</tr><tr>';
-        $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_picsperrow.'><b>'.$text_gallery_picsperrow.'</b></td>';
-        $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="2" name="gallery[setings][gallerypicsperrow]" value="'.$GALLERY_CONF->get("gallerypicsperrow").'"'.$post['gallery']['error_html']['gallerypicsperrow'].$tooltip_gallery_help_input_picsperrow.' /></td>';
+      $pagecontent .= '</tr><tr>';
+      $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_scale_thumbs.'><b>'.$text_gallery_scale_thumbs.'</b></td>';
+      $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxthumbwidth]" value="'.$GALLERY_CONF->get("maxthumbwidth").'"'.$post['gallery']['error_html']['maxthumbwidth'].$tooltip_gallery_help_input_scale.' />&nbsp;x&nbsp;<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxthumbheight]" value="'.$GALLERY_CONF->get("maxthumbheight").'"'.$post['gallery']['error_html']['maxthumbheight'].$tooltip_gallery_help_input_scale.' />&nbsp;'.getLanguageValue("pixels").'</td>';
     }
+
     $pagecontent .= '</tr>';
     $pagecontent .= '</table>';
 
@@ -1973,7 +1971,7 @@ function gallery($post) {
     # setings end
 
     $pagecontent .= '<tr><td width="100%" class="td_toggle_new">';
-    # Neue GAllery
+    # Neue Gallery
     $pagecontent .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
     $pagecontent .= '<tr><td width="30%" class="td_left_title"><b>'.getLanguageValue("gallery_new").'</b></td>';
     $pagecontent .= '<td width="70%" class="td_left_title">&nbsp;</td>';
@@ -4433,7 +4431,7 @@ function renameCategoryInDownloadStats($oldcatname, $newcatname) {
     $DOWNLOAD_COUNTS->setFromArray($downloadsarray);
 }
 
-// Überschreibt die layoutabhängigen CMS-Einstellungen usesubmenu und gallerypicsperrow
+// Überschreibt die layoutabhängigen CMS-Einstellungen usesubmenu
 function setLayoutAndDependentSettings($layoutfolder) {
     global $CMS_CONF;
     global $GALLERY_CONF;
@@ -4446,7 +4444,6 @@ function setLayoutAndDependentSettings($layoutfolder) {
         return $layoutsettings->properties;
     } else {
         $CMS_CONF->set("usesubmenu", $layoutsettings->get("usesubmenu"));
-        $GALLERY_CONF->set("gallerypicsperrow", $layoutsettings->get("gallerypicsperrow"));
         if(isset($layoutsettings->properties['usesubmenu']))
             return $layoutsettings->properties['usesubmenu'];
     }
