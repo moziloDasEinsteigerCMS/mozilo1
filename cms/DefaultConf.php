@@ -179,14 +179,13 @@ function makeDefaultConf($conf_datei) {
 
     $version = array('cmsversion' => '1.12.beta4',
                         'cmsname' => 'Amalia',
-                        'revision' => '791');
+                        'revision' => '806');
 
     $gallery = array('digit' => array(
                         'maxheight' => '',
                         'maxwidth' => '',
                         'maxthumbheight' => '100',
-                        'maxthumbwidth' => '100',
-                        'gallerypicsperrow' => '4'),
+                        'maxthumbwidth' => '100'),
                     'checkbox' => array(
                         'usethumbs' => 'true'), # reihen folge ist wichtig
                     'text' => array(
@@ -194,8 +193,7 @@ function makeDefaultConf($conf_datei) {
                     'expert' => array(
                         'usethumbs',
                         'maxthumbheight',
-                        'maxthumbwidth',
-                        'gallerypicsperrow')
+                        'maxthumbwidth')
                     );
 
     $plugin = array('active' => 'true');
