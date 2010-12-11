@@ -188,8 +188,6 @@ function makeDefaultConf($conf_datei) {
                         'maxthumbwidth' => '100'),
                     'checkbox' => array(
                         'usethumbs' => 'true'), # reihen folge ist wichtig
-                    'text' => array(
-                        'target' => '_self'),
                     'expert' => array(
                         'usethumbs',
                         'maxthumbheight',
