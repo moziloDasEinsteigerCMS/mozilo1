@@ -83,7 +83,8 @@ $_POST = cleanREQUEST($_POST);
     $TEMPLATE_FILE  = $LAYOUT_DIR."/template.html";
 
     # wenn ein Plugin die gallerytemplate.html benutzten möchte und sie blank ist 
-    if ($GALLERY_CONF->get("target") == "_blank" and getRequestParam("gal", false)) {
+    # if ($GALLERY_CONF->get("target") == "_blank" and getRequestParam("gal", false)) // Ticket 64
+    if (getRequestParam("gal", false)) {
         $TEMPLATE_FILE  = $LAYOUT_DIR."/gallerytemplate.html";
     }
 
