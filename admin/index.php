@@ -2251,6 +2251,7 @@ function editGallery($post) {
                 } else continue;
             }
             if($error_messages === false and $GALLERY_CONF->get($syntax_name) != $syntax_value) {
+
                 $GALLERY_CONF->set($syntax_name, $syntax_value);
                 if(!isset($post['messages']['gallery_messages_setings'])) {
                     $post['messages']['gallery_messages_setings'][] = NULL;
