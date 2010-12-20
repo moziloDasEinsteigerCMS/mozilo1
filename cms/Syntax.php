@@ -169,16 +169,16 @@ class Syntax {
 // Umsetzung der übergebenen CMS-Syntax in HTML, Rückgabe als String
 // ------------------------------------------------------------------------------
     function convertContent($content, $cat, $firstrecursion) {
-
+        $this->content = $content;
         $this->cat = $cat;
         if ($firstrecursion) {
-            $content = $this->prepareContent($content);
+            $this->content = $this->prepareContent($this->content);
             // Überschriften einlesen
-            $this->headlineinfos = $this->getHeadlineInfos($content);
+            $this->headlineinfos = $this->getHeadlineInfos($this->content);
         }
 
         // Erstmal mit dummy ersetzen: Horizontale Linen
-        $this->content = str_replace('[----]', '~hr-', $content);
+#        $this->content = str_replace('[----]', '~hr-', $this->content);
         $matches = $this->match_syntax_plugins();
 $not_exit = 0;
 $not_exit_max = 20;
@@ -227,8 +227,10 @@ if($not_exit >= $not_exit_max)
         # Platzhalter wieder herstellen
         $this->change_placeholder(false);
 
+        # Horizontale Linen ersetzen
+        $this->content = str_replace('[----]', '<hr class="horizontalrule" />', $this->content);
         // dummy mit Horizontale Linen ersetzen
-        $this->content = preg_replace('/\~hr-/', '<hr class="horizontalrule" />', $this->content);
+#        $this->content = preg_replace('/\~hr-/', '<hr class="horizontalrule" />', $this->content);
         // Zeilenwechsel setzen
         // Zeilenwechsel nach Blockelementen entfernen
         // Tag-Beginn                                       <
@@ -244,7 +246,7 @@ if($not_exit >= $not_exit_max)
         // direkt aufeinanderfolgende numerierte Listen zusammenführen
         $this->content = preg_replace('/<\/ol>(\r\n|\r|\n)?<ol class="orderedlist">/', '', $this->content);
         # Table Hack recursive Table
-        $this->content = preg_replace('/&#38;/', '&', $this->content);
+        $this->content = str_replace('&#38;', '&', $this->content);
 
         // Zeilenwechsel in Include-Tags wiederherstellen    
         $this->content = preg_replace('/{newline_in_include_tag}/', "\n", $this->content);
@@ -717,6 +719,9 @@ if($not_exit >= $not_exit_max)
         # getHtmlEntityDecode nicht das Zeichen herstellt
         $nobrvalue = preg_replace("/\&\#(\d+)\;/Umsie", "'&amp;#\\1;'", $nobrvalue);
         $nobrvalue = $specialchars->getHtmlEntityDecode($nobrvalue);
+# !!!!!!!! zum testen drin, geht glaube ich nicht bei verschachtelten [html|[html|]]
+# alle & nach &#38; wandeln die werden am schluss wieder hergestelt
+$nobrvalue = str_replace('&', '&#38;', $nobrvalue);
         return $nobrvalue;
     }
 
@@ -758,6 +763,7 @@ if($not_exit >= $not_exit_max)
     }
 
     function syntax_include($desciption,$value) {
+# !!!!!!! muss da nich ein prepareContent($content) gemacht werden????????????????
         // Includes
         global $specialchars;
         global $CONTENT_DIR_REL;
