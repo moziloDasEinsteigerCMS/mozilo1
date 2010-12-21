@@ -15,7 +15,6 @@ a:hover { border-bottom: 1px dashed #49515C; color: #49515C; }
 em { font-style:normal; }
 .deadlink {
 color:#aa0000;
-text-decoration:line-through;
 }
 .highlight {
     padding:0px 1px;
@@ -72,7 +71,7 @@ text-decoration:line-through;
 }
 #header #searchcontainer input.searchtextfield {
     border:1px solid #49515C;
-    -moz-opacity:0.8; /* Transparenz - nur für Mozilla-Browser */
+    -moz-opacity:0.8; /* Transparenz - nur fï¿½r Mozilla-Browser */
 }
 fieldset#searchfieldset {
     border:none;

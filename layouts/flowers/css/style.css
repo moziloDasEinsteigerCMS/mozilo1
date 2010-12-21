@@ -95,7 +95,7 @@ input, textarea {
 
 a#cmsinfolink { } /* "CMS-Version" */
 a#sitemaplink { } /* "Sitemap" */
-a#lastchangelink { } /* "Zuletzt geändert"-Link */
+a#lastchangelink { } /* "Zuletzt geï¿½ndert"-Link */
 
 /* -------------------------------------------------------- */
 /* Suchformular */
@@ -137,7 +137,7 @@ fieldset#searchfieldset {
 
 div.menu {padding-top : 3px;}
 
-/* Hauptmenüpunkt */
+/* Hauptmenï¿½punkt */
 a.menu {padding       : 4px 4px 1px 4px;
 			color       : #74a235;
 	    text-align  : center;
@@ -151,7 +151,7 @@ a.menu:hover {color           : #ff6a27;
 	          text-decoration : none;
              }
 
-/* Aktiver Hauptmenüpunkt */
+/* Aktiver Hauptmenï¿½punkt */
 a.menuactive {padding       : 4px 4px 1px 4px;
 	          color         : #003300;
 	          text-align    : left;
@@ -223,13 +223,13 @@ div.gallerycontent {overflow     : hidden;
 div.gallerypagecontent {text-align : center;
                         margin     : 5px auto;}
 
-/* Hauptmenü (Galerie) */
+/* Hauptmenï¿½ (Galerie) */
 #gallerymenu {padding     : 10px 8px 11px 0px;
               line-height : 23px;
 	          text-align  : center;
              }
 
-/* Detailmenü (Galerie) */
+/* Detailmenï¿½ (Galerie) */
 div.gallerynumbermenu {padding     : 6px 8px 0px 8px;
 	                   line-height : 20px;
 	                   text-align  : center;
@@ -238,7 +238,7 @@ div.gallerynumbermenu {padding     : 6px 8px 0px 8px;
 	                   margin      : 2px auto;
                       }
 
-/* Galerie-Tabelle (Übersichtsmodus) */
+/* Galerie-Tabelle (ï¿½bersichtsmodus) */
 table.gallerytable {margin          : 0px auto;
                     border          : 3px double #663300;
 	                border-collapse : collapse;
@@ -263,7 +263,6 @@ em {
 /* --------------------------------- */
 .deadlink {
 	color:#dd3333;
-	text-decoration:line-through;
 	font-weight:bold;
 }
 

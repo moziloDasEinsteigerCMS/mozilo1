@@ -99,7 +99,7 @@ div.sitetitle {
 }
 
 /* -------------------------------------------------------- */
-/* Detailmenü und Seiteninhalt */
+/* Detailmenï¿½ und Seiteninhalt */
 /* --------------------------- */
 div.catcontent {
 	float:right;
@@ -109,7 +109,7 @@ div.catcontent {
 
 
 /* -------------------------------------------------------- */
-/* Detailmenü und Seiteninhalt (Galerie) */
+/* Detailmenï¿½ und Seiteninhalt (Galerie) */
 /* ------------------------------------- */
 div.gallerycontent {
 	width:99%;
@@ -119,7 +119,7 @@ div.gallerycontent {
 
 
 /* -------------------------------------------------------- */
-/* Hauptmenü */
+/* Hauptmenï¿½ */
 /* --------- */
 div.mainmenu {
 	float:left;
@@ -137,7 +137,7 @@ li.mainmenu {
 }
 
 /* -------------------------------------------------------- */
-/* Hauptmenü (Galerie) */
+/* Hauptmenï¿½ (Galerie) */
 /* ------------------- */
 div.gallerymenu {
 	padding:6px 8px 0px 8px;
@@ -155,7 +155,7 @@ li.gallerymenu, li.gallerynumbermenu {
 
 
 /* -------------------------------------------------------- */
-/* Detailmenü */
+/* Detailmenï¿½ */
 /* ---------- */
 div.detailmenu {
 	padding:6px 8px 0px 8px;
@@ -172,7 +172,7 @@ li.detailmenu {
 
 
 /* -------------------------------------------------------- */
-/* Detailmenü (Galerie) */
+/* Detailmenï¿½ (Galerie) */
 /* -------------------- */
 div.gallerynumbermenu {
 	padding:6px 8px 0px 8px;
@@ -185,7 +185,7 @@ div.gallerynumbermenu {
 
 
 /* -------------------------------------------------------- */
-/* Galerie-Tabelle (Übersichtsmodus) */
+/* Galerie-Tabelle (ï¿½bersichtsmodus) */
 /* --------------------------------- */
 table.gallerytable {
 	margin:0px auto;
@@ -213,7 +213,7 @@ div.pagecontent {
 
 
 /* -------------------------------------------------------- */
-/* Letzte Änderung */
+/* Letzte ï¿½nderung */
 /* --------------- */
 div.lastchange {
 	text-align:center;
@@ -227,7 +227,7 @@ div.lastchange {
 
 
 /* -------------------------------------------------------- */
-/* Hauptmenüpunkt */
+/* Hauptmenï¿½punkt */
 /* -------------- */
 a.menu {
 	display:block;
@@ -248,7 +248,7 @@ a.menu:hover {
 
 
 /* -------------------------------------------------------- */
-/* Aktiver Hauptmenüpunkt */
+/* Aktiver Hauptmenï¿½punkt */
 /* ---------------------- */
 a.menuactive {
 	display:block;
@@ -267,7 +267,7 @@ a.menuactive:hover {
 
 
 /* -------------------------------------------------------- */
-/* Detailmenüpunkt */
+/* Detailmenï¿½punkt */
 /* --------------- */
 a.detailmenu {
 	padding:3px 5px;
@@ -281,7 +281,7 @@ a.detailmenu:hover {
 
 
 /* -------------------------------------------------------- */
-/* Aktiver Detailmenüpunkt */
+/* Aktiver Detailmenï¿½punkt */
 /* ----------------------- */
 a.detailmenuactive {
 	padding:3px 5px;
@@ -294,7 +294,7 @@ a.detailmenuactive:hover {
 
 
 /* -------------------------------------------------------- */
-/* Galeriemenüpunkt */
+/* Galeriemenï¿½punkt */
 /* --------------- */
 a.gallerymenu, a.gallerynumbermenu {
 	padding:3px 5px;
@@ -308,7 +308,7 @@ a.gallerymenu:hover, a.gallerynumbermenu:hover  {
 
 
 /* -------------------------------------------------------- */
-/* Aktiver Galeriemenüpunkt */
+/* Aktiver Galeriemenï¿½punkt */
 /* ----------------------- */
 a.gallerymenuactive, a.gallerynumbermenuactive {
 	padding:3px 5px;
@@ -321,7 +321,7 @@ a.gallerymenuactive:hover, , a.gallerynumbermenuactivehover {
 
 
 /* -------------------------------------------------------- */
-/* Submenüpunkt */
+/* Submenï¿½punkt */
 /* --------------- */
 a.submenu {
 	display:block;
@@ -342,7 +342,7 @@ a.submenu:hover {
 
 
 /* -------------------------------------------------------- */
-/* Aktiver Submenüpunkt */
+/* Aktiver Submenï¿½punkt */
 /* ----------------------- */
 a.submenuactive {
 	display:block;
@@ -380,7 +380,6 @@ div.lastchange a:hover {
 /* --------------------------------- */
 .deadlink {
 	color:#ff4444;
-	text-decoration:line-through;
 	font-weight:bold;
 }
 
