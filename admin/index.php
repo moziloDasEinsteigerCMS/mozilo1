@@ -1879,9 +1879,8 @@ function gallery($post) {
     $pagecontent .= $tooltip_gallery_help;
     $pagecontent .= "<p>".getLanguageValue("gallery_text")."</p>";
 
-    $array_getLanguageValue = array("gallery_scale","gallery_scale_thumbs",
-        "gallery_picsperrow","gallery_usethumbs","gallery_target","gallery_scaleimages",
-        "gallery_rebuildthumbs","gallery_size","gallery_subtitle","gallery_button_cut","gallery_newname",
+    $array_getLanguageValue = array("gallery_scale","gallery_scale_thumbs", "gallery_create_thumbs",
+        "gallery_scaleimages","gallery_rebuildthumbs","gallery_size","gallery_subtitle","gallery_button_cut","gallery_newname",
         "gallery_button_img_delete","gallery_button_gallery_delete","target","toggle_show","toggle_hide","gallery_no_preview");
 
     # Variable erzeugen z.B. pages = $text_pages
@@ -1890,8 +1889,7 @@ function gallery($post) {
     }
 
     $array_getTooltipValue = array("help_target_blank","help_target_self","help_target","gallery_help_scale","gallery_help_scale_thumbs","gallery_help_input_scale",
-        "gallery_help_picsperrow","gallery_help_input_picsperrow","gallery_help_use_thumbs","gallery_help_all_picture_scale",
-        "gallery_help_all_thumbs_new","gallery_help_size","gallery_help_picture","gallery_help_subtitle","gallery_help_name",
+        "gallery_help_create_thumbs","gallery_help_all_picture_scale","gallery_help_all_thumbs_new","gallery_help_size","gallery_help_picture","gallery_help_subtitle","gallery_help_name",
         "gallery_help_del","gallery_help_target","gallery_help_conf","gallery_help_edit","gallery_help_newname","gallery_help_usedfgallery","gallery_help_overwrite");
 
 
@@ -1930,7 +1928,7 @@ function gallery($post) {
 
     if($ADMIN_CONF->get('showexpert') == "true") {
       $pagecontent .= '</tr><tr>';
-      $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_use_thumbs.'><b>'.$text_gallery_usethumbs.'</b></td>';
+      $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_create_thumbs.'><b>'.$text_gallery_create_thumbs.'</b></td>';
       $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"'.$tooltip_gallery_help_use_thumbs.'>'.buildCheckBox("gallery[setings][usethumbs]", $GALLERY_CONF->get("usethumbs")).'</td>';
 
       $pagecontent .= '</tr><tr>';
