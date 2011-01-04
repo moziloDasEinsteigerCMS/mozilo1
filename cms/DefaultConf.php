@@ -186,8 +186,8 @@ function makeDefaultConf($conf_datei) {
                         'maxwidth' => '',
                         'maxthumbheight' => '100',
                         'maxthumbwidth' => '100'),
-                    'checkbox' => array(
-                        'usethumbs' => 'true'), # reihen folge ist wichtig
+## Ticket 64        'checkbox' => array(
+##                        'usethumbs' => 'true'),
                     'expert' => array(
                         'usethumbs',
                         'maxthumbheight',

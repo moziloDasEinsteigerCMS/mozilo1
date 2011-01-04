@@ -47,12 +47,12 @@ $_POST = cleanREQUEST($_POST);
     require_once($BASE_DIR_CMS."Properties.php");
     
     // Initial: Fehlerausgabe unterdruecken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
-    @ini_set("display_errors", 0);
+    @ini_set("display_errors", 1);
 
     $specialchars   = new SpecialChars();
     $CMS_CONF     = new Properties($BASE_DIR_CMS."conf/main.conf",true);
     $VERSION_CONF  = new Properties($BASE_DIR_CMS."conf/version.conf",true);
-    $GALLERY_CONF  = new Properties($BASE_DIR_CMS."conf/gallery.conf",true);
+##    $GALLERY_CONF  = new Properties($BASE_DIR_CMS."conf/gallery.conf",true); // Ticket 64
     $USER_SYNTAX  = new Properties($BASE_DIR_CMS."conf/syntax.conf",true);
     $URL_BASE = substr($_SERVER['PHP_SELF'],0,strpos($_SERVER['PHP_SELF'],"index.php"));
     $CONTENT_DIR_REL        = $BASE_DIR.$CONTENT_DIR_NAME."/";
