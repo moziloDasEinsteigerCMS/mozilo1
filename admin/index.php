@@ -35,7 +35,7 @@ if(isset($_FILE)) $_FILE = cleanREQUEST($_FILE);
 $debug = "nein"; # ja oder nein
  // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 if($debug != "ja")
-    @ini_set("display_errors", 0);
+    @ini_set("display_errors", 1);
 
  // ISO 8859-1 erzwingen - experimentell!
  // @ini_set("default_charset", $CHARSET);
@@ -163,10 +163,10 @@ $PLUGIN_DIR_REL = $BASE_DIR.$PLUGIN_DIR_NAME."/";
 $ALLOWED_SPECIALCHARS_REGEX = $specialchars->getSpecialCharsRegex();
 
 // Dateiendungen fuer Inhaltsseiten 
-$EXT_PAGE     = ".txt";
-$EXT_HIDDEN     = ".hid";
-$EXT_DRAFT     = ".tmp";
-$EXT_LINK     = ".lnk";
+$EXT_PAGE    = ".txt";
+$EXT_HIDDEN  = ".hid";
+$EXT_DRAFT   = ".tmp";
+$EXT_LINK    = ".lnk";
 
 $icon_size = "24x24"; # 16x16 22x22 24x24 32x32 48x48
 $icon_size_tabs = "16x16"; # 16x16 22x22 24x24 32x32 48x48
@@ -305,6 +305,12 @@ $html .= '<tr>';
 
 # Menue Tabs erzeugen
 foreach($array_tabs as $position => $language) {
+
+    # wenn es den Ordner plugins nicht gibt, dann Plugin-Tab nicht anzeigen
+    if ($language == "plugins" && !is_dir($PLUGIN_DIR_REL)) {
+        continue;
+    }
+    
     if($ADMIN_CONF->get("showTooltips") == "true") {
         $tooltip = createTooltipWZ($language."_button",$language."_text",",WIDTH,400");
     } else {
@@ -315,7 +321,7 @@ foreach($array_tabs as $position => $language) {
     $html .= '<a id="tab_'.$position.'" href="index.php?action_'.$position.'='.$language.'" title="'.getLanguageValue($language."_button",true).'"><img class="tab_img" src="gfx/icons/'.$icon_size_tabs.'/'.$language.'.png" alt="" hspace="0" vspace="0" border="0">'.getLanguageValue($language."_button").'</a>';
     $html .= '<script type="text/javascript">document.getElementById("tab_'.$position.'").href="index.php?action_'.$position.'='.$language.'&javascript=ja";</script>';
     $html .= '</td>';
-# width="24" height="24"
+    # width="24" height="24"
 }
 
 $html .= '<td class="rest_td_tabs">&nbsp;</td>';
@@ -405,7 +411,7 @@ header('content-type: text/html; charset='.$CHARSET.'');
 /* Ausgabe der kompletten Seite */
 echo $html;
 
-/*     ------------------------------
+/*------------------------------
  Zusätzliche Funktionen
  ------------------------------ */
 
@@ -1929,7 +1935,7 @@ function gallery($post) {
     if($ADMIN_CONF->get('showexpert') == "true") {
       $pagecontent .= '</tr><tr>';
       $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_create_thumbs.'><b>'.$text_gallery_create_thumbs.'</b></td>';
-      $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"'.$tooltip_gallery_help_use_thumbs.'>'.buildCheckBox("gallery[setings][usethumbs]", $GALLERY_CONF->get("usethumbs")).'</td>';
+      $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"'.$tooltip_gallery_help_create_thumbs.'>'.buildCheckBox("gallery[setings][usethumbs]", $GALLERY_CONF->get("usethumbs")).'</td>';
 
       $pagecontent .= '</tr><tr>';
       $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_scale_thumbs.'><b>'.$text_gallery_scale_thumbs.'</b></td>';
