@@ -47,7 +47,7 @@ $_POST = cleanREQUEST($_POST);
     require_once($BASE_DIR_CMS."Properties.php");
     
     // Initial: Fehlerausgabe unterdruecken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
-    @ini_set("display_errors", 1);
+    @ini_set("display_errors", 0);
 
     $specialchars   = new SpecialChars();
     $CMS_CONF     = new Properties($BASE_DIR_CMS."conf/main.conf",true);
@@ -547,6 +547,9 @@ $_POST = cleanREQUEST($_POST);
         global $EXT_LINK;
         global $tmp_getDirContentAsArray;
 
+        # wenn dir nicht vorhanden dann leeres array zurückgeben
+        if (!is_dir($dir)) return array();
+        
         $files_read = array();
         if(!isset($tmp_getDirContentAsArray[$dir])) {
             $currentdir = opendir($dir);
