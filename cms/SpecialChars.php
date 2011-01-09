@@ -124,5 +124,23 @@ class SpecialChars {
         return str_replace('&amp;#', '&#', $text);
     }
 
+// ------------------------------------------------------------------------------
+// Geschütze zeichen codieren
+// ------------------------------------------------------------------------------
+    function encodeProtectedChr($text) {# protected
+        # alle geschützten zeichen suchen und in html code wandeln auch das ^
+        $text = preg_replace("/\^(.)/Umsie", "'&#94;&#'.ord('\\1').';'", $text);
+        return $text;
+    }
+
+// ------------------------------------------------------------------------------
+// Geschütze zeichen wieder herstellen
+// ------------------------------------------------------------------------------
+    function decodeProtectedChr($text) {
+        # alle &#94;&#?????; suchen und als zeichen ohne &#94; (^) ersetzen
+        $text = preg_replace("/&#94;&#(\d{2,5});/e", "chr('\\1')", $text);
+        return $text;
+    }
+
 }
 ?>
