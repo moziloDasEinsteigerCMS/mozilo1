@@ -47,12 +47,12 @@ $_POST = cleanREQUEST($_POST);
     require_once($BASE_DIR_CMS."Properties.php");
     
     // Initial: Fehlerausgabe unterdruecken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
-    @ini_set("display_errors", 0);
+#    @ini_set("display_errors", 0);
 
     $specialchars   = new SpecialChars();
     $CMS_CONF     = new Properties($BASE_DIR_CMS."conf/main.conf",true);
     $VERSION_CONF  = new Properties($BASE_DIR_CMS."conf/version.conf",true);
-    $GALLERY_CONF  = new Properties($BASE_DIR_CMS."conf/gallery.conf",true); // Nach Ticket 64 nur noch Plugins greifen drauf zu
+    $GALLERY_CONF  = new Properties($BASE_DIR_CMS."conf/gallery.conf",true);
     $USER_SYNTAX  = new Properties($BASE_DIR_CMS."conf/syntax.conf",true);
     $URL_BASE = substr($_SERVER['PHP_SELF'],0,strpos($_SERVER['PHP_SELF'],"index.php"));
     $CONTENT_DIR_REL        = $BASE_DIR.$CONTENT_DIR_NAME."/";
@@ -60,6 +60,7 @@ $_POST = cleanREQUEST($_POST);
 
     require_once($BASE_DIR_CMS."Language.php");
     $language       = new Language();
+
     $activ_plugins = array();
     $deactiv_plugins = array();
     # Vorhandene Plugins finden und in array $activ_plugins und $deactiv_plugins einsetzen
@@ -83,6 +84,7 @@ $_POST = cleanREQUEST($_POST);
     $TEMPLATE_FILE  = $LAYOUT_DIR."/template.html";
 
     # wenn ein Plugin die gallerytemplate.html benutzten möchte und sie blank ist 
+    # if ($GALLERY_CONF->get("target") == "_blank" and getRequestParam("gal", false)) // Ticket 64
     if (getRequestParam("galtemplate", false) == "true") {
         $TEMPLATE_FILE  = $LAYOUT_DIR."/gallerytemplate.html";
     }
@@ -121,30 +123,20 @@ $_POST = cleanREQUEST($_POST);
 
     $HTML                   = "";
 
-    $DEFAULT_CATEGORY = $CMS_CONF->get("defaultcat");
-    // Ueberpruefen: Ist die Startkategorie vorhanden? Wenn nicht, nimm einfach die allererste als Standardkategorie
-    if (!file_exists($CONTENT_DIR_REL.$DEFAULT_CATEGORY)) {
-        $contentdir = opendir($CONTENT_DIR_REL);
-        while ($cat = readdir($contentdir)) {
-            if (isValidDirOrFile($cat)) {
-                $DEFAULT_CATEGORY = $cat;
-                break;
-            }
-        }
-        closedir($contentdir);
-    }
-   
-    $CAT_REQUEST = nameToCategory($CAT_REQUEST_URL);
-    if ($CAT_REQUEST == "") {
-    	$CAT_REQUEST = $DEFAULT_CATEGORY;
-    }
-    $PAGE_REQUEST = nameToPage($PAGE_REQUEST_URL, $CAT_REQUEST,false);
+    require_once($BASE_DIR_CMS."CatPageClass.php");
+    $CatPage         = new CatPageClass();
+
+    # $CAT_REQUEST und $PAGE_REQUEST setzen und mit nichts füllen
+    # wird von checkParameters() gefühlt
+    $CAT_REQUEST = "";
+    $PAGE_REQUEST = "";
 
     // Dateiname der aktuellen Inhaltsseite (wird in getContent() gesetzt)
     $PAGE_FILE = "";
 
     // Zuerst: Uebergebene Parameter ueberpruefen
     checkParameters();
+
     // Dann: HTML-Template einlesen und mit Inhalt fuellen
     readTemplate();
     # manche Provider sind auf iso eingestelt
@@ -160,45 +152,70 @@ $_POST = cleanREQUEST($_POST);
 // Parameter auf Korrektheit pruefen
 // ------------------------------------------------------------------------------
     function checkParameters() {
-        global $CONTENT_DIR_REL;
-        global $DEFAULT_CATEGORY;
         global $ACTION_REQUEST;
         global $CAT_REQUEST;
         global $PAGE_REQUEST;
-        global $EXT_DRAFT;
-        global $EXT_HIDDEN;
-        global $EXT_PAGE;
         global $CMS_CONF;
-
-        // Ueberpruefung der gegebenen Parameter
-        if (
-                // Wenn keine Kategorie uebergeben wurde...
-                ($CAT_REQUEST == "")
-                // ...oder eine nicht existente Kategorie...
-                || (!file_exists($CONTENT_DIR_REL.$CAT_REQUEST))
-                // ...oder eine Kategorie ohne Contentseiten...
-                || (count(getDirContentAsArray($CONTENT_DIR_REL.$CAT_REQUEST, true, true)) == 0)
-            )
-            // ...dann verwende die Standardkategorie
-            $CAT_REQUEST = $DEFAULT_CATEGORY;
-
-
-        // Kategorie-Verzeichnis einlesen
-        $pagesarray = getDirContentAsArray($CONTENT_DIR_REL.$CAT_REQUEST, true, $CMS_CONF->get("showhiddenpagesasdefaultpage") == "true");
-
-        // Wenn Contentseite nicht explizit angefordert wurde oder nicht vorhanden ist...
-        if (
-            ($PAGE_REQUEST == "")
-            || (!file_exists($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_PAGE) && !file_exists($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_HIDDEN) && !file_exists($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_DRAFT))
-            ) {
-            //...erste Contentseite der Kategorie setzen
-            $PAGE_REQUEST = substr($pagesarray[0], 0, strlen($pagesarray[0]) - 4);
-        }
+        global $PAGE_REQUEST_URL;
+        global $CAT_REQUEST_URL;
+        global $CatPage;
 
         // Wenn ein Action-Parameter uebergeben wurde: keine aktiven Kat./Inhaltts. anzeigen
+        # $CAT_REQUEST und $PAGE_REQUEST bleiben lehr
         if (($ACTION_REQUEST == "sitemap") || ($ACTION_REQUEST == "search")) {
-            $CAT_REQUEST = "";
-            $PAGE_REQUEST = "";
+            return;
+        }
+
+
+        # übergebene cat und page gibts
+        if($CatPage->exists_CatPage($CAT_REQUEST_URL,false)
+            and $CatPage->exists_CatPage($CAT_REQUEST_URL,$PAGE_REQUEST_URL)
+            ) {
+            $CAT_REQUEST = $CatPage->get_CatPageWithPos($CAT_REQUEST_URL,false);
+            $PAGE_REQUEST = $CatPage->get_CatPageWithPos($CAT_REQUEST_URL,$PAGE_REQUEST_URL);
+            return;
+        # übergebene cat gibts aber page nicht cat hat aber pages
+        } elseif($CatPage->exists_CatPage($CAT_REQUEST_URL,false)
+            and $CatPage->get_FirstPageOfCat($CAT_REQUEST_URL)
+            ) {
+            $CAT_REQUEST = $CatPage->get_CatPageWithPos($CAT_REQUEST_URL,false);
+            # erste page nehmen
+            $PAGE_REQUEST = $CatPage->get_FirstPageOfCat($CAT_REQUEST);
+            $PAGE_REQUEST = $CatPage->get_CatPageWithPos($CAT_REQUEST,$PAGE_REQUEST);
+            return;
+        }
+
+        # so wir sind bishierher gekommen dann probieren wirs mit defaultcat
+        # oder mit erster cat die page hat
+        $DEFAULT_CATEGORY = $CAT_REQUEST_URL;
+        # $CAT_REQUEST_URL ist lehr
+        # oder $CAT_REQUEST_URL gibts nicht als cat
+        # oder $CAT_REQUEST_URL hat keine pages
+        # dann defaultcat aus conf holen
+        if(empty($CAT_REQUEST_URL)
+            or !$CatPage->exists_CatPage($CAT_REQUEST_URL,false)
+            or !$CatPage->get_FirstPageOfCat($CAT_REQUEST_URL)
+            ) {
+            $DEFAULT_CATEGORY = $CMS_CONF->get("defaultcat");
+        }
+        # prüfen ob die $DEFAULT_CATEGORY existiert
+        if($CatPage->exists_CatPage($DEFAULT_CATEGORY,false)) {
+            # die erste page holen
+            # und setze $CAT_REQUEST und $PAGE_REQUEST
+            $CAT_REQUEST = $CatPage->get_CatPageWithPos($DEFAULT_CATEGORY,false);
+            $PAGE_REQUEST = $CatPage->get_FirstPageOfCat($CAT_REQUEST);
+            if($CatPage->exists_CatPage($CAT_REQUEST,$PAGE_REQUEST))
+                $PAGE_REQUEST = $CatPage->get_CatPageWithPos($CAT_REQUEST,$PAGE_REQUEST);
+            return;
+        # defaultcat gibts nicht hol die erste cat die auch pages hat und setze sie
+        } else {
+            list($CAT_REQUEST,$PAGE_REQUEST) = $CatPage->get_FirstCatPage();
+            if($CatPage->exists_CatPage($CAT_REQUEST,false))
+                $CAT_REQUEST = $CatPage->get_CatPageWithPos($CAT_REQUEST,false);
+            if($CatPage->exists_CatPage($CAT_REQUEST,$PAGE_REQUEST))
+                $PAGE_REQUEST = $CatPage->get_CatPageWithPos($CAT_REQUEST,$PAGE_REQUEST);
+            # $CAT_REQUEST und $PAGE_REQUEST sind gesetz
+            return;
         }
     }
 
@@ -228,6 +245,7 @@ $_POST = cleanREQUEST($_POST);
         global $BASE_DIR_CMS;
         global $activ_plugins;
         global $deactiv_plugins;
+        global $CatPage;
 
     if (!$file = @fopen($TEMPLATE_FILE, "r"))
         die($language->getLanguageValue1("message_template_error_1", $TEMPLATE_FILE));
@@ -265,7 +283,7 @@ $_POST = cleanREQUEST($_POST);
         if (file_exists($BASE_DIR_CMS."conf/passwords.conf")) {
             $passwords = new Properties($BASE_DIR_CMS."conf/passwords.conf", true); // alle Passwörter laden
             if ($passwords->keyExists($CAT_REQUEST.'/'.$PAGE_REQUEST)) { // nach Passwort fuer diese Seite suchen
-                $cattitle    = catToName($CAT_REQUEST, true);
+                $cattitle    = $CatPage->get_HrefText($CAT_REQUEST,false);
                 $pagetitle   = $language->getLanguageValue0("passwordform_title_0");
                 if (!isset($_POST) || ($_POST == array())) // sofern kein Passwort eingegeben, nach einem Fragen
                     $pagecontent = getPasswordForm();
@@ -302,7 +320,7 @@ $_POST = cleanREQUEST($_POST);
             }
         }
     }
-    if(strstr($TEMPLATE_FILE,"gallerytemplate.html"))
+    if(!strstr($template,"{CONTENT}"))
         $is_syntax = false;
 
     $HTML = str_replace('{CONTENT}','---content~~~'.$pagecontent.'~~~content---',$template);
@@ -372,7 +390,7 @@ $_POST = cleanREQUEST($_POST);
     if(strpos($HTML,'{TABLEOFCONTENTS}') !== false)
         $HTML = str_replace('{TABLEOFCONTENTS}', $syntax->getToC($pagecontent), $HTML);
 
-    $HTML = str_replace(array('&#123;','&#125;','&#91;','&#93;'),array('{','}','[',']'),$HTML);
+#    $HTML = str_replace(array('&#123;','&#125;','&#91;','&#93;'),array('{','}','[',']'),$HTML);
     $HTML = str_replace(array('---content~~~','~~~content---'),"",$HTML);
     }
 
@@ -402,22 +420,12 @@ $_POST = cleanREQUEST($_POST);
 // Zu einem Kategorienamen passendes Kategorieverzeichnis suchen und zurueckgeben
 // Alle Kuehe => 00_Alle-nbsp-K-uuml-he
 // ------------------------------------------------------------------------------
-    function nameToCategory($catname) {
-        global $CONTENT_DIR_REL;
 
-        // Content-Verzeichnis einlesen
-        $dircontent = getDirContentAsArray($CONTENT_DIR_REL, false, false);
-        // alle vorhandenen Kategorien durchgehen...
-        foreach ($dircontent as $currentelement) {
-            // ...und wenn eine auf den Namen paßt...
-            if (substr($currentelement, 3, strlen($currentelement)-3) == $catname) {
-                // ...den vollen Kategorienamen zurueckgeben
-                return $currentelement;
-            # bei alten links ist die Position noch dabei
-            } elseif($currentelement == $catname) {
-                return $currentelement;
-            }
-        }
+    # ACHTUNG nicht mehr benutzen siehe CatPage.php
+    function nameToCategory($catname) {
+        global $CatPage;
+        if($CatPage->exists_CatPage($catname,false))
+            return $CatPage->get_CatPageWithPos($catname,false);
         // Wenn kein Verzeichnis paßt: Leerstring zurueckgeben
         return "";
     }
@@ -427,6 +435,7 @@ $_POST = cleanREQUEST($_POST);
 // Zu einer Inhaltsseite passende Datei suchen und zurueckgeben
 // Muellers Kuh => 00_M-uuml-llers-nbsp-Kuh.txt
 // ------------------------------------------------------------------------------
+/*
     function nameToPage($pagename, $currentcat, $ext = true) {
         global $CONTENT_DIR_REL;
         global $EXT_PAGE;
@@ -464,12 +473,14 @@ $_POST = cleanREQUEST($_POST);
         // Wenn keine Datei paßt: Leerstring zurueckgeben
         return "";
     }
-
+*/
 
 // ------------------------------------------------------------------------------
 // Kategorienamen aus komplettem Verzeichnisnamen einer Kategorie zurueckgeben
 // 00_Alle-nbsp-K-uuml-he => Alle Kuehe
 // ------------------------------------------------------------------------------
+
+    # ACHTUNG nicht mehr benutzen siehe CatPage.php
     function catToName($cat, $rebuildnbsp) {
         global $specialchars;
         return $specialchars->rebuildSpecialChars(substr($cat, 3, strlen($cat)), $rebuildnbsp, true);
@@ -480,7 +491,9 @@ $_POST = cleanREQUEST($_POST);
 // Seitennamen aus komplettem Dateinamen einer Inhaltsseite zurueckgeben
 // 00_M-uuml-llers-nbsp-Kuh.txt => Muellers Kuh
 // ------------------------------------------------------------------------------
-    function pageToName($page, $rebuildnbsp) {
+
+    # ACHTUNG nicht mehr benutzen siehe CatPage.php
+   function pageToName($page, $rebuildnbsp) {
         global $specialchars;
         return $specialchars->rebuildSpecialChars(substr($page, 3, strlen($page) - 7), $rebuildnbsp, true);
     }
@@ -499,36 +512,40 @@ $_POST = cleanREQUEST($_POST);
         global $PAGE_FILE;
         global $ACTION_REQUEST;
         global $specialchars;
+        global $CatPage;
 
         // Entwurf
         if (
-                ($ACTION_REQUEST == "draft") &&
-                (file_exists($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_DRAFT))
+                $ACTION_REQUEST == "draft"
+                and $CatPage->get_Type($CAT_REQUEST,$PAGE_REQUEST) == $EXT_DRAFT
+                and $CatPage->exists_CatPage($CAT_REQUEST,$PAGE_REQUEST)
             ) {
-            $PAGE_FILE = $PAGE_REQUEST.$EXT_HIDDEN;
+            $PAGE_FILE = $PAGE_REQUEST.$EXT_DRAFT;
             return array (
-                                        implode("", file($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_DRAFT)),
-                                        catToName($CAT_REQUEST, true),
-                                        pageToName($PAGE_REQUEST.$EXT_DRAFT, true)
-                                        );
+                          $CatPage->get_PageContent($CAT_REQUEST,$PAGE_REQUEST),
+                          $CatPage->get_HrefText($CAT_REQUEST,false),
+                          $CatPage->get_HrefText($CAT_REQUEST,$PAGE_REQUEST)
+                          );
         }
         // normale Inhaltsseite
-        elseif (file_exists($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_PAGE)) {
+        elseif ($CatPage->get_Type($CAT_REQUEST,$PAGE_REQUEST) == $EXT_PAGE
+                and $CatPage->exists_CatPage($CAT_REQUEST,$PAGE_REQUEST)) {
             $PAGE_FILE = $PAGE_REQUEST.$EXT_PAGE;
             return array (
-                                        implode("", file($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_PAGE)),
-                                        catToName($CAT_REQUEST, true),
-                                        pageToName($PAGE_REQUEST.$EXT_PAGE, true)
-                                        );
+                          $CatPage->get_PageContent($CAT_REQUEST,$PAGE_REQUEST),
+                          $CatPage->get_HrefText($CAT_REQUEST,false),
+                          $CatPage->get_HrefText($CAT_REQUEST,$PAGE_REQUEST)
+                          );
         }
         // Versteckte Inhaltsseite
-        elseif (file_exists($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_HIDDEN)) {
+        elseif ($CatPage->get_Type($CAT_REQUEST,$PAGE_REQUEST) == $EXT_HIDDEN
+                and $CatPage->exists_CatPage($CAT_REQUEST,$PAGE_REQUEST)) {
             $PAGE_FILE = $PAGE_REQUEST.$EXT_HIDDEN;
             return array (
-                                        implode("", file($CONTENT_DIR_REL.$CAT_REQUEST."/".$PAGE_REQUEST.$EXT_HIDDEN)),
-                                        catToName($CAT_REQUEST, true),
-                                        pageToName($PAGE_REQUEST.$EXT_HIDDEN, true)
-                                        );
+                          $CatPage->get_PageContent($CAT_REQUEST,$PAGE_REQUEST),
+                          $CatPage->get_HrefText($CAT_REQUEST,false),
+                          $CatPage->get_HrefText($CAT_REQUEST,$PAGE_REQUEST)
+                          );
         }
         else
             return array("","","");
@@ -539,6 +556,9 @@ $_POST = cleanREQUEST($_POST);
 // Auslesen des Content-Verzeichnisses unter Beruecksichtigung
 // des auszuschließenden File-Verzeichnisses, Rueckgabe als Array
 // ------------------------------------------------------------------------------
+
+    # ACHTUNG nicht mehr benutzen siehe CatPage.php
+    # oder getDirAsArray()
     function getDirContentAsArray($dir, $iscatdir, $showhidden, $showdraft = false) {
         global $CONTENT_FILES_DIR_NAME;
         global $EXT_DRAFT;
@@ -547,9 +567,6 @@ $_POST = cleanREQUEST($_POST);
         global $EXT_LINK;
         global $tmp_getDirContentAsArray;
 
-        # wenn dir nicht vorhanden dann leeres array zurückgeben
-        if (!is_dir($dir)) return array();
-        
         $files_read = array();
         if(!isset($tmp_getDirContentAsArray[$dir])) {
             $currentdir = opendir($dir);
@@ -604,55 +621,25 @@ $_POST = cleanREQUEST($_POST);
 // Aufbau des Hauptmenues, Rueckgabe als String
 // ------------------------------------------------------------------------------
     function getMainMenu() {
-        global $CONTENT_DIR_REL;
-        global $CAT_REQUEST;
-        global $PAGE_REQUEST;
-        global $specialchars;
         global $CMS_CONF;
-        global $language;
-        global $syntax;
-        global $URL_BASE;
-        global $EXT_LINK;
+        global $CatPage;
 
         $mainmenu = "<ul class=\"mainmenu\">";
         // Kategorien-Verzeichnis einlesen
-        $categoriesarray = getDirContentAsArray($CONTENT_DIR_REL, false, false);
+        $categoriesarray = $CatPage->get_CatArray();
         // Jedes Element des Arrays ans Menue anhaengen
         foreach ($categoriesarray as $currentcategory) {
-            # Mod Rewrite
-            $url = $URL_BASE."index.php?cat=".substr($currentcategory,3);
-            if($CMS_CONF->get("modrewrite") == "true") {
-                $url = $URL_BASE.substr($currentcategory,3).".html";
+            $mainmenu .= '<li class="mainmenu">'
+                .$CatPage->create_AutoLinkTag($currentcategory,false,"menu");
+            if($CatPage->is_Activ($currentcategory,false)
+                    and $CMS_CONF->get("usesubmenu") > 0) {
+                $mainmenu .= getDetailMenu($currentcategory);
+            } elseif(!$CatPage->is_Activ($currentcategory,false)
+                    and $CMS_CONF->get("usesubmenu") == 2) {
+                $mainmenu .= getDetailMenu($currentcategory);
             }
-            if(substr($currentcategory,-(strlen($EXT_LINK))) == $EXT_LINK) {
-               $mainmenu .= '<li class="mainmenu">'.menuLink($currentcategory,"menu")."</li>";
-            }
-            // Wenn die Kategorie keine Contentseiten hat, zeige sie nicht an
-            elseif (count(getDirContentAsArray($CONTENT_DIR_REL.$currentcategory, true, false)) == 0) {
-                $mainmenu .= "";
-            }
-            // Aktuelle Kategorie als aktiven Menuepunkt anzeigen...
-            elseif ($currentcategory == $CAT_REQUEST) {
-                $mainmenu .= "<li class=\"mainmenu\">".
-                    "<a href=\"".$url."\" class=\"menuactive\"".
-                    $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_category_1", catToName($currentcategory, false))).
-                    ">".catToName($currentcategory, false)."</a>";
-                if ($CMS_CONF->get("usesubmenu") > 0) {
-                    $mainmenu .= getDetailMenu($currentcategory);
-                }
-                $mainmenu .= "</li>";
-            }
-            // ...alle anderen als normalen Menuepunkt.
-            else {
-                $mainmenu .= "<li class=\"mainmenu\">".
-                    "<a href=\"".$url."\" class=\"menu\"".
-                     $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_category_1", catToName($currentcategory, false))).
-                     ">".catToName($currentcategory, false)."</a>";
-                if ($CMS_CONF->get("usesubmenu") == 2) {
-                    $mainmenu .= getDetailMenu($currentcategory);
-                }
-                $mainmenu .= "</li>";
-            }
+            $mainmenu .= "</li>";
+
         }
         // Rueckgabe des Menues
         return $mainmenu . "</ul>";
@@ -662,100 +649,57 @@ $_POST = cleanREQUEST($_POST);
 // ------------------------------------------------------------------------------
 // Aufbau des Detailmenues, Rueckgabe als String
 // ------------------------------------------------------------------------------
-    function getDetailMenu($cat){
+    function getDetailMenu($cat) {
         global $ACTION_REQUEST;
         global $QUERY_REQUEST;
-        global $CONTENT_DIR_REL;
-        global $CAT_REQUEST;
         global $PAGE_REQUEST;
-        global $EXT_DRAFT;
         global $language;
         global $specialchars;
         global $CMS_CONF;
-        global $syntax;
-        global $URL_BASE;
-        global $EXT_LINK;
-        global $CHARSET;
+        global $CatPage;
 
         if ($CMS_CONF->get("usesubmenu") > 0)
             $cssprefix = "submenu";
         else
             $cssprefix = "detailmenu";
 
-        # Mod Rewrite
-        $url_draft = $URL_BASE."index.php?cat=".substr($cat,3)."&amp;page=".substr($PAGE_REQUEST, 3)."&amp;";
-        $modrewrite_dumy = NULL;
-        if($CMS_CONF->get("modrewrite") == "true") {
-            $url_draft = $URL_BASE.substr($cat,3)."/".substr($PAGE_REQUEST, 3).".html?";
-            $modrewrite_dumy = ".html";
-        }
         $detailmenu = "<ul class=\"detailmenu\">";
         // Sitemap
         if (($ACTION_REQUEST == "sitemap") && ($CMS_CONF->get("usesubmenu") == 0))
-            $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$URL_BASE."index.php".$modrewrite_dumy."?action=sitemap\" class=\"".$cssprefix."active\">".$language->getLanguageValue0("message_sitemap_0")."</a></li>";
+            $detailmenu .= '<li class="detailmenu">'
+                .$CatPage->create_LinkTag($CatPage->get_Href(false,false,"action=sitemap")
+                    ,$language->getLanguageValue0("message_sitemap_0")
+                    ,$cssprefix."active"
+                    ,false)
+                .'</li>';
         // Suchergebnis
         elseif (($ACTION_REQUEST == "search") && ($CMS_CONF->get("usesubmenu") == 0))
-            $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$URL_BASE."index.php".$modrewrite_dumy."?action=search&amp;query=".$specialchars->replaceSpecialChars($QUERY_REQUEST, false)."\" class=\"".$cssprefix."active\">".$language->getLanguageValue1("message_searchresult_1", $specialchars->getHtmlEntityDecode($QUERY_REQUEST))."</a></li>";
+            $detailmenu .= '<li class="detailmenu">'
+                .$CatPage->create_LinkTag($CatPage->get_Href(false,false,"action=search&amp;query=".$specialchars->replaceSpecialChars($QUERY_REQUEST, false))
+                    ,$language->getLanguageValue1("message_searchresult_1", $specialchars->getHtmlEntityDecode($QUERY_REQUEST))
+                    ,$cssprefix."active"
+                    ,false)
+                .'</li>';
         // Entwurfsansicht
         elseif (($ACTION_REQUEST == "draft") && ($CMS_CONF->get("usesubmenu") == 0))
-            $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$url_draft."action=draft\" class=\"".$cssprefix."active\">".pageToName($PAGE_REQUEST.$EXT_DRAFT, false)." (".$language->getLanguageValue0("message_draft_0").")</a></li>";
+            $detailmenu .= '<li class="detailmenu">'
+                .$CatPage->create_LinkTag($CatPage->get_Href($cat,$PAGE_REQUEST,"action=draft")
+                    ,$CatPage->get_HrefText($cat,$PAGE_REQUEST)." (".$language->getLanguageValue0("message_draft_0").")"
+                    ,$cssprefix."active"
+                    ,false)
+                .'</li>';
         // "ganz normales" Detailmenue einer Kategorie
         else {
             // Content-Verzeichnis der aktuellen Kategorie einlesen
-            $contentarray = getDirContentAsArray($CONTENT_DIR_REL.$cat, true, false);
-
-            // Kategorie, die nur versteckte Seiten enthaelt: kein Detailmenue zeigen
-            if ($contentarray == "") {
-                return "";
-            }
-
+            $contentarray = $CatPage->get_PageArray($cat);
+            # wenn keine Inhaltseiten lehr zurück
+            if(count($contentarray) == 0)
+                return NULL;
             // Jedes Element des Arrays ans Menue anhaengen
             foreach ($contentarray as $currentcontent) {
-                // Inhaltsseite nicht anzeigen, wenn sie genauso heißt wie die Kategorie
-                if ($CMS_CONF->get("hidecatnamedpages") == "true") {
-                    if(substr($currentcontent, 3, strlen($currentcontent) - 7) == substr($cat, 3) and substr($currentcontent,-(strlen($EXT_LINK))) != $EXT_LINK) {
-                        // Wenn es in der Kategorie nur diese eine (dank hidecatnamedpages eh nicht angezeigte) Seite gibt,
-                        // dann gib als Detailmenue gleich einen Leerstring zurueck
-                        if (count($contentarray) == 1) {
-                            return "";
-                        } 
-                        // ...ansonsten auf zur naechsten Inhaltsseite!
-                        else {
-                            continue;
-                        }
-                    }
-                }
-                # Mod Rewrite
-                $url = $URL_BASE."index.php?cat=".substr($cat,3)."&amp;page=".substr($currentcontent, 3, strlen($currentcontent) - 7);
-                if($CMS_CONF->get("modrewrite") == "true") {
-                    $url = $URL_BASE.substr($cat,3)."/".substr($currentcontent, 3, strlen($currentcontent) - 7).".html";
-                }
-                // Aktuelle Inhaltsseite als aktiven Menuepunkt anzeigen...
-                if (
-                    ($CAT_REQUEST == $cat) // aktive Kategorie
-                    && (substr($currentcontent, 0, strlen($currentcontent) - 4) == $PAGE_REQUEST) // aktive Seite
-                    && (substr($currentcontent, -(strlen($EXT_LINK))) != $EXT_LINK) // aktive Seite
-                ) {
-                    $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$url.
-                                                    "\" class=\"".$cssprefix."active\"".
-                                                    $syntax->getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", pageToName($currentcontent, false), catToName($cat, false))).
-                                                    ">".
-                                                    pageToName($currentcontent, false).
-                                                    "</a></li>";
-                }
-                // ...alle anderen als normalen Menuepunkt.
-                else {
-                    if(substr($currentcontent,-(strlen($EXT_LINK))) == $EXT_LINK) {
-                        $detailmenu .= '<li class="detailmenu">'.menuLink($currentcontent,$cssprefix)."</li>";
-                    } else {
-                        $detailmenu .= "<li class=\"detailmenu\"><a href=\"".$url.
-                                                    "\" class=\"".$cssprefix."\"".
-                                                    $syntax->getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", pageToName($currentcontent, false), catToName($cat, false))).
-                                                    ">".
-                                                    pageToName($currentcontent, false).
-                                                    "</a></li>";
-            }
-                }
+                $detailmenu .= '<li class="detailmenu">'
+                    .$CatPage->create_AutoLinkTag($cat,$currentcontent,$cssprefix)
+                    ."</li>";
             }
         }
         // Rueckgabe des Menues
@@ -790,45 +734,34 @@ $_POST = cleanREQUEST($_POST);
 // Erzeugung einer Sitemap
 // ------------------------------------------------------------------------------
     function getSiteMap() {
-        global $CONTENT_DIR_REL;
         global $language;
-        global $specialchars;
         global $CMS_CONF;
-        global $EXT_LINK;
-        global $URL_BASE;
-        
-        $showhiddenpages = ($CMS_CONF->get("showhiddenpagesinsitemap") == "true");
-        
+        global $CatPage;
+        global $EXT_PAGE;
+
+        $include_pages = array($EXT_PAGE);
+        if($CMS_CONF->get("showhiddenpagesinsitemap") == "true") {
+            global $EXT_HIDDEN;
+            $include_pages = array($EXT_PAGE,$EXT_HIDDEN);
+        }
+
         $sitemap = "<h1>".$language->getLanguageValue0("message_sitemap_0")."</h1>"
         ."<div class=\"sitemap\">";
         // Kategorien-Verzeichnis einlesen
-        $categoriesarray = getDirContentAsArray($CONTENT_DIR_REL, false, false);
+        $categoriesarray = $CatPage->get_CatArray(false, false, $include_pages);
         // Jedes Element des Arrays an die Sitemap anhaengen
         foreach ($categoriesarray as $currentcategory) {
-            # ist ein link
-            if(substr($currentcategory,-(strlen($EXT_LINK))) == $EXT_LINK) {
-                continue;
-            }
-            // Wenn die Kategorie keine Contentseiten hat, zeige sie nicht an
-            $contentarray = getDirContentAsArray($CONTENT_DIR_REL.$currentcategory, true, $showhiddenpages);
-            if ($contentarray == "")
-                continue;
-
-            $sitemap .= "<h2>".catToName($currentcategory, false)."</h2><ul>";
+            $sitemap .= "<h2>".$CatPage->get_HrefText($currentcategory,false)."</h2><ul>";
+            // Inhaltsseiten-Verzeichnis einlesen
+            $contentarray = $CatPage->get_PageArray($currentcategory,$include_pages,true);
             // Alle Inhaltsseiten der aktuellen Kategorie auflisten...
             // Jedes Element des Arrays an die Sitemap anhaengen
             foreach ($contentarray as $currentcontent) {
-                # ist ein link
-                if(substr($currentcontent,-(strlen($EXT_LINK))) == $EXT_LINK) {
-                    continue;
-                }
-                $url = "index.php?cat=".substr($currentcategory,3)."&amp;page=".substr($currentcontent, 3, strlen($currentcontent) - 7);
-                if($CMS_CONF->get("modrewrite") == "true") {
-                    $url = $URL_BASE.substr($currentcategory,3)."/".substr($currentcontent, 3, strlen($currentcontent) - 7).".html";
-                }
-                $sitemap .= "<li><a href=\"$url\"".getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", pageToName($currentcontent, false), catToName($currentcategory, false))).">".
-                                                    pageToName($currentcontent, false).
-                                                    "</a></li>";
+                $url = $CatPage->get_Href($currentcategory,$currentcontent);
+                $urltext = $CatPage->get_HrefText($currentcategory,$currentcontent);
+                $titel = $language->getLanguageValue2("tooltip_link_page_2", $CatPage->get_HrefText($currentcategory,$currentcontent), $CatPage->get_HrefText($currentcategory,false));
+
+                $sitemap .= "<li>".$CatPage->create_LinkTag($url,$urltext,false,$titel)."</li>";
             }
             $sitemap .= "</ul>";
         }
@@ -915,7 +848,7 @@ $_POST = cleanREQUEST($_POST);
         global $PAGE_FILE;
         global $EXT_PAGE;
         global $LAYOUT_DIR_URL;
-
+        global $CatPage;
         // Titel der Website
         $content = str_replace('{WEBSITE_NAME}', $specialchars->rebuildSpecialChars($CMS_CONF->get("websitetitle"),false,true), $content);
         // Layout-Verzeichnis
@@ -928,7 +861,7 @@ $_POST = cleanREQUEST($_POST);
             $content = str_replace('{CATEGORY_URL}', $specialchars->replaceSpecialChars($CAT_REQUEST,true), $content);
             // "sauberer" Name der aktuellen Kategorie ("Muellers Kuh")
             if(strpos("tmp".$content,'{CATEGORY_NAME}') !== false)
-                $content = str_replace('{CATEGORY_NAME}', catToName($CAT_REQUEST, true), $content);
+                $content = str_replace('{CATEGORY_NAME}', $CatPage->get_HrefText($CAT_REQUEST,false), $content);
         }
         // Suche, Sitemap
         else {
@@ -949,7 +882,7 @@ $_POST = cleanREQUEST($_POST);
             $content = str_replace('{PAGE_FILE}', $PAGE_FILE, $content);
             // "sauberer" Name der aktuellen Inhaltsseite ("Muellers Kuh")
             if(strpos("tmp".$content,'{PAGE_NAME}') !== false)
-                $content = str_replace('{PAGE_NAME}', pageToName($PAGE_FILE, true), $content);
+                $content = str_replace('{PAGE_NAME}', $CatPage->get_HrefText($CAT_REQUEST,$PAGE_REQUEST), $content);
             
         }
         // Suche, Sitemap
@@ -967,6 +900,7 @@ $_POST = cleanREQUEST($_POST);
         return $content;
     }
     
+/*
 // ------------------------------------------------------------------------------
 // Handelt es sich um ein valides Verzeichnis / eine valide Datei?
 // ------------------------------------------------------------------------------
@@ -988,210 +922,8 @@ $_POST = cleanREQUEST($_POST);
 	        return false;
 	    }
 	    return true;
-    }
-/*
-// ------------------------------------------------------------------------------
-// Gibt das Kontaktformular zurueck
-// ------------------------------------------------------------------------------
-    function buildContactForm() {
-        global $contactformconfig;
-        global $language;
-        global $CMS_CONF;
-        global $WEBSITE_NAME;
-        global $CAT_REQUEST;
-        global $PAGE_REQUEST;
-        global $CHARSET;
-        global $specialchars;
-        global $BASE_DIR_CMS;
-        
-        require_once($BASE_DIR_CMS."Mail.php");
-        // existiert eine Mailadresse? Wenn nicht: Das Kontaktformular gar nicht anzeigen!
-        if (strlen($contactformconfig->get("formularmail")) < 1) {
-            return "<span class=\"deadlink\"".getTitleAttribute($language->getLanguageValue0("tooltip_no_mail_error_0")).">{CONTACT}</span>";
-        }
-        
-        // Sollen die Spamschutz-Aufgaben verwendet werden?
-        $usespamprotection = $contactformconfig->get("contactformusespamprotection") == "true";
+    }*/
 
-        $config_name = explode(",", ($contactformconfig->get("name")));
-        $config_mail = explode(",", ($contactformconfig->get("mail")));
-        $config_website = explode(",", ($contactformconfig->get("website")));
-        $config_message = explode(",", ($contactformconfig->get("message")));
-        
-        $mandatory = false;
-        if(($config_name[2] == "true") or ($config_mail[2] == "true") or ($config_website[2] == "true") or ($config_message[2] == "true"))
-            $mandatory = true;
-
-        $errormessage = "";
-        $form = "";
-        
-        if (isset($_SESSION['contactform_name'])) {
-            $name       = getRequestParam($_SESSION['contactform_name'], false);
-            $mail       = getRequestParam($_SESSION['contactform_mail'], false);
-            $website    = getRequestParam($_SESSION['contactform_website'], false);
-            $message    = getRequestParam($_SESSION['contactform_message'], false);
-            $calcresult = getRequestParam($_SESSION['contactform_calculation'], false);
-        }
-        else {
-            $name       = "";
-            $mail       = "";
-            $website    = "";
-            $message    = "";
-            $calcresult = "";
-        }
-        // Das Formular wurde abgesendet
-        if (getRequestParam('submit', false) <> "") { 
-
-            // Bot-Schutz: Wurde das Formular innerhalb von x Sekunden abgeschickt?
-            $sendtime = $contactformconfig->get("contactformwaittime");
-            if (($sendtime == "") || !preg_match("/^[\d+]+$/", $sendtime)) {
-                $sendtime = 15;
-            }
-            if (time() - $_SESSION['contactform_loadtime'] < $sendtime) {
-                $errormessage = $language->getLanguageValue1("contactform_senttoofast_1", $sendtime);
-            }
-            if ($usespamprotection) {
-                // Nochmal Spamschutz: Ergebnis der Spamschutz-Aufgabe auswerten
-                if (strtolower($calcresult) != strtolower($_SESSION['calculation_result'])) {
-                    $errormessage = $language->getLanguageValue0("contactform_wrongresult_0");
-                }
-            }
-            // Es ist ein Fehler aufgetreten!
-            if ($errormessage == "") {
-                // Eines der Pflichtfelder leer?
-                if (($config_name[2] == "true") && ($name == "")) {
-                    $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_name_0");
-                }
-                else if (($config_mail[2] == "true") && ($mail == "")) {
-                    $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_mail_0");
-                }
-                else if (($config_website[2] == "true") && ($website == "")) {
-                    $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_website_0");
-                }
-                else if (($config_message[2] == "true") && ($message == "")) {
-                    $errormessage = $language->getLanguageValue0("contactform_fieldnotset_0")." ".$language->getLanguageValue0("contactform_message_0");
-                }
-            }
-            // Es ist ein Fehler aufgetreten!
-            if ($errormessage <> "") {
-                $form .= "<span id=\"contact_errormessage\">".$errormessage."</span>";
-            }
-            else {
-                $mailcontent = "";
-                if ($config_name[1] == "true") {
-                    $mailcontent .= $language->getLanguageValue0("contactform_name_0").":\t".$name."\r\n";
-                }
-                if ($config_mail[1] == "true") {
-                    $mailcontent .= $language->getLanguageValue0("contactform_mail_0").":\t".$mail."\r\n";
-                }
-                if ($config_website[1] == "true") {
-                    $mailcontent .= $language->getLanguageValue0("contactform_website_0").":\t".$website."\r\n";
-                }
-                if ($config_message[1] == "true") {
-                    $mailcontent .= "\r\n".$language->getLanguageValue0("contactform_message_0").":\r\n".$message."\r\n";
-                }
-                $mailsubject = $language->getLanguageValue1("contactform_mailsubject_1", $specialchars->getHtmlEntityDecode($WEBSITE_NAME));
-                $mailsubject_confirm = $language->getLanguageValue1("contactform_mailsubject_confirm_1", $specialchars->getHtmlEntityDecode($WEBSITE_NAME));
-                
-                // Wenn Mail-Adresse im Formular gesetzt ist - versuchen Kopie dorthin zu senden
-                if ($mail <> "") {
-                    sendMail($mailsubject_confirm, $mailcontent, $contactformconfig->get("formularmail"), $mail, $contactformconfig->get("formularmail"));
-                }
-                // Mail an eingestellte Mail-Adresse (Mail-Absender muss auch diese Adresse sein,
-                // sonst gibts kein Mail wenn der keine oder ungültige Adresse eingibt..
-                sendMail($mailsubject, $mailcontent, $contactformconfig->get("formularmail"), $contactformconfig->get("formularmail"), $mail);
-                $form .= "<span id=\"contact_successmessage\">".$language->getLanguageValue0("contactform_confirmation_0")."</span>";
-                
-                // Felder leeren
-                $name = "";
-                $mail = "";
-                $website = "";
-                $message = "";
-            }
-        }
-
-        // Wenn das Formular nicht abgesendet wurde: die Feldnamen neu bestimmen
-        else {
-            renameContactInputs();
-        }
-        
-        // aktuelle Zeit merken
-        $_SESSION['contactform_loadtime'] = time();
-        $action_para = "index.php";
-        if($CMS_CONF->get("modrewrite") == "true") {
-            $action_para = substr($PAGE_REQUEST,3).".html";
-        }
-        $form .= "<form accept-charset=\"$CHARSET\" method=\"post\" action=\"$action_para\" name=\"contact_form\" id=\"contact_form\">"
-        ."<input type=\"hidden\" name=\"cat\" value=\"".substr($CAT_REQUEST,3)."\" />"
-        ."<input type=\"hidden\" name=\"page\" value=\"".substr($PAGE_REQUEST,3)."\" />"
-        ."<table id=\"contact_table\" summary=\"contact form table\">";
-        if ($config_name[1] == "true") {
-            // Bezeichner aus formular.conf nutzen, wenn gesetzt
-            if ($config_name[0] != "") {
-                $form .= "<tr><td style=\"padding-right:10px;\">".$specialchars->rebuildSpecialChars($config_name[0],false,true);
-            } else {
-                $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_name_0");
-            }
-            if ($config_name[2] == "true") {
-                $form .= "*";
-            }
-            $form .= "</td><td><input type=\"text\" id=\"contact_name\" name=\"".$_SESSION['contactform_name']."\" value=\"".$name."\" /></td></tr>";
-        }
-        if ($config_mail[1] == "true") {
-            // Bezeichner aus formular.conf nutzen, wenn gesetzt
-            if ($config_mail[0] != "") {
-                $form .= "<tr><td style=\"padding-right:10px;\">".$specialchars->rebuildSpecialChars($config_mail[0],false,true);
-            } else {
-                $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_mail_0");
-            }
-            if ($config_mail[2] == "true") {
-                $form .= "*";
-            }
-            $form .= "</td><td><input type=\"text\" id=\"contact_mail\" name=\"".$_SESSION['contactform_mail']."\" value=\"".$mail."\" /></td></tr>";
-        }
-        if ($config_website[1] == "true") {
-            // Bezeichner aus formular.conf nutzen, wenn gesetzt
-            if ($config_website[0] != "") {
-                $form .= "<tr><td style=\"padding-right:10px;\">".$specialchars->rebuildSpecialChars($config_website[0],false,true);
-            } else {
-                $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_website_0");
-            }
-            if ($config_website[2] == "true") {
-                $form .= "*";
-            }
-            $form .= "</td><td><input type=\"text\" id=\"contact_website\" name=\"".$_SESSION['contactform_website']."\" value=\"".$website."\" /></td></tr>";
-        }
-        if ($config_message[1] == "true") {
-            // Bezeichner aus formular.conf nutzen, wenn gesetzt
-            if ($config_message[0] != "") {
-                $form .= "<tr><td style=\"padding-right:10px;\">".$specialchars->rebuildSpecialChars($config_message[0],false,true);
-            } else {
-                $form .= "<tr><td style=\"padding-right:10px;\">".$language->getLanguageValue0("contactform_message_0");
-            }
-            if ($config_message[2] == "true") {
-                $form .= "*";
-            }
-            $form .= "</td><td><textarea rows=\"10\" cols=\"50\" id=\"contact_message\" name=\"".$_SESSION['contactform_message']."\">".$message."</textarea></td></tr>";
-        }
-        if ($usespamprotection) {
-            $mandatory = true;
-            // Spamschutz-Aufgabe
-            $calculation_data = getRandomCalculationData();
-            $_SESSION['calculation_result'] = $calculation_data[1];
-            $form .= "<tr><td colspan=\"2\">".$language->getLanguageValue0("contactform_spamprotection_text_0")."</td></tr>"
-                ."<tr><td style=\"padding-right:10px;\">".$calculation_data[0]."*</td>"
-                ."<td><input type=\"text\" id=\"contact_calculation\" name=\"".$_SESSION['contactform_calculation']."\" value=\"\" /></td></tr>";
-            
-        }
-        if($mandatory)
-            $form .= "<tr><td style=\"padding-right:10px;\">&nbsp;</td><td>".$language->getLanguageValue0("contactform_mandatory_fields_0")."</td></tr>";
-        $form .= "<tr><td style=\"padding-right:10px;\">&nbsp;</td><td><input type=\"submit\" class=\"submit\" id=\"contact_submit\" name=\"submit\" value=\"".$language->getLanguageValue0("contactform_submit_0")."\" /></td></tr>";
-        $form .= "</table>"
-        ."</form>";
-        
-        return $form;
-    }
-*/
 // ------------------------------------------------------------------------------
 // Hilfsfunktion: Sichert einen Input-Wert
 // ------------------------------------------------------------------------------
@@ -1300,20 +1032,26 @@ $_POST = cleanREQUEST($_POST);
 // ------------------------------------------------------------------------------
 // Rueckgabe der Dateinamen der vorigen und naechsten Seite
 // ------------------------------------------------------------------------------
+#!!!!!!!!! wird garnich mehr benuzt finde es jedenfals nicht
     function getNeighbourPages($page) {
-        global $CONTENT_DIR_REL;
+#        global $CONTENT_DIR_REL;
         global $CAT_REQUEST;
         global $CMS_CONF;
-        global $EXT_LINK;
+#        global $EXT_LINK;
         
+        global $EXT_PAGE, $EXT_HIDDEN;
+        global $CatPage;
         // leer initialisieren
         $neighbourPages = array("", "");
+        $include_pages = array($EXT_PAGE);
+        if($CMS_CONF->get("showhiddenpagesincmsvariables") == "true")
+            $include_pages = array($EXT_PAGE,$EXT_HIDDEN);
         // aktuelle Kategorie einlesen
-        $pagesarray = getDirContentAsArray($CONTENT_DIR_REL.$CAT_REQUEST, true, $CMS_CONF->get("showhiddenpagesincmsvariables") == "true");
+        $pagesarray = $CatPage->get_PageArray($CAT_REQUEST,$include_pages,true);
         // Schleife ueber alle Seiten
         for ($i = 0; $i < count($pagesarray); $i++) {
-            if(substr($pagesarray[$i], -(strlen($EXT_LINK))) == $EXT_LINK)
-                continue;
+#            if(substr($pagesarray[$i], -(strlen($EXT_LINK))) == $EXT_LINK)
+#                continue;
             if ($page == substr($pagesarray[$i], 0, strlen($pagesarray[$i]) - 4)) {
                 // vorige Seite (nur setzen, wenn aktuelle nicht die erste ist)
                 if ($i > 0) {
@@ -1331,36 +1069,13 @@ $_POST = cleanREQUEST($_POST);
         return $neighbourPages;
     }
 
-/*
-// ------------------------------------------------------------------------------
-// Hilfsfunktion: Zufaellige Spamschutz-Rechenaufgabe und deren Ergebnis zurueckgeben
-// ------------------------------------------------------------------------------
-    function getRandomCalculationData() {
-        global $contactformcalcs;
-        $confarray = $contactformcalcs->toArray();
-        unset($confarray['readonly']);
-        $tmp = array_keys($confarray);
-        $randnum = rand(0, count($confarray)-1);
-        return array($tmp[$randnum],$confarray[$tmp[$randnum]]);
-    }
-// ------------------------------------------------------------------------------
-// Hilfsfunktion: Bestimmt die Inputnamen neu
-// ------------------------------------------------------------------------------    
-    function renameContactInputs() {
-        $_SESSION['contactform_name'] = time()-rand(30, 40);
-        $_SESSION['contactform_mail'] = time()-rand(10, 20);
-        $_SESSION['contactform_website'] = time()-rand(0, 10);
-        $_SESSION['contactform_message'] = time()-rand(40, 50);
-        $_SESSION['contactform_calculation'] = time()-rand(50, 60);
-    }
-*/
     function findPlugins() {
         global $PLUGIN_DIR_REL;
         # Damit ein Platzhalter der als erste kommt erkant wierd
         $activ_plugins = array();
         $deactiv_plugins = array();
         // alle Plugins einlesen
-        $dircontent = getDirContentAsArray($PLUGIN_DIR_REL, false, false);
+        $dircontent = getDirAsArray($PLUGIN_DIR_REL,"dir");
         foreach ($dircontent as $currentelement) {
             # nach schauen ob das Plugin active ist
             if(file_exists($PLUGIN_DIR_REL.$currentelement."/plugin.conf")
@@ -1378,126 +1093,7 @@ $_POST = cleanREQUEST($_POST);
         return array($activ_plugins,$deactiv_plugins);
     }
 
-
-/*
-// ------------------------------------------------------------------------------
-// Hilfsfunktion: Plugin-Variablen ersetzen
-// ------------------------------------------------------------------------------    
-    function replacePluginVariables($content,$activ_plugins,$deactiv_plugins) {
-        global $PLUGIN_DIR_REL;
-        global $syntax;
-        global $language;
-        global $URL_BASE;
-        global $PLUGIN_DIR_NAME;
-
-        # ab php > 5.2.0 hat preg_* ein default pcre.backtrack_limit von 100000 zeichen
-        # deshalb der versuch mit ini_set
-        @ini_set('pcre.backtrack_limit', 1000000);
-        # alle script sachen rausnemen da könten verschachtelungen mit {} drin sein
-        preg_match_all("/\<script(.*)\<\/script>/Umsi", $content, $java_script);
-
-        if(count($java_script[0]) > 0) {
-            foreach($java_script[0] as $pos => $script_match) {
-                $content = str_replace($script_match,'<!-- plugin script '.$pos.'start -->',$content);
-                $script[] = array('<!-- plugin script '.$pos.'start -->' => $script_match);
-            }
-        }
-        # alle style sachen rausnemen da könten verschachtelungen mit {} drin sein
-        preg_match_all("/\<style(.*)\<\/style>/Umsi", $content, $style);
-        if(count($style[0]) > 0) {
-            foreach($style[0] as $pos => $style_match) {
-                $content = str_replace($style_match,'<!-- plugin style '.$pos.'start -->',$content);
-                $script[] = array('<!-- plugin style '.$pos.'start -->' => $style_match);
-            }
-        }
-        # alle Platzhalter mit Parameter suchen die in einer Verschachtelung sind
-        preg_match_all("/\{([^\{\}]+)\|([^\{\}]*)\}/Um", $content, $matches);
-        # wenn keine gefunden die ohne Parameter suchen
-        if(count($matches[0]) <= 0) {
-            preg_match_all("/\{([^\|\{]+)\}/Umsi", $content, $matches);
-        }
-        $notexit = 0;
-        $css = array();
-        while (count($matches[0]) > 0 and $notexit < 10) {
-            # $matches[0] = {Plugin|Parameter}
-            # $matches[1] = Plugin name
-            # $matches[2] = Plugin Parameter
-            foreach($matches[0] as $pos => $halter) {
-                $match = $matches[0][$pos];
-                $plugin = $matches[1][$pos];
-                $plugin_parameter = "";
-                if(isset($matches[2][$pos]))
-                    $plugin_parameter = $matches[2][$pos];
-                // ...ueberpruefen, ob es eine zugehörige Plugin-PHP-Datei gibt
-                if(in_array($plugin, $activ_plugins)) {
-                    $replacement = "";
-                    if(file_exists($PLUGIN_DIR_REL.$plugin."/index.php")) {
-                        // Plugin-Code includieren
-                        require_once($PLUGIN_DIR_REL.$plugin."/index.php");
-                    }
-                    // Enthaelt der Code eine Klasse mit dem Namen des Plugins?
-                    if(class_exists($plugin)) {
-                        if(!in_array($plugin, $deactiv_plugins)) {
-                            // Objekt instanziieren und Inhalt holen!
-                            $currentpluginobject = new $plugin();
-                            $replacement = $currentpluginobject->getPluginContent($plugin_parameter);
-                        }
-                    } else {
-                        $replacement = str_replace(array('{','}','|'),array('~noplugin_start-','-noplugin_end~','-noplugin_grade~'),$match);
-                    }
-                    // Variable durch Plugin-Inhalt (oder Fehlermeldung) ersetzen
-                    $content = str_replace($match,$replacement,$content);
-                    if(!in_array($plugin, $deactiv_plugins)
-                        and file_exists($PLUGIN_DIR_REL.$plugin."/plugin.css")
-                        ) {
-                        $css[] = '<style type="text/css"> @import "'.$URL_BASE.$PLUGIN_DIR_NAME.'/'.$plugin.'/plugin.css"; </style>';
-                    }
-                } elseif(in_array($plugin, $deactiv_plugins)) {
-                    # Deactiviertes Plugin mit nichts ersetzen
-                    $content = str_replace($match,"",$content);
-                } else {
-                    # Platzhalter nicht bekant
-                    $noplugin = str_replace(array('{','}','|'),array('~noplugin_start-','-noplugin_end~','-noplugin_grade~'),$match);
-                    $content = str_replace($match,$noplugin,$content);
-                }
-
-                # alle script sachen rausnemen da könten verschachtelungen mit {} drin sein
-                preg_match_all("/\<script(.*)\<\/script>/Umsi", $content, $java_script);
-                if(count($java_script[0]) > 0) {
-                    foreach($java_script[0] as $scriptpos => $script_match) {
-                        $content = str_replace($script_match,'<!-- plugin script '.$scriptpos.'drin'.$pos.' -->',$content);
-                        $script[] = array('<!-- plugin script '.$scriptpos.'drin'.$pos.' -->' => $script_match);
-                    }
-                }
-                # alle style sachen rausnemen da könten verschachtelungen mit {} drin sein
-                preg_match_all("/\<style(.*)\<\/style>/Umsi", $content, $style);
-                if(count($style[0]) > 0) {
-                    foreach($style[0] as $stylepos => $style_match) {
-                        $content = str_replace($style_match,'<!-- plugin style '.$stylepos.'drin'.$pos.' -->',$content);
-                        $script[] = array('<!-- plugin style '.$stylepos.'drin'.$pos.' -->' => $style_match);
-                    }
-                }
-            }
-            # noch mal alle Platzhalter mit Parameter suchen die in einer Verschachtelung sind
-            preg_match_all("/\{([^\{\}]+)\|([^\{\}]*)\}/Um", $content, $matches);
-            # wenn keine gefunden die ohne Parameter suchen
-            if(count($matches[0]) <= 0) {
-                preg_match_all("/\{([^\|\{]+)\}/Umsi", $content, $matches);
-            }
-            $notexit++;
-        }
-        # alle script und style sachen wieder einsetzen
-        if(isset($script) and is_array($script)) {
-            foreach($script as $script_tmp) {
-                $content = str_replace(key($script_tmp),$script_tmp[key($script_tmp)],$content);
-            }
-        }
-        # alle nicht bekanten wieder herstellen
-        $content = str_replace(array('~noplugin_start-','-noplugin_end~','-noplugin_grade~'),array('{','}','|'),$content);
-        return array($content,$css);
-    }
-*/
-
+#!!!!!! nur noch in Plugins
     function menuLink($link,$css) {
         global $EXT_LINK;
         global $specialchars;
@@ -1521,4 +1117,39 @@ $_POST = cleanREQUEST($_POST);
         return '<a href="'.$specialchars->rebuildSpecialChars($tmp_link[1], true, true).'"'.$css.' target="'.$target.'"'.$titel.'>'.$specialchars->rebuildSpecialChars(substr($tmp_link[0],3), true, true).'</a> ';
     }
     
+/*
+# $filetype = "dir" nur ordner
+# $filetype = "file" nur dateien
+# $filetype = array(".txt",".hid",...) nur die mit dieser ext
+#               Achtung Punkt nicht vergessen Gross/Kleinschreibung ist egal
+# $filetype = false alle dateien
+function getDirAsArray($dir,$filetype = false) {
+    $dateien = array();
+    if($currentdir = opendir($dir)) {
+        while(false !== ($file = readdir($currentdir))) {
+            # keine gültige datei gleich zur nächsten datei
+            if(!isValidDirOrFile($file))
+                continue;
+            # nur mit ext
+            if(is_array($filetype)) {
+                # alle ext im array in kleinschreibung wandeln
+                $filetype = array_map('strtolower', $filetype);
+                $ext = strtolower(substr($file,strrpos($file,".")));
+                if(in_array($ext,$filetype)) {
+                    $dateien[] = $file;
+                }
+            # nur dir oder file
+            } elseif(filetype($dir."/".$file) == $filetype) {
+                $dateien[] = $file;
+            # alle
+            } elseif(!$filetype) {
+                $dateien[] = $file;
+            }
+        }
+        closedir($currentdir);
+    }
+    sort($dateien);
+    return $dateien;
+}*/
+
 ?>

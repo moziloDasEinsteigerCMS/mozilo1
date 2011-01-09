@@ -14,10 +14,10 @@ class Syntax {
     var $LINK_REGEX;
     var $MAIL_REGEX;
     var $TARGETBLANK_LINK;
-    var $TARGETBLANK_DOWNLOAD;
+#    var $TARGETBLANK_DOWNLOAD;
     var $anchorcounter;
     var $headlineinfos;
-
+#    var $firstconvertContent;
 // ------------------------------------------------------------------------------    
 // Konstruktor
 // ------------------------------------------------------------------------------
@@ -48,12 +48,12 @@ class Syntax {
             $this->TARGETBLANK_LINK = "";
         }
         // Download-Links in neuem Fenster öffnen?
-        if ($CMS_CONF->get("targetblank_download") == "true") {
+/*        if ($CMS_CONF->get("targetblank_download") == "true") {
             $this->TARGETBLANK_DOWNLOAD = " target=\"_blank\"";
         }
         else {
             $this->TARGETBLANK_DOWNLOAD = "";
-        }
+        }*/
         $this->anchorcounter            = 1;
 
         $syntax_elemente = get_class_methods($this);
@@ -91,10 +91,12 @@ class Syntax {
         $this->script_replace = array();
         $this->pluginself['placeholder'] = array();
         $this->pluginself['replace'] = array();
+#        $this->firstconvertContent = false;
     }
 
     function match_syntax_plugins() {
         /*
+        Der array aufbau der zurückgegeben wird ist immer so
         0 = match
         1 = plugin syntax
         2 = description
@@ -109,10 +111,12 @@ class Syntax {
             $syntax = true;
         }
         preg_match_all($this->PLUGIN_SEARCH, $this->content, $matches_plugins);
+        # hier stimt der array aufbau nicht deshalb passen wir in an
         $matches_plugins[3] = $matches_plugins[2];
 
         preg_match_all($this->PLUGIN_SEARCH_OHNE, $this->content, $matches_plugins_ohne);
         if(isset($matches_plugins_ohne[0]) and count($matches_plugins_ohne[0]) > 0) {
+            # hier stimt der array aufbau nicht deshalb passen wir in an
             $matches_plugins_ohne[2] = array_fill(0, count($matches_plugins_ohne[0]), '');
             $matches_plugins_ohne[3] = array_fill(0, count($matches_plugins_ohne[0]), '');
             $matches_plugins[0] = array_merge($matches_plugins[0], $matches_plugins_ohne[0]);
@@ -125,39 +129,50 @@ class Syntax {
         if(isset($matches_plugins[0]) and count($matches_plugins[0]) > 0) {
             $plugins = true;
         }
+        # syntax gefunden plugins nicht
         if($syntax and !$plugins) {
             return $matches_syntax;
         }
+        # plugins gefunden syntax nicht
         if(!$syntax and $plugins) {
             return $matches_plugins;
         }
+        # plugins und syntax gefunden
         if($syntax and $plugins) {
+            # aus gefunden syntax und plugins ein array machen
             $result[0] = array_merge($matches_syntax[0], $matches_plugins[0]);
             $result[1] = array_merge($matches_syntax[1], $matches_plugins[1]);
             $result[2] = array_merge($matches_syntax[2], $matches_plugins[2]);
             $result[3] = array_merge($matches_syntax[3], $matches_plugins[3]);
             return $result;
         }
-
+        # mit den "SYNTAX_SEARCH, PLUGIN_SEARCH, PLUGIN_SEARCH_OHNE"
+        # such parametern wurde nichts gefunden
+        # dann versuchen wir es noch mit den "SYNTAX_SEARCH_REST, PLUGIN_SEARCH_REST"
         preg_match_all($this->SYNTAX_SEARCH_REST, $this->content, $matches_syntax);
         $syntax = false;
         if(isset($matches_syntax[0]) and count($matches_syntax[0]) > 0) {
             $syntax = true;
         }
         preg_match_all($this->PLUGIN_SEARCH_REST, $this->content, $matches_plugins);
+        # hier stimt der array aufbau nicht deshalb passen wir in an
         $matches_plugins[3] = $matches_plugins[2];
 
         $plugins = false;
         if(isset($matches_plugins[0]) and count($matches_plugins[0]) > 0) {
             $plugins = true;
         }
+        # syntax gefunden plugins nicht
         if($syntax and !$plugins) {
             return $matches_syntax;
         }
+        # plugins gefunden syntax nicht
         if(!$syntax and $plugins) {
             return $matches_plugins;
         }
+        # plugins und syntax gefunden
         if($syntax and $plugins) {
+            # aus gefunden syntax und plugins ein array machen
             $result[0] = array_merge($matches_syntax[0], $matches_plugins[0]);
             $result[1] = array_merge($matches_syntax[1], $matches_plugins[1]);
             $result[2] = array_merge($matches_syntax[2], $matches_plugins[2]);
@@ -169,6 +184,9 @@ class Syntax {
 // Umsetzung der übergebenen CMS-Syntax in HTML, Rückgabe als String
 // ------------------------------------------------------------------------------
     function convertContent($content, $cat, $firstrecursion) {
+#        if($this->firstconvertContent)
+#            die("convertContent darf nur einmal aufgerufen werden");
+#        $this->firstconvertContent = true;
         $this->content = $content;
         $this->cat = $cat;
         if ($firstrecursion) {
@@ -187,7 +205,7 @@ $not_exit_max = 20;
 if($not_exit >= $not_exit_max)
     break;
             foreach($matches[1] as $pos => $function) {
-                # weil nach syntax= gesucht wird enthält das array syntax=
+                # weil nach syntax= gesucht wird enthält das array auch syntax=
                 if(substr($function,-1) == "=")
                     $function = substr($function,0,-1);
                 $replace = NULL;
@@ -246,13 +264,18 @@ if($not_exit >= $not_exit_max)
         // direkt aufeinanderfolgende numerierte Listen zusammenführen
         $this->content = preg_replace('/<\/ol>(\r\n|\r|\n)?<ol class="orderedlist">/', '', $this->content);
         # Table Hack recursive Table
-        $this->content = str_replace('&#38;', '&', $this->content);
+#        $this->content = str_replace('&#38;', '&', $this->content);
 
         // Zeilenwechsel in Include-Tags wiederherstellen    
-        $this->content = preg_replace('/{newline_in_include_tag}/', "\n", $this->content);
+#        $this->content = preg_replace('/{newline_in_include_tag}/', "\n", $this->content);
         // Zeilenwechsel in HTML-Tags wiederherstellen    
-        $this->content = preg_replace('/{newline_in_html_tag}/', "\n", $this->content);
+#        $this->content = preg_replace('/{newline_in_html_tag}/', "\n", $this->content);
 
+$this->content = str_replace(array("-html_lt~","-html_gt~"),array("&lt;","&gt;"),$this->content);
+global $specialchars;
+$this->content = $specialchars->decodeProtectedChr($this->content);
+
+#echo "return content";
         return $this->content;
     }
 
@@ -393,25 +416,23 @@ if($not_exit >= $not_exit_max)
     function syntax_kategorie($desciption,$value) {
         // Kategorie-Link (überprüfen, ob Kategorie existiert)
         // Kategorie-Link mit eigenem Text
-        global $specialchars;
         global $language;
-        global $CONTENT_DIR_REL;
-        global $CMS_CONF;
-        global $URL_BASE;
-        $link_text = $value;
-        if(!empty($desciption)) {
-            $link_text = $desciption;
+        global $CatPage;
+
+        $cat = $CatPage->get_AsKeyName($value, true);
+
+        $link_text = $desciption;
+        if(empty($desciption)) {
+            $link_text = $CatPage->get_HrefText($cat,false);
         }
-        $requestedcat = nameToCategory($specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($value),false));
-        $requestedcat_url = $specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($value),false);
-        $url = "index.php?cat=$requestedcat_url";
-        if($CMS_CONF->get("modrewrite") == "true") {
-            $url = $URL_BASE.$requestedcat_url.".html";
-        }
-        if ((!$requestedcat=="") && (file_exists($CONTENT_DIR_REL.$requestedcat))) {
-            return "<a class=\"category\" href=\"$url\"".$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_category_1", $value)).">$link_text</a>";
-        }
-        else {
+
+        if($CatPage->exists_CatPage($cat,false)) {
+            return $CatPage->create_LinkTag($CatPage->get_Href($cat,false)
+                    ,$link_text
+                    ,"category"
+                    ,$language->getLanguageValue1("tooltip_link_category_1", $value)
+                    );
+        } else {
             return $this->createDeadlink($value, $language->getLanguageValue1("tooltip_link_category_error_1", $value));
         }
     }
@@ -420,43 +441,29 @@ if($not_exit >= $not_exit_max)
         // Link auf Inhaltsseite in aktueller oder anderer Kategorie (überprüfen, ob Inhaltsseite existiert)
         // Link auf Inhaltsseite in aktueller oder anderer Kategorie mit beliebigem Text
         global $specialchars;
-        global $CMS_CONF;
-        global $URL_BASE;
-        global $EXT_PAGE;
-        global $CONTENT_DIR_REL;
         global $language;
-        $seite = $specialchars->getHtmlEntityDecode($value);
-        $valuearray = explode(":", $seite);
-        if (count($valuearray) == 1) {
-            $valuearray[1] = $valuearray[0];
-            $valuearray[0] = $this->cat;
+        global $CatPage;
+
+        list($cat,$page) = $CatPage->split_CatPage_fromSyntax($value,$this->cat);
+
+        if(!$CatPage->exists_CatPage($cat,false)) {
+            $cat_text = $specialchars->rebuildSpecialChars($cat,true,true);
+            return $this->createDeadlink($cat_text, $language->getLanguageValue1("tooltip_link_category_error_1", $cat_text));
         }
-        $link_text = "";
-        if(!empty($desciption)) {
-            $link_text = $desciption;
+        if(!$CatPage->exists_CatPage($cat,$page)) {
+            $cat_text = $specialchars->rebuildSpecialChars($cat,true,true);
+            $page_text = $specialchars->rebuildSpecialChars($page,true,true);
+            return $this->createDeadlink($page_text, $language->getLanguageValue2("tooltip_link_page_error_2", $page_text, $cat_text));
         }
-        $requestedcat = nameToCategory($specialchars->replaceSpecialChars($valuearray[0],false));
-        $html_seite = $specialchars->rebuildSpecialChars($valuearray[1],true,true);
-        $html_seite_cat = $specialchars->rebuildSpecialChars($valuearray[0],true,true);
-        if(empty($link_text)) {
-            $link_text = $html_seite;
+        $link_text = $desciption;
+        if(empty($desciption)) {
+            $link_text = $CatPage->get_HrefText($cat,$page);
         }
-        if ((!$requestedcat == "") && (file_exists($CONTENT_DIR_REL.$requestedcat))) {
-            $requestedpage = nameToPage($specialchars->replaceSpecialChars($valuearray[1],false), $requestedcat);
-            $url = "index.php?cat=".substr($requestedcat,3)."&amp;page=".substr($requestedpage, 3, strlen($requestedpage) - strlen($EXT_PAGE) - 3);
-            if($CMS_CONF->get("modrewrite") == "true") {
-                $url = $URL_BASE.substr($requestedcat,3)."/".substr($requestedpage, 3, strlen($requestedpage) - strlen($EXT_PAGE) - 3).".html";
-            }
-            if ((!$requestedpage == "") && (file_exists($CONTENT_DIR_REL.$requestedcat."/".$requestedpage))) {
-                return "<a class=\"page\" href=\"$url\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", $html_seite, $html_seite_cat)).">".$link_text."</a>";
-            }
-            else {
-                return $this->createDeadlink($html_seite, $language->getLanguageValue2("tooltip_link_page_error_2", $html_seite, $html_seite_cat));
-            }
-        }
-        else {
-            return $this->createDeadlink($html_seite, $language->getLanguageValue1("tooltip_link_category_error_1", $valuearray[0]));
-        }
+        return $CatPage->create_LinkTag($CatPage->get_Href($cat,$page)
+                    ,$link_text
+                    ,"page"
+                    ,$language->getLanguageValue2("tooltip_link_page_2", $specialchars->rebuildSpecialChars($page,true,true), $specialchars->rebuildSpecialChars($cat,true,true))
+                    );
     }
 
     function syntax_absatz($desciption,$value) {
@@ -491,37 +498,29 @@ if($not_exit >= $not_exit_max)
         // Datei aus dem Dateiverzeichnis mit beliebigem Text
         global $specialchars;
         global $language;
-        global $CONTENT_DIR_REL;
-        global $CONTENT_FILES_DIR_NAME;
-        global $URL_BASE;
-        global $CMS_DIR_NAME;
-        $datei = $specialchars->getHtmlEntityDecode($value);
-        $valuearray = explode(":", $datei);
-        if (count($valuearray) == 1) {
-            $valuearray[1] = $valuearray[0];
-            $valuearray[0] = $this->cat;
+        global $CatPage;
+        global $CMS_CONF;
+
+        list($cat,$datei) = $CatPage->split_CatPage_fromSyntax($value,$this->cat,true);
+
+        if(!$CatPage->exists_File($cat,$datei)) {
+            $cat_text = $specialchars->rebuildSpecialChars($cat,true,true);
+            $datei_text = $specialchars->rebuildSpecialChars($datei,true,true);
+            return $this->createDeadlink($datei_text, $language->getLanguageValue2("tooltip_link_file_error_2", $datei_text, $cat_text));
         }
-        $link_text = "";
-        if(!empty($desciption)) {
-            $link_text = $desciption;
-        }
-        $datei_cat = nameToCategory($specialchars->replaceSpecialChars($valuearray[0],false));
-        $datei = $specialchars->replaceSpecialChars($valuearray[1],false);
-        $html_datei_cat = $specialchars->rebuildSpecialChars($datei_cat,true,true);
-        $html_datei = $specialchars->rebuildSpecialChars($datei,true,true);
-        if(empty($link_text))
+        $link_text = $desciption;
+        if(empty($desciption)) {
             $link_text = $specialchars->rebuildSpecialChars($datei,true,true);
-        if ((!$datei_cat == "") && (file_exists($CONTENT_DIR_REL.$datei_cat))) {
-            if (file_exists($CONTENT_DIR_REL.$datei_cat."/".$CONTENT_FILES_DIR_NAME."/".$datei)) {
-                return "<a class=\"file\" href=\"".$URL_BASE.$CMS_DIR_NAME."/download.php?cat=$datei_cat&amp;file=$datei\"".$this->getTitleAttribute($language->getLanguageValue2("tooltip_link_file_2", $html_datei, $html_datei_cat)).$this->TARGETBLANK_DOWNLOAD.">".$link_text."</a>";
-            }
-            else {
-                return $this->createDeadlink($html_datei, $language->getLanguageValue2("tooltip_link_file_error_2", $html_datei, $html_datei_cat));
-            }
         }
-        else {
-            return $this->createDeadlink($html_datei, $language->getLanguageValue1("tooltip_link_category_error_1", $html_datei_cat));
-        }
+        // Download-Links in neuem Fenster öffnen?
+        $target = false;
+        if ($CMS_CONF->get("targetblank_download") == "true")
+            $target = "_blank";
+        return $CatPage->create_LinkTag($CatPage->get_HrefFile($cat,$datei)
+                    ,$link_text
+                    ,"file"
+                    ,$language->getLanguageValue2("tooltip_link_file_2", $specialchars->rebuildSpecialChars($datei,true,true), $specialchars->rebuildSpecialChars($cat,true,true))
+                    ,$target);
     }
 
     function syntax_galerie($desciption,$value) {
@@ -554,46 +553,31 @@ if($not_exit >= $not_exit_max)
         if(!empty($desciption))
             $subtitle = $desciption;
 
-        $imgsrc = "";
-        $error = false;
+        $imgsrc = false;
 
         $value = $specialchars->getHtmlEntityDecode($value);
         // Bei externen Bildern: $value NICHT nach ":" aufsplitten!
         if (preg_match($this->LINK_REGEX, $value)) {
-            $valuearray = $specialchars->replaceSpecialChars($value,false);
+            $imgsrc = $value;
         }
 
         // Ansonsten: Nach ":" aufsplitten
         else {
-            $valuearray = explode(":", $value);
-            if (count($valuearray) == 1) {
-                $valuearray[1] = $valuearray[0];
-                $valuearray[0] = $this->cat;
+            global $CatPage;
+            global $CMS_CONF;
+
+            list($cat,$datei) = $CatPage->split_CatPage_fromSyntax($value,$this->cat,true);
+
+            if(!$CatPage->exists_File($cat,$datei)) {
+                $cat_text = $specialchars->rebuildSpecialChars($cat,true,true);
+                $datei_text = $specialchars->rebuildSpecialChars($datei,true,true);
+                return $this->createDeadlink($datei_text, $language->getLanguageValue2("tooltip_image_error_2", $datei_text, $cat_text));
             }
-            $valuearray[0] = $specialchars->replaceSpecialChars($valuearray[0],false);
-            $valuearray[1] = $specialchars->replaceSpecialChars($valuearray[1],false);
+            $imgsrc = $CatPage->get_srcFile($cat,$datei);
         }
-        $requestedcat = nameToCategory($valuearray[0]);
-        // Kategorie existiert
-        if ((!$requestedcat=="") && (file_exists($CONTENT_DIR_REL.$requestedcat))) {
-            // Bilddatei existiert
-            if (file_exists($CONTENT_DIR_REL.$requestedcat."/".$CONTENT_FILES_DIR_NAME."/".$valuearray[1])) {
-                $imgsrc = $specialchars->replaceSpecialChars($URL_BASE.$CONTENT_DIR_NAME."/".$requestedcat."/".$CONTENT_FILES_DIR_NAME."/".$valuearray[1],true);
-            }
-            // Bilddatei existiert nicht
-            else {
-                return $this->createDeadlink($valuearray[1], $language->getLanguageValue2("tooltip_image_error_2", $valuearray[1], $valuearray[0]));
-                $error = true;
-            }
-        }
-        // Kategorie existiert nicht
-        else {
-            return $this->createDeadlink($valuearray[1], $language->getLanguageValue1("tooltip_link_category_error_1", $valuearray[0]));
-            $error = true;
-        }
-        
+
         // Nun aber das Bild ersetzen!
-        if (!$error) {
+        if ($imgsrc) {
             $alt = $specialchars->rebuildSpecialChars($value,true,true);
             $cssclass = "";
             if ($syntax == "bild") {
@@ -712,16 +696,16 @@ if($not_exit >= $not_exit_max)
     }
 
     function syntax_html($desciption,$value) {
-        // HTML
-        global $specialchars;
-        $nobrvalue = preg_replace('/(\r\n|\r|\n)/m', '{newline_in_html_tag}', $value);
+#        global $specialchars;
+#        $nobrvalue = preg_replace('/(\r\n|\r|\n)/m', '{newline_in_html_tag}', $value);
         # Wichtig alle &#???; (sind die zeichen mit ^ dafor) nach &amp;#???; wandel damit
         # getHtmlEntityDecode nicht das Zeichen herstellt
-        $nobrvalue = preg_replace("/\&\#(\d+)\;/Umsie", "'&amp;#\\1;'", $nobrvalue);
-        $nobrvalue = $specialchars->getHtmlEntityDecode($nobrvalue);
-# !!!!!!!! zum testen drin, geht glaube ich nicht bei verschachtelten [html|[html|]]
-# alle & nach &#38; wandeln die werden am schluss wieder hergestelt
-$nobrvalue = str_replace('&', '&#38;', $nobrvalue);
+#       $nobrvalue = preg_replace("/\&\#(\d+)\;/Umsie", "'&amp;#\\1;'", $nobrvalue);
+#       $nobrvalue = $specialchars->getHtmlEntityDecode($nobrvalue);
+
+# alle < und > im html code wieder herstellen
+$nobrvalue = str_replace(array("&lt;","&gt;"),array("<",">"),$value);
+
         return $nobrvalue;
     }
 
@@ -734,6 +718,7 @@ $nobrvalue = str_replace('&', '&#38;', $nobrvalue);
         // Tabelleninhalt aufbauen
         $tablecontent = "";
         // Tabellenzeilen
+
         preg_match_all("/(&lt;|&lt;&lt;)(.*)(&gt;|&gt;&gt;)/Umsie", $value, $tablelines);
         foreach ($tablelines[0] as $j => $tablematch) {
             // Kopfzeilen
@@ -759,50 +744,55 @@ $nobrvalue = str_replace('&', '&#38;', $nobrvalue);
                 $tablecontent .= "</tr>";
             }
         }
+
         return '<table class="'.$tabellecss.'" cellspacing="0" border="0" cellpadding="0" summary="">'.$tablecontent.'</table>';
     }
 
     function syntax_include($desciption,$value) {
-# !!!!!!! muss da nich ein prepareContent($content) gemacht werden????????????????
         // Includes
-        global $specialchars;
         global $CONTENT_DIR_REL;
-        global $EXT_PAGE;
+        global $EXT_PAGE, $EXT_HIDDEN;
         global $PAGE_REQUEST;
+        global $specialchars;
         global $language;
-        $valuearray = explode(":", $value);
-        if (count($valuearray) == 1) {
-            $valuearray[1] = $valuearray[0];
-            $valuearray[0] = $this->cat;
+        global $CatPage;
+
+        list($cat,$page) = $CatPage->split_CatPage_fromSyntax($value,$this->cat);
+
+        if(!$CatPage->exists_CatPage($cat,false)) {
+            $cat_text = $specialchars->rebuildSpecialChars($cat,true,true);
+            return $this->createDeadlink($cat_text, $language->getLanguageValue1("tooltip_link_category_error_1", $cat_text));
         }
-        $requestedcat = nameToCategory($specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($valuearray[0]),false));
-        if ((!$requestedcat=="") && (file_exists($CONTENT_DIR_REL.$requestedcat))) {
-            $requestedpage = nameToPage($specialchars->replaceSpecialChars($specialchars->getHtmlEntityDecode($valuearray[1]),false), $requestedcat);
-            if ((!$requestedpage=="") && (file_exists($CONTENT_DIR_REL.$requestedcat."/".$requestedpage)))
-                // Seite darf sich nicht selbst includen!
-                if (($requestedcat == $this->cat) && (substr($requestedpage, 0, strlen($requestedpage)-strlen($EXT_PAGE)) == $PAGE_REQUEST)) {
-                    return $this->createDeadlink($value, $language->getLanguageValue0("tooltip_include_recursion_error_0"));
-                }
-                // Includierte Inhaltsseite parsen
-                else {
-                    $file = $CONTENT_DIR_REL.$requestedcat."/".$requestedpage;
-                    $handle = fopen($file, "r");
-                    $pagecontent = "";
-                    if (filesize($file) > 0) {
-                        // "include"-Tags in includierten Seiten sind nicht erlaubt, um Rekursionen zu vermeiden
-                        $pagecontent = preg_replace("/\[include\|([^\[\]]*)\]/Um", "[html|".$this->createDeadlink("$1", $language->getLanguageValue0("tooltip_include_reinclude_error_0"))."]", fread($handle, filesize($file)));
-                        // Zeilenwechsel sichern
-                        $pagecontent = preg_replace('/(\r\n|\r|\n)/', '{newline_in_include_tag}', $pagecontent);
-                    }
-                    fclose($handle);
+        if(!$CatPage->exists_CatPage($cat,$page)) {
+            $cat_text = $specialchars->rebuildSpecialChars($cat,true,true);
+            $page_text = $specialchars->rebuildSpecialChars($page,true,true);
+            return $this->createDeadlink($page_text, $language->getLanguageValue2("tooltip_link_page_error_2", $page_text, $cat_text));
+        }
+        $link_text = $desciption;
+        if(empty($desciption)) {
+            $link_text = $CatPage->get_HrefText($cat,$page);
+        }
+
+        // Seite darf sich nicht selbst includen!
+        if (($cat == substr($this->cat,3)) and ($page == substr($PAGE_REQUEST,3))) {
+            return $this->createDeadlink($value, $language->getLanguageValue0("tooltip_include_recursion_error_0"));
+        }
+        // Includierte Inhaltsseite parsen
+        else {
+            # wenn cat page schonn im merker ist fehlermeldung weil sonst
+            # include endlosschleife
+            $incl_catpage = $CatPage->get_AsKeyName($cat).":".$CatPage->get_AsKeyName($page);
+            if(isset($CatPage->SyntaxIncludeRemember[$incl_catpage]))
+                return $this->createDeadlink($CatPage->get_HrefText($cat,false).":".$CatPage->get_HrefText($cat,$page), $language->getLanguageValue0("tooltip_include_recursion_error_0"));
+            else {
+                if(false !== ($pagecontent = $CatPage->get_PageContent($cat,$page))) {
+                    # include merker setzen
+                    $CatPage->SyntaxIncludeRemember[$incl_catpage] = $CatPage->get_AsKeyName($page);
+                    # ist eine Inhaltseite also inhalt vorbereiten
+                    $pagecontent = $this->prepareContent($pagecontent);
                     return $pagecontent;
                 }
-            else {
-                return $this->createDeadlink($valuearray[1], $language->getLanguageValue2("tooltip_link_page_error_2", $valuearray[1], $valuearray[0]));    
             }
-        }
-        else {
-            return $this->createDeadlink($valuearray[1], $language->getLanguageValue1("tooltip_link_category_error_1", $valuearray[0]));
         }
     }
 
@@ -832,9 +822,9 @@ $nobrvalue = str_replace('&', '&#38;', $nobrvalue);
         global $URL_BASE;
         global $PLUGIN_DIR_NAME;
         global $language;
-        // ...ueberpruefen, ob es eine zugehörige Plugin-PHP-Datei gibt
         if(in_array($plugin, $this->activ_plugins)) {
             $replacement = NULL;
+            // ...ueberpruefen, ob es eine zugehörige Plugin-PHP-Datei gibt
             if(file_exists($PLUGIN_DIR_REL.$plugin."/index.php")) {
                 // Plugin-Code includieren
                 require_once($PLUGIN_DIR_REL.$plugin."/index.php");
@@ -933,31 +923,47 @@ $nobrvalue = str_replace('&', '&#38;', $nobrvalue);
         return $headlines;
     }
 
+// ------------------------------------------------------------------------------
+// Hilfsfunktion: content heraus filtern und ersetzen
+// ------------------------------------------------------------------------------
+    function getReplaceContent() {
+        echo "!!!!!!!!!!getReplaceContent solten wir einfüren";
+    }
 
 // ------------------------------------------------------------------------------
 // Hilfsfunktion: Inhalte vorbereiten
 // ------------------------------------------------------------------------------
     function prepareContent($content) {
         global $specialchars;
-        global $CHARSET;
-        $content_true = false;
-        if(strstr($content,'---content~~~')) {
-            $tmp = $content;
-            preg_match("/---content~~~(.*)~~~content---/Umsi", $tmp,$content);
-            $content = $content[0];
-            $content_true = true;
+
+        $content_search = false;
+        if(strstr($content,'---content~~~') and strstr($content,'~~~content---')) {
+            $tmp_content = $content;
+            $start = strpos($content,"---content~~~");
+            $length = (strpos($content,"~~~content---") + strlen("~~~content---")) - $start;
+            $content = substr($content,$start,$length);
+            $content_search = $content;
         }
+
         // Inhaltsformatierungen
-        $content = htmlentities($content,ENT_COMPAT,$CHARSET);
-        $content = preg_replace("/&amp;#036;/Umsi", "&#036;", $content);
-        $content = preg_replace("/&amp;#092;/Umsi", "&#092;", $content);
-        $content = preg_replace("/\^(.)/Umsie", "'&#'.ord('\\1').';'", $content);
-        $content = $specialchars->numeric_entities_decode($content); 
+        # alle &lt; und &gt; die in einer page sind sollen so sein
+        $content = str_replace(array("&lt;","&gt;"),array("-html_lt~","-html_gt~"),$content);
+        # alle < und > in &lt; und &gt; wandeln damit sie nicht als html tags angezeigt werden
+        $content = str_replace(array("<",">"),array("&lt;","&gt;"),$content);
+
+#        $content = preg_replace("/&amp;#036;/Umsi", "&#036;", $content);
+#        $content = preg_replace("/&amp;#092;/Umsi", "&#092;", $content);
+#        $content = preg_replace("/\^(.)/Umsie", "'&#'.ord('\\1').';'", $content);
+#        $content = $specialchars->numeric_entities_decode($content); 
+        # alle zeichen die ein ^ davor sind geschützte zeichen
+        $content = $specialchars->encodeProtectedChr($content);
         // Für Einrückungen
         $content = str_replace("  ","&nbsp;&nbsp;",$content);
+        # Zeilenümbrüche sind in pages später html umbrüche
         $content = preg_replace('/(\r\n|\r|\n)/', '$1<br />', $content);
-        if($content_true)
-            $content = preg_replace("/---content~~~(.*)~~~content---/Umsi",$content , $tmp);
+        if($content_search) {
+            $content = str_replace($content_search,$content,$tmp_content);
+        }
         // Platzhalter ersetzen
         $content = replacePlaceholders($content, "", "");
 

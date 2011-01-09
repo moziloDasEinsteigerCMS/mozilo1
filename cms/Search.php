@@ -20,34 +20,29 @@ function getSearchString($searchstring,$array = true) {
 
 
 function searchInPages() {
-    global $CONTENT_DIR_REL;
-    global $EXT_LINK;
     global $CMS_CONF;
     global $QUERY_REQUEST;
-    global $URL_BASE;
     global $specialchars;
     global $language;
+    global $EXT_HIDDEN;
+    global $EXT_PAGE;
+    global $CatPage;
 
     if(!$highlightparameter = getSearchString($QUERY_REQUEST,false))
         return false;
 
-    $showhiddenpages = ($CMS_CONF->get("showhiddenpagesinsearch") == "true");
+    $include_pages = array($EXT_PAGE);
+    if($CMS_CONF->get("showhiddenpagesinsearch") == "true")
+        $include_pages = array($EXT_PAGE,$EXT_HIDDEN);
+
     // Kategorien-Verzeichnis einlesen
-    $categoriesarray = getDirContentAsArray($CONTENT_DIR_REL, false, false);
+    $categoriesarray = $CatPage->get_CatArray(false, false, $include_pages);
     $matchingpages = array();
     // Alle Kategorien durchsuchen
     foreach ($categoriesarray as $currentcategory) {
-        // Wenn die Kategorie keine Contentseiten hat, direkt zur naechsten springen
-        $contentarray = getDirContentAsArray($CONTENT_DIR_REL.$currentcategory, true, $showhiddenpages);
-        if ($contentarray == "") {
-            continue;
-        }
+        $contentarray = $CatPage->get_PageArray($currentcategory,$include_pages,true);
         // Alle Inhaltsseiten durchsuchen
         foreach ($contentarray as $currentcontent) {
-            # wenns ein link ist
-            if(substr($currentcontent,-(strlen($EXT_LINK))) == $EXT_LINK) {
-                continue;
-            }
             // Treffer in der aktuellen Seite?
             if (searchPage($currentcategory,$currentcontent)) {
                 $matchingpages[$currentcategory][$currentcontent] = "true";
@@ -57,24 +52,19 @@ function searchInPages() {
     $searchresults = "";
     $matchesoverall = 0;
     foreach ($matchingpages as $cat => $tmp) {
-        $categoryname = catToName($cat, false);
+        $categoryname = $CatPage->get_HrefText($cat,false);
         $searchresults .= "<h2>$categoryname</h2><ul>";
         if(!isset($matchingpages[$cat])) continue;
         foreach ($matchingpages[$cat] as $page => $tmp) {
             if($tmp != "true") continue;
             $matchesoverall++;
-            $url = "index.php?cat=".substr($cat,3)."&amp;page=".substr($page, 3, strlen($page) - 7)."&amp;";
-            if($CMS_CONF->get("modrewrite") == "true") {
-                $url = $URL_BASE.substr($cat,3)."/".substr($page, 3, strlen($page) - 7).".html?";
-            }
-            $pagename = pageToName($page, false);
-            $filepath = $CONTENT_DIR_REL.$cat."/".$page;
+            $pagename = $CatPage->get_HrefText($cat,$page);
             $searchresults .= "<li>".
-                "<a href=\"".$url.
-                "highlight=".$specialchars->replaceSpecialChars($highlightparameter,false)."\"".
-                getTitleAttribute($language->getLanguageValue2("tooltip_link_page_2", $pagename, $categoryname)).">".
-                highlightSearch($pagename,$highlightparameter).
-                "</a>".
+                $CatPage->create_LinkTag($CatPage->get_Href($cat,$page,"highlight=".$specialchars->replaceSpecialChars($highlightparameter,false)),
+                highlightSearch($pagename,$highlightparameter),
+                false,
+                $titel = $language->getLanguageValue2("tooltip_link_page_2", $pagename, $categoryname)
+                ).
                 "</li>";
         }
         $searchresults .= "</ul>";
@@ -87,23 +77,19 @@ function searchInPages() {
 }
 
 function searchPage($cat,$page) {
-    global $activ_plugins;
-    global $deactiv_plugins;
     global $syntax;
     global $QUERY_REQUEST;
-    global $CONTENT_DIR_REL;
     global $specialchars;
-
-    $filepath = $CONTENT_DIR_REL.$cat."/".$page;
+    global $CatPage;
 
     if(!$queryarray = getSearchString($QUERY_REQUEST))
         return false;
 
     // Dateiinhalt auslesen, wenn vorhanden...
-    if (filesize($filepath) > 0) {
-        $pagecontent = implode(file($CONTENT_DIR_REL.$cat."/".$page));
+    if (false !== ($pagecontent = $CatPage->get_PageContent($cat,$page))) {
+        if(empty($pagecontent))
+            return false;
         $pagecontent = $syntax->convertContent($pagecontent, $cat, true);
-#        list($pagecontent,$css) = replacePluginVariables($pagecontent,$activ_plugins,$deactiv_plugins);
         # alle Komentare raus
         $pagecontent = preg_replace("/\<!--(.*)-->/Umsi"," ", $pagecontent);
         # alle script, select, object, embed sachen raus
@@ -123,7 +109,7 @@ function searchPage($cat,$page) {
             // Wenn...
             if (
                 // ...der aktuelle Suchbegriff im Seitennamen...
-                (substr_count(strtolower(pageToName($page, false)), strtolower($query)) > 0)
+                (substr_count(strtolower($CatPage->get_HrefText($cat,$page)), strtolower($query)) > 0)
                 // ...oder im eigentlichen Seiteninhalt vorkommt
                 or (substr_count($pagecontent, strtolower($query)) > 0)
                 ) {
