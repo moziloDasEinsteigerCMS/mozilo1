@@ -227,7 +227,7 @@ function convertFileSizeUnit($filesize){
     else
         return round(($filesize/1024/1024) , 2) . "&nbsp;MB";
 }
-
+/*
 // ------------------------------------------------------------------------------
 // Handelt es sich um ein valides Verzeichnis / eine valide Datei?
 // ------------------------------------------------------------------------------
@@ -250,7 +250,7 @@ function isValidDirOrFile($file) {
     }
     return true;
 }
-
+*/
 
 // ------------------------------------------------------------------------------
 // Ändert Referenzen auf eine Inhaltsseite in allen anderen Inhaltsseiten
