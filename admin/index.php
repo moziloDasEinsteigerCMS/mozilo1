@@ -35,7 +35,7 @@ if(isset($_FILE)) $_FILE = cleanREQUEST($_FILE);
 $debug = "nein"; # ja oder nein
  // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 if($debug != "ja")
-    @ini_set("display_errors", 1);
+    @ini_set("display_errors", 0);
 
  // ISO 8859-1 erzwingen - experimentell!
  // @ini_set("default_charset", $CHARSET);
