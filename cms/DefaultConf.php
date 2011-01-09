@@ -1,13 +1,5 @@
 <?php
 
-/* 
-* 
-* $Revision$
-* $LastChangedDate$
-* $Author$
-*
-*/
-
 $CHARSET                = 'UTF-8';
 
 $CONTENT_DIR_NAME       = "kategorien";
@@ -219,4 +211,65 @@ function makeDefaultConf($conf_datei) {
         return $$conf_datei;
     }
 }
+
+// ------------------------------------------------------------------------------
+// Handelt es sich um ein valides Verzeichnis / eine valide Datei?
+// ------------------------------------------------------------------------------
+function isValidDirOrFile($file) {
+    # Alles, was einen Punkt vor der Datei hat
+    if(strpos($file,".") === 0) {
+        return false;
+    }
+    # alle PHP-Dateien
+    if(substr($file,-4) == ".php") {
+        return false;
+    }
+    # ...und der Rest
+    if(in_array($file, array(
+            "Thumbs.db", // Windows-spezifisch
+            "__MACOSX", // Mac-spezifisch
+            "settings" // Eclipse
+            ))) {
+        return false;
+    }
+    return true;
+}
+
+# $filetype = "dir" nur ordner
+# $filetype = "file" nur dateien
+# $filetype = array(".txt",".hid",...) nur die mit dieser ext
+#               Achtung Punkt nicht vergessen Gross/Kleinschreibung ist egal
+# $filetype = false alle dateien
+function getDirAsArray($dir,$filetype = false) {
+    $dateien = array();
+    if(is_dir($dir) and false !== ($currentdir = opendir($dir))) {
+        while(false !== ($file = readdir($currentdir))) {
+            # keine gültige datei gleich zur nächsten datei
+            if(!isValidDirOrFile($file))
+                continue;
+            # nur mit ext
+            if(is_array($filetype)) {
+                # alle ext im array in kleinschreibung wandeln
+                $filetype = array_map('strtolower', $filetype);
+                $ext = strtolower(substr($file,strrpos($file,".")));
+                if(in_array($ext,$filetype)) {
+                    $dateien[] = $file;
+                }
+            # nur dir oder file
+            } elseif(filetype($dir."/".$file) == $filetype) {
+                $dateien[] = $file;
+            # alle
+            } elseif(!$filetype) {
+                $dateien[] = $file;
+            }
+        }
+        closedir($currentdir);
+        sort($dateien);
+    }
+    return $dateien;
+}
+
+
+
+
 ?>
