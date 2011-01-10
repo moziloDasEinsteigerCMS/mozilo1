@@ -306,11 +306,10 @@ $html .= '<tr>';
 # Menue Tabs erzeugen
 foreach($array_tabs as $position => $language) {
 
-    # wenn es den Ordner plugins nicht gibt, dann Plugin-Tab nicht anzeigen
-    if ($language == "plugins" && !is_dir($PLUGIN_DIR_REL)) {
+    # Plugin-Tab nur anzeigen wenn plugin Ordner mit mind. einem plugin vorhanden ist
+    if ($language == "plugins" AND count(getDirAsArray($PLUGIN_DIR_REL, "dir")) < 1 ) {
         continue;
     }
-    
     if($ADMIN_CONF->get("showTooltips") == "true") {
         $tooltip = createTooltipWZ($language."_button",$language."_text",",WIDTH,400");
     } else {
