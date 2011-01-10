@@ -174,8 +174,15 @@ $icon_size_tabs = "16x16"; # 16x16 22x22 24x24 32x32 48x48
 $post = NULL;
 # getRequestParam() ferarbeitet nur $_POST sachen deshalb hier eine ausname
 if(isset($_REQUEST['javascript']) and $_REQUEST['javascript'] == "ja") $_POST['javascript'] = "ja";
+
+
 # hier das tabs array
 $array_tabs = array("home","category","page","files","gallery","config","admin","plugins");
+
+# Plugin-Tab nur anzeigen wenn plugin Ordner mit mind. einem plugin vorhanden ist
+if (count(getDirAsArray($PLUGIN_DIR_REL, "dir")) < 1 )
+    $array_tabs = array("home","category","page","files","gallery","config","admin");
+
 $action = 'home';
 foreach($array_tabs as $pos => $tab) {
     # actives tab
@@ -305,11 +312,6 @@ $html .= '<tr>';
 
 # Menue Tabs erzeugen
 foreach($array_tabs as $position => $language) {
-
-    # Plugin-Tab nur anzeigen wenn plugin Ordner mit mind. einem plugin vorhanden ist
-    if ($language == "plugins" AND count(getDirAsArray($PLUGIN_DIR_REL, "dir")) < 1 ) {
-        continue;
-    }
     if($ADMIN_CONF->get("showTooltips") == "true") {
         $tooltip = createTooltipWZ($language."_button",$language."_text",",WIDTH,400");
     } else {
