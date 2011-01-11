@@ -178,10 +178,10 @@ function makeDefaultConf($conf_datei) {
                         'maxwidth' => '',
                         'maxthumbheight' => '100',
                         'maxthumbwidth' => '100'),
-## Ticket 64        'checkbox' => array(
-##                        'usethumbs' => 'true'),
+##                  'checkbox' => array(
+##                      'createthumbs' => 'true'),
                     'expert' => array(
-                        'usethumbs',
+##                      'createthumbs',
                         'maxthumbheight',
                         'maxthumbwidth')
                     );

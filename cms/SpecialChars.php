@@ -45,7 +45,7 @@ class SpecialChars {
         global $CHARSET;
 
         $regex = "/^[a-zA-Z0-9_\%\-\s\?\!\@\.€".addslashes($this->getHtmlEntityDecode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES))))."]+$/";
-        $regex = preg_replace("/&#39;/", "\'", $regex);
+        $regex = str_replace("&#39;", "'", $regex);
         return $regex;
     }
 
@@ -53,7 +53,7 @@ class SpecialChars {
 // Inhaltsseiten/Kategorien für Speicherung umlaut- und sonderzeichenbereinigen 
 // ------------------------------------------------------------------------------
     function replaceSpecialChars($text,$nochmal_erlauben) {
-        # $nochmal_erlauben = für Tags mit src z.B. img dann muss das % auch gewndelt werden
+        # $nochmal_erlauben = für Tags mit src z.B. img dann muss das % auch gewandelt werden
         $text = str_replace('/','ssslashhh',$text);
         if(preg_match('#\%([0-9a-f]{2})#ie',$text) < 1)
             $text = rawurlencode(stripslashes($text));

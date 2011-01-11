@@ -703,8 +703,8 @@ $this->content = $specialchars->decodeProtectedChr($this->content);
 #       $nobrvalue = preg_replace("/\&\#(\d+)\;/Umsie", "'&amp;#\\1;'", $nobrvalue);
 #       $nobrvalue = $specialchars->getHtmlEntityDecode($nobrvalue);
 
-# alle < und > im html code wieder herstellen
-$nobrvalue = str_replace(array("&lt;","&gt;"),array("<",">"),$value);
+        # alle < und > im html code wieder herstellen
+        $nobrvalue = str_replace(array("&lt;","&gt;"),array("<",">"),$value);
 
         return $nobrvalue;
     }

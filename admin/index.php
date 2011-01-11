@@ -98,7 +98,8 @@ if(!is_dir($BASE_DIR."layouts")) {
 if(!is_dir($BASE_DIR_CMS."sprachen")) {
     die(getLanguageValue("error_dir")." ".$BASE_DIR_CMS."sprachen/");
 }
-/*if(!is_dir($BASE_DIR_CMS."formular")) {
+/*
+if(!is_dir($BASE_DIR_CMS."formular")) {
     die(getLanguageValue("error_dir")." ".$BASE_DIR_CMS."formular/");
 }*/
 if(!is_dir($BASE_DIR."galerien")) {
@@ -250,7 +251,7 @@ if($LOGINCONF->get("initialsetup") == "true") {
     $action = "admin";
 }
 
-# Backup erinerung bestätigen
+# Backup Erinnerung bestätigen
 $error_backup = NULL;
 if(getRequestParam("lastbackup_yes", true)) {
     $post['makepara'] = "yes";
@@ -1837,7 +1838,7 @@ function gallery($post) {
                                 $post['error_messages']['gallery_error_ftp_rename_pic'][] = $PREVIEW_DIR_NAME."/".$currentgalerien." - ".$test_pic;
                             }
                         }
-#                        if($GALLERY_CONF->get("usethumbs") == "true" and !is_file($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic)) {
+                        # if($GALLERY_CONF->get("usethumbs") == "true" and !is_file($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic)) {
                         if(!is_file($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic)) {
                             require_once($BASE_DIR_CMS."Image.php");
                             scaleImage($test_pic, $GALLERIES_DIR_REL.$currentgalerien.'/', $GALLERIES_DIR_REL.$currentgalerien.'/'.$PREVIEW_DIR_NAME.'/', $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'));
@@ -1853,7 +1854,7 @@ function gallery($post) {
             }
         }
         # hinweis wenn nicht alle vorschau bilder existieren
-#        if($GALLERY_CONF->get("usethumbs") == "true" and count($gallerypics[$currentgalerien]) != $count_preview_pic) {
+        # if($GALLERY_CONF->get("usethumbs") == "true" and count($gallerypics[$currentgalerien]) != $count_preview_pic) {
         if(count($gallerypics[$currentgalerien]) != $count_preview_pic) {
             $post['error_messages']['gallery_error_ftp_preview_pic'][] = $currentgalerien;
         }
@@ -1934,9 +1935,9 @@ function gallery($post) {
     $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"><input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxwidth]" value="'.$GALLERY_CONF->get("maxwidth").'"'.$post['gallery']['error_html']['maxwidth'].$tooltip_gallery_help_input_scale.' />&nbsp;x&nbsp;<input type="text" class="input_cms_zahl" size="4" maxlength="4" name="gallery[setings][maxheight]" value="'.$GALLERY_CONF->get("maxheight").'"'.$post['gallery']['error_html']['maxheight'].$tooltip_gallery_help_input_scale.' />&nbsp;'.getLanguageValue("pixels").'</td>';
 
     if($ADMIN_CONF->get('showexpert') == "true") {
-      $pagecontent .= '</tr><tr>';
-      $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_create_thumbs.'><b>'.$text_gallery_create_thumbs.'</b></td>';
-      $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"'.$tooltip_gallery_help_create_thumbs.'>'.buildCheckBox("gallery[setings][usethumbs]", $GALLERY_CONF->get("usethumbs")).'</td>';
+##    $pagecontent .= '</tr><tr>';
+##    $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_create_thumbs.'><b>'.$text_gallery_create_thumbs.'</b></td>';
+##    $pagecontent .= '<td width="20%" class="td_togglen_padding_bottom"'.$tooltip_gallery_help_create_thumbs.'>'.buildCheckBox("gallery[setings][createthumbs]", $GALLERY_CONF->get("createthumbs")).'</td>';
 
       $pagecontent .= '</tr><tr>';
       $pagecontent .= '<td width="35%" class="td_left_title_padding_bottom"'.$tooltip_gallery_help_scale_thumbs.'><b>'.$text_gallery_scale_thumbs.'</b></td>';
@@ -2625,7 +2626,7 @@ function files($post) {
                 $filesize = filesize($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME."/".$subfile);
 
         $titel_dateien = NULL;
-        if(!isset($display_titel_dateien)) {# Position:          
+        if(!isset($display_titel_dateien)) { # Position:          
             $titel_dateien = '<tr><td class="td_left_title"><b>'.$text_file.'</b></td><td width="10%" class="td_left_title" nowrap><b>'.$text_files_size.'</b></td><td width="20%" class="td_left_title" nowrap><b>'.$text_files_uploaddate.'</b></td><td width="10%" class="td_center_title" nowrap><b'.$tooltip_files_help_downloads.'>'.$text_files_downloads.'</b></td><td width="5%" class="td_left_title" nowrap>&nbsp;</td></tr>';
             $display_titel_dateien = true;
         }
@@ -3013,10 +3014,10 @@ function config($post) {
         if ($titlebarformat == $specialchars->rebuildSpecialChars($CMS_CONF->get("titlebarformat"),true,true)) {
             $selected = "selected ";
         }
-        $text = preg_replace('/{WEBSITE}/', $txt_websitetitle, $titlebarformat);
-        $text = preg_replace('/{CATEGORY}/', $txt_category, $text);
-        $text = preg_replace('/{PAGE}/', $txt_page, $text);
-        $text = preg_replace('/{SEP}/', $titlebarsep, $text);
+        $text = str_replace('{WEBSITE}', $txt_websitetitle, $titlebarformat);
+        $text = str_replace('{CATEGORY}', $txt_category, $text);
+        $text = str_replace('{PAGE}', $txt_page, $text);
+        $text = str_replace('{SEP}', $titlebarsep, $text);
         $pagecontent .= "<option ".$selected."value=\"".$titlebarformat."\">".$text."</option>";
     }
     $pagecontent .= "</select></td>";
@@ -3156,7 +3157,7 @@ function config($post) {
         }
     }
 /*
-            // KONTAKTFORMULAR-EINSTELLUNGEN formularmail
+    // KONTAKTFORMULAR-EINSTELLUNGEN formularmail
     $pagecontent .= "<tr>";
     $pagecontent .= '<td class="td_cms_titel" colspan="2">'.getLanguageValue("config_titel_contact").'</td>';
     $pagecontent .= "</tr>";
