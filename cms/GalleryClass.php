@@ -1,13 +1,13 @@
 <?php
 class GalleryClass {
 
-    var $allowed_pics = array("jpg", "jpeg", "jpe", "gif", "png", "svg");
+    var $allowed_pics = array(".jpg", ".jpeg", ".jpe", ".gif", ".png", ".svg");
     var $GalleryArray = array();
-    var $GalleryMenuArray = array();
+    var $MenuArray = array();
     var $GalleriesArray = array();
     var $currentGallery = false;
-    var $currentImageIndex = 1;
-    var $currentImageGroup = 0;
+    var $currentIndex = 1;
+    var $currentGroup = 0;
 
     function GalleryClass() {
         global $BASE_DIR, $GALLERIES_DIR_NAME;
@@ -47,6 +47,7 @@ class GalleryClass {
             $Galleries = array($Galleries);
         # Gallerien erstellen
         $this->GalleryArray = $this->make_DirGalleryArray($Galleries,$with_preview,$with_description);
+
         if(count($this->GalleryArray) < 1)
             return false;
         # wenn die currentGallery noch nicht gesetzt wurde einfach mal die erste setzen
@@ -73,10 +74,10 @@ class GalleryClass {
                 $group++;
             $image_z++;
         }
-        $this->GalleryMenuArray[$gallery] = $menu_array;
+        $this->MenuArray[$gallery] = $menu_array;
 $this->currentGallery = $gallery;
-$this->set_currentIndexFromRequest();
-$this->set_currentGroupFromRequest();
+$this->set_currentGroupIndexFromRequest();
+#$this->set_currentGroupFromRequest();
     }
 
     function get_RequestGalery() {
@@ -188,16 +189,12 @@ $this->set_currentGroupFromRequest();
             if($coded_as == "html") {
 #                global $CHARSET;
                 global $specialchars;
-$description = $specialchars->rebuildSpecialChars($description,false,true)
+$description = $specialchars->rebuildSpecialChars($description,false,true);
 #                $description = htmlentities($description,ENT_COMPAT,$CHARSET);
             } elseif($coded_as == "url")
                 $description = rawurlencode($description);
             return $description;
         }
-        return NULL;
-    }
-    function get_Description($group,$index,$coded_as = false) {
-
         return NULL;
     }
 # $BASE_DIR.$GALLERIES_DIR_NAME."/".$gallery."/".$pic
@@ -209,16 +206,24 @@ $description = $specialchars->rebuildSpecialChars($description,false,true)
         return $BASE_DIR.$GALLERIES_DIR_NAME."/".$gallery."/".$image;
     }
 
-    function get_currentHrefImage($preview = false) {
+    function get_HrefImage($preview,$index = false,$group = false) {
         global $URL_BASE, $GALLERIES_DIR_NAME, $PREVIEW_DIR_NAME;
-        $image = $this->get_fromMenuImagName($this->currentImageGroup,$this->currentImageIndex);
+        if($index === false)
+            $index = $this->currentIndex;
+        if($group === false)
+            $group = $this->currentGroup;
+        $image = $this->get_fromIndexGroupImage($index,$group);
         if($preview === true)
             return $URL_BASE.$GALLERIES_DIR_NAME."/".$this->currentGallery."/".$PREVIEW_DIR_NAME."/".$image;
         return $URL_BASE.$GALLERIES_DIR_NAME."/".$this->currentGallery."/".$image;
     }
 
-    function get_currentImageName() {
-        return $this->get_fromMenuImagName($this->currentImageGroup,$this->currentImageIndex);
+    function get_ImageName($index = false,$group = false) {
+        if($index === false)
+            $index = $this->currentIndex;
+        if($group === false)
+            $group = $this->currentGroup;
+        return $this->get_fromIndexGroupImage($index,$group);
     }
 
     function get_srcImage($gallery,$image,$preview = false) {
@@ -240,152 +245,195 @@ $description = $specialchars->rebuildSpecialChars($description,false,true)
         return false;
     }
 
-    function set_currentIndexFromRequest() {
+#!!!!!!!!! Achtung erst groupr dan index solten wir in einem zusammen fassen
+    function set_currentGroupIndexFromRequest() {
+        if(
+                $this->get_RequestGalery() == $this->currentGallery
+                and count($this->MenuArray[$this->currentGallery]) > 1
+                and isset($_REQUEST['group'])
+                and strlen($_REQUEST['group']) > 0
+                and ctype_digit($_REQUEST['group'])
+                and isset($this->MenuArray[$this->currentGallery][$_REQUEST['group']])
+        )
+            $this->currentGroup = $_REQUEST['group'];
         if(
                 $this->get_RequestGalery() == $this->currentGallery
                 and isset($_REQUEST['index'])
                 and strlen($_REQUEST['index']) > 0
                 and ctype_digit($_REQUEST['index'])
+                and isset($this->MenuArray[$this->currentGallery][$this->currentGroup][$_REQUEST['index']])
         )
-            $this->currentImageIndex = $_REQUEST['index'];
+            $this->currentIndex = $_REQUEST['index'];
+#echo $this->currentIndex."=index<br>\n";
     }
 
-    function set_currentGroupFromRequest() {
-        if(
-                $this->get_RequestGalery() == $this->currentGallery
-                and count($this->GalleryMenuArray[$this->currentGallery]) > 1
-                and isset($_REQUEST['group'])
-                and strlen($_REQUEST['group']) > 0
-                and ctype_digit($_REQUEST['group'])
-        )
-            $this->currentImageGroup = $_REQUEST['group'];
+    function get_Description($coded_as = false,$index = false,$group = false) {
+        if($index === false)
+            $index = $this->currentIndex;
+        if($group === false)
+            $group = $this->currentGroup;
+
+        $image = $this->MenuArray[$this->currentGallery][$group][$index];
+$description = $this->GalleryArray[$this->currentGallery][$image]['description'];
+        if(false !== $description) {
+            $description = $this->GalleryArray[$this->currentGallery][$image]['description'];
+            if($coded_as == "html") {
+#                global $CHARSET;
+                global $specialchars;
+$description = $specialchars->rebuildSpecialChars($description,false,true);
+#                $description = htmlentities($description,ENT_COMPAT,$CHARSET);
+            } elseif($coded_as == "url")
+                $description = rawurlencode($description);
+            return $description;
+        }
+
+        return $description;
     }
 
-    function get_firstImageIndex($group = false) {
-        if($group !== false)
-            return array($this->get_firstGroupIndex(),"1");
-        return "1";
+    function get_GalIndexGroupUrl($array,$whith_group = false) {
+        if(!is_array($array))
+            $array = array($array,$this->currentGroup);
+        $index = '&amp;index='.$array[0].'';
+        $group = NULL;
+        if($whith_group === true)
+            $group = '&amp;group='.$array[1].'';
+        return 'gal='.$this->currentGallery.$index.$group;
+    }
+
+    function get_firstIndex() {
+#        if($group !== false)
+            return array("1",$this->get_firstGroup());
+#        return "1";
 #$this->currentGallery
-#$this->GalleryMenuArray[$Gallery]
+#$this->MenuArray[$Gallery]
     }
 
-    function get_lastImageIndex($group = false) {
-        $lastgroup = $this->get_lastGroupIndex();
-        $lastimage = (count($this->GalleryMenuArray[$this->currentGallery][$lastgroup]) - 1);
-        if($group !== false)
-            return array($lastgroup,$lastimage);
-        return $lastimage;
-    }
-#$this->currentImageIndex
-#$this->currentImageGroup
-    function get_nextImageIndex($group = false,$circular = true) {
-        if(isset($this->GalleryMenuArray[$this->currentGallery][$this->currentImageGroup][($this->currentImageIndex + 1)]))
-            $return_array = array($this->currentImageGroup,($this->currentImageIndex + 1));
-        elseif(isset($this->GalleryMenuArray[$this->currentGallery][($this->currentImageGroup + 1)][($this->currentImageIndex + 1)])) {
-            $return_array array(($this->currentImageGroup + 1),($this->currentImageIndex + 1));
-        } elseif($circular === true)
-            $return_array $this->get_firstImageIndex(true);
-        $return_array array($this->currentImageGroup,$this->currentImageIndex);
-        if($group !== false)
-            return $return_array;
-        return $return_array[1]
+    function get_lastIndex() {
+        $lastgroup = $this->get_lastGroup();
+        end($this->MenuArray[$this->currentGallery][$lastgroup]);
+        $lastimage = key($this->MenuArray[$this->currentGallery][$lastgroup]);
+        return array($lastimage,$lastgroup);
     }
 
-    function get_previousImageIndex($group = false,$circular = true) {
-        if(isset($this->GalleryMenuArray[$this->currentGallery][$this->currentImageGroup][($this->currentImageIndex - 1)]))
-            $return_array array($this->currentImageGroup,($this->currentImageIndex - 1));
-        elseif(isset($this->GalleryMenuArray[$this->currentGallery][($this->currentImageGroup - 1)][($this->currentImageIndex - 1)])) {
-            $return_array array(($this->currentImageGroup - 1),($this->currentImageIndex - 1));
-        } elseif($circular === true)
-            $return_array $this->get_lastImageIndex(true);
-        $return_array array($this->currentImageGroup,$this->currentImageIndex);
-        if($group !== false)
-            return $return_array;
-        return $return_array[1]
+    function get_nextIndex($circular = true) {
+        if(isset($this->MenuArray[$this->currentGallery][$this->currentGroup][($this->currentIndex + 1)]))
+            return array(($this->currentIndex + 1),$this->currentGroup);
+        elseif(isset($this->MenuArray[$this->currentGallery][($this->currentGroup + 1)][($this->currentIndex + 1)]))
+            return array(($this->currentIndex + 1),($this->currentGroup + 1));
+        elseif($circular === true)
+            return $this->get_firstIndex(true);
+#        else
+            return array($this->currentIndex,$this->currentGroup);
+#        if($group !== false)
+#            return $return_array;
+#        return $return_array[1];
     }
 
-    function get_firstGroupIndex() {
+    function get_previousIndex($circular = true) {
+        if(isset($this->MenuArray[$this->currentGallery][$this->currentGroup][($this->currentIndex - 1)]))
+            return array(($this->currentIndex - 1),$this->currentGroup);
+        elseif(isset($this->MenuArray[$this->currentGallery][($this->currentGroup - 1)][($this->currentIndex - 1)]))
+            return array(($this->currentIndex - 1),($this->currentGroup - 1));
+        elseif($circular === true)
+            return $this->get_lastIndex(true);
+#        else
+            return array($this->currentIndex,$this->currentGroup);
+#        if($group !== false)
+#            return $return_array;
+#        return $return_array[1];
+    }
+
+    function get_firstGroup() {
         return 0;
     }
 
-    function get_lastGroupIndex() {
-        return (count($this->GalleryMenuArray[$this->currentGallery]) - 1);
+    function get_lastGroup() {
+        return (count($this->MenuArray[$this->currentGallery]) - 1);
     }
 
-    function get_firstImageFromGroup($group) {
-        return key($this->GalleryMenuArray[$this->currentGallery][$group]);
+    function get_firstIndexFromGroup($group) {
+        return key($this->MenuArray[$this->currentGallery][$group]);
     }
 
-    function get_lastImageFromGroup($group) {
-        end($this->GalleryMenuArray[$this->currentGallery][$group]);
-        return key($this->GalleryMenuArray[$this->currentGallery][$group]);
+    function get_lastIndexFromGroup($group) {
+        end($this->MenuArray[$this->currentGallery][$group]);
+        return key($this->MenuArray[$this->currentGallery][$group]);
     }
 
-    function get_nextGroupIndex($circular = true) {
-        if(isset($this->GalleryMenuArray[$this->currentGallery][($this->currentImageGroup + 1)])) {
-            $group = ($this->currentImageGroup + 1);
-#echo $this->get_firstImageFromGroup($group)."=first $group=group<br>\n";
-            return array($group,$this->get_firstImageFromGroup($group));
+    function get_nextGroup($circular = true) {
+        if(isset($this->MenuArray[$this->currentGallery][($this->currentGroup + 1)])) {
+            $group = ($this->currentGroup + 1);
+            return array($this->get_firstIndexFromGroup($group),$group);
         } elseif($circular === true) {
-            $group = $this->get_firstGroupIndex();
-#echo $this->get_firstImageFromGroup($group)."=first $group=group<br>\n";
-            return array($group,$this->get_firstImageFromGroup($group));
-#            return $this->get_firstGroupIndex();
+            $group = $this->get_firstGroup();
+            return array($this->get_firstIndexFromGroup($group),$group);
         }
-        return array($this->currentImageGroup,$this->currentImageIndex);
-#        return $this->currentImageGroup;
+        return array($this->currentIndex,$this->currentGroup);
     }
-#get_lastImageFromGroup()
-#get_firstImageFromGroup()
-    function get_previousGroupIndex($circular = true) {
-        if(isset($this->GalleryMenuArray[$this->currentGallery][($this->currentImageGroup - 1)])) {
-            $group = ($this->currentImageGroup - 1);
-            return array($group,$this->get_lastImageFromGroup($group));
+
+    function get_previousGroup($circular = true) {
+        if(isset($this->MenuArray[$this->currentGallery][($this->currentGroup - 1)])) {
+            $group = ($this->currentGroup - 1);
+            return array($this->get_lastIndexFromGroup($group),$group);
         } elseif($circular === true) {
-            $group = $this->get_lastGroupIndex();
-            return array($group,$this->get_lastImageFromGroup($group));
+            $group = $this->get_lastGroup();
+            return array($this->get_lastIndexFromGroup($group),$group);
         }
-        return array($this->currentImageGroup,$this->currentImageIndex);
+        return array($this->currentIndex,$this->currentGroup);
     }
 
-    function get_currentGroupImageIndexArray($group = false) {# ,$shift = false
-        $link_array = array_keys($this->GalleryMenuArray[$this->currentGallery][$this->currentImageGroup]);
-#        if($shift !== false)
-#$link_array = array_slice($link_array, $this->currentImageIndex, $shift);   // liefert "a", "b" und "c"
-        if($group !== false)
-            return array($this->currentImageGroup,$link_array);
-        return $link_array;
+    function get_currentIndexArray() {
+        return array_keys($this->MenuArray[$this->currentGallery][$this->currentGroup]);
     }
 
-    function get_fromMenuImagName($group,$index) {
-        return $this->GalleryMenuArray[$this->currentGallery][$group][$index];
+    function get_fromIndexGroupImage($index,$group) {
+        if(!isset($this->MenuArray[$this->currentGallery][$group][$index])) {
+            $group = 0;
+            $index = 1;
+        }
+        return $this->MenuArray[$this->currentGallery][$group][$index];
     }
 
-    function create_currentImgTag($alt = false) {
+    function create_ImgTag($alt,$css = false,$preview = false,$index = false,$group = false) {
+        if($index === false)
+            $index = $this->currentIndex;
+        if($group === false)
+            $group = $this->currentGroup;
+
 #get_ImageDescription($gallery,$image,$coded_as = false) {
 #get_srcImage($gallery,$image,$preview = false)
         global $URL_BASE;
         global $GALLERIES_DIR_NAME;
-        $image = $this->get_fromMenuImagName($this->currentImageGroup,$this->currentImageIndex);
+        $image = $this->get_fromIndexGroupImage($index,$group);
         $alttext = $alt;
         if($alt === false)
             $alttext = $this->get_ImageDescription($this->currentGallery,$image,"html");
+        $csstext = NULL;
+        if($css !== false)
+            $csstext = ' class="'.$css.'"';
 #        $text = $this->get_ImageDescription($this->currentGallery,$image);
-#        $img = $this->currentGallery."/".$this->GalleryMenuArray[$this->currentGallery][$this->currentImageGroup][$this->currentImageIndex];
-        $img = $this->get_srcImage($this->currentGallery,$image);
+#        $img = $this->currentGallery."/".$this->MenuArray[$this->currentGallery][$this->currentGroup][$this->currentIndex];
+        $img = $this->get_srcImage($this->currentGallery,$image,$preview);
 
 #        $img = str_replace("%","%25",$URL_BASE.$GALLERIES_DIR_NAME."/".$img);
 #        $alt = 
-        $img_tag = '<img src="'.$img.'" alt="'.$alttext.'" hspace="0" vspace="0" border="0" />';
+        $img_tag = '<img src="'.$img.'" alt="'.$alttext.'"'.$csstext.' hspace="0" vspace="0" border="0" />';
         return $img_tag;
 #<img align="middle" border="0">
     }
 
     function is_ImageActiv($index) {
-        if($index == $this->currentImageIndex)
+        if($index == $this->currentIndex)
             return true;
         return false;
     }
+
+    function get_CssActiv($index,$activtext = "active") {
+        if($index == $this->currentIndex)
+            return $activtext;
+        return NULL;
+    }
+
 ###############################################################################
 # Hilfs Functionen
 ###############################################################################
@@ -531,9 +579,6 @@ $description = $specialchars->rebuildSpecialChars($description,false,true)
             # Galerie hat keine Bilder also nicht erstellen
             if(count($gallery_images) < 1)
                 continue;
-/*echo "<pre>";
-print_r($gallery_images);
-echo "</pre><br>\n";*/
             # Bildbeschreibung soll benutzt werden und texte.conf gibts also erzeugen
             if($with_description === true
                     and count($gallery_images) > 0
