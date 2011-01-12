@@ -8,6 +8,8 @@ class GalleryClass {
     var $currentGallery = false;
     var $currentIndex = 1;
     var $currentGroup = 0;
+    var $Cols = false;
+    var $Rows = false;
 
     function GalleryClass() {
         global $BASE_DIR, $GALLERIES_DIR_NAME;
@@ -64,8 +66,21 @@ class GalleryClass {
     function initial_GalleryMenu($gallery,$cols = false,$rows = false) {
         $menu_array = array();
         $image_group = count($this->GalleryArray[$gallery]);
-        if($cols !== false and $rows !== false)
-            $image_group = $cols * $rows;
+        if($cols === false and $rows === false) {
+            $this->Cols = $image_group;
+            $this->Rows = 1;
+        } elseif($cols !== false and $rows === false) {
+            $this->Cols = $cols;
+            $this->Rows = ceil($image_group / $cols);
+        } elseif($cols === false and $rows !== false) {
+            $this->Cols = ceil($image_group / $rows);
+            $this->Rows = $rows;
+        } elseif($cols !== false and $rows !== false) {
+            $this->Cols = $cols;
+            $this->Rows = $rows;
+            if(($cols * $rows) < $image_group)
+                $image_group = $cols * $rows;
+        }
         $group = 0;
         $image_z = 1;
         foreach($this->GalleryArray[$gallery] as $image => $tmp) {
@@ -75,9 +90,8 @@ class GalleryClass {
             $image_z++;
         }
         $this->MenuArray[$gallery] = $menu_array;
-$this->currentGallery = $gallery;
-$this->set_currentGroupIndexFromRequest();
-#$this->set_currentGroupFromRequest();
+        $this->currentGallery = $gallery;
+        $this->set_currentGroupIndexFromRequest();
     }
 
     function get_RequestGalery() {
@@ -432,6 +446,27 @@ $description = $specialchars->rebuildSpecialChars($description,false,true);
         if($index == $this->currentIndex)
             return $activtext;
         return NULL;
+    }
+
+    function get_ColsRowsArray($group = false) {
+        $cols_rows = array();
+        if($group === false)
+            $group = $this->currentGroup;
+
+        $row = 0;
+        foreach ($this->MenuArray[$this->currentGallery][$group] as $index => $img) {
+            $cols_rows[$row][] = $index;
+            if (($index > 0) && ($index % $this->Cols == 0))
+                $row++;
+        }
+        $last_row_num = count($cols_rows) - 1;
+        # wenn die letzten Zeile weniger cols hat sie mit false auffühlen
+        if(count($cols_rows[$last_row_num]) != $this->Cols) {
+            $cols = count($cols_rows[(count($cols_rows) - 1)]) - 1;
+            $empty_cols = array_fill($cols, ($this->Cols - $cols - 1), false);
+            $cols_rows[$last_row_num] = array_merge($cols_rows[$last_row_num],$empty_cols);
+        }
+        return $cols_rows;
     }
 
 ###############################################################################
