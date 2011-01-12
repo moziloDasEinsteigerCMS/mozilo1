@@ -1586,7 +1586,7 @@ function copymoveSite($post) {
     if(isset($new_page)) {
         foreach($new_page as $cat => $tmp) {
             $page_inhalt = "Das ist ein Link";#$EXT_LINK $EXT_PAGE
-            if(substr($new_page[$cat],-4) == $EXT_PAGE) {
+            if(substr($new_page[$cat],-4) == $EXT_DRAFT) {
                 $page_inhalt = "[ueber1|".str_replace(array("[","]"),array("^[","^]"),$specialchars->rebuildSpecialChars(substr($new_page[$cat], 3,strlen($new_page[$cat])-7), false, false))."]";
             }
             $error = saveContentToPage($page_inhalt,$CONTENT_DIR_REL.$cat."/".$new_page[$cat]);
