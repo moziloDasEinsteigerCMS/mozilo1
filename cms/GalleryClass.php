@@ -10,9 +10,14 @@ class GalleryClass {
     var $currentGroup = 0;
     var $Cols = false;
     var $Rows = false;
+    var $GalleryTemplate = false;
 
     function GalleryClass() {
         global $BASE_DIR, $GALLERIES_DIR_NAME;
+
+        if(isset($_REQUEST['galtemplate']) and $_REQUEST['galtemplate'] == "true")
+            $this->GalleryTemplate = true;
+
         # das ist nur ein array mit den Galerie Ordnernamen
         # ohne jegliche Prüfung
         $this->GalleriesArray = getDirAsArray($BASE_DIR.$GALLERIES_DIR_NAME,"dir");
@@ -93,6 +98,11 @@ class GalleryClass {
         $this->currentGallery = $gallery;
         $this->set_currentGroupIndexFromRequest();
     }
+
+###############################################################################
+# Functionen die mit $gallery und $image Arbeiten
+# Sind ab initial_Galleries() Verfügbar
+###############################################################################
 
     function get_RequestGalery() {
         if(isset($_REQUEST['gal'])
@@ -220,26 +230,6 @@ $description = $specialchars->rebuildSpecialChars($description,false,true);
         return $BASE_DIR.$GALLERIES_DIR_NAME."/".$gallery."/".$image;
     }
 
-    function get_HrefImage($preview,$index = false,$group = false) {
-        global $URL_BASE, $GALLERIES_DIR_NAME, $PREVIEW_DIR_NAME;
-        if($index === false)
-            $index = $this->currentIndex;
-        if($group === false)
-            $group = $this->currentGroup;
-        $image = $this->get_fromIndexGroupImage($index,$group);
-        if($preview === true)
-            return $URL_BASE.$GALLERIES_DIR_NAME."/".$this->currentGallery."/".$PREVIEW_DIR_NAME."/".$image;
-        return $URL_BASE.$GALLERIES_DIR_NAME."/".$this->currentGallery."/".$image;
-    }
-
-    function get_ImageName($index = false,$group = false) {
-        if($index === false)
-            $index = $this->currentIndex;
-        if($group === false)
-            $group = $this->currentGroup;
-        return $this->get_fromIndexGroupImage($index,$group);
-    }
-
     function get_srcImage($gallery,$image,$preview = false) {
         global $URL_BASE, $GALLERIES_DIR_NAME, $PREVIEW_DIR_NAME;
         $gallery = rawurlencode($gallery);
@@ -259,7 +249,6 @@ $description = $specialchars->rebuildSpecialChars($description,false,true);
         return false;
     }
 
-#!!!!!!!!! Achtung erst groupr dan index solten wir in einem zusammen fassen
     function set_currentGroupIndexFromRequest() {
         if(
                 $this->get_RequestGalery() == $this->currentGallery
@@ -278,7 +267,31 @@ $description = $specialchars->rebuildSpecialChars($description,false,true);
                 and isset($this->MenuArray[$this->currentGallery][$this->currentGroup][$_REQUEST['index']])
         )
             $this->currentIndex = $_REQUEST['index'];
-#echo $this->currentIndex."=index<br>\n";
+    }
+
+###############################################################################
+# Functionen die mit $group und $index Arbeiten
+# Sind ab initial_GalleryMenu() Verfügbar
+###############################################################################
+
+    function get_HrefImage($preview,$index = false,$group = false) {
+        global $URL_BASE, $GALLERIES_DIR_NAME, $PREVIEW_DIR_NAME;
+        if($index === false)
+            $index = $this->currentIndex;
+        if($group === false)
+            $group = $this->currentGroup;
+        $image = $this->get_fromIndexGroupImage($index,$group);
+        if($preview === true)
+            return $URL_BASE.$GALLERIES_DIR_NAME."/".$this->currentGallery."/".$PREVIEW_DIR_NAME."/".$image;
+        return $URL_BASE.$GALLERIES_DIR_NAME."/".$this->currentGallery."/".$image;
+    }
+
+    function get_ImageName($index = false,$group = false) {
+        if($index === false)
+            $index = $this->currentIndex;
+        if($group === false)
+            $group = $this->currentGroup;
+        return $this->get_fromIndexGroupImage($index,$group);
     }
 
     function get_Description($coded_as = false,$index = false,$group = false) {
