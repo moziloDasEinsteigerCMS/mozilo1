@@ -15,7 +15,7 @@ class GalleryClass {
     function GalleryClass() {
         global $BASE_DIR, $GALLERIES_DIR_NAME;
 
-        if(isset($_REQUEST['galtemplate']) and $_REQUEST['galtemplate'] == "true")
+        if(isset($_REQUEST['galtemplate']))
             $this->GalleryTemplate = true;
 
         # das ist nur ein array mit den Galerie Ordnernamen
