@@ -1,13 +1,4 @@
 <?php
-
-/*
-*
-* $Revision$
-* $LastChangedDate$
-* $Author$
-*
-*/
-
 session_start();
 
 /* 
@@ -15,8 +6,16 @@ echo "<pre style=\"position:fixed;background-color:#000;color:#0f0;padding:5px;f
 print_r($_REQUEST);
 echo "</pre>"; 
 */
+# bei winsystemen gibts nicht immer $_SERVER["SCRIPT_FILENAME"]
+if(isset($_SERVER["SCRIPT_FILENAME"]))
+    $BASE_DIR = $_SERVER["SCRIPT_FILENAME"];
+else
+    $BASE_DIR = __FILE__;
+# fals da bei winsystemen \\ drin sind in \ wandeln
+$BASE_DIR = str_replace("\\\\", "\\",$BASE_DIR);
+# zum schluss noch den teil denn wir nicht brauchen abschneiden
+$BASE_DIR = substr($BASE_DIR,0,-(strlen("index.php")));
 
-$BASE_DIR = substr($_SERVER["SCRIPT_FILENAME"],0,strpos($_SERVER["SCRIPT_FILENAME"],'index.php'));
 $CMS_DIR_NAME = "cms";
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
 $tmp_getDirContentAsArray = NULL;

@@ -1,13 +1,4 @@
 <?php
-
-/*
- *
- * $Revision$
- * $LastChangedDate$
- * $Author$
- *
- */
-
 session_start();
 
 
@@ -15,7 +6,17 @@ $ADMIN_TITLE = "moziloAdmin";
 
 $CMS_DIR_NAME = "cms";
 $ADMIN_DIR_NAME = "admin";
-$BASE_DIR = strrev(substr(strrev($_SERVER["SCRIPT_FILENAME"]),strpos(strrev($_SERVER["SCRIPT_FILENAME"]),strrev($ADMIN_DIR_NAME)) + strlen($ADMIN_DIR_NAME)));
+
+# bei winsystemen gibts nicht immer $_SERVER["SCRIPT_FILENAME"]
+if(isset($_SERVER["SCRIPT_FILENAME"]))
+    $BASE_DIR = $_SERVER["SCRIPT_FILENAME"];
+else
+    $BASE_DIR = __FILE__;
+# fals da bei winsystemen \\ drin sind in \ wandeln
+$BASE_DIR = str_replace("\\\\", "\\",$BASE_DIR);
+# zum schluss noch den teil denn wir nicht brauchen abschneiden
+$BASE_DIR = substr($BASE_DIR,0,-(strlen($ADMIN_DIR_NAME."/index.php")));
+
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
 $BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
 $URL_BASE = substr($_SERVER['PHP_SELF'],0,strpos($_SERVER['PHP_SELF'],$ADMIN_DIR_NAME."/index.php"));
