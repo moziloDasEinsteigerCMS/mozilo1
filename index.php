@@ -83,9 +83,9 @@ $_POST = cleanREQUEST($_POST);
     $LAYOUT_DIR     = "layouts/".$CMS_CONF->get("cmslayout");
     $TEMPLATE_FILE  = $LAYOUT_DIR."/template.html";
 
-    # wenn ein Plugin die gallerytemplate.html benutzten möchte und sie blank ist 
-    # if ($GALLERY_CONF->get("target") == "_blank" and getRequestParam("gal", false)) // Ticket 64
-    if (getRequestParam("galtemplate", false) == "true") {
+    # wenn ein Plugin die gallerytemplate.html benutzten möchte
+    # recht es wenn in der URL galtemplate=??? enthalten ist ??? können Galerien sein
+    if (getRequestParam("galtemplate", false)) {
         $TEMPLATE_FILE  = $LAYOUT_DIR."/gallerytemplate.html";
     }
 
