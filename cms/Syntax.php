@@ -249,7 +249,13 @@ if($not_exit >= $not_exit_max)
         $this->content = str_replace('[----]', '<hr class="horizontalrule" />', $this->content);
         // dummy mit Horizontale Linen ersetzen
 #        $this->content = preg_replace('/\~hr-/', '<hr class="horizontalrule" />', $this->content);
-        // Zeilenwechsel setzen
+
+        # Zeilenümbrüche sind in pages später html umbrüche
+        $this->content = str_replace("-br~","<br />",$this->content);
+#        $content = preg_replace('/(\r\n|\r|\n)/', '$1<br />', $content);
+
+        $this->content = str_replace("-nbsp~","&nbsp;",$this->content);
+
         // Zeilenwechsel nach Blockelementen entfernen
         // Tag-Beginn                                       <
         // optional: Slash bei schließenden Tags            (\/?)
@@ -258,7 +264,11 @@ if($not_exit >= $not_exit_max)
         // Tag-Ende                                         >
         // optional: Zeilenwechsel                          (\r\n|\r|\n)?
         // <br /> mit oder ohne Slash (das, was raus muß!)  <br \/? >
-        $this->content = preg_replace('/<(\/?)(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)([^>]*)>(\r\n|\r|\n)?<br \/?>/', "<$1$2$3>$4",$this->content);
+/*preg_match_all('/<(\/?)(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|th|tr|td|ul|center|dir|isindex|menu)([^>]*)>(\r\n|\r|\n)?<br \/?>/',$this->content,$test);
+echo "<pre>";
+print_r($test);
+echo "</pre><br>\n";*/
+        $this->content = preg_replace('/<(\/?)(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|th|tr|td|ul|center|dir|isindex|menu)([^>]*)>(\r\n|\r|\n)?<br \/?>/', "<$1$2$3>$4",$this->content);
         // direkt aufeinanderfolgende Listen zusammenführen
         $this->content = preg_replace('/<\/ul>(\r\n|\r|\n)?<ul class="unorderedlist">/', '', $this->content);
         // direkt aufeinanderfolgende numerierte Listen zusammenführen
@@ -703,10 +713,12 @@ $this->content = $specialchars->decodeProtectedChr($this->content);
 #       $nobrvalue = preg_replace("/\&\#(\d+)\;/Umsie", "'&amp;#\\1;'", $nobrvalue);
 #       $nobrvalue = $specialchars->getHtmlEntityDecode($nobrvalue);
 
+        $value = str_replace("-nbsp~","",$value);
+        $value = str_replace("-br~","",$value);
         # alle < und > im html code wieder herstellen
-        $nobrvalue = str_replace(array("&lt;","&gt;"),array("<",">"),$value);
+        $value = str_replace(array("&lt;","&gt;"),array("<",">"),$value);
 
-        return $nobrvalue;
+        return $value;
     }
 
     function syntax_tabelle($desciption,$value) {
@@ -931,6 +943,13 @@ $this->content = $specialchars->decodeProtectedChr($this->content);
     }
 
 // ------------------------------------------------------------------------------
+// Hilfsfunktion: sachen im head einfügen aber nur wenn sie nocht drin sind
+// ------------------------------------------------------------------------------
+    function getReplaceHead() {
+        echo "!!!!!!!!!!getReplaceContent solten wir einfüren";
+    }
+
+// ------------------------------------------------------------------------------
 // Hilfsfunktion: Inhalte vorbereiten
 // ------------------------------------------------------------------------------
     function prepareContent($content) {
@@ -958,9 +977,11 @@ $this->content = $specialchars->decodeProtectedChr($this->content);
         # alle zeichen die ein ^ davor sind geschützte zeichen
         $content = $specialchars->encodeProtectedChr($content);
         // Für Einrückungen
-        $content = str_replace("  ","&nbsp;&nbsp;",$content);
+        $content = str_replace("  ","-nbsp~-nbsp~",$content);
         # Zeilenümbrüche sind in pages später html umbrüche
-        $content = preg_replace('/(\r\n|\r|\n)/', '$1<br />', $content);
+#        $content = preg_replace('/(\r\n|\r|\n)/', '$1<br />', $content);
+        $content = preg_replace('/(\r\n|\r|\n)/', '$1-br~', $content);
+/*        $content = preg_replace('/<(\/?)(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)([^>]*)>(\r\n|\r|\n)?<br \/?>/', "<$1$2$3>$4",$content);*/
         if($content_search) {
             $content = str_replace($content_search,$content,$tmp_content);
         }
