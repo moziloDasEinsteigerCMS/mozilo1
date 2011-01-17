@@ -17,6 +17,7 @@ class Syntax {
 #    var $TARGETBLANK_DOWNLOAD;
     var $anchorcounter;
     var $headlineinfos;
+var $is_preparePageContent = false;
 #    var $firstconvertContent;
 // ------------------------------------------------------------------------------    
 // Konstruktor
@@ -190,7 +191,7 @@ class Syntax {
         $this->content = $content;
         $this->cat = $cat;
         if ($firstrecursion) {
-            $this->content = $this->prepareContent($this->content);
+            $this->content = $this->preparePageContent($this->content);
             // Überschriften einlesen
             $this->headlineinfos = $this->getHeadlineInfos($this->content);
         }
@@ -245,47 +246,37 @@ if($not_exit >= $not_exit_max)
         # Platzhalter wieder herstellen
         $this->change_placeholder(false);
 
-        # Horizontale Linen ersetzen
-        $this->content = str_replace('[----]', '<hr class="horizontalrule" />', $this->content);
-        // dummy mit Horizontale Linen ersetzen
-#        $this->content = preg_replace('/\~hr-/', '<hr class="horizontalrule" />', $this->content);
-
         # Zeilenümbrüche sind in pages später html umbrüche
-        $this->content = str_replace("-br~","<br />",$this->content);
-#        $content = preg_replace('/(\r\n|\r|\n)/', '$1<br />', $content);
+        $this->content = str_replace("-html_br~","<br />",$this->content);
 
-        $this->content = str_replace("-nbsp~","&nbsp;",$this->content);
+        $this->content = str_replace("-html_nbsp~","&nbsp;",$this->content);
 
-        // Zeilenwechsel nach Blockelementen entfernen
-        // Tag-Beginn                                       <
-        // optional: Slash bei schließenden Tags            (\/?)
-        // Blockelemente                                    (address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)
-        // optional: sonstige Zeichen (z.B. Attribute)      ([^>]*)
-        // Tag-Ende                                         >
-        // optional: Zeilenwechsel                          (\r\n|\r|\n)?
-        // <br /> mit oder ohne Slash (das, was raus muß!)  <br \/? >
-/*preg_match_all('/<(\/?)(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|th|tr|td|ul|center|dir|isindex|menu)([^>]*)>(\r\n|\r|\n)?<br \/?>/',$this->content,$test);
-echo "<pre>";
-print_r($test);
-echo "</pre><br>\n";*/
-        $this->content = preg_replace('/<(\/?)(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|th|tr|td|ul|center|dir|isindex|menu)([^>]*)>(\r\n|\r|\n)?<br \/?>/', "<$1$2$3>$4",$this->content);
-        // direkt aufeinanderfolgende Listen zusammenführen
-        $this->content = preg_replace('/<\/ul>(\r\n|\r|\n)?<ul class="unorderedlist">/', '', $this->content);
-        // direkt aufeinanderfolgende numerierte Listen zusammenführen
-        $this->content = preg_replace('/<\/ol>(\r\n|\r|\n)?<ol class="orderedlist">/', '', $this->content);
-        # Table Hack recursive Table
-#        $this->content = str_replace('&#38;', '&', $this->content);
+        $this->content = str_replace(array("-html_lt~","-html_gt~"),array("&lt;","&gt;"),$this->content);
 
-        // Zeilenwechsel in Include-Tags wiederherstellen    
-#        $this->content = preg_replace('/{newline_in_include_tag}/', "\n", $this->content);
-        // Zeilenwechsel in HTML-Tags wiederherstellen    
-#        $this->content = preg_replace('/{newline_in_html_tag}/', "\n", $this->content);
+        # das nur machen wenn die function preparePageContent() benutzt wurde
+        if($this->is_preparePageContent) {
+            // Zeilenwechsel nach Blockelementen entfernen
+            // Tag-Beginn                                       <
+            // optional: Slash bei schließenden Tags            (\/?)
+            // Blockelemente                                    (address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)
+            // optional: sonstige Zeichen (z.B. Attribute)      ([^>]*)
+            // Tag-Ende                                         >
+            // optional: Zeilenwechsel                          (\r\n|\r|\n)?
+            // <br /> mit oder ohne Slash (das, was raus muß!)  <br \/? >
+            $this->content = preg_replace('/<(\/?)(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|th|tr|td|ul|center|dir|isindex|menu)([^>]*)>(\r\n|\r|\n)?<br \/?>/', "<$1$2$3>$4",$this->content);
 
-$this->content = str_replace(array("-html_lt~","-html_gt~"),array("&lt;","&gt;"),$this->content);
-global $specialchars;
-$this->content = $specialchars->decodeProtectedChr($this->content);
-
-#echo "return content";
+            global $specialchars;
+            $this->content = $specialchars->decodeProtectedChr($this->content);
+        }
+        global $USE_CMS_SYNTAX;
+        if($USE_CMS_SYNTAX) {
+            # Horizontale Linen ersetzen
+            $this->content = str_replace('[----]', '<hr class="horizontalrule" />', $this->content);
+            // direkt aufeinanderfolgende Listen zusammenführen
+            $this->content = preg_replace('/<\/ul>(\r\n|\r|\n)?<ul class="unorderedlist">/', '', $this->content);
+            // direkt aufeinanderfolgende numerierte Listen zusammenführen
+            $this->content = preg_replace('/<\/ol>(\r\n|\r|\n)?<ol class="orderedlist">/', '', $this->content);
+        }
         return $this->content;
     }
 
@@ -706,18 +697,12 @@ $this->content = $specialchars->decodeProtectedChr($this->content);
     }
 
     function syntax_html($desciption,$value) {
-#        global $specialchars;
-#        $nobrvalue = preg_replace('/(\r\n|\r|\n)/m', '{newline_in_html_tag}', $value);
-        # Wichtig alle &#???; (sind die zeichen mit ^ dafor) nach &amp;#???; wandel damit
-        # getHtmlEntityDecode nicht das Zeichen herstellt
-#       $nobrvalue = preg_replace("/\&\#(\d+)\;/Umsie", "'&amp;#\\1;'", $nobrvalue);
-#       $nobrvalue = $specialchars->getHtmlEntityDecode($nobrvalue);
-
+        # alle geschützten lehrzeichen die in preparePageContent() erstelt wurden entfernen
         $value = str_replace("-nbsp~","",$value);
+        # alle html Zeilenumbrüche die in preparePageContent() erstelt wurden entfernen
         $value = str_replace("-br~","",$value);
         # alle < und > im html code wieder herstellen
         $value = str_replace(array("&lt;","&gt;"),array("<",">"),$value);
-
         return $value;
     }
 
@@ -756,7 +741,6 @@ $this->content = $specialchars->decodeProtectedChr($this->content);
                 $tablecontent .= "</tr>";
             }
         }
-
         return '<table class="'.$tabellecss.'" cellspacing="0" border="0" cellpadding="0" summary="">'.$tablecontent.'</table>';
     }
 
@@ -801,7 +785,7 @@ $this->content = $specialchars->decodeProtectedChr($this->content);
                     # include merker setzen
                     $CatPage->SyntaxIncludeRemember[$incl_catpage] = $CatPage->get_AsKeyName($page);
                     # ist eine Inhaltseite also inhalt vorbereiten
-                    $pagecontent = $this->prepareContent($pagecontent);
+                    $pagecontent = $this->preparePageContent($pagecontent);
                     return $pagecontent;
                 }
             }
@@ -936,33 +920,30 @@ $this->content = $specialchars->decodeProtectedChr($this->content);
     }
 
 // ------------------------------------------------------------------------------
-// Hilfsfunktion: content heraus filtern und ersetzen
+// Hilfsfunktion: zerteilt content in "vor Inhaltseite", "Inhaltseite" und "nach Inhaltseite"
 // ------------------------------------------------------------------------------
-    function getReplaceContent() {
-        echo "!!!!!!!!!!getReplaceContent solten wir einfüren";
-    }
-
-// ------------------------------------------------------------------------------
-// Hilfsfunktion: sachen im head einfügen aber nur wenn sie nocht drin sind
-// ------------------------------------------------------------------------------
-    function getReplaceHead() {
-        echo "!!!!!!!!!!getReplaceContent solten wir einfüren";
+    function splitContent($content = false) {
+        if($content === false)
+            $content = $this->content;
+        $content_first = "";
+        $content_last = "";
+        if(strstr($content,'---content~~~') and strstr($content,'~~~content---')) {
+            $start = strpos($content,"---content~~~");
+            $content_first = substr($content,0,$start);
+            $length = (strpos($content,"~~~content---") + strlen("~~~content---")) - $start;
+            $content_last = substr($content,($start + $length));
+            $content = substr($content,$start,$length);
+        }
+        return array($content_first,$content,$content_last);
     }
 
 // ------------------------------------------------------------------------------
 // Hilfsfunktion: Inhalte vorbereiten
 // ------------------------------------------------------------------------------
-    function prepareContent($content) {
+    function preparePageContent($content) {
         global $specialchars;
 
-        $content_search = false;
-        if(strstr($content,'---content~~~') and strstr($content,'~~~content---')) {
-            $tmp_content = $content;
-            $start = strpos($content,"---content~~~");
-            $length = (strpos($content,"~~~content---") + strlen("~~~content---")) - $start;
-            $content = substr($content,$start,$length);
-            $content_search = $content;
-        }
+        list($content_first,$content,$content_last) = $this->splitContent($content);
 
         // Inhaltsformatierungen
         # alle &lt; und &gt; die in einer page sind sollen so sein
@@ -970,25 +951,17 @@ $this->content = $specialchars->decodeProtectedChr($this->content);
         # alle < und > in &lt; und &gt; wandeln damit sie nicht als html tags angezeigt werden
         $content = str_replace(array("<",">"),array("&lt;","&gt;"),$content);
 
-#        $content = preg_replace("/&amp;#036;/Umsi", "&#036;", $content);
-#        $content = preg_replace("/&amp;#092;/Umsi", "&#092;", $content);
-#        $content = preg_replace("/\^(.)/Umsie", "'&#'.ord('\\1').';'", $content);
-#        $content = $specialchars->numeric_entities_decode($content); 
         # alle zeichen die ein ^ davor sind geschützte zeichen
         $content = $specialchars->encodeProtectedChr($content);
         // Für Einrückungen
-        $content = str_replace("  ","-nbsp~-nbsp~",$content);
+        $content = str_replace("  ","-html_nbsp~-html_nbsp~",$content);
         # Zeilenümbrüche sind in pages später html umbrüche
-#        $content = preg_replace('/(\r\n|\r|\n)/', '$1<br />', $content);
-        $content = preg_replace('/(\r\n|\r|\n)/', '$1-br~', $content);
-/*        $content = preg_replace('/<(\/?)(address|blockquote|div|dl|fieldset|form|h[123456]|hr|noframes|noscript|ol|p|pre|table|ul|center|dir|isindex|menu)([^>]*)>(\r\n|\r|\n)?<br \/?>/', "<$1$2$3>$4",$content);*/
-        if($content_search) {
-            $content = str_replace($content_search,$content,$tmp_content);
-        }
+        $content = preg_replace('/(\r\n|\r|\n)/', '$1-html_br~', $content);
         // Platzhalter ersetzen
         $content = replacePlaceholders($content, "", "");
 
-        return $content;
+        $this->is_preparePageContent = true;
+        return $content_first.$content.$content_last;
     }
 
 // ------------------------------------------------------------------------------
