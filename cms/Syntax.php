@@ -698,9 +698,9 @@ if($not_exit >= $not_exit_max)
 
     function syntax_html($desciption,$value) {
         # alle geschützten lehrzeichen die in preparePageContent() erstelt wurden entfernen
-        $value = str_replace("-nbsp~","",$value);
+        $value = str_replace("-html_nbsp~","",$value);
         # alle html Zeilenumbrüche die in preparePageContent() erstelt wurden entfernen
-        $value = str_replace("-br~","",$value);
+        $value = str_replace("-html_br~","",$value);
         # alle < und > im html code wieder herstellen
         $value = str_replace(array("&lt;","&gt;"),array("<",">"),$value);
         return $value;
