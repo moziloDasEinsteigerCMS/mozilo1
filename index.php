@@ -261,7 +261,7 @@ $_POST = cleanREQUEST($_POST);
     $pagetitle = "";
      
     # ist nur true wenn Inhaltseite eingelesen wird
-    $is_syntax = false;
+    $is_Page = false;
     if ($ACTION_REQUEST == "sitemap") {
         $pagecontentarray = getSiteMap();
         $pagecontent    = $pagecontentarray[0];
@@ -276,7 +276,7 @@ $_POST = cleanREQUEST($_POST);
         $pagetitle         = $pagecontentarray[2];
     }
     // Inhalte aus Inhaltsseiten durch Passwort schuetzen
-    else { 
+    else {
         // zunaechst Passwort als gesetzt und nicht eingegeben annehmen
         $passwordok = false;
         if (file_exists($BASE_DIR_CMS."conf/passwords.conf")) {
@@ -303,27 +303,22 @@ $_POST = cleanREQUEST($_POST);
         // keine Seite hat ein Passwort - lasse Zugriff zu
             $passwordok = true;
         if ($passwordok) {
-            if ($USE_CMS_SYNTAX) {
-                $pagecontentarray = getContent();
-                # Inhaltseite wurde eingelesen also true
-                $is_syntax = true;
-                $pagecontent    = $pagecontentarray[0];
-                $cattitle         = $pagecontentarray[1];
-                $pagetitle         = $pagecontentarray[2];
-              }
-            else {
-                $pagecontentarray = getContent();
-                $pagecontent    = $pagecontentarray[0];
-                $cattitle         = $pagecontentarray[1];
-                $pagetitle         = $pagecontentarray[2];
-            }
+            # Inhaltseite wird eingelesen und $USE_CMS_SYNTAX wird benutzt
+            if ($USE_CMS_SYNTAX)
+                $is_Page = true;
+            $pagecontentarray = getContent();
+            $pagecontent    = $pagecontentarray[0];
+            $cattitle         = $pagecontentarray[1];
+            $pagetitle         = $pagecontentarray[2];
         }
     }
+
+    # wenn im Template keine Inhaltseite benutzt wird
     if(!strstr($template,"{CONTENT}"))
-        $is_syntax = false;
+        $is_Page = false;
 
     $HTML = str_replace('{CONTENT}','---content~~~'.$pagecontent.'~~~content---',$template);
-    $HTML = $syntax->convertContent($HTML, $CAT_REQUEST, $is_syntax);
+    $HTML = $syntax->convertContent($HTML, $CAT_REQUEST, $is_Page);
     unset($pagecontent);
 
     // Smileys ersetzen
@@ -335,10 +330,10 @@ $_POST = cleanREQUEST($_POST);
     if ($HIGHLIGHT_REQUEST <> "") {
         require_once($BASE_DIR_CMS."Search.php");
         # wir suchen nur im content teil
-        preg_match("/---content~~~(.*)~~~content---/Umsi", $HTML,$content);
-        $tmp = highlightSearch($content[0], $HIGHLIGHT_REQUEST);
-        $HTML = str_replace($content[0],$tmp,$HTML);
-        unset($tmp);
+        list($content_first,$content,$content_last) = $syntax->splitContent($HTML);
+        $content = highlightSearch($content, $HIGHLIGHT_REQUEST);
+        $HTML = $content_first.$content.$content_last;
+        unset($content);
     }
 
     $HTML = str_replace('{CSS_FILE}', $CSS_FILE, $HTML);
