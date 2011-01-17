@@ -126,6 +126,11 @@ function searchPage($cat,$page) {
 // ------------------------------------------------------------------------------
 function highlightSearch($content, $phrasestring) {
     global $specialchars;
+    global $syntax;
+    # in $syntax den content setzen
+    $syntax->content = $content;
+    # alle script style sachen mit dumy ersetzen
+    $syntax->find_script_style();
     // Zu highlightende Begriffe kommen kommasepariert ("begriff1,begriff2")-> in Array wandeln
     $phrasearray = explode(",", $phrasestring);
     // jeden Begriff highlighten
@@ -135,10 +140,15 @@ function highlightSearch($content, $phrasestring) {
         $phrase = preg_quote($phrase);
         // Slashes im zu highlightenden Text escapen
         $phrase = preg_replace("/\//", "\\\\/", $phrase);
-        $content = preg_replace("/((<[^>]*)|$phrase)/ie", '"\2"=="\1"? "\1":"<span class=\"highlight\">\1</span>"', $content); 
+        # die such worte hervorheben
+#!!!!!! wir brauchen eine regex die nicht in script style tags text hervorhebt
+# dann kann auch das find_script_style() wieder raus
+        $syntax->content = preg_replace("/((<[^>]*)|$phrase)/ie", '"\2"=="\1"? "\1":"<span class=\"highlight\">\1</span>"', $syntax->content); 
     }
-    return $content;
+    # alle script style sachen wieder einsetzen
+    $syntax->find_script_style(false);
+    # inhalt zurück
+    return $syntax->content;
 }
-
 
 ?>
