@@ -3712,7 +3712,8 @@ function plugins($post) {
                         foreach($config as $name => $inhalt) {
                             $error = NULL;
                             # Änderungen schreiben isset($_POST['apply'])
-                            if(getRequestParam('apply', true)) {
+                            # Änderungen nur übernehmen und überprüfen, wenn das Plugin aktiviert ist
+                            if(getRequestParam('apply', true) && $conf_plugin->get("active") == "true") {
                                 if(isset($_POST[$currentelement][$name])) {
                                     # ist array bei radio und select multi
                                     if(is_array($_POST[$currentelement][$name])) {
