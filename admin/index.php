@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-
 $ADMIN_TITLE = "moziloAdmin";
 
 $CMS_DIR_NAME = "cms";
@@ -997,11 +996,9 @@ function page($post) {
     $title_page_button_edit = getLanguageValue('page_button_edit',true);
     $title_page_button_delete = getLanguageValue('page_button_delete',true);
 
-    $array_getTooltipValue = array("help_new_url","help_target_blank","help_target_self","help_target","help_url",
-        "page_help_edit","page_help_position","page_help_new_position","page_help_name","page_help_new_name",
-        "page_help_move","page_help_editieren","page_help_edit_pages","page_help_delete","page_help_copy","page_help_password","page_help_password_del","page_page_help_show","page_link_help_show");
+    $array_getTooltipValue = array("help_new_url","help_target_blank","help_target_self","help_target","help_url","page_help_edit","page_help_position","page_help_new_position","page_help_name","page_help_new_name","page_help_move","page_help_editieren","page_help_edit_pages","page_help_delete","page_help_copy","page_help_password","page_help_password_del","page_page_help_show","page_link_help_show");
 
-    # Variable erzeugen z.B. pages = $text_pages
+    # Variable erzeugen z.B. pages = $tooltip_pages
     foreach($array_getTooltipValue as $language) {
         if(getRequestParam('javascript', true) and $ADMIN_CONF->get("showTooltips") == "true") {
             ${"tooltip_".$language} = createTooltipWZ("",$language,",WIDTH,200,CLICKCLOSE,true");
@@ -3633,7 +3630,11 @@ function plugins($post) {
     foreach ($dircontent as $currentelement) {
         if (file_exists($PLUGIN_DIR_REL.$currentelement."/index.php")) {
             require_once($PLUGIN_DIR_REL.$currentelement."/index.php");
-            $plugin = new $currentelement();
+            if(class_exists( $currentelement ) and in_array($currentelement, get_declared_classes()))
+                $plugin = new $currentelement();
+            else
+                # Plugin Dirname stimt nicht mit Plugin Classnamen überein
+                continue;
             $plugin_error = false;
             $conf_plugin = new Properties($PLUGIN_DIR_REL.$currentelement."/plugin.conf",true);
             $plugin_error_conf = NULL;
