@@ -16,13 +16,15 @@
 
 ######
 */
+
+    $CHARSET = 'UTF-8';
 	require_once("../cms/SpecialChars.php");
 	$specialchars = new SpecialChars();
 	
 	$htmlstart = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
 		."<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"de\" lang=\"de\">\n"
 		."<head>\n"
-		."<meta http-equiv=\"Content-Type\" content=\"text/html;charset=iso-8859-1\" />\n"
+		."<meta http-equiv=\"Content-Type\" content=\"text/html;charset=$CHARSET\" />\n"
 		."<title>moziloCMS-Sonderzeichenkonverter / moziloCMS special character converter</title>\n"
 		."<script type=\"text/javascript\"><!--\n"
 		."function setInputFocus() {\n"
@@ -74,6 +76,7 @@
 	echo $html;
 	
 	function getInputForm($input, $type){
+        global $CHARSET;
 		global $language;
 
 		$checked0 = "";
@@ -83,9 +86,9 @@
 		elseif ($type == 1)
 			$checked1 = " checked=\"checked\"";
 
-		$form = "<form accept-charset=\"ISO-8859-1\" method=\"get\" action=\"index.php\" name=\"form\" >\n"
+		$form = "<form accept-charset=\"$CHARSET\" method=\"get\" action=\"index.php\" name=\"form\" >\n"
 		."<input type=\"text\" id=\"input\" name=\"input\" value=\""
-		.htmlentities($input,ENT_COMPAT,'ISO-8859-1')
+		.htmlentities($input,ENT_COMPAT,$CHARSET)
 		."\" /> \n"
 		."<input type=\"submit\" id=\"ok\" value=\" OK \" /><br />\n"
 		."<input type=\"radio\" name=\"type\" value=\"0\"$checked0 />Sonderzeichen ersetzen / replace special characters <br />\n"
