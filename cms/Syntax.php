@@ -609,22 +609,22 @@ if($not_exit >= $not_exit_max)
 
     function syntax_links($desciption,$value) {
         // linksbündiger Text
-        return "<p class=\"alignleft\">".$value."</p>";
+        return "<div class=\"alignleft\">".$value."</div>";
     }
 
     function syntax_zentriert($desciption,$value) {
         // zentrierter Text
-        return "<p class=\"aligncenter\">".$value."</p>";
+        return "<div class=\"aligncenter\">".$value."</div>";
     }
 
     function syntax_block($desciption,$value) {
         // Text im Blocksatz
-        return "<p class=\"alignjustify\">".$value."</p>";
+        return "<div class=\"alignjustify\">".$value."</div>";
     }
 
     function syntax_rechts($desciption,$value) {
         // rechtsbündiger Text
-        return "<p class=\"alignright\">".$value."</p>";
+        return "<div class=\"alignright\">".$value."</div>";
     }
 
     function syntax_fett($desciption,$value) {
