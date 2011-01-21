@@ -4121,6 +4121,10 @@ function returnPluginSelectbox() {
             if ($plugin_conf->get("active") == "true") {
                 if(isset($plugin_info[5]) and is_array($plugin_info[5])) {
                     foreach($plugin_info[5] as $platzh => $info) {
+                        $platzhtext = $platzh;
+                        # wenn der Platzhater name länger wie 50 zeichen ist küze in auf 50 zeichen
+                        if(strlen($platzhtext) > 50)
+                            $platzhtext = substr($platzhtext,0,50)."...";
                         // wenn es vorgegebene Werte gibt: {PLUGIN|wert} 
                         /*if(strpos($platzh,'|') > 0) {
                             $info = str_replace('}',''.$info.'}',$platzh);
@@ -4132,7 +4136,7 @@ function returnPluginSelectbox() {
                             $selectbox .= '<option value="'.$platzh.'">'.$specialchars->rebuildSpecialChars($info, false, true).'</option>';
                         }*/
                         //$info = $platzh.' '.$info;
-                        $selectbox .= '<option title="'.$specialchars->rebuildSpecialChars($info, false, true).'" value="'.$platzh.'">'.$platzh.'</option>';
+                        $selectbox .= '<option title="'.$specialchars->rebuildSpecialChars($info, false, true).'" value="'.$platzh.'">'.$platzhtext.'</option>';
                     }
                 }
             }
