@@ -246,12 +246,10 @@ if($not_exit >= $not_exit_max)
         # Platzhalter wieder herstellen
         $this->change_placeholder(false);
 
-        # Zeilenümbrüche sind in pages später html umbrüche
-        $this->content = str_replace("-html_br~","<br />",$this->content);
-
-        $this->content = str_replace("-html_nbsp~","&nbsp;",$this->content);
-
-        $this->content = str_replace(array("-html_lt~","-html_gt~"),array("&lt;","&gt;"),$this->content);
+        # Syntax html zeichen nach html wandeln
+        $search = array("-html_br~","-html_nbsp~","-html_lt~","-html_gt~");
+        $replace = array("<br />","&nbsp;","&lt;","&gt;");
+        $this->content = str_replace($search,$replace,$this->content);
 
         # das nur machen wenn die function preparePageContent() benutzt wurde
         if($this->is_preparePageContent) {
