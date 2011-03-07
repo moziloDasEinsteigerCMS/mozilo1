@@ -278,7 +278,7 @@ function updateReferencesInAllContentPages($oldCategory, $oldPage, $newCategory,
                     // Datei schließen
                     @fclose($pagehandle);
                     # um diese Attribute geht es
-                    $allowed_attributes = array("seite","kategorie","datei","bild","bildlinks","bildrechts","include");
+                    $allowed_attributes = array("seite","datei","bild","bildlinks","bildrechts","include");
                     # kommt eins von den Attributen im Content vor
                     # Suche nach [Attribut|
                     preg_match("/(\[".implode('=|\[',$allowed_attributes)."=).*/Umis",$pagecontent,$matches_1);
