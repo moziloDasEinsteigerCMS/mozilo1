@@ -3900,7 +3900,9 @@ function showEditPageForm($cat, $page, $newsite)    {
         // Inhaltsseite: Inhalt ins Textfeld holen
         $handle=fopen($file, "r");
         if (filesize($file) > 0) {
-            $pagecontent = $specialchars->rebuildSpecialChars(fread($handle, filesize($file)),true,true);
+            $pagecontent = fread($handle, filesize($file));
+            $pagecontent = str_replace("%","%25",$pagecontent);
+            $pagecontent = $specialchars->rebuildSpecialChars($pagecontent,true,true);
         } else
             $pagecontent = "";
         fclose($handle);
