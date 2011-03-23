@@ -505,9 +505,49 @@ class CatPageClass {
     }
 */
 
+
+    # erzeugt einen Query String anhand $_SERVER['QUERY_STRING'] und $query
+    # wenn $query ein String ist werden die keys die in $query sind
+    # aus $_SERVER['QUERY_STRING'] rausgenommen fals vorhanden
+    # alle & werden nach $amp; gewandelt
+    function get_Query($query = false) {
+        if($query === false)
+            return $_SERVER['QUERY_STRING'];
+        $uri_query = array();
+        if(strlen($_SERVER['QUERY_STRING']) > 1)
+            $uri_query = explode("&",$_SERVER['QUERY_STRING']);
+        $uri = array();
+        foreach($uri_query as $para) {
+            $key = explode("=",$para);
+            if(!isset($key[1]))
+                $key[1] = "QUERY_STRING_DUMMY";
+            $uri[$key[0]] = $key[1];
+        }
+        $query = str_replace("&amp;","&",$query);
+        if($query[0] == "&")
+            $query = substr($query,1);
+        $query = explode("&",$query);
+        $query_string = NULL;
+        foreach($query as $para) {
+            $query_string .= "&".$para;
+            $key = explode("=",$para);
+            if(isset($uri[$key[0]]))
+                unset($uri[$key[0]]);
+        }
+        foreach($uri as $key => $para) {
+            if($para == "QUERY_STRING_DUMMY")
+                $query_string .= "&".$key;
+            else
+                $query_string .= "&".$key."=".$para;
+        }
+        $query_string = substr($query_string,1);
+        $query_string = str_replace("&","&amp;",$query_string);
+        return $query_string;
+    }
+
     # erzeugt eine url in abhängikeit von $CMS_CONF->get("modrewrite")
     # wenn $cat und $page = false oder nicht existieren wird nur index.php benutzt
-    # $request = TEXT für url Parameter
+    # $request = TEXT für url Parameter und alle & werden nach $amp; gewandelt
     function get_Href($cat,$page,$request = false) {
         global $CMS_CONF;
         global $URL_BASE;
@@ -515,9 +555,13 @@ class CatPageClass {
         global $specialchars;
 
         $requesturl = NULL;
-        if($request !== false)
+        if($request !== false) {
+            $request = str_replace("&amp;","&",$request);
+            if($request[0] == "&")
+                $request = substr($request,1);
+            $request = str_replace("&","&amp;",$request);
             $requesturl = "?".$request;
-
+        }
         if($cat !== false) {
             $cat = $this->get_AsKeyName($cat);
             # cat gibts nicht dann setzen wir auch $page auf false
