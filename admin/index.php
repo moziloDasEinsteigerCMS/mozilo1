@@ -3704,12 +3704,11 @@ function plugins($post) {
                             break;
                         }
                     }
-
-                    if(count($plugin->getConfig()) >= 1) {
-//                        $pagecontent_conf .= '<tr><td width="100%" colspan="2" class="td_togglen_padding_bottom" nowrap>';
-//                        $pagecontent_conf .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
-
-                        $config = $plugin->getConfig();
+# geändert damit getConfig() nicht 2mal ausgeführt wird
+                    $config = $plugin->getConfig();
+                    if(count($config) >= 1) {
+#                    if(count($plugin->getConfig()) >= 1) {
+#                        $config = $plugin->getConfig();
                         foreach($config as $name => $inhalt) {
                             $error = NULL;
                             # Änderungen schreiben isset($_POST['apply'])
