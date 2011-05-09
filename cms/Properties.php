@@ -346,6 +346,8 @@ class Properties {
         $tmp = $this->properties;
         if(isset($tmp['readonly']))
             unset($tmp['readonly']);
+        if(isset($tmp['error']))
+            unset($tmp['error']);
         return $tmp;
     }
 }
