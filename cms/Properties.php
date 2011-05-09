@@ -343,7 +343,10 @@ class Properties {
      * @return array an associtive array of values
      */
     function toArray() {
-        return $this->properties;
+        $tmp = $this->properties;
+        if(isset($tmp['readonly']))
+            unset($tmp['readonly']);
+        return $tmp;
     }
 }
 
