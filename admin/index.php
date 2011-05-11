@@ -38,7 +38,7 @@ $_POST = cleanREQUEST($_POST);
 if(isset($_FILE)) $_FILE = cleanREQUEST($_FILE);
 
 
-$debug = "nein"; # ja oder nein
+$debug = "ja"; # ja oder nein
  // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 if($debug != "ja")
     @ini_set("display_errors", 0);
@@ -71,6 +71,18 @@ if($debug == "ja") {
     $debug_txt = ob_get_contents();
     ob_end_clean();
 }
+
+// Pfade
+$CONTENT_DIR_REL        = BASE_DIR.CONTENT_DIR_NAME."/";
+define("CONTENT_DIR_REL",$CONTENT_DIR_REL);
+$GALLERIES_DIR_REL    = BASE_DIR.GALLERIES_DIR_NAME."/";
+define("GALLERIES_DIR_REL",$GALLERIES_DIR_REL);
+$PLUGIN_DIR_REL = BASE_DIR.PLUGIN_DIR_NAME."/";
+define("PLUGIN_DIR_REL",$PLUGIN_DIR_REL);
+
+
+    require_once(BASE_DIR_CMS."CatPageClass.php");
+    $CatPage         = new CatPageClass();
 
 require_once(BASE_DIR_ADMIN."filesystem.php");
 require_once(BASE_DIR_ADMIN."string.php");
@@ -158,14 +170,14 @@ if(!isset($CONTACT_CONF->properties['readonly'])) {
 // Abwärtskompatibilität: Downloadcounter initalisieren
 if ($DOWNLOAD_COUNTS->get("_downloadcounterstarttime") == "" and !isset($DOWNLOAD_COUNTS->properties['error']))
     $DOWNLOAD_COUNTS->set("_downloadcounterstarttime", time());
-
+/*
 // Pfade
 $CONTENT_DIR_REL        = BASE_DIR.CONTENT_DIR_NAME."/";
 define("CONTENT_DIR_REL",$CONTENT_DIR_REL);
 $GALLERIES_DIR_REL    = BASE_DIR.GALLERIES_DIR_NAME."/";
 define("GALLERIES_DIR_REL",$GALLERIES_DIR_REL);
 $PLUGIN_DIR_REL = BASE_DIR.PLUGIN_DIR_NAME."/";
-define("PLUGIN_DIR_REL",$PLUGIN_DIR_REL);
+define("PLUGIN_DIR_REL",$PLUGIN_DIR_REL);*/
 
 $ALLOWED_SPECIALCHARS_REGEX = $specialchars->getSpecialCharsRegex();
 define("ALLOWED_SPECIALCHARS_REGEX",$ALLOWED_SPECIALCHARS_REGEX);
@@ -4205,6 +4217,7 @@ function returnFormatToolbarIcon($tag) {
 // 4=Kategorien & Inhaltsseiten für Edit Select Inhaltseite ohne Klick in die Inhaltsseite
 function returnOverviewSelectbox($type, $currentcat) {
     global $specialchars;
+    global $CatPage;
 
     $elements = array();
     $selectname = "";
@@ -4214,29 +4227,28 @@ function returnOverviewSelectbox($type, $currentcat) {
 
         // Inhaltsseiten und Kategorien
         case ($type == 1 or $type == 4):
-            $categories = getDirAsArray(CONTENT_DIR_REL,"dir","natcasesort");
+            $categories = $CatPage->get_CatArray(true);
             foreach ($categories as $catdir) {
-                if(substr($catdir,-(strlen(EXT_LINK))) == EXT_LINK) continue;
-                $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
+                if($CatPage->get_Type($catdir,false) == EXT_LINK) continue;
+                $cleancatname = $CatPage->get_HrefText($catdir,false);
                 $elements[] = array($cleancatname, ":".$cleancatname);
-                $files = getDirAsArray(CONTENT_DIR_REL.$catdir,array(EXT_PAGE,EXT_HIDDEN,EXT_DRAFT),"natcasesort");
+                $files = $CatPage->get_PageArray($catdir, array(EXT_PAGE,EXT_HIDDEN), true);
                 foreach($files as $file) {
-                    if ((substr($file, strlen($file)-4, 4) == EXT_PAGE) || (substr($file, strlen($file)-4, 4) == EXT_HIDDEN)) {
-                        $cleanpagename = $specialchars->rebuildSpecialChars(substr($file, 3, strlen($file) - 3 - strlen(EXT_PAGE)), true, true);
-                        $completepagename = $cleanpagename;
-                        if (substr($file, strlen($file)-4, 4) == EXT_HIDDEN)
+                    $cleanpagename = $CatPage->get_HrefText($catdir,$file);
+                    $completepagename = $cleanpagename;
+                    if ($CatPage->get_Type($catdir,$file) == EXT_HIDDEN)
                             $completepagename = $cleanpagename." (".getLanguageValue("page_saveashidden").")";
-                        if($type == 4) {
-                            $elements[] = array($spacer.$completepagename, $catdir."/".$file);
-                        } else {
-                            if ($catdir == $currentcat)
-                                $elements[] = array($spacer.$completepagename, $cleanpagename);
-                            else
-                                $elements[] = array($spacer.$completepagename, $cleancatname.":".$cleanpagename);
-                        }
+                    if($type == 4) {
+                        $elements[] = array($spacer.$completepagename, $catdir."/".$file);
+                    } else {
+                        if ($catdir == $currentcat)
+                            $elements[] = array($spacer.$completepagename, $cleanpagename);
+                        else
+                            $elements[] = array($spacer.$completepagename, $cleancatname.":".$cleanpagename);
                     }
                 }
             }
+
             $selectname = "pages";
             if($type == 4)
                 $selectname = "edit_next_page";
@@ -4245,12 +4257,12 @@ function returnOverviewSelectbox($type, $currentcat) {
         // Dateien
         case 2:
             // alle Kategorien durchgehen
-            $categories = getDirAsArray(CONTENT_DIR_REL,"dir","natcasesort");
+            $categories = $CatPage->get_CatArray(true);
             foreach ($categories as $catdir) {
-                if(substr($catdir,-(strlen(EXT_LINK))) == EXT_LINK) continue;
-                $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
+                if($CatPage->get_Type($catdir,false) == EXT_LINK) continue;
+                $cleancatname = $CatPage->get_HrefText($catdir,false);
                 $elements[] = array($cleancatname, ":".$cleancatname);
-                $currentcat_filearray = getDirAsArray(CONTENT_DIR_REL.$catdir."/".CONTENT_FILES_DIR_NAME,"file","natcasesort");
+                $currentcat_filearray = $CatPage->get_FileArray($catdir);
                 foreach ($currentcat_filearray as $current_file) {
                     if ($catdir == $currentcat)
                         $elements[] = array($spacer.$specialchars->rebuildSpecialChars($current_file, true, true), $specialchars->rebuildSpecialChars($current_file, true, true));
