@@ -4,7 +4,9 @@ session_start();
 $ADMIN_TITLE = "moziloAdmin";
 
 $CMS_DIR_NAME = "cms";
+define("CMS_DIR_NAME",$CMS_DIR_NAME);
 $ADMIN_DIR_NAME = "admin";
+define("ADMIN_DIR_NAME",$ADMIN_DIR_NAME);
 
 # bei winsystemen gibts nicht immer $_SERVER["SCRIPT_FILENAME"]
 if(isset($_SERVER["SCRIPT_FILENAME"]))
@@ -14,19 +16,20 @@ else
 # fals da bei winsystemen \\ drin sind in \ wandeln
 $BASE_DIR = str_replace("\\\\", "\\",$BASE_DIR);
 # zum schluss noch den teil denn wir nicht brauchen abschneiden
-$BASE_DIR = substr($BASE_DIR,0,-(strlen($ADMIN_DIR_NAME."/index.php")));
+$BASE_DIR = substr($BASE_DIR,0,-(strlen(ADMIN_DIR_NAME."/index.php")));
 define("BASE_DIR",$BASE_DIR);
 
-$BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
+$BASE_DIR_CMS = BASE_DIR.CMS_DIR_NAME."/";
 define("BASE_DIR_CMS",$BASE_DIR_CMS);
-$BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
-$URL_BASE = substr($_SERVER['PHP_SELF'],0,strpos($_SERVER['PHP_SELF'],$ADMIN_DIR_NAME."/index.php"));
+$BASE_DIR_ADMIN = BASE_DIR.ADMIN_DIR_NAME."/";
+define("BASE_DIR_ADMIN",$BASE_DIR_ADMIN);
+$URL_BASE = substr($_SERVER['PHP_SELF'],0,strpos($_SERVER['PHP_SELF'],ADMIN_DIR_NAME."/index.php"));
 define("URL_BASE",$URL_BASE);
 
-if(is_file($BASE_DIR_CMS."DefaultConf.php")) {
-    require_once($BASE_DIR_CMS."DefaultConf.php");
+if(is_file(BASE_DIR_CMS."DefaultConf.php")) {
+    require_once(BASE_DIR_CMS."DefaultConf.php");
 } else {
-    die("Fatal Error ".$BASE_DIR_CMS."DefaultConf.php Datei existiert nicht");
+    die("Fatal Error ".BASE_DIR_CMS."DefaultConf.php Datei existiert nicht");
 }
 
 $_GET = cleanREQUEST($_GET);
@@ -41,7 +44,7 @@ if($debug != "ja")
     @ini_set("display_errors", 0);
 
  // ISO 8859-1 erzwingen - experimentell!
- // @ini_set("default_charset", $CHARSET);
+ // @ini_set("default_charset", CHARSET);
 
  // Session Fixation durch Vergabe einer neuen Session-ID beim ersten Login verhindern
  if (!isset($_SESSION['PHPSESSID'])) {
@@ -69,85 +72,85 @@ if($debug == "ja") {
     ob_end_clean();
 }
 
-require_once($BASE_DIR_ADMIN."filesystem.php");
-require_once($BASE_DIR_ADMIN."string.php");
-require_once($BASE_DIR_CMS."Smileys.php");
-require_once($BASE_DIR_CMS."Mail.php");
-require_once($BASE_DIR_ADMIN."categories_array.php");
+require_once(BASE_DIR_ADMIN."filesystem.php");
+require_once(BASE_DIR_ADMIN."string.php");
+require_once(BASE_DIR_CMS."Smileys.php");
+require_once(BASE_DIR_CMS."Mail.php");
+require_once(BASE_DIR_ADMIN."categories_array.php");
 
 # Fatal Errors sofort beenden
-if(!is_dir($BASE_DIR_ADMIN."conf")) {
-    die("Fatal Error ".$BASE_DIR_ADMIN."conf Verzeichnis existiert nicht");
+if(!is_dir(BASE_DIR_ADMIN."conf")) {
+    die("Fatal Error ".BASE_DIR_ADMIN."conf Verzeichnis existiert nicht");
 }
-if(!is_dir($BASE_DIR_CMS."conf")) {
-    die("Fatal Error ".$BASE_DIR_CMS."conf Verzeichnis existiert nicht");
+if(!is_dir(BASE_DIR_CMS."conf")) {
+    die("Fatal Error ".BASE_DIR_CMS."conf Verzeichnis existiert nicht");
 }
 
-$ADMIN_CONF = new Properties($BASE_DIR_ADMIN."conf/basic.conf",true);
+$ADMIN_CONF = new Properties(BASE_DIR_ADMIN."conf/basic.conf",true);
 if(!isset($ADMIN_CONF->properties['readonly'])) {
     die($ADMIN_CONF->properties['error']);
 }
-$BASIC_LANGUAGE = new Properties($BASE_DIR_ADMIN."sprachen/language_".$ADMIN_CONF->get("language").".conf",true);
+$BASIC_LANGUAGE = new Properties(BASE_DIR_ADMIN."sprachen/language_".$ADMIN_CONF->get("language").".conf",true);
 if(!isset($BASIC_LANGUAGE->properties['readonly'])) {
     die($BASIC_LANGUAGE->properties['error']);
 }
 # Errors nicht ganz so tragisch
-if(!is_dir($BASE_DIR.$CONTENT_DIR_NAME)) {
-    die(getLanguageValue("error_dir")." ".$BASE_DIR.$CONTENT_DIR_NAME."/");
+if(!is_dir(BASE_DIR.CONTENT_DIR_NAME)) {
+    die(getLanguageValue("error_dir")." ".BASE_DIR.CONTENT_DIR_NAME."/");
 }
-if(!is_dir($BASE_DIR."layouts")) {
-    die(getLanguageValue("error_dir")." ".$BASE_DIR."layouts/");
+if(!is_dir(BASE_DIR."layouts")) {
+    die(getLanguageValue("error_dir")." ".BASE_DIR."layouts/");
 }
-if(!is_dir($BASE_DIR_CMS."sprachen")) {
-    die(getLanguageValue("error_dir")." ".$BASE_DIR_CMS."sprachen/");
+if(!is_dir(BASE_DIR_CMS."sprachen")) {
+    die(getLanguageValue("error_dir")." ".BASE_DIR_CMS."sprachen/");
 }
 /*
-if(!is_dir($BASE_DIR_CMS."formular")) {
-    die(getLanguageValue("error_dir")." ".$BASE_DIR_CMS."formular/");
+if(!is_dir(BASE_DIR_CMS."formular")) {
+    die(getLanguageValue("error_dir")." ".BASE_DIR_CMS."formular/");
 }*/
-if(!is_dir($BASE_DIR."galerien")) {
-    die(getLanguageValue("error_dir")." ".$BASE_DIR.$GALLERIES_DIR_NAME."/");
+if(!is_dir(BASE_DIR."galerien")) {
+    die(getLanguageValue("error_dir")." ".BASE_DIR.GALLERIES_DIR_NAME."/");
 }
 
-$CMS_CONF    = new Properties($BASE_DIR_CMS."conf/main.conf",true);
+$CMS_CONF    = new Properties(BASE_DIR_CMS."conf/main.conf",true);
 if(!isset($CMS_CONF->properties['readonly'])) {
     die($CMS_CONF->properties['error']);
 }
 
-$VERSION_CONF    = new Properties($BASE_DIR_CMS."conf/version.conf",true);
+$VERSION_CONF    = new Properties(BASE_DIR_CMS."conf/version.conf",true);
 if(!isset($VERSION_CONF->properties['readonly'])) {
     die($VERSION_CONF->properties['error']);
 }
 
-$DOWNLOAD_COUNTS = new Properties($BASE_DIR_CMS."conf/downloads.conf",true);
+$DOWNLOAD_COUNTS = new Properties(BASE_DIR_CMS."conf/downloads.conf",true);
 if(!isset($DOWNLOAD_COUNTS->properties['readonly'])) {
     die($DOWNLOAD_COUNTS->properties['error']);
 }
-$GALLERY_CONF = new Properties($BASE_DIR_CMS."conf/gallery.conf",true);
+$GALLERY_CONF = new Properties(BASE_DIR_CMS."conf/gallery.conf",true);
 if(!isset($GALLERY_CONF->properties['readonly'])) {
     die($GALLERY_CONF->properties['error']);
 }
 
-$LOGINCONF = new Properties($BASE_DIR_ADMIN."conf/logindata.conf",true);
+$LOGINCONF = new Properties(BASE_DIR_ADMIN."conf/logindata.conf",true);
 # die muss schreiben geöffnet werden können
 if(isset($LOGINCONF->properties['error'])) {
     die($LOGINCONF->properties['error']);
 }
 
-$PASSWORDS = new Properties($BASE_DIR_CMS."conf/passwords.conf",true);
+$PASSWORDS = new Properties(BASE_DIR_CMS."conf/passwords.conf",true);
 # die muss schreiben geöffnet werden können
 if(isset($PASSWORDS->properties['error'])) {
     die($PASSWORDS->properties['error']);
 }
 
 
-$USER_SYNTAX_FILE = $BASE_DIR_CMS."conf/syntax.conf";
+$USER_SYNTAX_FILE = BASE_DIR_CMS."conf/syntax.conf";
 $USER_SYNTAX = new Properties($USER_SYNTAX_FILE,true);
 if($CMS_CONF->properties['usecmssyntax'] == "true" and !isset($USER_SYNTAX->properties['readonly'])) {
     die($USER_SYNTAX->properties['error']);
 }
 /*
-$CONTACT_CONF = new Properties($BASE_DIR_CMS."formular/formular.conf",true);
+$CONTACT_CONF = new Properties(BASE_DIR_CMS."formular/formular.conf",true);
 if(!isset($CONTACT_CONF->properties['readonly'])) {
     die($CONTACT_CONF->properties['error']);
 }*/
@@ -157,16 +160,15 @@ if ($DOWNLOAD_COUNTS->get("_downloadcounterstarttime") == "" and !isset($DOWNLOA
     $DOWNLOAD_COUNTS->set("_downloadcounterstarttime", time());
 
 // Pfade
-#$CONTENT_DIR_NAME        = "kategorien";
-$CONTENT_DIR_REL        = $BASE_DIR.$CONTENT_DIR_NAME."/";
-#$GALLERIES_DIR_NAME    = "galerien";
-$GALLERIES_DIR_REL    = $BASE_DIR.$GALLERIES_DIR_NAME."/";
-#$PREVIEW_DIR_NAME        = "vorschau";
-$PLUGIN_DIR_REL = $BASE_DIR.$PLUGIN_DIR_NAME."/";
+$CONTENT_DIR_REL        = BASE_DIR.CONTENT_DIR_NAME."/";
 define("CONTENT_DIR_REL",$CONTENT_DIR_REL);
+$GALLERIES_DIR_REL    = BASE_DIR.GALLERIES_DIR_NAME."/";
+define("GALLERIES_DIR_REL",$GALLERIES_DIR_REL);
+$PLUGIN_DIR_REL = BASE_DIR.PLUGIN_DIR_NAME."/";
 define("PLUGIN_DIR_REL",$PLUGIN_DIR_REL);
 
 $ALLOWED_SPECIALCHARS_REGEX = $specialchars->getSpecialCharsRegex();
+define("ALLOWED_SPECIALCHARS_REGEX",$ALLOWED_SPECIALCHARS_REGEX);
 
 $icon_size = "24x24"; # 16x16 22x22 24x24 32x32 48x48
 $icon_size_tabs = "16x16"; # 16x16 22x22 24x24 32x32 48x48
@@ -180,7 +182,7 @@ if(isset($_REQUEST['javascript']) and $_REQUEST['javascript'] == "ja") $_POST['j
 $array_tabs = array("home","category","page","files","gallery","config","admin","plugins");
 
 # Plugin-Tab nur anzeigen wenn plugin Ordner mit mind. einem plugin vorhanden ist
-if (count(getDirAsArray($PLUGIN_DIR_REL, "dir")) < 1 )
+if (count(getDirAsArray(PLUGIN_DIR_REL, "dir")) < 1 )
     $array_tabs = array("home","category","page","files","gallery","config","admin");
 
 $action = 'home';
@@ -212,7 +214,7 @@ if(isset($_POST['action_data'])) {
     # ist das Array für Kategorien oder Inhaltseiten nicht erzeugen
     $post['makepara'] = "no";
     if(isset($_POST['checkpara']) and $_POST['checkpara'] == "yes") {
-        $post['categories'] = checkPostCatPageReturnVariable($CONTENT_DIR_REL);
+        $post['categories'] = checkPostCatPageReturnVariable();
     }
     # aus checkPostCatPageReturnVariable error_messages umsetzen
     if(isset($post['categories']['error_messages'])) {
@@ -274,7 +276,7 @@ $pagecontent = $functionreturn[1];
 $html = '<!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN">'."\n";
 $html .= "<html>\n";
 $html .= "<head>";
-$html .= '<meta http-equiv="Content-Type" content="text/html;charset='.$CHARSET.'">';
+$html .= '<meta http-equiv="Content-Type" content="text/html;charset='.CHARSET.'">';
 $html .= '<script type="text/javascript" src="buttons.js"></script>';
 $html .= '<script type="text/javascript" src="multifileupload.js"></script>';
 $html .= "<title>$ADMIN_TITLE - $pagetitle</title>";
@@ -300,8 +302,8 @@ $html .= '<table summary="" width="90%" cellspacing="0" border="0" cellpadding="
 $html .= '<tr><td width="100%" id="td_title">';
 $html .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" id="table_titel">';
 $html .= '<tr><td id="td_table_titel_text">'.$ADMIN_TITLE.' - '.$pagetitle.'</td>';
-$html .= '<td width="'.$width_height.'" height="'.$width_height.'"'.$tooltip_help_website_button.' nowrap><form class="form" accept-charset="'.$CHARSET.'" action="../index.php" method="post" target="_blank"><input class="input_img_button" type="image" value="'.getLanguageValue("website_button").'" src="gfx/icons/'.$icon_size.'/website.png" title="'.getLanguageValue("help_website_button",true).'"'.$tooltip_help_website_button.'></form></td>';
-$html .= '<td width="'.$width_height.'" height="'.$width_height.'" id="td_table_titel_logout" nowrap><form class="form" accept-charset="'.$CHARSET.'" action="login.php" method="post"><input id="design_logout" class="input_img_button" type="image" name="logout" value="'.getLanguageValue("logout_button").'&nbsp;" accesskey="x" src="gfx/icons/'.$icon_size.'/logout.png" title="'.getLanguageValue("help_logout_button",true).'"'.$tooltip_help_logout_button.'></form></td></tr>';
+$html .= '<td width="'.$width_height.'" height="'.$width_height.'"'.$tooltip_help_website_button.' nowrap><form class="form" accept-charset="'.CHARSET.'" action="../index.php" method="post" target="_blank"><input class="input_img_button" type="image" value="'.getLanguageValue("website_button").'" src="gfx/icons/'.$icon_size.'/website.png" title="'.getLanguageValue("help_website_button",true).'"'.$tooltip_help_website_button.'></form></td>';
+$html .= '<td width="'.$width_height.'" height="'.$width_height.'" id="td_table_titel_logout" nowrap><form class="form" accept-charset="'.CHARSET.'" action="login.php" method="post"><input id="design_logout" class="input_img_button" type="image" name="logout" value="'.getLanguageValue("logout_button").'&nbsp;" accesskey="x" src="gfx/icons/'.$icon_size.'/logout.png" title="'.getLanguageValue("help_logout_button",true).'"'.$tooltip_help_logout_button.'></form></td></tr>';
 $html .= '</table>';
 
 $html .= "</td></tr>";
@@ -335,7 +337,7 @@ $enctype = NULL;
 if($action == 'files' or $action == 'gallery' or $action == 'plugins') {
     $enctype = ' enctype="multipart/form-data"';
 }
-$html .= '<form name="form" class="form" accept-charset="'.$CHARSET.'" action="index.php" method="post"'.$enctype.'>';
+$html .= '<form name="form" class="form" accept-charset="'.CHARSET.'" action="index.php" method="post"'.$enctype.'>';
 
 $html .= '<script type="text/javascript">document.write(\'<input type="hidden" name="javascript" value="ja">\');</script>';
 
@@ -408,7 +410,7 @@ $html .= "</body></html>";
 
 
 // Ausgabe als ISO 8859-1 deklarieren
-header('content-type: text/html; charset='.$CHARSET.'');
+header('content-type: text/html; charset='.CHARSET.'');
 /* Ausgabe der kompletten Seite */
 echo $html;
 
@@ -417,7 +419,6 @@ echo $html;
  ------------------------------ */
 
 function home($post) {
-    global $BASE_DIR;
     global $CMS_CONF;
     global $VERSION_CONF;
     global $ADMIN_CONF;
@@ -470,8 +471,7 @@ function home($post) {
     $pagecontent .= getLanguageValue("home_text_welcome");
     $pagecontent .= "</p>";
 
-#$URL_BASE $BASE_DIR
-    $path = $BASE_DIR;
+    $path = BASE_DIR;
     $cmssize = convertFileSizeUnit(dirsize($path));
     $pagecontent .= '<table summary="" width="100%" cellspacing="0" border="0" cellpadding="0" class="table_data">'
     // CMS-INFOS
@@ -535,10 +535,7 @@ function home($post) {
 
 function category($post) {
     global $specialchars;
-    global $CONTENT_DIR_REL;
-    global $EXT_LINK;
     global $ADMIN_CONF;
-    global $CONTENT_FILES_DIR_NAME;
     global $icon_size;
     $max_cat_page = 100;
     $max_strlen = 255;
@@ -554,7 +551,7 @@ function category($post) {
     }
 
     if(isset($post['makepara']) and $post['makepara'] == "yes") {
-        $post['categories'] = makePostCatPageReturnVariable($CONTENT_DIR_REL);
+        $post['categories'] = makePostCatPageReturnVariable();
         if(isset($post['categories']['error_messages'])) {
             $post['error_messages'] = $post['categories']['error_messages'];
             unset($post['categories']['error_messages']);
@@ -648,16 +645,16 @@ function category($post) {
             $file = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
             // Anzahl Inhaltsseiten auslesen
             $pagescount = 0;
-            if($pageshandle = opendir($CONTENT_DIR_REL.$file)) {
+            if($pageshandle = opendir(CONTENT_DIR_REL.$file)) {
                 while (($currentpage = readdir($pageshandle))) {
-                    if(is_file($CONTENT_DIR_REL.$file."/".$currentpage))
+                    if(is_file(CONTENT_DIR_REL.$file."/".$currentpage))
                         $pagescount++;
                 }
                 closedir($pageshandle);
             }
             // Anzahl Dateien auslesen
             $filecount = 0;
-            if($fileshandle = opendir($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME)) {
+            if($fileshandle = opendir(CONTENT_DIR_REL.$file."/".CONTENT_FILES_DIR_NAME)) {
                  while (($filesdir = readdir($fileshandle))) {
                     if(isValidDirOrFile($filesdir))
                         $filecount++;
@@ -688,7 +685,7 @@ function category($post) {
         }
         $del_dir = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
         if(isset($post['categories']['cat']['url'][$pos])) {
-            $del_dir = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos].$post['categories']['cat']['target'][$pos].$post['categories']['cat']['url'][$pos].$EXT_LINK;
+            $del_dir = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos].$post['categories']['cat']['target'][$pos].$post['categories']['cat']['url'][$pos].EXT_LINK;
         }
         $pagecontent .= '<input type="image" class="input_img_button_last" name="action_data[deletecategory]['.$del_dir.']" value="'.$text_category_button_delete.'"  src="gfx/icons/'.$icon_size.'/delete.png" title="'.$title_category_button_delete.'"'.$tooltip_category_help_delete.'>';
         $pagecontent .= '</td></tr></table></td></tr>';
@@ -726,9 +723,6 @@ function category($post) {
 
 function editCategory($post) {
     global $specialchars;
-    global $CONTENT_DIR_REL;
-    global $ALLOWED_SPECIALCHARS_REGEX;
-    global $EXT_LINK;
     global $CMS_CONF;
     global $PASSWORDS;
     $max_cat_page = 100;
@@ -755,15 +749,15 @@ function editCategory($post) {
         else
             $newname[$pos] = $post['categories']['cat']['new_position'][$pos]."_".$post['categories']['cat']['name'][$pos];
         if(isset($post['categories']['cat']['url'][$pos])) {
-            $orgname[$pos] = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos].$post['categories']['cat']['target'][$pos].$post['categories']['cat']['url'][$pos].$EXT_LINK;
+            $orgname[$pos] = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos].$post['categories']['cat']['target'][$pos].$post['categories']['cat']['url'][$pos].EXT_LINK;
             if(!empty($post['categories']['cat']['new_target'][$pos]))
                 $newname[$pos] = $newname[$pos].$post['categories']['cat']['new_target'][$pos];
             else
                 $newname[$pos] = $newname[$pos].$post['categories']['cat']['target'][$pos];
             if(!empty($post['categories']['cat']['new_url'][$pos]))
-                $newname[$pos] = $newname[$pos].$post['categories']['cat']['new_url'][$pos].$EXT_LINK;
+                $newname[$pos] = $newname[$pos].$post['categories']['cat']['new_url'][$pos].EXT_LINK;
             else
-                $newname[$pos] = $newname[$pos].$post['categories']['cat']['url'][$pos].$EXT_LINK;
+                $newname[$pos] = $newname[$pos].$post['categories']['cat']['url'][$pos].EXT_LINK;
         } else {
             $orgname[$pos] = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
         }
@@ -775,7 +769,7 @@ function editCategory($post) {
     # Rename $orgname[$pos] -> $newname[$pos]
     if(isset($newname)) {
         foreach ($newname as $pos => $tmp) {
-            @rename($CONTENT_DIR_REL.$orgname[$pos], $CONTENT_DIR_REL.$newname[$pos]);
+            @rename(CONTENT_DIR_REL.$orgname[$pos], CONTENT_DIR_REL.$newname[$pos]);
             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
             $last_error['line'] = NULL;
             if(function_exists("error_get_last")) {
@@ -784,7 +778,7 @@ function editCategory($post) {
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
                 $post['display']['cat']['error_html']['display'][$pos] = 'style="display:block;" ';
-            } elseif(!is_dir($CONTENT_DIR_REL.$newname[$pos])) {
+            } elseif(!is_dir(CONTENT_DIR_REL.$newname[$pos])) {
                 $post['error_messages']['category_error_rename'][] = $orgname[$pos];
                 $post['displays']['cat']['error_html']['display'][$pos] = 'style="display:block;" ';
             } else {
@@ -834,7 +828,7 @@ function editCategory($post) {
         $new_cat = $new_position."_".$post['categories']['cat']['new_name'][$max_cat_page];
 
         if(!empty($post['categories']['cat']['new_url'][$max_cat_page])) {
-            $new_cat .= $post['categories']['cat']['new_target'][$max_cat_page].$post['categories']['cat']['new_url'][$max_cat_page].$EXT_LINK;
+            $new_cat .= $post['categories']['cat']['new_target'][$max_cat_page].$post['categories']['cat']['new_url'][$max_cat_page].EXT_LINK;
         }
         $post['error_messages'] = createCategory($new_cat);
         if(isset($post['error_messages'])) {
@@ -853,7 +847,6 @@ function editCategory($post) {
 
 function deleteCategory($post) {
     global $specialchars;
-    global $CONTENT_DIR_REL;
     global $CMS_CONF;
     global $PASSWORDS;
     global $icon_size;
@@ -867,7 +860,7 @@ function deleteCategory($post) {
     }
     # Kategorie Löschen    
     if(isset($_POST['confirm']) and $_POST['confirm'] == "true" and isset($_POST['del_cat']) and !empty($_POST['del_cat'])) {
-        $del_cat = $CONTENT_DIR_REL.$_POST['del_cat'];
+        $del_cat = CONTENT_DIR_REL.$_POST['del_cat'];
         $post['error_messages'] = deleteDir($del_cat);
         if(!file_exists($_POST['del_cat'])) {
             // Alle Dateien der gelöschten Kategorie aus Downloadstatistik entfernen
@@ -875,7 +868,7 @@ function deleteCategory($post) {
             $post['messages']['category_message_delete'][] = $_POST['del_cat'];
             $post['makepara'] = "yes";
             if($CMS_CONF->get('defaultcat') == $_POST['del_cat']) {
-                $tmp_array = getDirs($CONTENT_DIR_REL,true,true);
+                $tmp_array = getDirs(CONTENT_DIR_REL,true,true);
                 $CMS_CONF->set('defaultcat',$tmp_array[0]);
                 $post['messages']['category_message_defaultcat'][] = $tmp_array[0];
             }
@@ -902,14 +895,8 @@ function deleteCategory($post) {
 
 function page($post) {
     global $specialchars;
-    global $CONTENT_DIR_REL;
-    global $EXT_PAGE;
-    global $EXT_DRAFT;
-    global $EXT_HIDDEN;
-    global $EXT_LINK;
     global $ADMIN_CONF;
     global $CMS_CONF;
-    global $URL_BASE;
     global $PASSWORDS;
     global $icon_size;
 
@@ -928,19 +915,18 @@ function page($post) {
                 $cat = key($post['action_data']['editsite']);
                 $page = $post['action_data']['editsite'][$cat];
                 global $CMS_CONF;
-                global $URL_BASE;
 
                 $page_draft = "?action=draft";
-                $link = $URL_BASE.substr($cat,3).'/'.substr($page,3,-(strlen($EXT_PAGE))).".html";
+                $link = URL_BASE.substr($cat,3).'/'.substr($page,3,-(strlen(EXT_PAGE))).".html";
                 if($CMS_CONF->get("modrewrite") != "true") {
-                    $link = $URL_BASE."index.php?cat=".substr($cat,3)."&amp;page=".substr($page,3,-(strlen($EXT_PAGE)));
+                    $link = URL_BASE."index.php?cat=".substr($cat,3)."&amp;page=".substr($page,3,-(strlen(EXT_PAGE)));
                     $page_draft = "&amp;action=draft";
                 }
 
-                if(substr($page,-(strlen($EXT_DRAFT))) != $EXT_DRAFT)
+                if(substr($page,-(strlen(EXT_DRAFT))) != EXT_DRAFT)
                     $page_draft = NULL;
 
-                $pagecontent .= '<span class="titel">'.getLanguageValue("page_edit").' → </span><a href="'.$link.$page_draft.'" target="_blank"'.createTooltipWZ("","page_page_help_show",",WIDTH,200,CLICKCLOSE,true").'>'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen($EXT_PAGE))), true, true).'</a><br /><br />';
+                $pagecontent .= '<span class="titel">'.getLanguageValue("page_edit").' → </span><a href="'.$link.$page_draft.'" target="_blank"'.createTooltipWZ("","page_page_help_show",",WIDTH,200,CLICKCLOSE,true").'>'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'/'.$specialchars->rebuildSpecialChars(substr($page,3,-(strlen(EXT_PAGE))), true, true).'</a><br /><br />';
                 $pagecontent .= $post['content'];
                 $pagecontent .= '<input type="hidden" name="checkpara" value="no">';
                 return array(getLanguageValue("page_button"), $pagecontent);
@@ -956,7 +942,7 @@ function page($post) {
     $pagecontent .= '<input type="hidden" name="checkpara" value="yes">';
 
     if(isset($post['makepara']) and $post['makepara'] == "yes") {
-        $post['categories'] = makePostCatPageReturnVariable($CONTENT_DIR_REL,true);
+        $post['categories'] = makePostCatPageReturnVariable(true);
         if(isset($post['categories']['error_messages'])) {
             $post['error_messages'] = $post['categories']['error_messages'];
             unset($post['categories']['error_messages']);
@@ -1017,9 +1003,9 @@ function page($post) {
         $pagecontent .= '<tr><td class="td_left_title">';
         $pagecontent .= '<span '.$post['categories'][$cat]['error_html']['cat_name'].'class="text_cat_page">'.$specialchars->rebuildSpecialChars(substr($cat,3), true, true).'</span><input type="hidden" name="categories['.$cat.']" value="'.$cat.'">';
         $pagescount = 0;
-        if($pageshandle = opendir($CONTENT_DIR_REL.$cat."/")) {
+        if($pageshandle = opendir(CONTENT_DIR_REL.$cat."/")) {
             while (($currentpage = readdir($pageshandle))) {
-                if(is_file($CONTENT_DIR_REL.$cat."/".$currentpage) and ctype_digit(substr($currentpage,0,2)))
+                if(is_file(CONTENT_DIR_REL.$cat."/".$currentpage) and ctype_digit(substr($currentpage,0,2)))
                     $pagescount++;
             }
             closedir($pageshandle);
@@ -1096,11 +1082,11 @@ function page($post) {
             }
             $pagecontent .= '<tr><td width="8%" class="td_left_title"><input '.$post['categories'][$cat]['error_html']['new_position'][$pos].'class="input_text" type="text" name="categories['.$cat.'][new_position]['.$pos.']" value="'.$post['categories'][$cat]['new_position'][$pos].'" size="2" maxlength="2"'.$tooltip_page_help_position.'><input type="hidden" name="categories['.$cat.'][position]['.$pos.']" value="'.$post['categories'][$cat]['position'][$pos].'"></td>';
             $pagecontent .= '<td class="td_left_title">';
-            if($post['categories'][$cat]['ext'][$pos] == $EXT_PAGE) {
+            if($post['categories'][$cat]['ext'][$pos] == EXT_PAGE) {
                 $text = "(".$text_page_saveasnormal.")";
-            } elseif($post['categories'][$cat]['ext'][$pos] == $EXT_DRAFT) {
+            } elseif($post['categories'][$cat]['ext'][$pos] == EXT_DRAFT) {
                 $text = "(".$text_page_saveasdraft.")";
-            } elseif($post['categories'][$cat]['ext'][$pos] == $EXT_HIDDEN) {
+            } elseif($post['categories'][$cat]['ext'][$pos] == EXT_HIDDEN) {
                 $text = "(".$text_page_saveashidden.")";
             } elseif(isset($post['categories'][$cat]['url'][$pos])) {
                 $text = "(".$text_target." ".substr($post['categories'][$cat]['target'][$pos],2,-1).")";
@@ -1109,19 +1095,19 @@ function page($post) {
             }
             $tooltip_url = $tooltip_page_page_help_show;
             $page_draft = "&amp;action=draft";
-            $url = $URL_BASE."index.php?cat=".$cat."&amp;page=".$post['categories'][$cat]['name'][$pos];
+            $url = URL_BASE."index.php?cat=".$cat."&amp;page=".$post['categories'][$cat]['name'][$pos];
             if($CMS_CONF->get("modrewrite") == "true") {
-                $url = $URL_BASE.$cat."/".$post['categories'][$cat]['name'][$pos].".html";
+                $url = URL_BASE.$cat."/".$post['categories'][$cat]['name'][$pos].".html";
                 $page_draft = "?action=draft";
             }
-            if($post['categories'][$cat]['ext'][$pos] != $EXT_DRAFT)
+            if($post['categories'][$cat]['ext'][$pos] != EXT_DRAFT)
                 $page_draft = NULL;
             if(isset($post['categories'][$cat]['url'][$pos])) {
                 $url = str_replace("%3A%2F%2F","://",$post['categories'][$cat]['url'][$pos]);
                 $tooltip_url = $tooltip_page_link_help_show;
             }
             $pagecontent .= '<span '.$post['categories'][$cat]['error_html']['name'][$pos].'class="text_cat_page"><a class="page_link" href="'.$url.$page_draft.'" target="_blank"'.$tooltip_url.'>'.$specialchars->rebuildSpecialChars($post['categories'][$cat]['name'][$pos],true,true).'</a></span>';
-            $pagecontent .= '<input type="hidden" name="categories['.$cat.'][name]['.$pos.']" value="'.$post['categories'][$cat]['name'][$pos].'"><input type="hidden" name="categories['.$cat.'][ext]['.$pos.']" value="'.substr($post['categories'][$cat]['ext'][$pos],-(strlen($EXT_PAGE))).'"></td>';
+            $pagecontent .= '<input type="hidden" name="categories['.$cat.'][name]['.$pos.']" value="'.$post['categories'][$cat]['name'][$pos].'"><input type="hidden" name="categories['.$cat.'][ext]['.$pos.']" value="'.substr($post['categories'][$cat]['ext'][$pos],-(strlen(EXT_PAGE))).'"></td>';
             $pagecontent .= '<td width="12%" class="td_left_title" nowrap><span class="text_info">'.$text.'</span></td>';
             $pagecontent .= '<td width="17%" class="td_left_title" nowrap>'.$select_box.'</td>';
             $pagecontent .= '<td width="12%" class="td_left_title" nowrap><b>'.$text_page_copy.'</b>&nbsp;<input class="input_check" type="checkbox" name="categories['.$cat.'][copy]['.$pos.']" value="yes"'.$post['categories'][$cat]['copy'][$pos].''.$tooltip_page_help_copy.'></td>';
@@ -1195,8 +1181,6 @@ function page($post) {
 
 function editSite($post) {
     global $specialchars;
-    global $CONTENT_DIR_REL;
-    global $EXT_PAGE;
 
     $cat = key($post['action_data']['editsite']);
     $page = $post['action_data']['editsite'][$cat];
@@ -1205,9 +1189,9 @@ function editSite($post) {
     $content = "editsite";
     if(isset($_POST['save']) or isset($_POST['savetemp'])) {
         $new_ext = $_POST['saveas'];
-        $new_page = substr($post['action_data']['editsite'][$cat],0,-(strlen($EXT_PAGE))).$new_ext;
+        $new_page = substr($post['action_data']['editsite'][$cat],0,-(strlen(EXT_PAGE))).$new_ext;
         if($new_page != $post['action_data']['editsite'][$cat]) {
-            @rename($CONTENT_DIR_REL.$cat."/".$page,$CONTENT_DIR_REL.$cat."/".$new_page);
+            @rename(CONTENT_DIR_REL.$cat."/".$page,CONTENT_DIR_REL.$cat."/".$new_page);
             $line_error = __LINE__ - 1;
             $last_error['line'] = NULL;
             if(function_exists("error_get_last")) {
@@ -1215,14 +1199,14 @@ function editSite($post) {
             }
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
-            } elseif(!is_file($CONTENT_DIR_REL.$cat."/".$new_page)) {
+            } elseif(!is_file(CONTENT_DIR_REL.$cat."/".$new_page)) {
                 $post['error_messages']['page_message_rename'][] = $page." <b>></b> ".$new_page;
             } else {
                 # ext hat sich geändert
                 $page = $new_page;
             }
         }
-        $error = saveContentToPage($_POST['pagecontent'],$CONTENT_DIR_REL.$cat."/".$page);
+        $error = saveContentToPage($_POST['pagecontent'],CONTENT_DIR_REL.$cat."/".$page);
         if(is_array($error)) {
             if(isset($post['error_messages'])) {
                 $post['error_messages'] = array_merge_recursive($post['error_messages'],$error);
@@ -1235,7 +1219,7 @@ function editSite($post) {
         $edit_next_page = false;
         if(isset($_POST['save']) and !isset($post['error_messages'])
             and isset($_POST['edit_next_page']) and !empty($_POST['edit_next_page'])) {
-            if(is_file($CONTENT_DIR_REL.$_POST['edit_next_page'])) {
+            if(is_file(CONTENT_DIR_REL.$_POST['edit_next_page'])) {
                 $cat_page = explode("/",$_POST['edit_next_page']);
                 $cat = $cat_page[0];
                 $page = $cat_page[1];
@@ -1265,15 +1249,10 @@ function editSite($post) {
 
 function copymoveSite($post) {
     global $specialchars;
-    global $CONTENT_DIR_REL;
-    global $EXT_LINK;
-    global $EXT_PAGE;
-    global $EXT_DRAFT;
     global $PASSWORDS;
-    global $BASE_DIR_ADMIN;
     $max_cat_page = 100;
 
-    require_once($BASE_DIR_ADMIN."Crypt.php");
+    require_once(BASE_DIR_ADMIN."Crypt.php");
     $pwcrypt = new Crypt();
     # wenn Verschoben wird unset die Position der Inhaltseite aus anderer Kategorie
     # damit bei position_move() die Positionen frei sind
@@ -1440,9 +1419,9 @@ function copymoveSite($post) {
         # die neue Inhaltseite
         if(!empty($post['categories'][$cat]['new_position'][$max_cat_page])) {
             $new_position = $post['categories'][$cat]['new_position'][$max_cat_page];
-            $new_page[$cat] = $new_position."_".$post['categories'][$cat]['new_name'][$max_cat_page].$EXT_DRAFT;
+            $new_page[$cat] = $new_position."_".$post['categories'][$cat]['new_name'][$max_cat_page].EXT_DRAFT;
             if(!empty($post['categories'][$cat]['new_url'][$max_cat_page])) {
-                $new_page[$cat] = $new_position."_".$post['categories'][$cat]['new_name'][$max_cat_page].$post['categories'][$cat]['new_target'][$max_cat_page].$post['categories'][$cat]['new_url'][$max_cat_page].$EXT_LINK;
+                $new_page[$cat] = $new_position."_".$post['categories'][$cat]['new_name'][$max_cat_page].$post['categories'][$cat]['new_target'][$max_cat_page].$post['categories'][$cat]['new_url'][$max_cat_page].EXT_LINK;
             }
         }
     }
@@ -1456,10 +1435,10 @@ function copymoveSite($post) {
             reset($array);
             $count_merker = count($array);
             while(list($z,$tmp) = each($array) and $notaus != "300") {
-            if(!is_file($CONTENT_DIR_REL.$cat."/".$rename_newname[$cat][$z])) {
-#echo "rename = ".$CONTENT_DIR_REL.$cat."/".$rename_newname[$cat][$z]."<br>\n";
+            if(!is_file(CONTENT_DIR_REL.$cat."/".$rename_newname[$cat][$z])) {
+#echo "rename = ".CONTENT_DIR_REL.$cat."/".$rename_newname[$cat][$z]."<br>\n";
 #            foreach($rename_newname[$cat] as $z => $tmp) {
-                @rename($CONTENT_DIR_REL.$cat."/".$rename_orgname[$cat][$z],$CONTENT_DIR_REL.$cat."/".$rename_newname[$cat][$z]);
+                @rename(CONTENT_DIR_REL.$cat."/".$rename_orgname[$cat][$z],CONTENT_DIR_REL.$cat."/".$rename_newname[$cat][$z]);
                 $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
                 $last_error['line'] = NULL;
                 if(function_exists("error_get_last")) {
@@ -1472,7 +1451,7 @@ function copymoveSite($post) {
                     }
                     $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" '; # letzte cat ausklappen
                     $post['makepara'] = "no"; # kein makePostCatPageReturnVariable()
-                } elseif(!is_file($CONTENT_DIR_REL.$cat."/".$rename_newname[$cat][$z])) {
+                } elseif(!is_file(CONTENT_DIR_REL.$cat."/".$rename_newname[$cat][$z])) {
                     $post['error_messages']['page_error_rename'][] =  $cat."/".$rename_orgname[$cat][$z]." <b>></b> ".$cat."/".$rename_newname[$cat][$z];
                    if(substr($rename_orgname[$cat][$z],3) != substr($rename_newname[$cat][$z],3)) {
                         $post['display'][$cat]['error_html']['display'][sprintf("%1d",substr($rename_orgname[$cat][$z],0,2))] = 'style="display:block;" '; # letzte cat ausklappen
@@ -1481,10 +1460,10 @@ function copymoveSite($post) {
                     $post['makepara'] = "no"; # kein makePostCatPageReturnVariable()
                 # Alles gut
                 } else {
-                    if($PASSWORDS->get($cat."/".substr($rename_orgname[$cat][$z],0,-(strlen($EXT_LINK))))) {
-                        $tmp_pas = $PASSWORDS->get($cat."/".substr($rename_orgname[$cat][$z],0,-(strlen($EXT_LINK))));
-                        $PASSWORDS->delete($cat."/".substr($rename_orgname[$cat][$z],0,-(strlen($EXT_LINK))));
-                        $PASSWORDS->set($cat."/".substr($rename_newname[$cat][$z],0,-(strlen($EXT_LINK))),$tmp_pas);
+                    if($PASSWORDS->get($cat."/".substr($rename_orgname[$cat][$z],0,-(strlen(EXT_LINK))))) {
+                        $tmp_pas = $PASSWORDS->get($cat."/".substr($rename_orgname[$cat][$z],0,-(strlen(EXT_LINK))));
+                        $PASSWORDS->delete($cat."/".substr($rename_orgname[$cat][$z],0,-(strlen(EXT_LINK))));
+                        $PASSWORDS->set($cat."/".substr($rename_newname[$cat][$z],0,-(strlen(EXT_LINK))),$tmp_pas);
                     }
                     $post['messages']['page_message_rename'][] = $cat."/".$rename_orgname[$cat][$z]." <b>></b> ".$cat."/".$rename_newname[$cat][$z];
                     $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" '; # letzte cat ausklappen
@@ -1520,7 +1499,7 @@ function copymoveSite($post) {
         foreach($move_newname as $cat => $tmp) {
             foreach($move_newname[$cat] as $z => $tmp) {
                 # Einfach mal Kopieren
-                @copy($CONTENT_DIR_REL.$move_orgname[$cat][$z],$CONTENT_DIR_REL.$move_newname[$cat][$z]);
+                @copy(CONTENT_DIR_REL.$move_orgname[$cat][$z],CONTENT_DIR_REL.$move_newname[$cat][$z]);
                 $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
                 $last_error['line'] = NULL;
                 if(function_exists("error_get_last")) {
@@ -1529,13 +1508,13 @@ function copymoveSite($post) {
                 if($last_error['line'] == $line_error) {
                     $post['error_messages']['php_error'][] = $last_error['message'];
                     $error = true;
-                } elseif(!is_file($CONTENT_DIR_REL.$move_newname[$cat][$z])) {
+                } elseif(!is_file(CONTENT_DIR_REL.$move_newname[$cat][$z])) {
                     $post['error_messages']['page_error_copy'][] = $move_orgname[$cat][$z]." <b>></b> ".$move_newname[$cat][$z];
                     $error = true;
                 }
                 # wenn Verschoben werden soll und copy erfolgreich war
-                if(isset($move_move[$cat][$z]) and is_file($CONTENT_DIR_REL.$move_newname[$cat][$z])) {
-                    @unlink($CONTENT_DIR_REL.$move_orgname[$cat][$z]);
+                if(isset($move_move[$cat][$z]) and is_file(CONTENT_DIR_REL.$move_newname[$cat][$z])) {
+                    @unlink(CONTENT_DIR_REL.$move_orgname[$cat][$z]);
                     $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
                     $last_error['line'] = NULL;
                     if(function_exists("error_get_last")) {
@@ -1544,7 +1523,7 @@ function copymoveSite($post) {
                     if($last_error['line'] == $line_error) {
                         $post['error_messages']['php_error'][] = $last_error['message'];
                         $error = true;
-                    } elseif(is_file($CONTENT_DIR_REL.$move_orgname[$cat][$z])) {
+                    } elseif(is_file(CONTENT_DIR_REL.$move_orgname[$cat][$z])) {
                         $post['error_messages']['page_error_delete'][] = $move_orgname[$cat][$z]." <b>></b> ".$move_newname[$cat][$z];
                         $error = true;
                     } else {
@@ -1566,10 +1545,10 @@ function copymoveSite($post) {
                     $post['display'][dirname($move_orgname[$cat][$z])]['error_html']['display_cat'] = 'style="display:block;" ';
                     unset($error);
                 } else {
-                    if($PASSWORDS->get(substr($move_orgname[$cat][$z],0,-(strlen($EXT_LINK))))) {
-                        $tmp_pas = $PASSWORDS->get(substr($move_orgname[$cat][$z],0,-(strlen($EXT_LINK))));
-                        $PASSWORDS->delete(substr($move_orgname[$cat][$z],0,-(strlen($EXT_LINK))));
-                        $PASSWORDS->set(substr($move_newname[$cat][$z],0,-(strlen($EXT_LINK))),$tmp_pas);
+                    if($PASSWORDS->get(substr($move_orgname[$cat][$z],0,-(strlen(EXT_LINK))))) {
+                        $tmp_pas = $PASSWORDS->get(substr($move_orgname[$cat][$z],0,-(strlen(EXT_LINK))));
+                        $PASSWORDS->delete(substr($move_orgname[$cat][$z],0,-(strlen(EXT_LINK))));
+                        $PASSWORDS->set(substr($move_newname[$cat][$z],0,-(strlen(EXT_LINK))),$tmp_pas);
                     }
                     # Erfogs meldungen
                     $post['messages']['page_message_copy_move'][] = $move_orgname[$cat][$z]." <b>></b> ".$move_newname[$cat][$z];
@@ -1582,11 +1561,11 @@ function copymoveSite($post) {
     # Neue Inhaltseite
     if(isset($new_page)) {
         foreach($new_page as $cat => $tmp) {
-            $page_inhalt = "Das ist ein Link";#$EXT_LINK $EXT_PAGE
-            if(substr($new_page[$cat],-4) == $EXT_DRAFT) {
+            $page_inhalt = "Das ist ein Link";#EXT_LINK EXT_PAGE
+            if(substr($new_page[$cat],-4) == EXT_DRAFT) {
                 $page_inhalt = "[ueber1|".str_replace(array("[","]"),array("^[","^]"),$specialchars->rebuildSpecialChars(substr($new_page[$cat], 3,strlen($new_page[$cat])-7), false, false))."]";
             }
-            $error = saveContentToPage($page_inhalt,$CONTENT_DIR_REL.$cat."/".$new_page[$cat]);
+            $error = saveContentToPage($page_inhalt,CONTENT_DIR_REL.$cat."/".$new_page[$cat]);
             # Fehler beim anlegen also return
             if(is_array($error)) {
                 if(isset($post['error_messages'])) {
@@ -1616,8 +1595,6 @@ function copymoveSite($post) {
 
 function deleteSite($post) {
     global $specialchars;
-    global $CONTENT_DIR_REL;
-    global $EXT_LINK;
     global $PASSWORDS;
     global $icon_size;
 
@@ -1633,7 +1610,7 @@ function deleteSite($post) {
     # Seite Löschen    
     if(isset($_POST['confirm'])) {
         if($_POST['confirm'] == "true") {
-            @unlink($CONTENT_DIR_REL.$del_page);
+            @unlink(CONTENT_DIR_REL.$del_page);
             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
             $last_error['line'] = NULL;
             if(function_exists("error_get_last")) {
@@ -1641,7 +1618,7 @@ function deleteSite($post) {
             }
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
-            } elseif(file_exists($CONTENT_DIR_REL.$del_page)) {
+            } elseif(file_exists(CONTENT_DIR_REL.$del_page)) {
                 $post['error_messages']['page_error_delete'][] = $del_cat;
                 $post['makepara'] = "yes"; # makePostCatPageReturnVariable()
                 $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
@@ -1650,8 +1627,8 @@ function deleteSite($post) {
                 $post['messages']['page_message_delete'][] = $post['action_data']['deletesite'][$cat];
                 $post['makepara'] = "yes"; # makePostCatPageReturnVariable()
                 $post['display'][$cat]['error_html']['display_cat'] = 'style="display:block;" ';
-                if($PASSWORDS->get(substr($del_page,0,-(strlen($EXT_LINK))))) {
-                    $PASSWORDS->delete(substr($del_page,0,-(strlen($EXT_LINK))));
+                if($PASSWORDS->get(substr($del_page,0,-(strlen(EXT_LINK))))) {
+                    $PASSWORDS->delete(substr($del_page,0,-(strlen(EXT_LINK))));
                 }
                 return $post;
             }
@@ -1666,13 +1643,8 @@ function deleteSite($post) {
 function gallery($post) {
     global $ADMIN_CONF;
     global $specialchars;
-    global $GALLERIES_DIR_REL;
-    global $PREVIEW_DIR_NAME;
     global $GALLERY_CONF;
     global $icon_size;
-    global $BASE_DIR_CMS;
-    global $URL_BASE;
-    global $GALLERIES_DIR_NAME;
 
     $max_strlen = 255;
 
@@ -1709,14 +1681,14 @@ function gallery($post) {
         $post = newGallery($post);
     }
 
-    $dircontent = getDirs($GALLERIES_DIR_REL, true);
+    $dircontent = getDirs(GALLERIES_DIR_REL, true);
     # Galerien array bilden mit den dazugehörigen Bilder
     # wenn die Galerie oder die Bilder mit FTP Hochgeladen wurden Automatisch umbennen
     foreach ($dircontent as $pos => $currentgalerien) {
         $test_galerie = $specialchars->replaceSpecialChars($specialchars->rebuildSpecialChars($currentgalerien, false, false),false);
-        if(!file_exists($GALLERIES_DIR_REL.$currentgalerien."/texte.conf")) {
-            touch($GALLERIES_DIR_REL.$currentgalerien."/texte.conf");
-            $error = changeChmod($GALLERIES_DIR_REL.$currentgalerien."/texte.conf");
+        if(!file_exists(GALLERIES_DIR_REL.$currentgalerien."/texte.conf")) {
+            touch(GALLERIES_DIR_REL.$currentgalerien."/texte.conf");
+            $error = changeChmod(GALLERIES_DIR_REL.$currentgalerien."/texte.conf");
             if(is_array($error)) {
                 $post['error_messages'][key($error)][] = $error[key($error)];
             }
@@ -1728,7 +1700,7 @@ function gallery($post) {
                 unset($dircontent[$pos]);
                 continue;
             } else {
-                @rename($GALLERIES_DIR_REL.$currentgalerien,$GALLERIES_DIR_REL.$test_galerie);
+                @rename(GALLERIES_DIR_REL.$currentgalerien,GALLERIES_DIR_REL.$test_galerie);
                 $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
                 $last_error['line'] = NULL;
                 if(function_exists("error_get_last")) {
@@ -1739,7 +1711,7 @@ function gallery($post) {
                     # die Galerie aus dem array nehmen der fehler muss mit ftp behoben werden
                     unset($dircontent[$pos]);
                     continue;
-                } elseif(!is_dir($GALLERIES_DIR_REL.$test_galerie)) {
+                } elseif(!is_dir(GALLERIES_DIR_REL.$test_galerie)) {
                     $post['error_messages']['gallery_error_ftp_rename'][] = $test_galerie;
                     # die Galerie aus dem array nehmen der fehler muss mit ftp behoben werden
                     unset($dircontent[$pos]);
@@ -1752,13 +1724,13 @@ function gallery($post) {
             }
         }
 /*
-        $error = changeChmod($GALLERIES_DIR_REL.$currentgalerien);
+        $error = changeChmod(GALLERIES_DIR_REL.$currentgalerien);
         if(is_array($error)) {
             $post['error_messages'][key($error)][] = $error[key($error)];
         }*/
 
-        if(!is_dir($GALLERIES_DIR_REL.$currentgalerien.'/'.$PREVIEW_DIR_NAME)) {
-            @mkdir($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME);
+        if(!is_dir(GALLERIES_DIR_REL.$currentgalerien.'/'.PREVIEW_DIR_NAME)) {
+            @mkdir(GALLERIES_DIR_REL.$currentgalerien."/".PREVIEW_DIR_NAME);
             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
             $last_error['line'] = NULL;
             if(function_exists("error_get_last")) {
@@ -1766,35 +1738,35 @@ function gallery($post) {
             }
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
-            } elseif(!is_dir($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME)) {
+            } elseif(!is_dir(GALLERIES_DIR_REL.$currentgalerien."/".PREVIEW_DIR_NAME)) {
                 $post['error_messages']['gallery_error_new_preview'][] = $currentgalerien;
             } else {
                 $post['messages']['gallery_message_ftp_preview'][] =  $test_galerie;
             }
         }
 /*
-        if(is_dir($GALLERIES_DIR_REL.$currentgalerien.'/'.$PREVIEW_DIR_NAME)) {
-            $error = changeChmod($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME);
+        if(is_dir(GALLERIES_DIR_REL.$currentgalerien.'/'.PREVIEW_DIR_NAME)) {
+            $error = changeChmod(GALLERIES_DIR_REL.$currentgalerien."/".PREVIEW_DIR_NAME);
             if(is_array($error)) {
                 $post['error_messages'][key($error)][] = $error[key($error)];
             }
         }*/
-        $gallerypics[$currentgalerien] = getFiles($GALLERIES_DIR_REL.$currentgalerien,"");
+        $gallerypics[$currentgalerien] = getFiles(GALLERIES_DIR_REL.$currentgalerien,"");
         $count_preview_pic = 0;
         foreach($gallerypics[$currentgalerien] as $pos => $file) {
             # nur Bilder zulassen
-            if(is_dir($file) or count(@getimagesize($GALLERIES_DIR_REL.$currentgalerien.'/'.$file)) < 2) {
+            if(is_dir($file) or count(@getimagesize(GALLERIES_DIR_REL.$currentgalerien.'/'.$file)) < 2) {
                 unset($gallerypics[$currentgalerien][$pos]);
                 continue;
             }
 /*
-            $error = changeChmod($GALLERIES_DIR_REL.$currentgalerien."/".$file);
+            $error = changeChmod(GALLERIES_DIR_REL.$currentgalerien."/".$file);
             if(is_array($error)) {
                 $post['error_messages'][key($error)][] = $error[key($error)];
             }*/
-            if(is_file($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file)) {
+            if(is_file(GALLERIES_DIR_REL.$currentgalerien."/".PREVIEW_DIR_NAME."/".$file)) {
 /*
-                $error = changeChmod($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file);
+                $error = changeChmod(GALLERIES_DIR_REL.$currentgalerien."/".PREVIEW_DIR_NAME."/".$file);
                 if(is_array($error)) {
                     $post['error_messages'][key($error)][] = $error[key($error)];
                 }*/
@@ -1807,7 +1779,7 @@ function gallery($post) {
                     # das Bild aus dem array nehmen der fehler muss mit ftp behoben werden
                     unset($gallerypics[$currentgalerien][$pos]);
                 } else {
-                    @rename($GALLERIES_DIR_REL.$currentgalerien."/".$file,$GALLERIES_DIR_REL.$currentgalerien."/".$test_pic);
+                    @rename(GALLERIES_DIR_REL.$currentgalerien."/".$file,GALLERIES_DIR_REL.$currentgalerien."/".$test_pic);
                     $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
                     $last_error['line'] = NULL;
                     if(function_exists("error_get_last")) {
@@ -1817,13 +1789,13 @@ function gallery($post) {
                         $post['error_messages']['php_error'][] = $last_error['message'];
                         # das Bild aus dem array nehmen der fehler muss mit ftp behoben werden
                         unset($gallerypics[$currentgalerien][$pos]);
-                    } elseif(!is_file($GALLERIES_DIR_REL.$currentgalerien."/".$test_pic)) {
+                    } elseif(!is_file(GALLERIES_DIR_REL.$currentgalerien."/".$test_pic)) {
                         $post['error_messages']['gallery_error_ftp_rename_pic'][] = $currentgalerien." - ".$test_pic;
                         # das Bild aus dem array nehmen der fehler muss mit ftp behoben werden
                         unset($gallerypics[$currentgalerien][$pos]);
                     } else {
-                        if(is_file($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file)) {
-                            @rename($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file,$GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic);
+                        if(is_file(GALLERIES_DIR_REL.$currentgalerien."/".PREVIEW_DIR_NAME."/".$file)) {
+                            @rename(GALLERIES_DIR_REL.$currentgalerien."/".PREVIEW_DIR_NAME."/".$file,GALLERIES_DIR_REL.$currentgalerien."/".PREVIEW_DIR_NAME."/".$test_pic);
                             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
                             $last_error['line'] = NULL;
                             if(function_exists("error_get_last")) {
@@ -1831,15 +1803,15 @@ function gallery($post) {
                             }
                             if($last_error['line'] == $line_error) {
                                 $post['error_messages']['php_error'][] = $last_error['message'];
-                            } elseif(!is_file($GALLERIES_DIR_REL.$currentgalerien."/".$test_pic)) {
-                                $post['error_messages']['gallery_error_ftp_rename_pic'][] = $PREVIEW_DIR_NAME."/".$currentgalerien." - ".$test_pic;
+                            } elseif(!is_file(GALLERIES_DIR_REL.$currentgalerien."/".$test_pic)) {
+                                $post['error_messages']['gallery_error_ftp_rename_pic'][] = PREVIEW_DIR_NAME."/".$currentgalerien." - ".$test_pic;
                             }
                         }
-                        # if($GALLERY_CONF->get("usethumbs") == "true" and !is_file($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic)) {
-                        if(!is_file($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic)) {
-                            require_once($BASE_DIR_CMS."Image.php");
-                            scaleImage($test_pic, $GALLERIES_DIR_REL.$currentgalerien.'/', $GALLERIES_DIR_REL.$currentgalerien.'/'.$PREVIEW_DIR_NAME.'/', $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'));
-                            if(is_file($GALLERIES_DIR_REL.$currentgalerien."/".$PREVIEW_DIR_NAME."/".$test_pic)) {
+                        # if($GALLERY_CONF->get("usethumbs") == "true" and !is_file(GALLERIES_DIR_REL.$currentgalerien."/".PREVIEW_DIR_NAME."/".$test_pic)) {
+                        if(!is_file(GALLERIES_DIR_REL.$currentgalerien."/".PREVIEW_DIR_NAME."/".$test_pic)) {
+                            require_once(BASE_DIR_CMS."Image.php");
+                            scaleImage($test_pic, GALLERIES_DIR_REL.$currentgalerien.'/', GALLERIES_DIR_REL.$currentgalerien.'/'.PREVIEW_DIR_NAME.'/', $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'));
+                            if(is_file(GALLERIES_DIR_REL.$currentgalerien."/".PREVIEW_DIR_NAME."/".$test_pic)) {
                                 $post['messages']['gallery_message_ftp_make_thumb'][] =  $currentgalerien." - ".$test_pic;
                                 $count_preview_pic++;
                             }
@@ -2014,7 +1986,7 @@ function gallery($post) {
         $pagecontent .= '</tr></table>';
         # inhalt gallery
         $pagecontent .= '<table summary="" width="98%" cellspacing="0" border="0" cellpadding="0" class="table_data">';
-        $subtitle = new Properties($GALLERIES_DIR_REL.$currentgalerien."/texte.conf",true);
+        $subtitle = new Properties(GALLERIES_DIR_REL.$currentgalerien."/texte.conf",true);
         $max_cols = 3;
         $max_cols_check = $max_cols;
         $td_width = round(100 / $max_cols).'%';
@@ -2024,11 +1996,11 @@ function gallery($post) {
             # ausgleich weil pos mit 0 anfängt
             $pos = $pos + 1;
             $lastsavedanchor = "";#$lastsavedanchor = " id=\"lastsavedimage\"";
-            $size = getimagesize($GALLERIES_DIR_REL.$currentgalerien."/".$file);
+            $size = getimagesize(GALLERIES_DIR_REL.$currentgalerien."/".$file);
             // Vorschaubild anzeigen, wenn vorhanden; sonst Text
-            if (file_exists($GALLERIES_DIR_REL.$currentgalerien."/$PREVIEW_DIR_NAME/".$file)) {
-                $preview = '<a href="'.$specialchars->replaceSpecialChars($URL_BASE.$GALLERIES_DIR_NAME."/".$currentgalerien."/".$file,true).'" target="_blank"'.$tooltip_gallery_help_picture.'>'
-                .'<img src="'.$specialchars->replaceSpecialChars($URL_BASE.$GALLERIES_DIR_NAME."/".$currentgalerien."/".$PREVIEW_DIR_NAME."/".$file,true).'" alt="'.$specialchars->rebuildSpecialChars($file, true, true).'" style="height:60px;border:none;" /></a>';
+            if (file_exists(GALLERIES_DIR_REL.$currentgalerien."/PREVIEW_DIR_NAME/".$file)) {
+                $preview = '<a href="'.$specialchars->replaceSpecialChars(URL_BASE.GALLERIES_DIR_NAME."/".$currentgalerien."/".$file,true).'" target="_blank"'.$tooltip_gallery_help_picture.'>'
+                .'<img src="'.$specialchars->replaceSpecialChars(URL_BASE.GALLERIES_DIR_NAME."/".$currentgalerien."/".PREVIEW_DIR_NAME."/".$file,true).'" alt="'.$specialchars->rebuildSpecialChars($file, true, true).'" style="height:60px;border:none;" /></a>';
             } else {
                 $preview = '<div style="color:red;text-align:center;"><b>'.$text_gallery_no_preview.'</b></div>';
             }
@@ -2088,11 +2060,8 @@ function gallery($post) {
 
 
 function newGalleryImg($post) {
-    global $PREVIEW_DIR_NAME;
-    global $GALLERIES_DIR_REL;
     global $specialchars;
     global $GALLERY_CONF;
-    global $BASE_DIR_CMS;
 
     $forceoverwrite = "";
     if (isset($_POST['overwrite'])) {
@@ -2109,19 +2078,19 @@ function newGalleryImg($post) {
                 $gallery_tmp .= $tmp."_";
             }
             $gallery[1] = substr($gallery_tmp,0,-1);
-            $error = uploadFile($_FILES[$array_name], $GALLERIES_DIR_REL.$gallery[1]."/", $forceoverwrite,$GALLERY_CONF->get('maxwidth'), $GALLERY_CONF->get('maxtheight'));
+            $error = uploadFile($_FILES[$array_name], GALLERIES_DIR_REL.$gallery[1]."/", $forceoverwrite,$GALLERY_CONF->get('maxwidth'), $GALLERY_CONF->get('maxtheight'));
             if(!empty($error)) {
                 $post['error_messages'][key($error)][] = $gallery[1]."/".$error[key($error)];
             } else {
-                require_once($BASE_DIR_CMS."Image.php");
+                require_once(BASE_DIR_CMS."Image.php");
                 $pict = $specialchars->replaceSpecialChars($_FILES[$array_name]['name'],false);
-                $size    = GetImageSize($GALLERIES_DIR_REL.$gallery[1]."/".$pict);
+                $size    = GetImageSize(GALLERIES_DIR_REL.$gallery[1]."/".$pict);
                 if($size[0] <= $GALLERY_CONF->get('maxthumbwidth') and $size[1] <= $GALLERY_CONF->get('maxthumbheight')) {
-                    copy($GALLERIES_DIR_REL.$gallery[1]."/".$pict,$GALLERIES_DIR_REL.$gallery[1]."/".$PREVIEW_DIR_NAME."/".$pict);
+                    copy(GALLERIES_DIR_REL.$gallery[1]."/".$pict,GALLERIES_DIR_REL.$gallery[1]."/".PREVIEW_DIR_NAME."/".$pict);
                 } else {
-                    scaleImage($pict, $GALLERIES_DIR_REL.$gallery[1]."/", $GALLERIES_DIR_REL.$gallery[1]."/".$PREVIEW_DIR_NAME."/", $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'));
+                    scaleImage($pict, GALLERIES_DIR_REL.$gallery[1]."/", GALLERIES_DIR_REL.$gallery[1]."/".PREVIEW_DIR_NAME."/", $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'));
                 }
-                useChmod($GALLERIES_DIR_REL.$gallery[1]."/".$PREVIEW_DIR_NAME."/".$pict);
+                useChmod(GALLERIES_DIR_REL.$gallery[1]."/".PREVIEW_DIR_NAME."/".$pict);
                 $post['messages']['gallery_message_new_img'][] = $_FILES[$array_name]['name']." <b>></b> ".$gallery[1];
                 $post['gallery']['error_html']['display'][$gallery[1]] = ' style="display:block;"';
             }
@@ -2133,19 +2102,16 @@ function newGalleryImg($post) {
 
 function newGallery($post) {
     global $specialchars;
-    global $GALLERIES_DIR_REL;
-    global $PREVIEW_DIR_NAME;
-    global $ALLOWED_SPECIALCHARS_REGEX;
     global $ADMIN_CONF;
 
     if(isset($_POST['new_gallery']))
         $galleryname = $specialchars->replaceSpecialChars($_POST['new_gallery'],false);
 
     if($_SERVER["REQUEST_METHOD"] == "POST") {
-        if(isset($galleryname) and preg_match($ALLOWED_SPECIALCHARS_REGEX, $galleryname)) {
+        if(isset($galleryname) and preg_match(ALLOWED_SPECIALCHARS_REGEX, $galleryname)) {
             // Galerieverzeichnis schon vorhanden? Wenn nicht: anlegen!
-            if(!file_exists($GALLERIES_DIR_REL.$galleryname)) {
-                @mkdir($GALLERIES_DIR_REL.$galleryname);
+            if(!file_exists(GALLERIES_DIR_REL.$galleryname)) {
+                @mkdir(GALLERIES_DIR_REL.$galleryname);
                 $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
                 $last_error['line'] = NULL;
                 if(function_exists("error_get_last")) {
@@ -2153,10 +2119,10 @@ function newGallery($post) {
                 }
                 if($last_error['line'] == $line_error) {
                     $post['error_messages']['php_error'][] = $last_error['message'];
-                } elseif(!is_dir($GALLERIES_DIR_REL.$galleryname)) {
+                } elseif(!is_dir(GALLERIES_DIR_REL.$galleryname)) {
                     $post['error_messages']['gallery_error_new'][] = $galleryname;
                 } else {
-                    @mkdir($GALLERIES_DIR_REL.$galleryname."/".$PREVIEW_DIR_NAME);
+                    @mkdir(GALLERIES_DIR_REL.$galleryname."/".PREVIEW_DIR_NAME);
                     $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
                     $last_error['line'] = NULL;
                     if(function_exists("error_get_last")) {
@@ -2164,10 +2130,10 @@ function newGallery($post) {
                     }
                     if($last_error['line'] == $line_error) {
                         $post['error_messages']['php_error'][] = $last_error['message'];
-                    } elseif(!is_dir($GALLERIES_DIR_REL.$galleryname."/".$PREVIEW_DIR_NAME)) {
+                    } elseif(!is_dir(GALLERIES_DIR_REL.$galleryname."/".PREVIEW_DIR_NAME)) {
                         $post['error_messages']['gallery_error_new_preview'][] = $galleryname;
                     } else {
-                        @touch($GALLERIES_DIR_REL.$galleryname."/texte.conf");
+                        @touch(GALLERIES_DIR_REL.$galleryname."/texte.conf");
                         $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
                         $last_error['line'] = NULL;
                         if(function_exists("error_get_last")) {
@@ -2175,18 +2141,18 @@ function newGallery($post) {
                         }
                         if($last_error['line'] == $line_error) {
                             $post['error_messages']['php_error'][] = $last_error['message'];
-                        } elseif(!is_file($GALLERIES_DIR_REL.$galleryname."/texte.conf")) {
+                        } elseif(!is_file(GALLERIES_DIR_REL.$galleryname."/texte.conf")) {
                             $post['error_messages']['gallery_error_datei_conf'][] = $galleryname."/texte.conf";
                         } else {
-                            $error = changeChmod($GALLERIES_DIR_REL.$galleryname);
+                            $error = changeChmod(GALLERIES_DIR_REL.$galleryname);
                             if(is_array($error)) {
                                 $post['error_messages'][key($error)][] = $error[key($error)];
                             }
-                            $error = changeChmod($GALLERIES_DIR_REL.$galleryname."/".$PREVIEW_DIR_NAME);
+                            $error = changeChmod(GALLERIES_DIR_REL.$galleryname."/".PREVIEW_DIR_NAME);
                             if(is_array($error)) {
                                 $post['error_messages'][key($error)][] = $error[key($error)];
                             }
-                            $error = changeChmod($GALLERIES_DIR_REL.$galleryname."/texte.conf");
+                            $error = changeChmod(GALLERIES_DIR_REL.$galleryname."/texte.conf");
                             if(is_array($error)) {
                                 $post['error_messages'][key($error)][] = $error[key($error)];
                             }
@@ -2206,12 +2172,8 @@ function newGallery($post) {
 
 function editGallery($post) {
     global $specialchars;
-    global $GALLERIES_DIR_REL;
-    global $ALLOWED_SPECIALCHARS_REGEX;
-    global $PREVIEW_DIR_NAME;
     global $GALLERY_CONF;
     global $ADMIN_CONF;
-    global $BASE_DIR_CMS;
 
     # wenn expert eingeschaltet wird müssen die expert $post gefüllt werden
     $gallery = makeDefaultConf("gallery");
@@ -2275,12 +2237,12 @@ function editGallery($post) {
         # Neuer Gallery Name
         if(isset($post['gallery'][$gallery]['newname']) and strlen($post['gallery'][$gallery]['newname']) > 0) {
             $newname = $specialchars->replaceSpecialChars($post['gallery'][$gallery]['newname'],false);
-            if(!preg_match($ALLOWED_SPECIALCHARS_REGEX, $newname) or stristr($newname,"%5E")) {
+            if(!preg_match(ALLOWED_SPECIALCHARS_REGEX, $newname) or stristr($newname,"%5E")) {
                 $post['error_messages']['check_name']['color'] = "#FFC197";
                 $post['gallery']['error_html']['newname'][$gallery] = 'style="background-color:#FFC197;" ';
                 $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
             } else {
-                @rename($GALLERIES_DIR_REL.$gallery,$GALLERIES_DIR_REL.$newname);
+                @rename(GALLERIES_DIR_REL.$gallery,GALLERIES_DIR_REL.$newname);
                 $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
                 $last_error['line'] = NULL;
                 if(function_exists("error_get_last")) {
@@ -2288,7 +2250,7 @@ function editGallery($post) {
                 }
                 if($last_error['line'] == $line_error) {
                     $post['error_messages']['php_error'][] = $last_error['message'];
-                } elseif(!is_dir($GALLERIES_DIR_REL.$newname)) {
+                } elseif(!is_dir(GALLERIES_DIR_REL.$newname)) {
                     $post['error_messages']['gallery_error_newname'][] = $newname;
                 } else {
                     $post['messages']['gallery_messages_newname'][] = $newname;
@@ -2301,9 +2263,9 @@ function editGallery($post) {
 
         # Subtitel setzen
         if(isset($post['gallery'][$gallery]['subtitle'])) {
-            $gallery_subtitel = new Properties($GALLERIES_DIR_REL.$gallery."/texte.conf",true);
+            $gallery_subtitel = new Properties(GALLERIES_DIR_REL.$gallery."/texte.conf",true);
             foreach($post['gallery'][$gallery]['subtitle'] as $img => $subtitel) {
-                if($gallery_subtitel->get($img) != $subtitel and is_file($GALLERIES_DIR_REL.$gallery."/".$img)) {
+                if($gallery_subtitel->get($img) != $subtitel and is_file(GALLERIES_DIR_REL.$gallery."/".$img)) {
                     $gallery_subtitel->set($img, $subtitel);
                     $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
                     if(isset($gallery_subtitel->properties['error'])) {
@@ -2318,12 +2280,12 @@ function editGallery($post) {
 
         #make_thumbs
         if(isset($post['gallery'][$gallery]['make_thumbs'])) {
-            require_once($BASE_DIR_CMS."Image.php");
-            $gallerypics = getFiles($GALLERIES_DIR_REL.$gallery,"");
+            require_once(BASE_DIR_CMS."Image.php");
+            $gallerypics = getFiles(GALLERIES_DIR_REL.$gallery,"");
             foreach($gallerypics as $pos => $file) {
                 # nur Dateien zulassen
-                if(!is_dir($GALLERIES_DIR_REL.$gallery.'/'.$file)) {
-                    scaleImage($file, $GALLERIES_DIR_REL.$gallery.'/', $GALLERIES_DIR_REL.$gallery.'/'.$PREVIEW_DIR_NAME.'/', $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'),true);
+                if(!is_dir(GALLERIES_DIR_REL.$gallery.'/'.$file)) {
+                    scaleImage($file, GALLERIES_DIR_REL.$gallery.'/', GALLERIES_DIR_REL.$gallery.'/'.PREVIEW_DIR_NAME.'/', $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'),true);
                     $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
                     $post['messages']['gallery_messages_make_thumbs'][$gallery] = $gallery;
                 }
@@ -2335,14 +2297,14 @@ function editGallery($post) {
                 $post['error_messages']['gallery_error_no_scale_max'][] = NULL;
                 $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
             } else {
-                require_once($BASE_DIR_CMS."Image.php");
-                $gallerypics = getFiles($GALLERIES_DIR_REL.$gallery,"");
+                require_once(BASE_DIR_CMS."Image.php");
+                $gallerypics = getFiles(GALLERIES_DIR_REL.$gallery,"");
                 foreach($gallerypics as $pos => $file) {
-                    $test_img = @getimagesize($GALLERIES_DIR_REL.$gallery.'/'.$file);
+                    $test_img = @getimagesize(GALLERIES_DIR_REL.$gallery.'/'.$file);
                     # nur Bilder zulassen
                     if(!is_dir($file) and count($test_img) > 2) {
                         if($test_img[0] > $GALLERY_CONF->get('maxwidth') or $test_img[1] > $GALLERY_CONF->get('maxheight')) {
-                            scaleImage($file, $GALLERIES_DIR_REL.$gallery.'/', $GALLERIES_DIR_REL.$gallery.'/', $GALLERY_CONF->get('maxwidth'), $GALLERY_CONF->get('maxheight'));
+                            scaleImage($file, GALLERIES_DIR_REL.$gallery.'/', GALLERIES_DIR_REL.$gallery.'/', $GALLERY_CONF->get('maxwidth'), $GALLERY_CONF->get('maxheight'));
                             $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
                             $post['messages']['gallery_messages_scale_max'][$gallery] = $gallery;
                         }
@@ -2357,16 +2319,14 @@ function editGallery($post) {
 
 function deleteGalleryImg($post) {
     global $specialchars;
-    global $GALLERIES_DIR_REL;
-    global $PREVIEW_DIR_NAME;
     global $icon_size;
 
     $gallery = key($post['action_data']['deletegalleryimg']);
     $del_file = $post['action_data']['deletegalleryimg'][$gallery];
 
     if (isset($_POST['confirm']) and ($_POST['confirm'] == "true")) {
-        if(file_exists($GALLERIES_DIR_REL.$gallery."/".$del_file)) {
-            @unlink($GALLERIES_DIR_REL.$gallery."/".$del_file);
+        if(file_exists(GALLERIES_DIR_REL.$gallery."/".$del_file)) {
+            @unlink(GALLERIES_DIR_REL.$gallery."/".$del_file);
             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
             $last_error['line'] = NULL;
             if(function_exists("error_get_last")) {
@@ -2374,11 +2334,11 @@ function deleteGalleryImg($post) {
             }
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
-            } elseif(is_file($GALLERIES_DIR_REL.$gallery."/".$del_file)) {
+            } elseif(is_file(GALLERIES_DIR_REL.$gallery."/".$del_file)) {
                 $post['error_messages']['gallery_error_deleted_img'][] = $gallery." <b>></b> ".$del_file;
             } else {
-                if(file_exists($GALLERIES_DIR_REL.$gallery."/".$PREVIEW_DIR_NAME."/".$del_file)) {
-                    @unlink($GALLERIES_DIR_REL.$gallery."/".$PREVIEW_DIR_NAME."/".$del_file);
+                if(file_exists(GALLERIES_DIR_REL.$gallery."/".PREVIEW_DIR_NAME."/".$del_file)) {
+                    @unlink(GALLERIES_DIR_REL.$gallery."/".PREVIEW_DIR_NAME."/".$del_file);
                     $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
                     $last_error['line'] = NULL;
                     if(function_exists("error_get_last")) {
@@ -2386,11 +2346,11 @@ function deleteGalleryImg($post) {
                     }
                     if($last_error['line'] == $line_error) {
                         $post['error_messages']['php_error'][] = $last_error['message'];
-                    } elseif(is_file($GALLERIES_DIR_REL.$gallery."/".$del_file)) {
-                        $post['error_messages']['gallery_error_deleted_img'][] = $gallery."/".$PREVIEW_DIR_NAME."/ <b>></b> ".$del_file;
+                    } elseif(is_file(GALLERIES_DIR_REL.$gallery."/".$del_file)) {
+                        $post['error_messages']['gallery_error_deleted_img'][] = $gallery."/".PREVIEW_DIR_NAME."/ <b>></b> ".$del_file;
                     }
                 }
-                $subtitle = new Properties($GALLERIES_DIR_REL.$gallery."/texte.conf",true);
+                $subtitle = new Properties(GALLERIES_DIR_REL.$gallery."/texte.conf",true);
                 $subtitle->delete($del_file);
                 $post['messages']['gallery_message_deleted_img'][] = $gallery." <b>></b> ".$del_file;
             }
@@ -2409,8 +2369,6 @@ function deleteGalleryImg($post) {
 
 function deleteGallery($post) {
     global $specialchars;
-    global $GALLERIES_DIR_REL;
-    global $PREVIEW_DIR_NAME;
     global $icon_size;
 
     # Nachfragen wirklich Löschen
@@ -2420,9 +2378,9 @@ function deleteGallery($post) {
     }
     # Gallery Löschen    
     if(isset($_POST['confirm']) and $_POST['confirm'] == "true" and isset($_POST['del_gallery']) and !empty($_POST['del_gallery'])) {
-        $del_gallery = $GALLERIES_DIR_REL.$_POST['del_gallery'];
+        $del_gallery = GALLERIES_DIR_REL.$_POST['del_gallery'];
         $post['error_messages'] = deleteDir($del_gallery);
-        if(!file_exists($GALLERIES_DIR_REL.$_POST['del_gallery'])) {
+        if(!file_exists(GALLERIES_DIR_REL.$_POST['del_gallery'])) {
             unset($post['gallery'][$_POST['del_gallery']]);
             $post['messages']['gallery_message_deleted'][] = $_POST['del_gallery'];
         } else {
@@ -2436,19 +2394,14 @@ function deleteGallery($post) {
 
 function files($post) {
     global $specialchars;
-    global $CONTENT_DIR_REL;
-    global $EXT_LINK;
     global $DOWNLOAD_COUNTS;
     global $ADMIN_CONF;
     global $icon_size;
-    global $URL_BASE;
-    global $CONTENT_DIR_NAME;
-    global $CONTENT_FILES_DIR_NAME;
 
     $max_cat_page = 100;
 
     $pagecontent = '<input type="hidden" name="action_activ" value="'.getLanguageValue("files_button").'">';
-    $post['categories'] = makePostCatPageReturnVariable($CONTENT_DIR_REL);
+    $post['categories'] = makePostCatPageReturnVariable();
 
     if(isset($post['action_data']) and !isset($post['error_messages'])) {
         $action_data_key = key($post['action_data']);
@@ -2477,9 +2430,9 @@ function files($post) {
             continue;
         }
         $file = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
-        if(!file_exists($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME)) {
-            $post['error_messages']['files_error_dateien'][] = $CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME;
-            @mkdir ($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME);
+        if(!file_exists(CONTENT_DIR_REL.$file."/".CONTENT_FILES_DIR_NAME)) {
+            $post['error_messages']['files_error_dateien'][] = CONTENT_DIR_REL.$file."/".CONTENT_FILES_DIR_NAME;
+            @mkdir (CONTENT_DIR_REL.$file."/".CONTENT_FILES_DIR_NAME);
             $line_error = __LINE__ - 1;
             $last_error['line'] = NULL;
             if(function_exists("error_get_last")) {
@@ -2487,10 +2440,10 @@ function files($post) {
             }
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
-            } elseif(!is_dir($CONTENT_DIR_REL.$file."/dateien")) {
-                $post['error_messages']['files_error_mkdir_dateien'][] = $CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME;
+            } elseif(!is_dir(CONTENT_DIR_REL.$file."/dateien")) {
+                $post['error_messages']['files_error_mkdir_dateien'][] = CONTENT_DIR_REL.$file."/".CONTENT_FILES_DIR_NAME;
             } else {
-                useChmod($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME);
+                useChmod(CONTENT_DIR_REL.$file."/".CONTENT_FILES_DIR_NAME);
             }
         }
     }
@@ -2542,8 +2495,8 @@ function files($post) {
         $file = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
         // Anzahl Dateien auslesen
         $filecount = 0;
-        if(file_exists($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME)) {
-            if($fileshandle = opendir($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME)) {
+        if(file_exists(CONTENT_DIR_REL.$file."/".CONTENT_FILES_DIR_NAME)) {
+            if($fileshandle = opendir(CONTENT_DIR_REL.$file."/".CONTENT_FILES_DIR_NAME)) {
                  while (($filesdir = readdir($fileshandle))) {
                     if(isValidDirOrFile($filesdir))
                         $filecount++;
@@ -2573,7 +2526,7 @@ function files($post) {
         $pagecontent .= '<td '.$post['categories']['cat']['error_html']['display'][$pos].'id="toggle_'.$pos.'" align="right" class="td_togglen">';
 
         $file = $post['categories']['cat']['position'][$pos]."_".$post['categories']['cat']['name'][$pos];
-        if (isValidDirOrFile($file) && ($subhandle = @opendir($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME))) {
+        if (isValidDirOrFile($file) && ($subhandle = @opendir(CONTENT_DIR_REL.$file."/".CONTENT_FILES_DIR_NAME))) {
             $hasdata = false;
             $pagecontent .= '<table summary="" width="98%" class="table_data" cellspacing="0" border="0" cellpadding="0">';
             $pagecontent .= '<tr><td class="td_left_title_padding_bottom td_toggle_new" colspan="1">'.$text_files_text_upload.'</td>'
@@ -2602,7 +2555,7 @@ function files($post) {
                 if ($downloads == "")
                     $downloads = "0";
                 // Downloads pro Tag berechnen
-                $uploadtime = filemtime($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME."/".$subfile);
+                $uploadtime = filemtime(CONTENT_DIR_REL.$file."/".CONTENT_FILES_DIR_NAME."/".$subfile);
                 $counterstart = $DOWNLOAD_COUNTS->get("_downloadcounterstarttime");
                 // Berechnungsgrundlage fuer "Downloads pro Tag":
                 // Entweder Upload-Zeitpunkt oder Beginn der Statistik - genommen wird der spätere Zeitpunkt
@@ -2620,7 +2573,7 @@ function files($post) {
  #               else
                     $downloadsperdaytext = "";
                 // Dateigröße
-                $filesize = filesize($CONTENT_DIR_REL.$file."/".$CONTENT_FILES_DIR_NAME."/".$subfile);
+                $filesize = filesize(CONTENT_DIR_REL.$file."/".CONTENT_FILES_DIR_NAME."/".$subfile);
 
         $titel_dateien = NULL;
         if(!isset($display_titel_dateien)) { # Position:          
@@ -2628,7 +2581,7 @@ function files($post) {
             $display_titel_dateien = true;
         }
 
-                $pagecontent .= $titel_dateien.'<tr><td class="td_left_title_padding_bottom"><a class="file_link" href="'.$URL_BASE.$CONTENT_DIR_NAME.'/'.$specialchars->replaceSpecialChars($file.'/dateien/'.$subfile,true).'" target="_blank"'.$tooltip_files_help_show.'>'.$specialchars->rebuildSpecialChars($subfile,true,true).'</a></td>'
+                $pagecontent .= $titel_dateien.'<tr><td class="td_left_title_padding_bottom"><a class="file_link" href="'.URL_BASE.CONTENT_DIR_NAME.'/'.$specialchars->replaceSpecialChars($file.'/dateien/'.$subfile,true).'" target="_blank"'.$tooltip_files_help_show.'>'.$specialchars->rebuildSpecialChars($subfile,true,true).'</a></td>'
                 .'<td class="td_left_title_padding_bottom" nowrap><span class="text_info">'.convertFileSizeUnit($filesize).'</span></td>'
                 .'<td class="td_left_title_padding_bottom" nowrap><span class="text_info">'.@strftime(getLanguageValue("_dateformat"), $uploadtime).'</span></td>'
                 .'<td class="td_center_title_padding_bottom" nowrap><span class="text_info">'.$downloads." ".$downloadsperdaytext.'</span></td>';
@@ -2658,10 +2611,8 @@ function files($post) {
 }
 
 function newFile($post) {
-    global $CONTENT_DIR_REL;
     global $error_color;
     global $ADMIN_CONF;
-    global $CONTENT_FILES_DIR_NAME;
 
     $forceoverwrite = "";
     if (isset($_POST['overwrite'])) {
@@ -2672,8 +2623,8 @@ function newFile($post) {
     foreach($_FILES as $array_name => $tmp) {
         if($_FILES[$array_name]['error'] == 0) {
             $cat_pos= explode("_",$array_name);
-            $cat = sprintf("%02d",$cat_pos[1])."_".specialNrDir("$CONTENT_DIR_REL", sprintf("%02d",$cat_pos[1]));
-            $error = uploadFile($_FILES[$array_name], $CONTENT_DIR_REL.$cat."/".$CONTENT_FILES_DIR_NAME."/", $forceoverwrite,$ADMIN_CONF->get("maximagewidth"),$ADMIN_CONF->get("maximageheight"));
+            $cat = sprintf("%02d",$cat_pos[1])."_".specialNrDir("CONTENT_DIR_REL", sprintf("%02d",$cat_pos[1]));
+            $error = uploadFile($_FILES[$array_name], CONTENT_DIR_REL.$cat."/".CONTENT_FILES_DIR_NAME."/", $forceoverwrite,$ADMIN_CONF->get("maximagewidth"),$ADMIN_CONF->get("maximageheight"));
             if(!empty($error)) {
                 $post['error_messages'][key($error)][] = $cat."/".$error[key($error)];
                 $key = array_keys($post['categories']['cat']['position'], substr($cat,0,2));
@@ -2689,9 +2640,7 @@ function newFile($post) {
 
 function deleteFile($post) {
     global $specialchars;
-    global $CONTENT_DIR_REL;
     global $DOWNLOAD_COUNTS;
-    global $CONTENT_FILES_DIR_NAME;
     global $icon_size;
 
     $cat = key($post['action_data']['deletefile']);
@@ -2700,8 +2649,8 @@ function deleteFile($post) {
     if(isset($_POST['confirm']) and ($_POST['confirm'] == "false")) {
         return $post;
     } elseif(isset($_POST['confirm']) and ($_POST['confirm'] == "true")) {
-        if(file_exists($CONTENT_DIR_REL.$cat."/".$CONTENT_FILES_DIR_NAME."/".$del_file)) {
-            @unlink($CONTENT_DIR_REL.$cat."/".$CONTENT_FILES_DIR_NAME."/".$del_file);
+        if(file_exists(CONTENT_DIR_REL.$cat."/".CONTENT_FILES_DIR_NAME."/".$del_file)) {
+            @unlink(CONTENT_DIR_REL.$cat."/".CONTENT_FILES_DIR_NAME."/".$del_file);
             $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
             $last_error['line'] = NULL;
             if(function_exists("error_get_last")) {
@@ -2709,7 +2658,7 @@ function deleteFile($post) {
             }
             if($last_error['line'] == $line_error) {
                 $post['error_messages']['php_error'][] = $last_error['message'];
-            } elseif(is_file($CONTENT_DIR_REL.$cat."/".$CONTENT_FILES_DIR_NAME."/".$del_file)) {
+            } elseif(is_file(CONTENT_DIR_REL.$cat."/".CONTENT_FILES_DIR_NAME."/".$del_file)) {
                 $post['error_messages']['files_error_delete'][] = $cat." <b>></b> ".$del_file;
             } else {
                 $post['messages']['files_message_deleted'][] = $cat." <b>></b> ".$del_file;
@@ -2730,13 +2679,10 @@ function deleteFile($post) {
 function config($post) {
     global $CMS_CONF;
     global $specialchars;
-    global $CONTENT_DIR_REL;
     global $USER_SYNTAX_FILE;
     global $CONTACT_CONF;
     global $ADMIN_CONF;
     global $icon_size;
-    global $BASE_DIR;
-    global $BASE_DIR_CMS;
 
     $main = makeDefaultConf("main");
 
@@ -2756,9 +2702,9 @@ function config($post) {
         $error_color['titel_'.$syntax_name] = NULL;
     }
 */
-    $language_array = getFiles($BASE_DIR_CMS.'sprachen',true);
-    $cat_array = getDirs($CONTENT_DIR_REL,true,true);
-    $layout_array = getDirs($BASE_DIR."layouts",true);
+    $language_array = getFiles(BASE_DIR_CMS.'sprachen',true);
+    $cat_array = getDirs(CONTENT_DIR_REL,true,true);
+    $layout_array = getDirs(BASE_DIR."layouts",true);
 
     $pagecontent = '<input type="hidden" name="action_activ" value="'.getLanguageValue("config_button").'">';
 
@@ -3068,7 +3014,7 @@ function config($post) {
     $pagecontent .= "<td class=\"td_cms_left\">";
     $pagecontent .= "<select name=\"defaultcat\" class=\"input_cms_select\"".$error_color['defaultcat'].">";
     foreach($cat_array as $element) {
-        if (count(getFiles($CONTENT_DIR_REL.$element, "")) == 0) {
+        if (count(getFiles(CONTENT_DIR_REL.$element, "")) == 0) {
             continue;
         }
         $selected = NULL;
@@ -3227,7 +3173,6 @@ function admin($post) {
     global $CMS_CONF;
     global $specialchars;
     global $icon_size;
-    global $BASE_DIR_ADMIN;
 
     $basic = makeDefaultConf("basic");
 
@@ -3248,7 +3193,7 @@ function admin($post) {
     $pagecontent = '<input type="hidden" name="action_activ" value="'.getLanguageValue("admin_button").'">';
 
     $error_color['language'] = NULL;
-    $language_array = getFiles($BASE_DIR_ADMIN.'sprachen',true);
+    $language_array = getFiles(BASE_DIR_ADMIN.'sprachen',true);
     if(count($language_array) <= 0) {
         $post['error_messages']['admin_error_language_emty'][] = NULL;
         $error_color['language'] = ' style="background-color:#FF7029;"';
@@ -3379,7 +3324,7 @@ function admin($post) {
             }
         }
 
-        require_once($BASE_DIR_ADMIN."Crypt.php");
+        require_once(BASE_DIR_ADMIN."Crypt.php");
         $pwcrypt = new Crypt();
         if($post['newpw'] != "" and $pwcrypt->encrypt($post['newpw']) != $LOGINCONF->get("pw")) {
             if (($post['newname'] == "" ) or ($post['newpw'] == "" ) or ($post['newpwrepeat'] == "" )) {
@@ -3596,13 +3541,10 @@ function admin($post) {
 
 function plugins($post) {
     global $ADMIN_CONF;
-    global $CHARSET;
-    global $PLUGIN_DIR_REL;
     global $icon_size;
-    global $BASE_DIR_CMS;
 
-    require_once($BASE_DIR_CMS."Plugin.php");
-    require_once($BASE_DIR_CMS."CatPageClass.php");
+    require_once(BASE_DIR_CMS."Plugin.php");
+    require_once(BASE_DIR_CMS."CatPageClass.php");
     global $CatPage;
     $CatPage         = new CatPageClass();
 
@@ -3626,19 +3568,19 @@ function plugins($post) {
     $pagecontent .= '<table summary="" width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
     $pagecontent .= '<tr><td width="100%" class="td_toggle"><input type="submit" class="input_submit" name="apply" value="'.getLanguageValue("plugins_submit").'"/></td></tr>';
 
-    $dircontent = getDirs($PLUGIN_DIR_REL, true);
+    $dircontent = getDirs(PLUGIN_DIR_REL, true);
     natcasesort($dircontent);
     $toggle_pos = 0;
     foreach ($dircontent as $currentelement) {
-        if (file_exists($PLUGIN_DIR_REL.$currentelement."/index.php")) {
-            require_once($PLUGIN_DIR_REL.$currentelement."/index.php");
+        if (file_exists(PLUGIN_DIR_REL.$currentelement."/index.php")) {
+            require_once(PLUGIN_DIR_REL.$currentelement."/index.php");
             if(class_exists( $currentelement ) and in_array($currentelement, get_declared_classes()))
                 $plugin = new $currentelement();
             else
                 # Plugin Dirname stimt nicht mit Plugin Classnamen überein
                 continue;
             $plugin_error = false;
-            $conf_plugin = new Properties($PLUGIN_DIR_REL.$currentelement."/plugin.conf",true);
+            $conf_plugin = new Properties(PLUGIN_DIR_REL.$currentelement."/plugin.conf",true);
             $plugin_error_conf = NULL;
             if(isset($conf_plugin->properties['error'])) {
                 $plugin_error_conf = returnMessage(false, getLanguageValue("properties_write").'&nbsp;&nbsp;<span style="font-weight:normal;">'.$currentelement.'/plugin.conf</span>');
@@ -3662,7 +3604,7 @@ function plugins($post) {
                 # Plugin Info Prüfen
                 if(isset($plugin_info) and count($plugin_info) > 0) {
                     $plugin_name = strip_tags($plugin_info[0],'<b>');
-                    $plugin_name = htmlentities($plugin_name,ENT_COMPAT,$CHARSET);
+                    $plugin_name = htmlentities($plugin_name,ENT_COMPAT,CHARSET);
                     $plugin_name = str_replace(array("&lt;","&gt;"),array("<",">"),$plugin_name);
                 } else {
                     $plugin_name = getLanguageValue('plugins_error').' <span style="color:#ff0000">'.$currentelement.'</span>';
@@ -3690,12 +3632,12 @@ function plugins($post) {
                         if($pos == 2) {
                             $plugin_info[$pos] = str_replace(array("&lt;","&gt;"),array("<",">"),$plugin_info[$pos]);
                             $plugin_info[$pos] = strip_tags($plugin_info[$pos], '<span><br>');
-                            $plugin_info[$pos] = htmlentities($plugin_info[$pos],ENT_NOQUOTES,$CHARSET);
+                            $plugin_info[$pos] = htmlentities($plugin_info[$pos],ENT_NOQUOTES,CHARSET);
                             $plugin_info[$pos] = str_replace(array('&amp;#',"&lt;","&gt;"),array('&#',"<",">"),$plugin_info[$pos]);
                         } elseif($pos == 4) {
                             $plugin_info[$pos] = '<a href="'.strip_tags($plugin_info[$pos]).'" target="_blank">'.strip_tags($plugin_info[$pos]).'</a>';
                         } else {
-                            $plugin_info[$pos] = htmlentities(strip_tags($plugin_info[$pos]),ENT_COMPAT,$CHARSET);
+                            $plugin_info[$pos] = htmlentities(strip_tags($plugin_info[$pos]),ENT_COMPAT,CHARSET);
                         }
                         if(isset($plugin_info[$pos])) {
                             $pagecontent_conf .= '<tr><td width="30%" valign="top" class="td_right_title_padding_bottom" nowrap><b class="text_grau">'.getLanguageValue($info).'</b></td>'
@@ -3886,15 +3828,11 @@ function showEditPageForm($cat, $page, $newsite)    {
     global $ADMIN_CONF;
     global $CMS_CONF;
     global $specialchars;
-    global $CONTENT_DIR_REL;
-    global $EXT_DRAFT;
-    global $EXT_HIDDEN;
-    global $EXT_PAGE;
 
     $content = "";
     $action = 'editsite';
 
-    $file = $CONTENT_DIR_REL.$cat."/".$page;
+    $file = CONTENT_DIR_REL.$cat."/".$page;
 
     # Vorhandene Inhaltseite öffnen
     if ($newsite == 'editsite') {
@@ -3934,18 +3872,18 @@ function showEditPageForm($cat, $page, $newsite)    {
     $checkednormal = "";
     $checkedhidden = "";
     $checkeddraft = "";
-    if ($extension == $EXT_PAGE) {
+    if ($extension == EXT_PAGE) {
         $checkednormal = ' checked="checked"';
     }
-    if ($extension == $EXT_HIDDEN) {
+    if ($extension == EXT_HIDDEN) {
         $checkedhidden = ' checked="checked"';
     }
-    if ($extension == $EXT_DRAFT) {
+    if ($extension == EXT_DRAFT) {
         $checkeddraft = ' checked="checked"';
     }
-    $content .= '<input type="radio" name="saveas" value="'.$EXT_PAGE.'"'.$checkednormal.' accesskey="n" /> '.getLanguageValue("page_saveasnormal")
-    .' <input type="radio" name="saveas" value="'.$EXT_HIDDEN.'"'.$checkedhidden.' accesskey="v" /> '.getLanguageValue("page_saveashidden")
-    .' <input type="radio" name="saveas" value="'.$EXT_DRAFT.'"'.$checkeddraft.' accesskey="e" /> '.getLanguageValue("page_saveasdraft");
+    $content .= '<input type="radio" name="saveas" value="'.EXT_PAGE.'"'.$checkednormal.' accesskey="n" /> '.getLanguageValue("page_saveasnormal")
+    .' <input type="radio" name="saveas" value="'.EXT_HIDDEN.'"'.$checkedhidden.' accesskey="v" /> '.getLanguageValue("page_saveashidden")
+    .' <input type="radio" name="saveas" value="'.EXT_DRAFT.'"'.$checkeddraft.' accesskey="e" /> '.getLanguageValue("page_saveasdraft");
     $content .= '<span style="margin-left:30px;margin-right:10px;">'.getLanguageValue("page_edit_next").'</span>'. returnOverviewSelectbox(4, $cat);
     return $content;
 }
@@ -4058,16 +3996,13 @@ function returnMessage($success, $message) {
 
 // Smiley-Liste
 function returnSmileyBar() {
-    global $BASE_DIR_CMS;
-    global $URL_BASE;
-    global $CMS_DIR_NAME;
-    $smileys = new Smileys($BASE_DIR_CMS."smileys");
+    $smileys = new Smileys(BASE_DIR_CMS."smileys");
     $content = "";
     foreach($smileys->getSmileysArray() as $icon => $emoticon) {
         if($icon == "readonly" or $icon == "error") {
             continue;
         }
-        $content .= '<img class="jss" title=":'.$icon.':" alt="'.$emoticon.'" src="'.$URL_BASE.$CMS_DIR_NAME.'/smileys/'.$icon.'.gif" onClick="insert(\' :'.$icon.': \', \'\', false)"'.createUserTooltipWZ($emoticon,':'.$icon.':').' />';
+        $content .= '<img class="jss" title=":'.$icon.':" alt="'.$emoticon.'" src="'.URL_BASE.CMS_DIR_NAME.'/smileys/'.$icon.'.gif" onClick="insert(\' :'.$icon.': \', \'\', false)"'.createUserTooltipWZ($emoticon,':'.$icon.':').' />';
     }
     return $content;
 
@@ -4107,21 +4042,19 @@ function returnPlatzhalterSelectbox() {
 
 // Selectbox mit allen Plugin Platzhaltern die nichts mit dem Template zu tun haben
 function returnPluginSelectbox() {
-    global $PLUGIN_DIR_REL;
     global $specialchars;
-    global $BASE_DIR_CMS;
 
-    require_once($BASE_DIR_CMS."Plugin.php");
-    $plugins = getDirContentAsArray($PLUGIN_DIR_REL, false);
+    require_once(BASE_DIR_CMS."Plugin.php");
+    $plugins = getDirContentAsArray(PLUGIN_DIR_REL, false);
     $selectbox = '<select class="overviewselect" name="plugins" onchange="insertPluginAndResetSelectbox(this);">'
     .'<option class="noaction" value="">'.getLanguageValue("toolbar_plugins").'</option>';
     foreach ($plugins as $currentplugin) {
-        if (file_exists($PLUGIN_DIR_REL.$currentplugin."/index.php")) {
-            require_once($PLUGIN_DIR_REL.$currentplugin."/index.php");
+        if (file_exists(PLUGIN_DIR_REL.$currentplugin."/index.php")) {
+            require_once(PLUGIN_DIR_REL.$currentplugin."/index.php");
             $plugin = new $currentplugin();
             $plugin_info = $plugin->getInfo();
             // Plugin nur in der Auswahlliste zeigen, wenn es aktiv geschaltet ist
-            $plugin_conf = new Properties($PLUGIN_DIR_REL.$currentplugin."/plugin.conf",true);
+            $plugin_conf = new Properties(PLUGIN_DIR_REL.$currentplugin."/plugin.conf",true);
             if ($plugin_conf->get("active") == "true") {
                 if(isset($plugin_info[5]) and is_array($plugin_info[5])) {
                     foreach($plugin_info[5] as $platzh => $info) {
@@ -4275,12 +4208,6 @@ function returnFormatToolbarIcon($tag) {
 // 4=Kategorien & Inhaltsseiten für Edit Select Inhaltseite ohne Klick in die Inhaltsseite
 function returnOverviewSelectbox($type, $currentcat) {
     global $specialchars;
-    global $CONTENT_DIR_REL;
-    global $CONTENT_FILES_DIR_NAME;
-    global $GALLERIES_DIR_REL;
-    global $EXT_PAGE;
-    global $EXT_HIDDEN;
-    global $EXT_LINK;
 
     $elements = array();
     $selectname = "";
@@ -4290,18 +4217,18 @@ function returnOverviewSelectbox($type, $currentcat) {
 
         // Inhaltsseiten und Kategorien
         case ($type == 1 or $type == 4):
-            $categories = getDirContentAsArray($CONTENT_DIR_REL, false);
+            $categories = getDirContentAsArray(CONTENT_DIR_REL, false);
             foreach ($categories as $catdir) {
-                if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
+                if(substr($catdir,-(strlen(EXT_LINK))) == EXT_LINK) continue;
                 $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
                 $elements[] = array($cleancatname, ":".$cleancatname);
-                $files = getFiles($CONTENT_DIR_REL.$catdir, $EXT_LINK);
+                $files = getFiles(CONTENT_DIR_REL.$catdir, EXT_LINK);
                 natcasesort($files);
                 foreach($files as $file) {
-                    if ((substr($file, strlen($file)-4, 4) == $EXT_PAGE) || (substr($file, strlen($file)-4, 4) == $EXT_HIDDEN)) {
-                        $cleanpagename = $specialchars->rebuildSpecialChars(substr($file, 3, strlen($file) - 3 - strlen($EXT_PAGE)), true, true);
+                    if ((substr($file, strlen($file)-4, 4) == EXT_PAGE) || (substr($file, strlen($file)-4, 4) == EXT_HIDDEN)) {
+                        $cleanpagename = $specialchars->rebuildSpecialChars(substr($file, 3, strlen($file) - 3 - strlen(EXT_PAGE)), true, true);
                         $completepagename = $cleanpagename;
-                        if (substr($file, strlen($file)-4, 4) == $EXT_HIDDEN)
+                        if (substr($file, strlen($file)-4, 4) == EXT_HIDDEN)
                             $completepagename = $cleanpagename." (".getLanguageValue("page_saveashidden").")";
                         if($type == 4) {
                             $elements[] = array($spacer.$completepagename, $catdir."/".$file);
@@ -4322,12 +4249,12 @@ function returnOverviewSelectbox($type, $currentcat) {
         // Dateien
         case 2:
             // alle Kategorien durchgehen
-            $categories = getDirContentAsArray($CONTENT_DIR_REL, false);
+            $categories = getDirContentAsArray(CONTENT_DIR_REL, false);
             foreach ($categories as $catdir) {
-                if(substr($catdir,-(strlen($EXT_LINK))) == $EXT_LINK) continue;
+                if(substr($catdir,-(strlen(EXT_LINK))) == EXT_LINK) continue;
                 $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
                 $elements[] = array($cleancatname, ":".$cleancatname);
-                $currentcat_filearray = getFiles($CONTENT_DIR_REL.$catdir."/".$CONTENT_FILES_DIR_NAME,"");
+                $currentcat_filearray = getFiles(CONTENT_DIR_REL.$catdir."/".CONTENT_FILES_DIR_NAME,"");
                 natcasesort($currentcat_filearray);
                 foreach ($currentcat_filearray as $current_file) {
                     if ($catdir == $currentcat)
@@ -4341,7 +4268,7 @@ function returnOverviewSelectbox($type, $currentcat) {
 
         // Galerien
         case 3:
-            $galleries = getDirContentAsArray($GALLERIES_DIR_REL, false);
+            $galleries = getDirContentAsArray(GALLERIES_DIR_REL, false);
             foreach ($galleries as $currentgallery) {
                 $elements[] = array($specialchars->rebuildSpecialChars($currentgallery, false, true), $specialchars->rebuildSpecialChars($currentgallery, false, false));
             }
@@ -4448,7 +4375,6 @@ function setLayoutAndDependentSettings($layoutfolder) {
 function uploadFile($uploadfile, $destination, $forceoverwrite,$MAX_IMG_WIDTH,$MAX_IMG_HEIGHT){
     global $ADMIN_CONF;
     global $specialchars;
-    global $BASE_DIR_CMS;
 
     $uploadfile_name = $specialchars->replaceSpecialChars($uploadfile['name'],false);
     if (isset($uploadfile) and !$uploadfile['error']) {
@@ -4486,7 +4412,7 @@ function uploadFile($uploadfile, $destination, $forceoverwrite,$MAX_IMG_WIDTH,$M
                 $image_typ = strtolower(str_replace('image/','',$size['mime']));
                 # nur wenns ein bild ist
                 if($image_typ == "gif" or $image_typ == "png" or $image_typ == "jpeg") {
-                    require_once($BASE_DIR_CMS."Image.php");
+                    require_once(BASE_DIR_CMS."Image.php");
                     scaleImage($uploadfile_name, $destination, $destination, $MAX_IMG_WIDTH, $MAX_IMG_HEIGHT);
                 } else {
                     return array("files_error_no_image" => $uploadfile_name);
@@ -4521,9 +4447,8 @@ function checkBoxChecked($checkboxrequest) {
 // Hilfsfunktion: Sichert einen Input-Wert
 // ------------------------------------------------------------------------------
     function cleanInput($input) {
-        global $CHARSET;
         if (function_exists("mb_convert_encoding")) {
-            $input = @mb_convert_encoding($input,$CHARSET,@mb_detect_encoding($input,"UTF-8,ISO-8859-1,ISO-8859-15",true));
+            $input = @mb_convert_encoding($input,CHARSET,@mb_detect_encoding($input,"UTF-8,ISO-8859-1,ISO-8859-15",true));
         }
         return $input;
     }

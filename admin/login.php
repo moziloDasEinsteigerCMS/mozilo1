@@ -3,7 +3,9 @@ session_start();
 
 if(!isset($BASE_DIR)) {
     $CMS_DIR_NAME = "cms";
+    define("CMS_DIR_NAME",$CMS_DIR_NAME);
     $ADMIN_DIR_NAME = "admin";
+    define("ADMIN_DIR_NAME",$ADMIN_DIR_NAME);
     # bei winsystemen gibts nicht immer $_SERVER["SCRIPT_FILENAME"]
     if(isset($_SERVER["SCRIPT_FILENAME"]))
         $BASE_DIR = $_SERVER["SCRIPT_FILENAME"];
@@ -12,45 +14,48 @@ if(!isset($BASE_DIR)) {
     # fals da bei winsystemen \\ drin sind in \ wandeln
     $BASE_DIR = str_replace("\\\\", "\\",$BASE_DIR);
     # zum schluss noch den teil denn wir nicht brauchen abschneiden
-    $BASE_DIR = substr($BASE_DIR,0,-(strlen($ADMIN_DIR_NAME."/index.php")));
-    $BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
-    $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
+    $BASE_DIR = substr($BASE_DIR,0,-(strlen(ADMIN_DIR_NAME."/index.php")));
+    define("BASE_DIR",$BASE_DIR);
+    $BASE_DIR_ADMIN = BASE_DIR.ADMIN_DIR_NAME."/";
+    define("BASE_DIR_ADMIN",$BASE_DIR_ADMIN);
+    $BASE_DIR_CMS = BASE_DIR.CMS_DIR_NAME."/";
+    define("BASE_DIR_CMS",$BASE_DIR_CMS);
 }
 
-if(is_file($BASE_DIR_CMS."DefaultConf.php")) {
-    require_once($BASE_DIR_CMS."DefaultConf.php");
+if(is_file(BASE_DIR_CMS."DefaultConf.php")) {
+    require_once(BASE_DIR_CMS."DefaultConf.php");
 } else {
-    die("Fatal Error ".$BASE_DIR_CMS."DefaultConf.php Datei existiert nicht");
+    die("Fatal Error ".BASE_DIR_CMS."DefaultConf.php Datei existiert nicht");
 }
 
 $_GET = cleanREQUEST($_GET);
 $_REQUEST = cleanREQUEST($_REQUEST);
 $_POST = cleanREQUEST($_POST);
 
-require_once($BASE_DIR_ADMIN."Crypt.php");
-require_once($BASE_DIR_CMS."Mail.php");
-require_once($BASE_DIR_ADMIN."filesystem.php");
+require_once(BASE_DIR_ADMIN."Crypt.php");
+require_once(BASE_DIR_CMS."Mail.php");
+require_once(BASE_DIR_ADMIN."filesystem.php");
 
 
 // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 @ini_set("display_errors", 0);
 
 // Initialisierungen
-$logindataconf = new Properties($BASE_DIR_ADMIN."conf/logindata.conf",true);
+$logindataconf = new Properties(BASE_DIR_ADMIN."conf/logindata.conf",true);
 if(!isset($logindataconf->properties['readonly'])) {
     die($logindataconf->properties['error']);
 }
-$VERSION_CONF    = new Properties($BASE_DIR_CMS."conf/version.conf",true);
+$VERSION_CONF    = new Properties(BASE_DIR_CMS."conf/version.conf",true);
 if(!isset($VERSION_CONF->properties['readonly'])) {
     die($VERSION_CONF->properties['error']);
 }
 
-$ADMIN_CONF = new Properties($BASE_DIR_ADMIN."conf/basic.conf",true);
+$ADMIN_CONF = new Properties(BASE_DIR_ADMIN."conf/basic.conf",true);
 if(!isset($ADMIN_CONF->properties['readonly'])) {
     die($ADMIN_CONF->properties['error']);
 }
 $pwcrypt = new Crypt();
-$BASIC_LANGUAGE = new Properties($BASE_DIR_ADMIN."sprachen/language_".$ADMIN_CONF->get("language").".conf");
+$BASIC_LANGUAGE = new Properties(BASE_DIR_ADMIN."sprachen/language_".$ADMIN_CONF->get("language").".conf");
 
 // MAXIMALE ANZAHL FALSCHER LOGINS
 $FALSELOGINLIMIT = 3;
@@ -157,14 +162,13 @@ echo $HTML;
 
 // Aufbau des Login-Formulars
 function login_formular($enabled) {
-    global $CHARSET;
     $form = "";
     if ($enabled)
         $form .= "<div id=\"loginform_maindiv\">";
     else
         $form .= "<div id=\"loginform_maindiv_disabled\">";
     if ($enabled)
-        $form .= "<form accept-charset=\"$CHARSET\" name=\"loginform\" action=\"".htmlentities($_SERVER['PHP_SELF'],ENT_COMPAT,$CHARSET)."\" method=\"POST\">";
+        $form .= "<form accept-charset=\"CHARSET\" name=\"loginform\" action=\"".htmlentities($_SERVER['PHP_SELF'],ENT_COMPAT,CHARSET)."\" method=\"POST\">";
   $form .= "<table id=\"table_loginform\" width=\"100%\" cellspacing=\"10\" border=\"0\" cellpadding=\"0\">"
       ."<tr>"
       ."<td width=\"5%\" rowspan=\"2\" align=\"center\" valign=\"middle\">"

@@ -21,13 +21,12 @@ $error_color = array('check_name' => '#CCFFCC',
                 'check_doubles_digit_same_cat' => '#FFCCCC');
 
 # beim ersten aufruf von cat oder page mussen einige variable vorbereitet werden
-function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
-    global $EXT_LINK;
+function makePostCatPageReturnVariable($pages = false) {
     global $error_color;
 
     $max_cat_page = 100;
 
-    $cat_array = getDirs("$CONTENT_DIR_REL",true);
+    $cat_array = getDirs(CONTENT_DIR_REL,true);
 
     if(count($cat_array) > $max_cat_page) {
         $post['error_messages']['check_too_many_categories'][] = NULL;
@@ -47,7 +46,7 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
         $test_doubles_position[$cat] = array();
         $test_doubles_name[$cat] = array();
         # nach dopelten Positionen und namen suchen wichtig bei FTP
-        if($cat != 'cat' and strpos($cat,$EXT_LINK) === false) {
+        if($cat != 'cat' and strpos($cat,EXT_LINK) === false) {
             $cat_position = substr($cat,0,2);
             if(in_array($cat_position,$test_doubles_position_cat)) {
                 $post['error_messages']['check_doubles_position_cat'][] = $cat_position;
@@ -64,10 +63,10 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
             $test_doubles_name_cat[sprintf("%1d",$cat_position)] = $cat_name;
         }
         if($pages === true) {
-            if(substr($cat,-(strlen($EXT_LINK))) == $EXT_LINK) {
+            if(substr($cat,-(strlen(EXT_LINK))) == EXT_LINK) {
                 continue;
             }
-            $page_array = getFiles($CONTENT_DIR_REL.$cat, "");
+            $page_array = getFiles(CONTENT_DIR_REL.$cat, "");
             if(!isset($post[$cat]['error_html']['cat_name'])) {
                 $post[$cat]['error_html']['cat_name'] = NULL;
             }
@@ -85,7 +84,7 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
             $position = substr($file,0,2);
             # New cat page
             if($pos == $max_cat_page) {
-                $file = $EXT_LINK;
+                $file = EXT_LINK;
                 $position = NULL;
             } else {
                 $pos = sprintf("%1d",substr($file,0,2));
@@ -104,10 +103,10 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
             # wird nur bei Inhaltseiten gebraucht (move Inhaltseiten in andere Kategory)
             if($pages === true) {
                 $post[$cat]['new_cat'][$pos] = NULL;
-                $post[$cat]['ext'][$pos] = substr($file,-(strlen($EXT_LINK)));
+                $post[$cat]['ext'][$pos] = substr($file,-(strlen(EXT_LINK)));
             }
             # file ist ein LINK
-            if(strpos("tmp".$file,$EXT_LINK)) { # "tmp" deshalb damit strpos() $EXT_LINK findet (strpos = schneller)
+            if(strpos("tmp".$file,EXT_LINK)) { # "tmp" deshalb damit strpos() EXT_LINK findet (strpos = schneller)
                 $post[$cat]['checked_selv'][$pos] = NULL;
                 $post[$cat]['checked_blank'][$pos] = ' checked="checked"';
                 if(strpos($file,"-_self-")) {
@@ -122,9 +121,9 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
                 }
                 if($pos != $max_cat_page) {
                     $post[$cat]['name'][$pos] = substr($exlink[0],3);
-                    $post[$cat]['url'][$pos] = substr($exlink[1],0,-(strlen($EXT_LINK)));
+                    $post[$cat]['url'][$pos] = substr($exlink[1],0,-(strlen(EXT_LINK)));
                     if($pages === true) {
-                        $post[$cat]['ext'][$pos] = $EXT_LINK;
+                        $post[$cat]['ext'][$pos] = EXT_LINK;
                     }
                 }
                 $post[$cat]['new_url'][$pos] = NULL;
@@ -132,7 +131,7 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
             # file ist eine Kategorie oder Inhaltseite
             } else {
                 if($pages === true) {
-                    $post[$cat]['name'][$pos] = substr($file,3,-(strlen($EXT_LINK)));
+                    $post[$cat]['name'][$pos] = substr($file,3,-(strlen(EXT_LINK)));
                 } else {
                     $post[$cat]['name'][$pos] = substr($file,3);
                 }
@@ -147,7 +146,7 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
             }
             $test_doubles_position[$cat][] = $position;
             $file_name = substr($file,3);
-            if(strpos($file,$EXT_LINK) === false) {
+            if(strpos($file,EXT_LINK) === false) {
                 if(in_array($file_name,$test_doubles_name[$cat])) {
                     if($cat != 'cat') {
                         foreach(array_keys($test_doubles_name[$cat],$file_name) as $pos_doubles) {
@@ -172,10 +171,8 @@ function makePostCatPageReturnVariable($CONTENT_DIR_REL,$pages = false) {
 }
 
 # die daten die von cat oder page übermitelt wurden überprüfen
-function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
-    global $EXT_LINK;
+function checkPostCatPageReturnVariable() {
     global $specialchars;
-    global $ALLOWED_SPECIALCHARS_REGEX;
     global $error_color;
     global $PASSWORDS;
 
@@ -322,7 +319,7 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
                     $post[$cat]['new_name'][$pos] = $_POST['categories'][$cat]['new_name'][$pos];
                    $newname = $post[$cat]['new_name'][$pos];
                     $name_len = strlen($newname);
-                    if(!preg_match($ALLOWED_SPECIALCHARS_REGEX, $newname) or stristr($newname,"%5E")) {
+                    if(!preg_match(ALLOWED_SPECIALCHARS_REGEX, $newname) or stristr($newname,"%5E")) {
                         $post['error_messages']['check_name']['color'] = $error_color['check_name'];
                         $post['error_messages']['check_name'][] = NULL;
                         $post[$cat]['error_html']['new_name'][$pos] = 'style="background-color:'.$error_color['check_name'].';" ';
@@ -360,7 +357,7 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
                 $post[$cat]['url'][$pos] = $_POST['categories'][$cat]['url'][$pos];
                 $url_len = strlen($post[$cat]['url'][$pos]);
                 # urls haben immer eine ext.
-                $ext_len = strlen($EXT_LINK);
+                $ext_len = strlen(EXT_LINK);
             }
             $post[$cat]['error_html']['new_url'][$pos] = NULL;
             $post[$cat]['new_url'][$pos] = NULL;
@@ -369,8 +366,8 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
                 if(strlen($post[$cat]['new_url'][$pos]) > "0") {
                     $url_len = strlen($post[$cat]['new_url'][$pos]);
                     # urls haben immer eine ext.
-                    $ext_len = strlen($EXT_LINK);
-                    if(!preg_match($ALLOWED_SPECIALCHARS_REGEX, $post[$cat]['new_url'][$pos]) or stristr($post[$cat]['new_url'][$pos],"%5E")) {
+                    $ext_len = strlen(EXT_LINK);
+                    if(!preg_match(ALLOWED_SPECIALCHARS_REGEX, $post[$cat]['new_url'][$pos]) or stristr($post[$cat]['new_url'][$pos],"%5E")) {
                         $post['error_messages']['check_url']['color'] = $error_color['check_url'];
                         $post['error_messages']['check_url'][] = NULL;
                         $post[$cat]['error_html']['new_url'][$pos] = 'style="background-color:'.$error_color['check_url'].';" ';
@@ -471,7 +468,7 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
             }
             # existiert die cat oder page überhaupt
             if(!isset($post[$cat]['url'][$pos]) and isset($post[$cat]['position'][$pos]) and isset($post[$cat]['name'][$pos])) {
-                $file_test = $CONTENT_DIR_REL.$kategorie.$post[$cat]['position'][$pos]."_".$post[$cat]['name'][$pos].$post[$cat]['ext'][$pos];
+                $file_test = CONTENT_DIR_REL.$kategorie.$post[$cat]['position'][$pos]."_".$post[$cat]['name'][$pos].$post[$cat]['ext'][$pos];
                 If(is_file($file_test)) {
                     $tt = true;
                 } elseif(is_dir($file_test)) {
@@ -482,7 +479,7 @@ function checkPostCatPageReturnVariable($CONTENT_DIR_REL) {
                     $post[$cat]['error_html']['name'][$pos] = 'style="background-color:'.$error_color['check_is_file'].';" ';
                 }
             } elseif(isset($post[$cat]['url'][$pos]) and isset($post[$cat]['position'][$pos]) and isset($post[$cat]['name'][$pos]) and isset($post[$cat]['target'][$pos]) and isset($post[$cat]['url'][$pos])) {
-                $file_test =$CONTENT_DIR_REL.$kategorie.$post[$cat]['position'][$pos]."_".$post[$cat]['name'][$pos].$post[$cat]['target'][$pos].$post[$cat]['url'][$pos].$EXT_LINK;
+                $file_test =CONTENT_DIR_REL.$kategorie.$post[$cat]['position'][$pos]."_".$post[$cat]['name'][$pos].$post[$cat]['target'][$pos].$post[$cat]['url'][$pos].EXT_LINK;
                 if(is_file($file_test)) {
                     $tt = true;
                 } elseif(is_dir($file_test)) {

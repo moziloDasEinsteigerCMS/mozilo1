@@ -22,11 +22,10 @@ require_once($BASE_DIR_CMS."Properties.php");
 function getLanguageValue($confpara,$title = false)
 {
     global $BASIC_LANGUAGE;
-    global $CHARSET;
     if(isset($_REQUEST['javascript']) and $title) {
         return NULL;
     }
-    $text = htmlentities($BASIC_LANGUAGE->get($confpara),ENT_COMPAT,$CHARSET);
+    $text = htmlentities($BASIC_LANGUAGE->get($confpara),ENT_COMPAT,CHARSET);
     if(empty($text)) {
         return "FEHLER = ".$confpara;
     }
@@ -70,12 +69,11 @@ function getDirs($dir,$complet = false,$exclude_link = false)
  --------------------------------------------------------------------------------*/
 function getFiles($dir, $excludeextension)
 {
-    global $CONTENT_FILES_DIR_NAME;
     //$dir = stripslashes($dir);
     $files = array();
     $handle = opendir($dir);
     while($file = readdir($handle)) {
-        if(isValidDirOrFile($file) && ($file != $CONTENT_FILES_DIR_NAME)) {
+        if(isValidDirOrFile($file) && ($file != CONTENT_FILES_DIR_NAME)) {
             // auszuschließende Extensions nicht berücksichtigen
             if ($excludeextension != "") {
                 if (substr($file, strlen($file)-4, strlen($file)) != "$excludeextension")
@@ -118,11 +116,9 @@ function specialNrDir($dir, $nr)
 function createCategory($new_cat) {
     global $specialchars;
     global $ADMIN_CONF;
-    global $CONTENT_DIR_NAME;
-    global $CONTENT_FILES_DIR_NAME;
     # dummy fehlermeldung erzeugen
     @chmod();
-    @mkdir ("../".$CONTENT_DIR_NAME."/".$new_cat);
+    @mkdir ("../".CONTENT_DIR_NAME."/".$new_cat);
     $line_error = __LINE__ - 1;
     $last_error['line'] = NULL;
     if(function_exists("error_get_last")) {
@@ -130,12 +126,12 @@ function createCategory($new_cat) {
     }
     if($last_error['line'] == $line_error) {
         $error['php_error'][] = $last_error['message'];
-    } elseif(!is_dir("../".$CONTENT_DIR_NAME."/".$new_cat)) {
+    } elseif(!is_dir("../".CONTENT_DIR_NAME."/".$new_cat)) {
         $error['category_error_new'][] = $new_cat;
     }
     # ist kein Link
     if(!preg_match('/-_blank-|-_self-/', $new_cat)) {
-        @mkdir ("../".$CONTENT_DIR_NAME."/".$new_cat."/".$CONTENT_FILES_DIR_NAME);
+        @mkdir ("../".CONTENT_DIR_NAME."/".$new_cat."/".CONTENT_FILES_DIR_NAME);
         $line_error = __LINE__ - 1;
         $last_error['line'] = NULL;
         if(function_exists("error_get_last")) {
@@ -143,8 +139,8 @@ function createCategory($new_cat) {
         }
         if($last_error['line'] == $line_error) {
             $error['php_error'][] = $last_error['message'];
-        } elseif(!is_dir("../".$CONTENT_DIR_NAME."/".$new_cat."/".$CONTENT_FILES_DIR_NAME)) {
-            $error['category_error_new'][] = $new_cat."/".$CONTENT_FILES_DIR_NAME;
+        } elseif(!is_dir("../".CONTENT_DIR_NAME."/".$new_cat."/".CONTENT_FILES_DIR_NAME)) {
+            $error['category_error_new'][] = $new_cat."/".CONTENT_FILES_DIR_NAME;
         }
     }
     if(isset($error['php_error']) or isset($error['category_error_new'])) {
@@ -152,10 +148,10 @@ function createCategory($new_cat) {
         return $error;
     }
     # bis hier kein fehler dann solte das chmod auch fehlerfrei gehen
-    useChmod("../".$CONTENT_DIR_NAME."/".$new_cat);
+    useChmod("../".CONTENT_DIR_NAME."/".$new_cat);
     # ist kein Link
     if(!preg_match('/-_blank-|-_self-/', $new_cat)) {
-        useChmod("../".$CONTENT_DIR_NAME."/".$new_cat."/".$CONTENT_FILES_DIR_NAME);
+        useChmod("../".CONTENT_DIR_NAME."/".$new_cat."/".CONTENT_FILES_DIR_NAME);
     }
 }
 
@@ -260,21 +256,20 @@ function updateReferencesInAllContentPages($oldCategory, $oldPage, $newCategory,
     # Rename CAT: $oldPage und $newPage müssen leer sein, $oldCategory und $newCategory aber gesetzt
     # Rename PAGE: $newCategory muss leer sein, $oldCategory, $oldPage und $newPage aber gesetzt
     # Move PAGE: Alle müssen gefüllt sein
-    global $CONTENT_DIR_REL;
 
     $error = NULL;
     // Alle Kategorien einlesen
-    $contentdirhandle = opendir($CONTENT_DIR_REL);
+    $contentdirhandle = opendir(CONTENT_DIR_REL);
     while($currentcategory = readdir($contentdirhandle)) {
         if(isValidDirOrFile($currentcategory)) {
             // Alle Inhaltseiten der aktuellen Kategorie einlesen 
-            $cathandle = opendir($CONTENT_DIR_REL.$currentcategory);
+            $cathandle = opendir(CONTENT_DIR_REL.$currentcategory);
             while($currentpage = readdir($cathandle)) {
-                if(isValidDirOrFile($currentpage) && is_file($CONTENT_DIR_REL.$currentcategory."/".$currentpage)) {
+                if(isValidDirOrFile($currentpage) && is_file(CONTENT_DIR_REL.$currentcategory."/".$currentpage)) {
                     // Datei öffnen
-                    $pagehandle = @fopen($CONTENT_DIR_REL.$currentcategory."/".$currentpage, "r");
+                    $pagehandle = @fopen(CONTENT_DIR_REL.$currentcategory."/".$currentpage, "r");
                     // Inhalt auslesen
-                    $pagecontent = @fread($pagehandle, @filesize($CONTENT_DIR_REL.$currentcategory."/".$currentpage));
+                    $pagecontent = @fread($pagehandle, @filesize(CONTENT_DIR_REL.$currentcategory."/".$currentpage));
                     // Datei schließen
                     @fclose($pagehandle);
                     # um diese Attribute geht es
@@ -291,7 +286,7 @@ function updateReferencesInAllContentPages($oldCategory, $oldPage, $newCategory,
                     // Ersetzung nur vornehmen, wenn überhaupt Referenzen auftauchen
                     if ($result[0]) {
                         // Inhaltsseite speichern
-                        $error_tmp = saveContentToPage($result[1], $CONTENT_DIR_REL.$currentcategory."/".$currentpage);
+                        $error_tmp = saveContentToPage($result[1], CONTENT_DIR_REL.$currentcategory."/".$currentpage);
                         if(!empty($error_tmp)) {
                             if(is_array($error)) {
                                 $error = array_merge_recursive($error,$error_tmp);
@@ -314,8 +309,6 @@ function updateReferencesInAllContentPages($oldCategory, $oldPage, $newCategory,
 // ------------------------------------------------------------------------------
 function updateReferencesInText($currentPagesContent, $currentPagesCategory, $movedPage, $oldCategory, $oldPage, $newCategory, $newPage, $allowed_attributes) {
     global $specialchars;
-    global $CONTENT_DIR_REL;
-    global $CHARSET;
 
     $pos_currentPagesCategory     = $specialchars->rebuildSpecialChars($currentPagesCategory,false,false);
     $pos_oldCategory        = $specialchars->rebuildSpecialChars($oldCategory,false,false);
@@ -474,13 +467,11 @@ function changeChmod($file) {
 # änder die dateirechte Recursiv wenn kein Parameter über geben wird das array $ordner benutzt
 function useChmod($dir = false, $error = NULL) {
     global $error;
-    global $CONTENT_DIR_NAME;
-    global $CMS_DIR_NAME;
 
     if($dir === false) {
         $ordner = array("conf",
-                        "../".$CMS_DIR_NAME."/conf",
-                        "../".$CONTENT_DIR_NAME,"../galerien");
+                        "../".CMS_DIR_NAME."/conf",
+                        "../".CONTENT_DIR_NAME,"../galerien");
         foreach($ordner as $dirs) {
             $error_tmp = useChmod($dirs,$error);
             if(is_array($error_tmp)) {
