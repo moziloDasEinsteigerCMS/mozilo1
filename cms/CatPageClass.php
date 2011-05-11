@@ -26,52 +26,18 @@ class CatPageClass {
     var $link_search = array("%3A","%2F","%3F","%26","%3D","%23");
     var $link_replace = array(":","/","?","&amp;","=","#");
     function CatPageClass() {
-        global $CONTENT_DIR_REL;
         if(defined("isCatPage"))
             die("die class CatPage darf nur einmal initaliesiert werden");
-        $this->CatPageArray = $this->make_DirCatPageArray($CONTENT_DIR_REL);
+        $this->CatPageArray = $this->make_DirCatPageArray(CONTENT_DIR_REL);
         $this->OrgCatPageArray = $this->CatPageArray;
         define("isCatPage",true);
     }
-/*
-    [Link_ext] => Array
-        (
-            [_name-] => Link_ext
-            [_pos-] => 01
-            [_type-] => .lnk
-            [_link-] => http%3A%2F%2Fwww.lin_test.de
-            [_target-] => _blank
-        )
-    }
-    [%CE%95%CE%BB%CE%BB%CE%AC%CE%B4%CE%B1%D0%94%C3%B1%C3%BC] => Array
-        (
-            [_pages-] => Array
-                (
-                    [reve] => Array
-                        (
-                            [_name-] => reve
-                            [_pos-] => 01
-                            [_type-] => .hid
-                        )
 
-                )
-
-            [_name-] => %CE%95%CE%BB%CE%BB%CE%AC%CE%B4%CE%B1%D0%94%C3%B1%C3%BC
-            [_pos-] => 03
-            [_type-] => cat
-            [_files-] => Array
-                (
-                )
-
-        )
-*/
     function get_FirstCatPage() {
-        global $EXT_PAGE;
         global $CMS_CONF;
-        $pages = array($EXT_PAGE);
+        $pages = array(EXT_PAGE);
         if($CMS_CONF->get("showhiddenpagesasdefaultpage") == "true") {
-            global $EXT_HIDDEN;
-            $pages = array($EXT_PAGE,$EXT_HIDDEN);
+            $pages = array(EXT_PAGE,EXT_HIDDEN);
         }
         $firstcat = $this->get_CatArray(false,false,$pages);
         $firstcat = current($firstcat);
@@ -83,14 +49,12 @@ class CatPageClass {
         return array("","");
     }
 
-     function get_FirstPageOfCat($cat) {
+    function get_FirstPageOfCat($cat) {
         $cat = $this->get_AsKeyName($cat);
-        global $EXT_PAGE;
         global $CMS_CONF;
-        $pages = array($EXT_PAGE);
+        $pages = array(EXT_PAGE);
         if($CMS_CONF->get("showhiddenpagesasdefaultpage") == "true") {
-            global $EXT_HIDDEN;
-            $pages = array($EXT_PAGE,$EXT_HIDDEN);
+            $pages = array(EXT_PAGE,EXT_HIDDEN);
         }
         $firstpage = $this->get_PageArray($cat,$pages,true);
         $firstpage = current($firstpage);
@@ -99,11 +63,6 @@ class CatPageClass {
         }
         return false;
      }
-/*    $EXT_PAGE       = ".txt";
-    $EXT_HIDDEN     = ".hid";
-    $EXT_DRAFT      = ".tmp";
-    $EXT_LINK       = ".lnk";
-*/
 
     # Erzeugt ein durchnummeriertes array mit cats in richtiger Reihenfolge
     # $any = true # alle cats auch links ins array $showlink und $containspage werden übergangen
@@ -111,18 +70,16 @@ class CatPageClass {
     # $containspage = array(ext.) # mit page ext. die enthalten sein müssen damit cat ins array geht
     # Default = array mit catlinks und cat mit midestens einer normalen page oder link
     function get_CatArray($any = false, $showlink = true, $containspage = false) {
-        global $EXT_LINK;
-        global $EXT_PAGE;
         $return = array();
         # Default $containspage array erzeugen
         if(!$containspage or !is_array($containspage))
-            $containspage = array($EXT_PAGE, $EXT_LINK);
+            $containspage = array(EXT_PAGE, EXT_LINK);
         foreach($this->CatPageArray as $cat => $info) {
             # alle cat
             if($any)
                 $return[] = $cat;
             # wenn cat ein Link ist und $showlink = true ist
-            elseif($showlink and $info['_type-'] == $EXT_LINK)
+            elseif($showlink and $info['_type-'] == EXT_LINK)
                 $return[] = $cat;
             else {
                 # nur cat zulassen wenn auch pages mit array($containspage) vorhanden sind
@@ -147,10 +104,9 @@ class CatPageClass {
             $hidenamedpages = true;
         $cat = $this->get_AsKeyName($cat);
         $return = array();
-        global $EXT_PAGE, $EXT_LINK;#, $EXT_DRAFT, $EXT_HIDDEN;
         # Default page arten erzeugen
         if(!$showext or !is_array($showext))
-            $showext = array($EXT_PAGE, $EXT_LINK);
+            $showext = array(EXT_PAGE, EXT_LINK);
         if(isset($this->CatPageArray[$cat]['_pages-'])) {
             foreach($this->CatPageArray[$cat]['_pages-'] as $page => $info) {
                 # wenn page art nicht in $showext array ist nächste page
@@ -232,9 +188,8 @@ class CatPageClass {
     # $css = css class, wenn cat oder page activ wird an die class ein "active" angehängt
     function create_AutoLinkTag($cat,$page,$css) {
         global $language;
-        global $EXT_LINK;
         if($page !== false) {
-            if($this->get_Type($cat,$page) == $EXT_LINK) {
+            if($this->get_Type($cat,$page) == EXT_LINK) {
                 $title = $language->getLanguageValue1("tooltip_link_extern_1", $this->get_HrefText($cat,$page));
                 $target = $this->get_HrefTarget($cat,$page);
             } else {
@@ -247,7 +202,7 @@ class CatPageClass {
                     $css.$this->get_CssActiv($cat,$page),
                     $title,$target);
         }
-        if($this->get_Type($cat,false) == $EXT_LINK) {
+        if($this->get_Type($cat,false) == EXT_LINK) {
             $title = $language->getLanguageValue1("tooltip_link_extern_1", $this->get_HrefText($cat,false));
             $target = $this->get_HrefTarget($cat,false);
         } else {
@@ -264,19 +219,16 @@ class CatPageClass {
     # gibt $activtext zurück wenn cat oder page activ ist
     # Default $activtext = active
     function get_CssActiv($cat,$page,$activtext = "active") {
-        global $CAT_REQUEST;
-        global $EXT_LINK;
-        $req_cat = $this->get_AsKeyName($CAT_REQUEST);
+        $req_cat = $this->get_AsKeyName(CAT_REQUEST);
         $cat = $this->get_AsKeyName($cat);
         if($page !== false) {
-            global $PAGE_REQUEST;
-            $req_page = $this->get_AsKeyName($PAGE_REQUEST);
+            $req_page = $this->get_AsKeyName(PAGE_REQUEST);
             $page = $this->get_AsKeyName($page);
-            if($cat == $req_cat and $page == $req_page and $this->get_Type($cat,$page) != $EXT_LINK)
+            if($cat == $req_cat and $page == $req_page and $this->get_Type($cat,$page) != EXT_LINK)
                 return $activtext;
             return NULL;
         }
-        if($cat == $req_cat and $this->get_Type($cat,false) != $EXT_LINK)
+        if($cat == $req_cat and $this->get_Type($cat,false) != EXT_LINK)
             return $activtext;
         return NULL;
     }
@@ -291,22 +243,19 @@ class CatPageClass {
     # Achtung $change_chars nur benutzen wenn nötig wegen geschwindigkeit
     # Achtung wenn $change_chars = false wird auch false zurückgegeben
     # damit auf z.B. $page !== false geprüft werden kann
-#    function get_IndexName($name, $change_chars = false) {
     function get_AsKeyName($name, $change_chars = false) {
-        global $EXT_PAGE, $EXT_HIDDEN, $EXT_LINK, $EXT_DRAFT;
-        $ext = array($EXT_PAGE, $EXT_HIDDEN, $EXT_LINK, $EXT_DRAFT);
+        $ext = array(EXT_PAGE, EXT_HIDDEN, EXT_LINK, EXT_DRAFT);
         if(strpos($name,"-_self-") > 1)
             $name = substr($name,0,strpos($name,"-_self-"));
         if(strpos($name,"-_blank-") > 1)
             $name = substr($name,0,strpos($name,"-_blank-"));
         if(ctype_digit(substr($name,0,2)) and substr($name,2,1) == "_")
             $name = substr($name,3);
-        if(in_array(substr($name,-(strlen($EXT_PAGE))),$ext))
-            $name = substr($name,0,-(strlen($EXT_PAGE)));
+        if(in_array(substr($name,-(strlen(EXT_PAGE))),$ext))
+            $name = substr($name,0,-(strlen(EXT_PAGE)));
         if($change_chars === true) {
             $name = $this->get_UrlCoded($name);
         }
-#echo "$name<br>\n";
         return $name;
     }
 
@@ -323,8 +272,6 @@ class CatPageClass {
         return true;
     }
 
-
-#    function get_IndexFileName($name) {
     # wandelt $name von z.B. "Über uns" nach "%C3%9Cber%20uns"
     function get_UrlCoded($name,$protectUrlChr = false) {
         global $specialchars;
@@ -333,16 +280,14 @@ class CatPageClass {
             $name = str_replace($this->link_search,$this->link_replace,$name);
         return $name;
     }
-# coded
+
     function get_FileSystemName($cat,$page) {
-#    function get_CatPageFileSystemName($cat,$page) {
-        global $EXT_LINK;
         $cat = $this->get_AsKeyName($cat);
         if($page !== false) {
             $page = $this->get_AsKeyName($page);
             if(isset($this->CatPageArray[$cat]['_pages-'][$page])) {
                 $pos = $this->CatPageArray[$cat]['_pages-'][$page]['_pos-'].'_';
-                if($this->get_Type($cat,$page) == $EXT_LINK) {
+                if($this->get_Type($cat,$page) == EXT_LINK) {
                     return $pos.$page.'-'.$this->CatPageArray[$cat]['_pages-'][$page]['_target-'].'-'.$this->CatPageArray[$cat]['_pages-'][$page]['_link-'].$this->CatPageArray[$cat]['_pages-'][$page]['_type-'];
                 } else {
                     return $pos.$page.$this->CatPageArray[$cat]['_pages-'][$page]['_type-'];
@@ -352,7 +297,7 @@ class CatPageClass {
         }
         if(isset($this->CatPageArray[$cat])) {
             $pos = $this->CatPageArray[$cat]['_pos-'].'_';
-            if($this->get_Type($cat,false) == $EXT_LINK) {
+            if($this->get_Type($cat,false) == EXT_LINK) {
                 return $pos.$cat.'-'.$this->CatPageArray[$cat]['_target-'].'-'.$this->CatPageArray[$cat]['_link-'].$this->CatPageArray[$cat]['_type-'];
             } else {
                 return $pos.$cat;
@@ -361,9 +306,6 @@ class CatPageClass {
         return false;
     }
 
-    # !!!! prüfen brauchen wir noch den ganzen request quatsch
-#    function get_AsRequestName($cat,$page) {
-#with
     function get_CatPageWithPos($cat,$page) {
         $cat = $this->get_AsKeyName($cat);
         if($page !== false) {
@@ -372,15 +314,6 @@ class CatPageClass {
         }
         return $this->CatPageArray[$cat]['_pos-'].'_'.$cat;
     }
-# 01_Link_ext-_blank-http%3A%2F%2Fwww.lin_test.de.lnk
-//     [Link_ext] => Array
-//         (
-//             [_name-] => Link_ext
-//             [_pos-] => 01
-//             [_type-] => .lnk
-//             [_link-] => http%3A%2F%2Fwww.lin_test.de
-//             [_target-] => _blank
-//         )
 
     # gibt anhand eines Syntaxelement cat:page string ein array($cat,$page) zurück
     # der Inhalt von array($cat,$page) ist filesystem konform formatiert
@@ -407,8 +340,7 @@ class CatPageClass {
             $cat = $this->get_AsKeyName($default_cat, true);
         # ansonsten nim einfach $CAT_REQUEST
         } else {
-            global $CAT_REQUEST;
-            $cat = $this->get_AsKeyName($CAT_REQUEST);
+            $cat = $this->get_AsKeyName(CAT_REQUEST);
         }
         if($file === true) {
             $page = $this->get_UrlCoded($valuearray[0]);
@@ -446,6 +378,21 @@ class CatPageClass {
                 return false;
         }
         if(isset($this->CatPageArray[$cat]))
+            return true;
+        return false;
+    }
+
+    function is_Protectet($cat,$page) {
+        $cat = $this->get_AsKeyName($cat);
+        if($page !== false) {
+            $page = $this->get_AsKeyName($page);
+            if(isset($this->CatPageArray[$cat]['_pages-'][$page]['_protect-'])
+                    and $this->CatPageArray[$cat]['_pages-'][$page]['_protect-'])
+                return true;
+            else
+                return false;
+        }
+        if(isset($this->CatPageArray[$cat]['_protect-']) and $this->CatPageArray[$cat]['_protect-'])
             return true;
         return false;
     }
@@ -494,9 +441,8 @@ class CatPageClass {
 /*
     function has_CatPage($cat = false) {
         if($cat) {
-            global $EXT_LINK;
             $cat = $this->get_AsKeyName($cat);
-            if($this->CatPageArray[$cat]['_type-'] == $EXT_LINK)
+            if($this->CatPageArray[$cat]['_type-'] == EXT_LINK)
                 return true;
             if(isset($this->CatPageArray[$cat]['_pages-']) and count($this->CatPageArray[$cat]['_pages-']) >= 1)
                 return true;
@@ -550,8 +496,6 @@ class CatPageClass {
     # $request = TEXT für url Parameter und alle & werden nach $amp; gewandelt
     function get_Href($cat,$page,$request = false) {
         global $CMS_CONF;
-        global $URL_BASE;
-        global $EXT_LINK;
         global $specialchars;
 
         $requesturl = NULL;
@@ -575,27 +519,24 @@ class CatPageClass {
             if(!isset($this->CatPageArray[$cat]['_pages-'][$page]))
                 $page = false;
         }
-#            if(isset($this->CatPageArray[$cat]['_pages-'][$page]))
-
         # wenn cat und page false sind
         if($cat === false and $page === false) {
             $dummy = ".php";
             if($CMS_CONF->get("modrewrite") == "true")
                 $dummy = ".html";
-            return $URL_BASE."index".$dummy.$requesturl;
+            return URL_BASE."index".$dummy.$requesturl;
         }
         $cat = $this->get_AsKeyName($cat);
-#        $page = $this->get_AsKeyName($page);
         # wenn cat ein link ist
-        if($this->get_Type($cat,false) == $EXT_LINK) {
+        if($this->get_Type($cat,false) == EXT_LINK) {
             return $this->CatPageArray[$cat]['_link-'];
         }
         # wenn page ein link ist
-        if($this->get_Type($cat,$page) == $EXT_LINK) {
+        if($this->get_Type($cat,$page) == EXT_LINK) {
             return $this->CatPageArray[$cat]['_pages-'][$page]['_link-'];
         }
         $pageurl = NULL;
-        $url = $URL_BASE;
+        $url = URL_BASE;
         if($CMS_CONF->get("modrewrite") == "true") {
             if($page !== false)
                 $pageurl = "/".$page;
@@ -608,7 +549,6 @@ class CatPageClass {
                 $pageurl = "&amp;page=".$page;
             $url .= "index.php".$caturl.$pageurl.$requesturl;
         }
-#echo $url."<br>\n";
         return $url;
     }
 
@@ -616,11 +556,9 @@ class CatPageClass {
     function get_HrefFile($cat,$datei) {
         $cat = $this->get_FileSystemName($cat,false);
         if($cat !== false and $this->exists_File($cat,$datei)) {
-            global $URL_BASE;
-            global $CMS_DIR_NAME;
             global $specialchars;
             $datei = $this->get_UrlCoded($datei);
-            return $URL_BASE.$CMS_DIR_NAME.'/download.php?cat='.$cat.'&amp;file='.$datei;
+            return URL_BASE.CMS_DIR_NAME.'/download.php?cat='.$cat.'&amp;file='.$datei;
         }
         return false;
     }
@@ -630,12 +568,9 @@ class CatPageClass {
     function get_srcFile($cat,$file,$twice = false) {
         $cat = $this->get_FileSystemName($cat,false);
         if($cat !== false and $this->exists_File($cat,$file)) {
-            global $URL_BASE;
-            global $CONTENT_DIR_NAME;
-            global $CONTENT_FILES_DIR_NAME;
             global $specialchars;
             $file = $this->get_UrlCoded($file);
-            $file = $specialchars->replaceSpecialChars($URL_BASE.$CONTENT_DIR_NAME."/".$cat."/".$CONTENT_FILES_DIR_NAME."/".$file,true);
+            $file = $specialchars->replaceSpecialChars(URL_BASE.CONTENT_DIR_NAME."/".$cat."/".CONTENT_FILES_DIR_NAME."/".$file,true);
             if($twice === true)
                 $file = str_replace("%","%25",$file);;
             return $file;
@@ -676,19 +611,16 @@ class CatPageClass {
     }
 
     function is_Activ($cat,$page) {
-        global $CAT_REQUEST;
-        global $EXT_LINK;
-        $req_cat = $this->get_AsKeyName($CAT_REQUEST);
+        $req_cat = $this->get_AsKeyName(CAT_REQUEST);
         $cat = $this->get_AsKeyName($cat);
         if($page !== false) {
             $page = $this->get_AsKeyName($page);
-            global $PAGE_REQUEST;
-            $req_page = $this->get_AsKeyName($PAGE_REQUEST);
-            if($cat == $req_cat and $page == $req_page and $this->get_Type($cat,$page) != $EXT_LINK)
+            $req_page = $this->get_AsKeyName(PAGE_REQUEST);
+            if($cat == $req_cat and $page == $req_page and $this->get_Type($cat,$page) != EXT_LINK)
                 return true;
             return false;
         }
-        if($cat == $req_cat and $this->get_Type($cat,false) != $EXT_LINK)
+        if($cat == $req_cat and $this->get_Type($cat,false) != EXT_LINK)
             return true;
         return false;
     }
@@ -798,14 +730,25 @@ class CatPageClass {
         return $undelete;
     }
 
-    function get_PageContent($cat,$page) {
-        global $EXT_LINK;
-        global $CONTENT_DIR_REL;
+    function get_PageContent($cat,$page,$for_syntax = false) {
+        $cat = $this->get_AsKeyName($cat);
+        $page = $this->get_AsKeyName($page);
+        if($this->CatPageArray[$cat]['_protect-']) {
+            return false;
+        }
+        if($this->CatPageArray[$cat]['_pages-'][$page]['_protect-']) {
+            return false;
+        }
+
         $cat = $this->get_FileSystemName($cat,false);
         $page = $this->get_FileSystemName($cat,$page);
-        if($this->get_Type($cat,$page) != $EXT_LINK) {
-            if(file_exists($CONTENT_DIR_REL.$cat.'/'.$page)) {
-                $page_content = file_get_contents($CONTENT_DIR_REL.$cat.'/'.$page);
+        if($this->get_Type($cat,$page) != EXT_LINK) {
+            if(file_exists(CONTENT_DIR_REL.$cat.'/'.$page)) {
+                $page_content = file_get_contents(CONTENT_DIR_REL.$cat.'/'.$page);
+                if($for_syntax) {
+                    global $syntax;
+                    $page_content = $syntax->preparePageContent($page_content);
+                }
                 return $page_content;
            }
         }
@@ -819,13 +762,11 @@ class CatPageClass {
     function make_DirPageArray($dir) {
         if(defined("isCatPage"))
             die("make_DirPageArray() darf nur von der class CatPage verwendet werden");
-        global $EXT_LINK;
-        global $CONTENT_FILES_DIR_NAME;
         $page_a = array();
         $page_sort = array();
         $currentdir = getDirAsArray($dir,"file");
         foreach($currentdir as $file) {
-            if(substr($file, -4) == $EXT_LINK) {
+            if(substr($file, -4) == EXT_LINK) {
                 $target = "-_blank-";
                 if(strpos($file,"-_self-") > 1)
                     $target = "-_self-";
@@ -834,7 +775,7 @@ class CatPageClass {
                 $page_a[$key]["_name-"] = $key;
                 $page_a[$key]["_orgname-"] = $page_a[$key]["_name-"];
                 $page_a[$key]["_pos-"] = substr($file,0,2);
-                $page_a[$key]["_type-"] = $EXT_LINK;
+                $page_a[$key]["_type-"] = EXT_LINK;
                 $page_a[$key]["_link-"] = str_replace($this->link_search,$this->link_replace,substr($tmp[1],0,strlen($tmp[1])-4));
                 $page_a[$key]["_target-"] = str_replace("-","",$target);
             } else {
@@ -844,6 +785,7 @@ class CatPageClass {
                 $page_a[$key]["_pos-"] = substr($file,0,2);
                 $page_a[$key]["_type-"] = substr($file,-4);
                 $page_a[$key]["_time-"] = filemtime($dir."/".$file);
+                $page_a[$key]["_protect-"] = false;
             }
         }
         return $page_a;
@@ -852,13 +794,11 @@ class CatPageClass {
     function make_DirCatPageArray($dir) {
         if(defined("isCatPage"))
             die("make_DirCatPageArray() darf nur von der class CatPage verwendet werden");
-        global $EXT_LINK;
-        global $CONTENT_FILES_DIR_NAME;
         $cat_a = array();
         $cat_sort = array();
         $currentdir = getDirAsArray($dir,"dir");
         foreach($currentdir as $file) {
-            if(substr($file, -4) == $EXT_LINK) {
+            if(substr($file, -4) == EXT_LINK) {
                 $target = "-_blank-";
                 if(strpos($file,"-_self-") > 1)
                     $target = "-_self-";
@@ -867,7 +807,7 @@ class CatPageClass {
                 $cat_a[$key]["_name-"] = $key;
                 $cat_a[$key]["_orgname-"] = $cat_a[$key]["_name-"];
                 $cat_a[$key]["_pos-"] = substr($file,0,2);
-                $cat_a[$key]["_type-"] = $EXT_LINK;
+                $cat_a[$key]["_type-"] = EXT_LINK;
                 $cat_a[$key]["_link-"] = str_replace($this->link_search,$this->link_replace,substr($tmp[1],0,strlen($tmp[1])-4));
                 $cat_a[$key]["_target-"] = str_replace("-","",$target);
             } else {
@@ -877,12 +817,12 @@ class CatPageClass {
                 $cat_a[$key]["_orgname-"] = $cat_a[$key]["_name-"];
                 $cat_a[$key]["_pos-"] = substr($file,0,2);
                 $cat_a[$key]["_type-"] = "cat";
-                $cat_a[$key]["_files-"] = getDirAsArray($dir."/".$file."/".$CONTENT_FILES_DIR_NAME,"file");
+                $cat_a[$key]["_files-"] = getDirAsArray($dir."/".$file."/".CONTENT_FILES_DIR_NAME,"file");
                 $cat_a[$key]["_time-"] = filemtime($dir."/".$file);
+                $cat_a[$key]["_protect-"] = false;
             }
         }
         return $cat_a;
     }
-    
 }
 ?>

@@ -13,14 +13,12 @@ class GalleryClass {
     var $GalleryTemplate = false;
 
     function GalleryClass() {
-        global $BASE_DIR, $GALLERIES_DIR_NAME;
-
         if(isset($_REQUEST['galtemplate']))
             $this->GalleryTemplate = true;
 
         # das ist nur ein array mit den Galerie Ordnernamen
         # ohne jegliche Prüfung
-        $this->GalleriesArray = getDirAsArray($BASE_DIR.$GALLERIES_DIR_NAME,"dir");
+        $this->GalleriesArray = getDirAsArray(BASE_DIR.GALLERIES_DIR_NAME,"dir");
 #        if(isset($_REQUEST['gal']) and strlen($_REQUEST['gal']) > 0)
 #            $this->currentGallery = $_REQUEST['gal'];
     }
@@ -211,33 +209,29 @@ class GalleryClass {
         if(isset($this->GalleryArray[$gallery][$image]['description']) and false !== $this->GalleryArray[$gallery][$image]['description']) {
             $description = $this->GalleryArray[$gallery][$image]['description'];
             if($coded_as == "html") {
-#                global $CHARSET;
                 global $specialchars;
 $description = $specialchars->rebuildSpecialChars($description,false,true);
-#                $description = htmlentities($description,ENT_COMPAT,$CHARSET);
+#                $description = htmlentities($description,ENT_COMPAT,CHARSET);
             } elseif($coded_as == "url")
                 $description = rawurlencode($description);
             return $description;
         }
         return NULL;
     }
-# $BASE_DIR.$GALLERIES_DIR_NAME."/".$gallery."/".$pic
 
     function get_ImagePath($gallery,$image,$preview = false) {
-        global $BASE_DIR, $GALLERIES_DIR_NAME, $PREVIEW_DIR_NAME;
         if($preview === true)
-            return $BASE_DIR.$GALLERIES_DIR_NAME."/".$gallery."/".$PREVIEW_DIR_NAME."/".$image;
-        return $BASE_DIR.$GALLERIES_DIR_NAME."/".$gallery."/".$image;
+            return BASE_DIR.GALLERIES_DIR_NAME."/".$gallery."/".PREVIEW_DIR_NAME."/".$image;
+        return BASE_DIR.GALLERIES_DIR_NAME."/".$gallery."/".$image;
     }
 
     function get_srcImage($gallery,$image,$preview = false) {
-        global $URL_BASE, $GALLERIES_DIR_NAME, $PREVIEW_DIR_NAME;
         $gallery = rawurlencode($gallery);
         $image = rawurlencode($image);
-#        $img = str_replace("%","%25",$URL_BASE.$GALLERIES_DIR_NAME."/".$img);
+#        $img = str_replace("%","%25",URL_BASE.GALLERIES_DIR_NAME."/".$img);
         if($preview === true)
-            return $URL_BASE.$GALLERIES_DIR_NAME."/".$gallery."/".$PREVIEW_DIR_NAME."/".$image;
-        return $URL_BASE.$GALLERIES_DIR_NAME."/".$gallery."/".$image;
+            return URL_BASE.GALLERIES_DIR_NAME."/".$gallery."/".PREVIEW_DIR_NAME."/".$image;
+        return URL_BASE.GALLERIES_DIR_NAME."/".$gallery."/".$image;
     }
 
     function get_ImageType($image) {
@@ -275,23 +269,26 @@ $description = $specialchars->rebuildSpecialChars($description,false,true);
 ###############################################################################
 
     function get_HrefImage($preview,$index = false,$group = false) {
-        global $URL_BASE, $GALLERIES_DIR_NAME, $PREVIEW_DIR_NAME;
         if($index === false)
             $index = $this->currentIndex;
         if($group === false)
             $group = $this->currentGroup;
         $image = $this->get_fromIndexGroupImage($index,$group);
         if($preview === true)
-            return $URL_BASE.$GALLERIES_DIR_NAME."/".$this->currentGallery."/".$PREVIEW_DIR_NAME."/".$image;
-        return $URL_BASE.$GALLERIES_DIR_NAME."/".$this->currentGallery."/".$image;
+            return URL_BASE.GALLERIES_DIR_NAME."/".$this->currentGallery."/".PREVIEW_DIR_NAME."/".$image;
+        return URL_BASE.GALLERIES_DIR_NAME."/".$this->currentGallery."/".$image;
     }
 
-    function get_ImageName($index = false,$group = false) {
+    function get_ImageName($index = false,$group = false,$text_coded = false) {
         if($index === false)
             $index = $this->currentIndex;
         if($group === false)
             $group = $this->currentGroup;
-        return $this->get_fromIndexGroupImage($index,$group);
+        if($text_coded) {
+            global $specialchars;
+            return $specialchars->rebuildSpecialChars($this->get_fromIndexGroupImage($index,$group),true,true);
+        } else
+            return $this->get_fromIndexGroupImage($index,$group);
     }
 
     function get_Description($coded_as = false,$index = false,$group = false) {
@@ -305,10 +302,9 @@ $description = $this->GalleryArray[$this->currentGallery][$image]['description']
         if(false !== $description) {
             $description = $this->GalleryArray[$this->currentGallery][$image]['description'];
             if($coded_as == "html") {
-#                global $CHARSET;
                 global $specialchars;
 $description = $specialchars->rebuildSpecialChars($description,false,true);
-#                $description = htmlentities($description,ENT_COMPAT,$CHARSET);
+#                $description = htmlentities($description,ENT_COMPAT,CHARSET);
             } elseif($coded_as == "url")
                 $description = rawurlencode($description);
             return $description;
@@ -429,12 +425,14 @@ $description = $specialchars->rebuildSpecialChars($description,false,true);
 
 #get_ImageDescription($gallery,$image,$coded_as = false) {
 #get_srcImage($gallery,$image,$preview = false)
-        global $URL_BASE;
-        global $GALLERIES_DIR_NAME;
         $image = $this->get_fromIndexGroupImage($index,$group);
-        $alttext = $alt;
+#        $alttext = $alt;
         if($alt === false)
-            $alttext = $this->get_ImageDescription($this->currentGallery,$image,"html");
+            $alt = $this->get_ImageDescription($this->currentGallery,$image,"html");
+        else {
+            global $specialchars;
+            $alt = $specialchars->rebuildSpecialChars($alt,true,true);
+        }
         $csstext = NULL;
         if($css !== false)
             $csstext = ' class="'.$css.'"';
@@ -442,9 +440,9 @@ $description = $specialchars->rebuildSpecialChars($description,false,true);
 #        $img = $this->currentGallery."/".$this->MenuArray[$this->currentGallery][$this->currentGroup][$this->currentIndex];
         $img = $this->get_srcImage($this->currentGallery,$image,$preview);
 
-#        $img = str_replace("%","%25",$URL_BASE.$GALLERIES_DIR_NAME."/".$img);
+#        $img = str_replace("%","%25",URL_BASE.GALLERIES_DIR_NAME."/".$img);
 #        $alt = 
-        $img_tag = '<img src="'.$img.'" alt="'.$alttext.'"'.$csstext.' hspace="0" vspace="0" border="0" />';
+        $img_tag = '<img src="'.$img.'" alt="'.$alt.'"'.$csstext.' hspace="0" vspace="0" border="0" />';
         return $img_tag;
 #<img align="middle" border="0">
     }
@@ -609,10 +607,7 @@ $description = $specialchars->rebuildSpecialChars($description,false,true);
     function make_DirGalleryArray($Galleries,$with_preview,$with_description) {
 #!!!!!!!!! hier muss noch nee prüfung rein das wenn galerie keine bilder hat sie erst garnich erscheint
 
-        global $BASE_DIR;
-        global $GALLERIES_DIR_NAME;
-        global $PREVIEW_DIR_NAME;
-        $GALERIE_DIR = $BASE_DIR.$GALLERIES_DIR_NAME."/";
+        $GALERIE_DIR = BASE_DIR.GALLERIES_DIR_NAME."/";
 #echo "$GALERIE_DIR<br>\n";
         $return_array = array();
         if($Galleries !== false and is_array($Galleries)) {
@@ -621,6 +616,7 @@ $description = $specialchars->rebuildSpecialChars($description,false,true);
             $galleries_array = getDirAsArray($GALERIE_DIR,"dir");
 
         foreach($galleries_array as $gallery) {
+
 #echo $GALERIE_DIR.$gallery."<br>\n";
             $description = array();
             $gallery_images = getDirAsArray($GALERIE_DIR.$gallery,$this->allowed_pics);
@@ -647,7 +643,7 @@ $description = $specialchars->rebuildSpecialChars($description,false,true);
                 # Bild hat kein Vorschaubild, Vorschaubilder sollen aber benutzt werden
                 # dann nicht ins array
                 if($with_preview === true
-                        and !file_exists($GALERIE_DIR.$gallery."/".$PREVIEW_DIR_NAME."/".$image))
+                        and !file_exists($GALERIE_DIR.$gallery."/".PREVIEW_DIR_NAME."/".$image))
                     continue;
 #echo "$image<br>\n";
                 $return_array[$gallery][$image]['preview'] = false;

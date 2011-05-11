@@ -247,8 +247,8 @@ if($not_exit >= $not_exit_max)
         $this->change_placeholder(false);
 
         # Syntax html zeichen nach html wandeln
-        $search = array("-html_br~","-html_nbsp~","-html_lt~","-html_gt~");
-        $replace = array("<br />","&nbsp;","&lt;","&gt;");
+        $search = array("-html_br~","-html_nbsp~","-html_lt~","-html_gt~","-html_amp~");
+        $replace = array("<br />","&nbsp;","&lt;","&gt;","&amp;");
         $this->content = str_replace($search,$replace,$this->content);
 
         # das nur machen wenn die function preparePageContent() benutzt wurde
@@ -346,6 +346,15 @@ if($not_exit >= $not_exit_max)
         } else {
             # script und style sachen wieder einsetzen
             $this->content = str_replace($this->script_search,$this->script_replace,$this->content);
+        }
+    }
+
+    function insert_in_head($data) {
+        if(!in_array($data,$this->script_replace)) {
+            $dummy = '<!-- dummy script style '.count($this->script_search).' -->';
+            $this->content = str_replace(array("</head>","</HEAD>"),$dummy."\n</head>",$this->content);
+            $this->script_search[] = $dummy;
+            $this->script_replace[] = $data;
         }
     }
 
@@ -542,10 +551,6 @@ if($not_exit >= $not_exit_max)
     function syntax_bild($desciption,$value,$syntax = "bild") {
         // Bild aus dem Dateiverzeichnis oder externes Bild
         global $specialchars;
-        global $CONTENT_DIR_REL;
-        global $CONTENT_FILES_DIR_NAME;
-        global $URL_BASE;
-        global $CONTENT_DIR_NAME;
         global $language;
         // Bildunterschrift merken, wenn vorhanden
         $subtitle = "";
@@ -744,9 +749,6 @@ if($not_exit >= $not_exit_max)
 
     function syntax_include($desciption,$value) {
         // Includes
-        global $CONTENT_DIR_REL;
-        global $EXT_PAGE, $EXT_HIDDEN;
-        global $PAGE_REQUEST;
         global $specialchars;
         global $language;
         global $CatPage;
@@ -768,7 +770,7 @@ if($not_exit >= $not_exit_max)
         }
 
         // Seite darf sich nicht selbst includen!
-        if (($cat == substr($this->cat,3)) and ($page == substr($PAGE_REQUEST,3))) {
+        if (($cat == substr($this->cat,3)) and ($page == substr(PAGE_REQUEST,3))) {
             return $this->createDeadlink($value, $language->getLanguageValue0("tooltip_include_recursion_error_0"));
         }
         // Includierte Inhaltsseite parsen
@@ -812,16 +814,13 @@ if($not_exit >= $not_exit_max)
     }
 
     function plugin_replace($plugin,$plugin_parameter) {
-        global $PLUGIN_DIR_REL;
-        global $URL_BASE;
-        global $PLUGIN_DIR_NAME;
         global $language;
         if(in_array($plugin, $this->activ_plugins)) {
             $replacement = NULL;
             // ...ueberpruefen, ob es eine zugehörige Plugin-PHP-Datei gibt
-            if(file_exists($PLUGIN_DIR_REL.$plugin."/index.php")) {
+            if(file_exists(PLUGIN_DIR_REL.$plugin."/index.php")) {
                 // Plugin-Code includieren
-                require_once($PLUGIN_DIR_REL.$plugin."/index.php");
+                require_once(PLUGIN_DIR_REL.$plugin."/index.php");
             }
             $plugin_true = true;
             // Enthaelt der Code eine Klasse mit dem Namen des Plugins?
@@ -835,9 +834,9 @@ if($not_exit >= $not_exit_max)
                 $replacement = $this->createDeadlink($plugin, $language->getLanguageValue1("plugin_error_1", $plugin));
             }
             if($plugin_true and !in_array($plugin, $this->deactiv_plugins)
-                and file_exists($PLUGIN_DIR_REL.$plugin."/plugin.css")
+                and file_exists(PLUGIN_DIR_REL.$plugin."/plugin.css")
                 ) {
-                $css = '<style type="text/css"> @import "'.$URL_BASE.$PLUGIN_DIR_NAME.'/'.$plugin.'/plugin.css"; </style>';
+                $css = '<style type="text/css"> @import "'.URL_BASE.PLUGIN_DIR_NAME.'/'.$plugin.'/plugin.css"; </style>';
                 if(strpos($this->content,$css) < 1 and !in_array($css,$this->script_replace)) {
                     $dummy = '<!-- dummy script style '.count($this->script_search).' -->';
                     $this->script_search[] = $dummy;
@@ -942,7 +941,6 @@ if($not_exit >= $not_exit_max)
         global $specialchars;
 
         list($content_first,$content,$content_last) = $this->splitContent($content);
-
         // Inhaltsformatierungen
         # alle &lt; und &gt; die in einer page sind sollen so sein
         $content = str_replace(array("&lt;","&gt;"),array("-html_lt~","-html_gt~"),$content);
@@ -951,6 +949,8 @@ if($not_exit >= $not_exit_max)
 
         # alle zeichen die ein ^ davor sind geschützte zeichen
         $content = $specialchars->encodeProtectedChr($content);
+# alle & die nicht zu entities gehören wandeln nach &amp;
+$content = preg_replace('/&(?!#?[a-z0-9]+;)/i', '-html_amp~', $content);
         // Für Einrückungen
         $content = str_replace("  ","-html_nbsp~-html_nbsp~",$content);
         # Zeilenümbrüche sind in pages später html umbrüche

@@ -6,6 +6,7 @@ echo "<pre style=\"position:fixed;background-color:#000;color:#0f0;padding:5px;f
 print_r($_REQUEST);
 echo "</pre>"; 
 */
+
 # bei winsystemen gibts nicht immer $_SERVER["SCRIPT_FILENAME"]
 if(isset($_SERVER["SCRIPT_FILENAME"]))
     $BASE_DIR = $_SERVER["SCRIPT_FILENAME"];
@@ -15,24 +16,27 @@ else
 $BASE_DIR = str_replace("\\\\", "\\",$BASE_DIR);
 # zum schluss noch den teil denn wir nicht brauchen abschneiden
 $BASE_DIR = substr($BASE_DIR,0,-(strlen("index.php")));
+define("BASE_DIR",$BASE_DIR);
 
 $CMS_DIR_NAME = "cms";
-$BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
+define("CMS_DIR_NAME",$CMS_DIR_NAME);
+$BASE_DIR_CMS = BASE_DIR.$CMS_DIR_NAME."/";
+define("BASE_DIR_CMS",$BASE_DIR_CMS);
 $tmp_getDirContentAsArray = NULL;
 
-if(is_file($BASE_DIR_CMS."DefaultConf.php")) {
-    require_once($BASE_DIR_CMS."DefaultConf.php");
+if(is_file(BASE_DIR_CMS."DefaultConf.php")) {
+    require_once(BASE_DIR_CMS."DefaultConf.php");
 } else {
-    die("Fatal Error ".$BASE_DIR_CMS."DefaultConf.php Datei existiert nicht");
+    die("Fatal Error ".BASE_DIR_CMS."DefaultConf.php Datei existiert nicht");
 }
 
 # Um Cross-Site Scripting-Schwachstellen zu verhindern
-$_SERVER["PHP_SELF"] = htmlspecialchars($_SERVER["PHP_SELF"], ENT_QUOTES, $CHARSET);
-$_SERVER["REQUEST_URI"] = htmlspecialchars($_SERVER["REQUEST_URI"], ENT_QUOTES, $CHARSET);
+$_SERVER["PHP_SELF"] = htmlspecialchars($_SERVER["PHP_SELF"], ENT_QUOTES, CHARSET);
+$_SERVER["REQUEST_URI"] = htmlspecialchars($_SERVER["REQUEST_URI"], ENT_QUOTES, CHARSET);
 if(isset($_SERVER["SCRIPT_URL"]))
-    $_SERVER["SCRIPT_URL"] = htmlspecialchars($_SERVER["SCRIPT_URL"], ENT_QUOTES, $CHARSET);
+    $_SERVER["SCRIPT_URL"] = htmlspecialchars($_SERVER["SCRIPT_URL"], ENT_QUOTES, CHARSET);
 if(isset($_SERVER["SCRIPT_URI"]))
-    $_SERVER["SCRIPT_URI"] = htmlspecialchars($_SERVER["SCRIPT_URI"], ENT_QUOTES, $CHARSET);
+    $_SERVER["SCRIPT_URI"] = htmlspecialchars($_SERVER["SCRIPT_URI"], ENT_QUOTES, CHARSET);
 
 $_GET = cleanREQUEST($_GET);
 $_REQUEST = cleanREQUEST($_REQUEST);
@@ -42,22 +46,25 @@ $_POST = cleanREQUEST($_POST);
     # deshalb der versuch mit ini_set
     @ini_set('pcre.backtrack_limit', 1000000);
 
-    require_once($BASE_DIR_CMS."SpecialChars.php");
-    require_once($BASE_DIR_CMS."Properties.php");
+    require_once(BASE_DIR_CMS."SpecialChars.php");
+    require_once(BASE_DIR_CMS."Properties.php");
     
     // Initial: Fehlerausgabe unterdruecken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 #    @ini_set("display_errors", 0);
 
     $specialchars   = new SpecialChars();
-    $CMS_CONF     = new Properties($BASE_DIR_CMS."conf/main.conf",true);
-    $VERSION_CONF  = new Properties($BASE_DIR_CMS."conf/version.conf",true);
-    $GALLERY_CONF  = new Properties($BASE_DIR_CMS."conf/gallery.conf",true);
-    $USER_SYNTAX  = new Properties($BASE_DIR_CMS."conf/syntax.conf",true);
+    $CMS_CONF     = new Properties(BASE_DIR_CMS."conf/main.conf",true);
+    $VERSION_CONF  = new Properties(BASE_DIR_CMS."conf/version.conf",true);
+    $GALLERY_CONF  = new Properties(BASE_DIR_CMS."conf/gallery.conf",true);
+    $USER_SYNTAX  = new Properties(BASE_DIR_CMS."conf/syntax.conf",true);
     $URL_BASE = substr($_SERVER['PHP_SELF'],0,strpos($_SERVER['PHP_SELF'],"index.php"));
-    $CONTENT_DIR_REL        = $BASE_DIR.$CONTENT_DIR_NAME."/";
-    $PLUGIN_DIR_REL         = $BASE_DIR.$PLUGIN_DIR_NAME."/";
+    $CONTENT_DIR_REL        = BASE_DIR.CONTENT_DIR_NAME."/";
+    $PLUGIN_DIR_REL         = BASE_DIR.PLUGIN_DIR_NAME."/";
+    define("URL_BASE",$URL_BASE);
+    define("CONTENT_DIR_REL",$CONTENT_DIR_REL);
+    define("PLUGIN_DIR_REL",$PLUGIN_DIR_REL);
 
-    require_once($BASE_DIR_CMS."Language.php");
+    require_once(BASE_DIR_CMS."Language.php");
     $language       = new Language();
 
     $activ_plugins = array();
@@ -65,19 +72,12 @@ $_POST = cleanREQUEST($_POST);
     # Vorhandene Plugins finden und in array $activ_plugins und $deactiv_plugins einsetzen
     # wird für Search und Pluginplatzhaltern verwendet
     list($activ_plugins,$deactiv_plugins) = findPlugins();
-    require_once($BASE_DIR_CMS."Syntax.php");
-    require_once($BASE_DIR_CMS."Smileys.php");
+    require_once(BASE_DIR_CMS."Syntax.php");
+    require_once(BASE_DIR_CMS."Smileys.php");
     $syntax         = new Syntax();
-    $smileys        = new Smileys($BASE_DIR_CMS."smileys");
+    $smileys        = new Smileys(BASE_DIR_CMS."smileys");
 
-    require_once($BASE_DIR_CMS."Plugin.php");
-
-    // Dateiendungen fuer Inhaltsseiten
-    # Achtung die endungen muessen alle gleich lang sein
-    $EXT_PAGE       = ".txt";
-    $EXT_HIDDEN     = ".hid";
-    $EXT_DRAFT      = ".tmp";
-    $EXT_LINK       = ".lnk";
+    require_once(BASE_DIR_CMS."Plugin.php");
 
     $LAYOUT_DIR     = "layouts/".$CMS_CONF->get("cmslayout");
     $TEMPLATE_FILE  = $LAYOUT_DIR."/template.html";
@@ -88,21 +88,21 @@ $_POST = cleanREQUEST($_POST);
         $TEMPLATE_FILE  = $LAYOUT_DIR."/gallerytemplate.html";
     }
 
-    $LAYOUT_DIR_URL = $specialchars->replaceSpecialChars($URL_BASE.$LAYOUT_DIR,true);
+    $LAYOUT_DIR_URL = $specialchars->replaceSpecialChars(URL_BASE.$LAYOUT_DIR,true);
     $CSS_FILE       = $LAYOUT_DIR_URL."/css/style.css";
     $FAVICON_FILE   = $LAYOUT_DIR_URL."/favicon.ico";
     // Einstellungen fuer Kontaktformular
-/*    $contactformconfig  = new Properties($BASE_DIR_CMS."formular/formular.conf",true);
+/*    $contactformconfig  = new Properties(BASE_DIR_CMS."formular/formular.conf",true);
 
     // Spamschutz-Aufgaben lt. frontend sprache laden
-    if (is_file($BASE_DIR_CMS."formular/aufgaben_".$CMS_CONF->get("cmslanguage").".conf")) {
-        $contactformcalcs = new Properties($BASE_DIR_CMS."formular/aufgaben_".$CMS_CONF->get("cmslanguage").".conf",true);
-    } elseif (is_file($BASE_DIR_CMS."formular/aufgaben_enEN.conf")) {
+    if (is_file(BASE_DIR_CMS."formular/aufgaben_".$CMS_CONF->get("cmslanguage").".conf")) {
+        $contactformcalcs = new Properties(BASE_DIR_CMS."formular/aufgaben_".$CMS_CONF->get("cmslanguage").".conf",true);
+    } elseif (is_file(BASE_DIR_CMS."formular/aufgaben_enEN.conf")) {
     // wenn nicht vorhanden als default enEN laden
-        $contactformcalcs = new Properties($BASE_DIR_CMS."formular/aufgaben_enEN.conf",true);
+        $contactformcalcs = new Properties(BASE_DIR_CMS."formular/aufgaben_enEN.conf",true);
     } else {
     // wenn enEN auch nicht vorhanden - die()
-        die("Fatal Error: ".$BASE_DIR_CMS."formular/aufgaben_enEN.conf existiert nicht!");
+        die("Fatal Error: ".BASE_DIR_CMS."formular/aufgaben_enEN.conf existiert nicht!");
     }
 */
     $WEBSITE_NAME = $specialchars->rebuildSpecialChars($CMS_CONF->get("websitetitle"),false,true);
@@ -122,7 +122,7 @@ $_POST = cleanREQUEST($_POST);
 
     $HTML                   = "";
 
-    require_once($BASE_DIR_CMS."CatPageClass.php");
+    require_once(BASE_DIR_CMS."CatPageClass.php");
     $CatPage         = new CatPageClass();
 
     # $CAT_REQUEST und $PAGE_REQUEST setzen und mit nichts füllen
@@ -135,11 +135,13 @@ $_POST = cleanREQUEST($_POST);
 
     // Zuerst: Uebergebene Parameter ueberpruefen
     checkParameters();
+    define("CAT_REQUEST",$CAT_REQUEST);
+    define("PAGE_REQUEST",$PAGE_REQUEST);
 
     // Dann: HTML-Template einlesen und mit Inhalt fuellen
     readTemplate();
     # manche Provider sind auf iso eingestelt
-    header('content-type: text/html; charset='.$CHARSET.'');
+    header('content-type: text/html; charset='.CHARSET.'');
 
 #echo memory_get_peak_usage(true) / 1024 / 1024 . " MB<br>\n";
 #echo memory_get_peak_usage() / 1024 / 1024 . " MB<br>\n";
@@ -152,12 +154,12 @@ $_POST = cleanREQUEST($_POST);
 // ------------------------------------------------------------------------------
     function checkParameters() {
         global $ACTION_REQUEST;
-        global $CAT_REQUEST;
-        global $PAGE_REQUEST;
         global $CMS_CONF;
         global $PAGE_REQUEST_URL;
         global $CAT_REQUEST_URL;
         global $CatPage;
+        global $CAT_REQUEST;
+        global $PAGE_REQUEST;
 
         // Wenn ein Action-Parameter uebergeben wurde: keine aktiven Kat./Inhaltts. anzeigen
         # $CAT_REQUEST und $PAGE_REQUEST bleiben lehr
@@ -232,16 +234,11 @@ $_POST = cleanREQUEST($_POST);
         global $WEBSITE_NAME;
         global $ACTION_REQUEST;
         global $HIGHLIGHT_REQUEST;
-        global $CAT_REQUEST;
-        global $PAGE_REQUEST;
         global $language;
         global $syntax;
         global $CMS_CONF;
         global $smileys;
         global $specialchars;
-        global $URL_BASE;
-        global $CHARSET;
-        global $BASE_DIR_CMS;
         global $activ_plugins;
         global $deactiv_plugins;
         global $CatPage;
@@ -269,7 +266,7 @@ $_POST = cleanREQUEST($_POST);
         $pagetitle         = $pagecontentarray[2];
     }
     elseif ($ACTION_REQUEST == "search") {
-        require_once($BASE_DIR_CMS."Search.php");
+        require_once(BASE_DIR_CMS."Search.php");
         $pagecontentarray = searchInPages();
         $pagecontent    = $pagecontentarray[0];
         $cattitle         = $pagecontentarray[1];
@@ -279,15 +276,15 @@ $_POST = cleanREQUEST($_POST);
     else {
         // zunaechst Passwort als gesetzt und nicht eingegeben annehmen
         $passwordok = false;
-        if (file_exists($BASE_DIR_CMS."conf/passwords.conf")) {
-            $passwords = new Properties($BASE_DIR_CMS."conf/passwords.conf", true); // alle Passwörter laden
-            if ($passwords->keyExists($CAT_REQUEST.'/'.$PAGE_REQUEST)) { // nach Passwort fuer diese Seite suchen
-                $cattitle    = $CatPage->get_HrefText($CAT_REQUEST,false);
+        if (file_exists(BASE_DIR_CMS."conf/passwords.conf")) {
+            $passwords = new Properties(BASE_DIR_CMS."conf/passwords.conf", true); // alle Passwörter laden
+            if ($passwords->keyExists(CAT_REQUEST.'/'.PAGE_REQUEST)) { // nach Passwort fuer diese Seite suchen
+                $cattitle    = $CatPage->get_HrefText(CAT_REQUEST,false);
                 $pagetitle   = $language->getLanguageValue0("passwordform_title_0");
                 if (!isset($_POST) || ($_POST == array())) // sofern kein Passwort eingegeben, nach einem Fragen
                     $pagecontent = getPasswordForm();
                 else {
-                    if (md5(getRequestParam("password", false)) == $passwords->get($CAT_REQUEST.'/'.$PAGE_REQUEST))
+                    if (md5(getRequestParam("password", false)) == $passwords->get(CAT_REQUEST.'/'.PAGE_REQUEST))
                     // richtiges Passwort eingegeben
                         $passwordok = true;
                     else
@@ -318,7 +315,7 @@ $_POST = cleanREQUEST($_POST);
         $is_Page = false;
 
     $HTML = str_replace('{CONTENT}','---content~~~'.$pagecontent.'~~~content---',$template);
-    $HTML = $syntax->convertContent($HTML, $CAT_REQUEST, $is_Page);
+    $HTML = $syntax->convertContent($HTML, CAT_REQUEST, $is_Page);
     unset($pagecontent);
 
     // Smileys ersetzen
@@ -328,7 +325,7 @@ $_POST = cleanREQUEST($_POST);
 
     // Gesuchte Phrasen hervorheben
     if ($HIGHLIGHT_REQUEST <> "") {
-        require_once($BASE_DIR_CMS."Search.php");
+        require_once(BASE_DIR_CMS."Search.php");
         # wir suchen nur im content teil
         list($content_first,$content,$content_last) = $syntax->splitContent($HTML);
         $content = highlightSearch($content, $HIGHLIGHT_REQUEST);
@@ -337,10 +334,10 @@ $_POST = cleanREQUEST($_POST);
     }
 
     $HTML = str_replace('{CSS_FILE}', $CSS_FILE, $HTML);
-    $HTML = str_replace('{CHARSET}', $CHARSET, $HTML);
+    $HTML = str_replace('{CHARSET}', CHARSET, $HTML);
     $HTML = str_replace('{FAVICON_FILE}', $FAVICON_FILE, $HTML);
     $HTML = str_replace('{LAYOUT_DIR}', $LAYOUT_DIR_URL, $HTML);
-    $HTML = str_replace('{BASE_URL}', $URL_BASE, $HTML);
+    $HTML = str_replace('{BASE_URL}', URL_BASE, $HTML);
 
     // Platzhalter ersetzen
     $HTML = replacePlaceholders($HTML, $cattitle, $pagetitle);
@@ -362,7 +359,7 @@ $_POST = cleanREQUEST($_POST);
             $HTML = str_replace('{DETAILMENU}', "", $HTML);
         }
         else {
-            $HTML = str_replace('{DETAILMENU}', getDetailMenu($CAT_REQUEST), $HTML);
+            $HTML = str_replace('{DETAILMENU}', getDetailMenu(CAT_REQUEST), $HTML);
         }
     }
     // Suchformular
@@ -370,7 +367,7 @@ $_POST = cleanREQUEST($_POST);
         $HTML = str_replace('{SEARCH}', getSearchForm(), $HTML);
     
     // Sitemap-Link
-    $HTML = str_replace('{SITEMAPLINK}', "<a href=\"".$URL_BASE."index.php?action=sitemap\" id=\"sitemaplink\"".getTitleAttribute($language->getLanguageValue0("tooltip_showsitemap_0")).">".$language->getLanguageValue0("message_sitemap_0")."</a>", $HTML);
+    $HTML = str_replace('{SITEMAPLINK}', "<a href=\"".URL_BASE."index.php?action=sitemap\" id=\"sitemaplink\"".getTitleAttribute($language->getLanguageValue0("tooltip_showsitemap_0")).">".$language->getLanguageValue0("message_sitemap_0")."</a>", $HTML);
     
     // CMS-Info-Link
     if(strpos($HTML,'{CMSINFO}') !== false)
@@ -382,7 +379,7 @@ $_POST = cleanREQUEST($_POST);
 */
     // Kontaktformular
     if(strpos($HTML,'{TABLEOFCONTENTS}') !== false)
-        $HTML = str_replace('{TABLEOFCONTENTS}', $syntax->getToC($pagecontent), $HTML);
+        $HTML = str_replace('{TABLEOFCONTENTS}', $syntax->getToC($HTML), $HTML);
 
 #    $HTML = str_replace(array('&#123;','&#125;','&#91;','&#93;'),array('{','}','[',']'),$HTML);
     $HTML = str_replace(array('---content~~~','~~~content---'),"",$HTML);
@@ -394,13 +391,10 @@ $_POST = cleanREQUEST($_POST);
     function getPasswordForm() {
         global $language;
         global $CMS_CONF;
-        global $CAT_REQUEST;
-        global $PAGE_REQUEST;
-        global $URL_BASE;
 
-        $url = "index.php?cat=".substr($CAT_REQUEST,3)."&amp;page=".substr($PAGE_REQUEST,3);
+        $url = "index.php?cat=".substr(CAT_REQUEST,3)."&amp;page=".substr(PAGE_REQUEST,3);
         if($CMS_CONF->get("modrewrite") == "true") {
-            $url = $URL_BASE.substr($CAT_REQUEST,3)."/".substr($PAGE_REQUEST,3).".html";
+            $url = URL_BASE.substr(CAT_REQUEST,3)."/".substr(PAGE_REQUEST,3).".html";
         }
         // TODO: sollte auch wahlweise ueber ein Template gehen
         return '<form action="'.$url.'" method="post" class="contentpassword">
@@ -431,36 +425,34 @@ $_POST = cleanREQUEST($_POST);
 // ------------------------------------------------------------------------------
 /*
     function nameToPage($pagename, $currentcat, $ext = true) {
-        global $CONTENT_DIR_REL;
-        global $EXT_PAGE;
         global $ACTION_REQUEST;
 
         $showdraft = false;
         if($ACTION_REQUEST == "draft")
             $showdraft = true;
         // Kategorie-Verzeichnis einlesen
-        $dircontent = getDirContentAsArray($CONTENT_DIR_REL.$currentcat, true, true, $showdraft);
+        $dircontent = getDirContentAsArray(CONTENT_DIR_REL.$currentcat, true, true, $showdraft);
         if(!is_array($dircontent))
             return "";
         // alle vorhandenen Inhaltsdateien durchgehen...
         foreach ($dircontent as $currentelement) {
             // ...und wenn eine auf den Namen paßt...
-            if (substr($currentelement, 3, strlen($currentelement) - 3 - strlen($EXT_PAGE)) == $pagename) {
+            if (substr($currentelement, 3, strlen($currentelement) - 3 - strlen(EXT_PAGE)) == $pagename) {
                 // ...den vollen Seitennamen zurueckgeben mit extension
                 if($ext) {
                     return $currentelement;
                 } else {
                 // ...den vollen Seitennamen zurueckgeben ohne extension
-                    return substr($currentelement, 0, strlen($currentelement) - strlen($EXT_PAGE));
+                    return substr($currentelement, 0, strlen($currentelement) - strlen(EXT_PAGE));
                 }
             # bei alten links ist die Positon noch im Namen
-            } elseif (substr($currentelement, 0, strlen($currentelement) - strlen($EXT_PAGE)) == $pagename) {
+            } elseif (substr($currentelement, 0, strlen($currentelement) - strlen(EXT_PAGE)) == $pagename) {
                 // ...den vollen Seitennamen zurueckgeben mit extension
                 if($ext) {
                     return $currentelement;
                 } else {
                 // ...den vollen Seitennamen zurueckgeben ohne extension
-                    return substr($currentelement, 0, strlen($currentelement) - strlen($EXT_PAGE));
+                    return substr($currentelement, 0, strlen($currentelement) - strlen(EXT_PAGE));
                 }
             }
         }
@@ -497,12 +489,6 @@ $_POST = cleanREQUEST($_POST);
 // Inhalt einer Content-Datei einlesen, Rueckgabe als String
 // ------------------------------------------------------------------------------
     function getContent() {
-        global $CONTENT_DIR_REL;
-        global $CAT_REQUEST;
-        global $PAGE_REQUEST;
-        global $EXT_HIDDEN;
-        global $EXT_PAGE;
-        global $EXT_DRAFT;
         global $PAGE_FILE;
         global $ACTION_REQUEST;
         global $specialchars;
@@ -511,38 +497,37 @@ $_POST = cleanREQUEST($_POST);
         // Entwurf
         if (
                 $ACTION_REQUEST == "draft"
-                and $CatPage->get_Type($CAT_REQUEST,$PAGE_REQUEST) == $EXT_DRAFT
-                and $CatPage->exists_CatPage($CAT_REQUEST,$PAGE_REQUEST)
+                and $CatPage->get_Type(CAT_REQUEST,PAGE_REQUEST) == EXT_DRAFT
+                and $CatPage->exists_CatPage(CAT_REQUEST,PAGE_REQUEST)
             ) {
-            $PAGE_FILE = $PAGE_REQUEST.$EXT_DRAFT;
+            $PAGE_FILE = PAGE_REQUEST.EXT_DRAFT;
             return array (
-                          $CatPage->get_PageContent($CAT_REQUEST,$PAGE_REQUEST),
-                          $CatPage->get_HrefText($CAT_REQUEST,false),
-                          $CatPage->get_HrefText($CAT_REQUEST,$PAGE_REQUEST)
+                          $CatPage->get_PageContent(CAT_REQUEST,PAGE_REQUEST),
+                          $CatPage->get_HrefText(CAT_REQUEST,false),
+                          $CatPage->get_HrefText(CAT_REQUEST,PAGE_REQUEST)
                           );
         }
         // normale Inhaltsseite
-        elseif ($CatPage->get_Type($CAT_REQUEST,$PAGE_REQUEST) == $EXT_PAGE
-                and $CatPage->exists_CatPage($CAT_REQUEST,$PAGE_REQUEST)) {
-            $PAGE_FILE = $PAGE_REQUEST.$EXT_PAGE;
+        elseif ($CatPage->get_Type(CAT_REQUEST,PAGE_REQUEST) == EXT_PAGE
+                and $CatPage->exists_CatPage(CAT_REQUEST,PAGE_REQUEST)) {
+            $PAGE_FILE = PAGE_REQUEST.EXT_PAGE;
             return array (
-                          $CatPage->get_PageContent($CAT_REQUEST,$PAGE_REQUEST),
-                          $CatPage->get_HrefText($CAT_REQUEST,false),
-                          $CatPage->get_HrefText($CAT_REQUEST,$PAGE_REQUEST)
+                          $CatPage->get_PageContent(CAT_REQUEST,PAGE_REQUEST),
+                          $CatPage->get_HrefText(CAT_REQUEST,false),
+                          $CatPage->get_HrefText(CAT_REQUEST,PAGE_REQUEST)
                           );
         }
         // Versteckte Inhaltsseite
-        elseif ($CatPage->get_Type($CAT_REQUEST,$PAGE_REQUEST) == $EXT_HIDDEN
-                and $CatPage->exists_CatPage($CAT_REQUEST,$PAGE_REQUEST)) {
-            $PAGE_FILE = $PAGE_REQUEST.$EXT_HIDDEN;
+        elseif ($CatPage->get_Type(CAT_REQUEST,PAGE_REQUEST) == EXT_HIDDEN
+                and $CatPage->exists_CatPage(CAT_REQUEST,PAGE_REQUEST)) {
+            $PAGE_FILE = PAGE_REQUEST.EXT_HIDDEN;
             return array (
-                          $CatPage->get_PageContent($CAT_REQUEST,$PAGE_REQUEST),
-                          $CatPage->get_HrefText($CAT_REQUEST,false),
-                          $CatPage->get_HrefText($CAT_REQUEST,$PAGE_REQUEST)
+                          $CatPage->get_PageContent(CAT_REQUEST,PAGE_REQUEST),
+                          $CatPage->get_HrefText(CAT_REQUEST,false),
+                          $CatPage->get_HrefText(CAT_REQUEST,PAGE_REQUEST)
                           );
         }
-        else
-            return array("","","");
+        return array("","","");
     }
 
 
@@ -554,11 +539,6 @@ $_POST = cleanREQUEST($_POST);
     # ACHTUNG nicht mehr benutzen siehe CatPage.php
     # oder getDirAsArray()
     function getDirContentAsArray($dir, $iscatdir, $showhidden, $showdraft = false) {
-        global $CONTENT_FILES_DIR_NAME;
-        global $EXT_DRAFT;
-        global $EXT_HIDDEN;
-        global $EXT_PAGE;
-        global $EXT_LINK;
         global $tmp_getDirContentAsArray;
 
         $files_read = array();
@@ -567,7 +547,7 @@ $_POST = cleanREQUEST($_POST);
             while (false !== ($file = readdir($currentdir))) {
                 if (
                     // ...und nicht $CONTENT_FILES_DIR_NAME
-                    (($file <> $CONTENT_FILES_DIR_NAME) || (!$iscatdir))
+                    (($file <> CONTENT_FILES_DIR_NAME) || (!$iscatdir))
                     // nicht "." und ".."
                     && isValidDirOrFile($file)
                     ) {
@@ -587,16 +567,16 @@ $_POST = cleanREQUEST($_POST);
 #        while ($file = readdir($currentdir)) {
         foreach ($files_read as $file) {
             if (
-                    // wenn Kategorieverzeichnis: Alle Dateien auslesen, die auf $EXT_PAGE oder $EXT_HIDDEN enden...
+                    // wenn Kategorieverzeichnis: Alle Dateien auslesen, die auf EXT_PAGE oder EXT_HIDDEN enden...
 #                    (
                         (!$iscatdir)
-                        || (substr($file, strlen($file)-4, strlen($file)) == $EXT_PAGE)
-                        || (substr($file, strlen($file)-4, strlen($file)) == $EXT_LINK)
-                        || ($showhidden && (substr($file, strlen($file)-4, strlen($file)) == $EXT_HIDDEN))
-                        || ($showdraft && (substr($file, strlen($file)-4, strlen($file)) == $EXT_DRAFT))
+                        || (substr($file, strlen($file)-4, strlen($file)) == EXT_PAGE)
+                        || (substr($file, strlen($file)-4, strlen($file)) == EXT_LINK)
+                        || ($showhidden && (substr($file, strlen($file)-4, strlen($file)) == EXT_HIDDEN))
+                        || ($showdraft && (substr($file, strlen($file)-4, strlen($file)) == EXT_DRAFT))
 #                    )
                     // ...und nicht $CONTENT_FILES_DIR_NAME
-#                    && (($file <> $CONTENT_FILES_DIR_NAME) || (!$iscatdir))
+#                    && (($file <> CONTENT_FILES_DIR_NAME) || (!$iscatdir))
                     // nicht "." und ".."
 #                    && isValidDirOrFile($file)
                     ) {
@@ -646,7 +626,6 @@ $_POST = cleanREQUEST($_POST);
     function getDetailMenu($cat) {
         global $ACTION_REQUEST;
         global $QUERY_REQUEST;
-        global $PAGE_REQUEST;
         global $language;
         global $specialchars;
         global $CMS_CONF;
@@ -677,8 +656,8 @@ $_POST = cleanREQUEST($_POST);
         // Entwurfsansicht
         elseif (($ACTION_REQUEST == "draft") && ($CMS_CONF->get("usesubmenu") == 0))
             $detailmenu .= '<li class="detailmenu">'
-                .$CatPage->create_LinkTag($CatPage->get_Href($cat,$PAGE_REQUEST,"action=draft")
-                    ,$CatPage->get_HrefText($cat,$PAGE_REQUEST)." (".$language->getLanguageValue0("message_draft_0").")"
+                .$CatPage->create_LinkTag($CatPage->get_Href($cat,PAGE_REQUEST,"action=draft")
+                    ,$CatPage->get_HrefText($cat,PAGE_REQUEST)." (".$language->getLanguageValue0("message_draft_0").")"
                     ,$cssprefix."active"
                     ,false)
                 .'</li>';
@@ -708,14 +687,13 @@ $_POST = cleanREQUEST($_POST);
         global $language;
         global $CMS_CONF;
         global $specialchars;
-        global $CHARSET;
         global $LAYOUT_DIR_URL;
 
         $modrewrite_dumy = NULL;
         if($CMS_CONF->get("modrewrite") == "true") {
             $modrewrite_dumy = ".html";
         }
-        $form = "<form accept-charset=\"$CHARSET\" method=\"get\" action=\"index.php$modrewrite_dumy\" class=\"searchform\"><fieldset id=\"searchfieldset\">"
+        $form = "<form accept-charset=\"CHARSET\" method=\"get\" action=\"index.php$modrewrite_dumy\" class=\"searchform\"><fieldset id=\"searchfieldset\">"
         ."<input type=\"hidden\" name=\"action\" value=\"search\" />"
         ."<input type=\"text\" name=\"query\" value=\"\" class=\"searchtextfield\" />"
         ."<input type=\"image\" name=\"action\" value=\"search\" src=\"".$LAYOUT_DIR_URL."/grafiken/searchicon.gif\" alt=\"".$language->getLanguageValue0("message_search_0")."\" class=\"searchbutton\"".getTitleAttribute($language->getLanguageValue0("message_search_0"))." />"
@@ -731,12 +709,10 @@ $_POST = cleanREQUEST($_POST);
         global $language;
         global $CMS_CONF;
         global $CatPage;
-        global $EXT_PAGE;
 
-        $include_pages = array($EXT_PAGE);
+        $include_pages = array(EXT_PAGE);
         if($CMS_CONF->get("showhiddenpagesinsitemap") == "true") {
-            global $EXT_HIDDEN;
-            $include_pages = array($EXT_PAGE,$EXT_HIDDEN);
+            $include_pages = array(EXT_PAGE,EXT_HIDDEN);
         }
 
         $sitemap = "<h1>".$language->getLanguageValue0("message_sitemap_0")."</h1>"
@@ -837,10 +813,7 @@ $_POST = cleanREQUEST($_POST);
     function replacePlaceholders($content, $cattitle, $pagetitle) {
         global $CMS_CONF;
         global $specialchars;
-        global $CAT_REQUEST;
-        global $PAGE_REQUEST;
         global $PAGE_FILE;
-        global $EXT_PAGE;
         global $LAYOUT_DIR_URL;
         global $CatPage;
         // Titel der Website
@@ -848,14 +821,14 @@ $_POST = cleanREQUEST($_POST);
         // Layout-Verzeichnis
         $content = str_replace('{LAYOUT_DIR}', $LAYOUT_DIR_URL, $content);
 
-        if ($CAT_REQUEST != "") {
+        if (CAT_REQUEST != "") {
             // "unbehandelter" Name der aktuellen Kategorie ("10_M%FCllers%20Kuh")
-            $content = str_replace('{CATEGORY}', $CAT_REQUEST, $content);
+            $content = str_replace('{CATEGORY}', CAT_REQUEST, $content);
             // Aus dem "unbehandelter" Name der aktuellen Kategorie werden für die URL die % zu %25
-            $content = str_replace('{CATEGORY_URL}', $specialchars->replaceSpecialChars($CAT_REQUEST,true), $content);
+            $content = str_replace('{CATEGORY_URL}', $specialchars->replaceSpecialChars(CAT_REQUEST,true), $content);
             // "sauberer" Name der aktuellen Kategorie ("Muellers Kuh")
             if(strpos("tmp".$content,'{CATEGORY_NAME}') !== false)
-                $content = str_replace('{CATEGORY_NAME}', $CatPage->get_HrefText($CAT_REQUEST,false), $content);
+                $content = str_replace('{CATEGORY_NAME}', $CatPage->get_HrefText(CAT_REQUEST,false), $content);
         }
         // Suche, Sitemap
         else {
@@ -867,16 +840,16 @@ $_POST = cleanREQUEST($_POST);
             $content = str_replace('{CATEGORY_NAME}', $cattitle, $content);
         }
 
-        if ($PAGE_REQUEST != "") {
+        if (PAGE_REQUEST != "") {
             // "unbehandelter" Name der aktuellen Inhaltsseite ("10_M%FCllers%20Kuh")
-            $content = str_replace('{PAGE}', $PAGE_REQUEST, $content);
+            $content = str_replace('{PAGE}', PAGE_REQUEST, $content);
             // Aus dem "unbehandelter" Name der aktuellen Inhaltsseite werden für die URL die % zu %25
-            $content = str_replace('{PAGE_URL}', $specialchars->replaceSpecialChars($PAGE_REQUEST,true), $content);
+            $content = str_replace('{PAGE_URL}', $specialchars->replaceSpecialChars(PAGE_REQUEST,true), $content);
             // Dateiname der aktuellen Inhaltsseite ("10_M%FCllers%20Kuh.txt")
             $content = str_replace('{PAGE_FILE}', $PAGE_FILE, $content);
             // "sauberer" Name der aktuellen Inhaltsseite ("Muellers Kuh")
             if(strpos("tmp".$content,'{PAGE_NAME}') !== false)
-                $content = str_replace('{PAGE_NAME}', $CatPage->get_HrefText($CAT_REQUEST,$PAGE_REQUEST), $content);
+                $content = str_replace('{PAGE_NAME}', $CatPage->get_HrefText(CAT_REQUEST,PAGE_REQUEST), $content);
             
         }
         // Suche, Sitemap
@@ -922,9 +895,8 @@ $_POST = cleanREQUEST($_POST);
 // Hilfsfunktion: Sichert einen Input-Wert
 // ------------------------------------------------------------------------------
     function cleanInput($input) {
-        global $CHARSET;
         if (function_exists("mb_convert_encoding")) {
-            $input = @mb_convert_encoding($input, $CHARSET);
+            $input = @mb_convert_encoding($input, CHARSET);
         }
         return $input;
     }
@@ -956,7 +928,6 @@ $_POST = cleanREQUEST($_POST);
 // Hilfsfunktion: Prueft einen Requestparameter
 // ------------------------------------------------------------------------------
     function getRequestParam($param, $clean) {
-        global $URL_BASE;
         global $CMS_CONF;
 
         # wenn in der url z.B. cat[]=Kategorie übergeben wurde
@@ -974,8 +945,8 @@ $_POST = cleanREQUEST($_POST);
                 return $_REQUEST[$param];
             }
 
-            # ein tmp dafor weil wenn $URL_BASE = / ist werden alle / ersetzt durch nichts
-            $url_get = str_replace("tmp".$URL_BASE,"","tmp".$_SERVER['REQUEST_URI']);
+            # ein tmp dafor weil wenn URL_BASE = / ist werden alle / ersetzt durch nichts
+            $url_get = str_replace("tmp".URL_BASE,"","tmp".$_SERVER['REQUEST_URI']);
             $url_get = str_replace("&amp;","&",$url_get);
             $QUERY_STRING = str_replace("&amp;","&",$_SERVER['QUERY_STRING']);
             $url_get = str_replace("?".$QUERY_STRING,"",$url_get);
@@ -1028,23 +999,18 @@ $_POST = cleanREQUEST($_POST);
 // ------------------------------------------------------------------------------
 #!!!!!!!!! wird garnich mehr benuzt finde es jedenfals nicht
     function getNeighbourPages($page) {
-#        global $CONTENT_DIR_REL;
-        global $CAT_REQUEST;
         global $CMS_CONF;
-#        global $EXT_LINK;
-        
-        global $EXT_PAGE, $EXT_HIDDEN;
         global $CatPage;
         // leer initialisieren
         $neighbourPages = array("", "");
-        $include_pages = array($EXT_PAGE);
+        $include_pages = array(EXT_PAGE);
         if($CMS_CONF->get("showhiddenpagesincmsvariables") == "true")
-            $include_pages = array($EXT_PAGE,$EXT_HIDDEN);
+            $include_pages = array(EXT_PAGE,EXT_HIDDEN);
         // aktuelle Kategorie einlesen
-        $pagesarray = $CatPage->get_PageArray($CAT_REQUEST,$include_pages,true);
+        $pagesarray = $CatPage->get_PageArray(CAT_REQUEST,$include_pages,true);
         // Schleife ueber alle Seiten
         for ($i = 0; $i < count($pagesarray); $i++) {
-#            if(substr($pagesarray[$i], -(strlen($EXT_LINK))) == $EXT_LINK)
+#            if(substr($pagesarray[$i], -(strlen(EXT_LINK))) == EXT_LINK)
 #                continue;
             if ($page == substr($pagesarray[$i], 0, strlen($pagesarray[$i]) - 4)) {
                 // vorige Seite (nur setzen, wenn aktuelle nicht die erste ist)
@@ -1064,17 +1030,16 @@ $_POST = cleanREQUEST($_POST);
     }
 
     function findPlugins() {
-        global $PLUGIN_DIR_REL;
         # Damit ein Platzhalter der als erste kommt erkant wierd
         $activ_plugins = array();
         $deactiv_plugins = array();
         // alle Plugins einlesen
-        $dircontent = getDirAsArray($PLUGIN_DIR_REL,"dir");
+        $dircontent = getDirAsArray(PLUGIN_DIR_REL,"dir");
         foreach ($dircontent as $currentelement) {
             # nach schauen ob das Plugin active ist
-            if(file_exists($PLUGIN_DIR_REL.$currentelement."/plugin.conf")
-                and file_exists($PLUGIN_DIR_REL.$currentelement."/index.php")) {
-                $conf_plugin = new Properties($PLUGIN_DIR_REL.$currentelement."/plugin.conf",true);
+            if(file_exists(PLUGIN_DIR_REL.$currentelement."/plugin.conf")
+                and file_exists(PLUGIN_DIR_REL.$currentelement."/index.php")) {
+                $conf_plugin = new Properties(PLUGIN_DIR_REL.$currentelement."/plugin.conf",true);
                 if($conf_plugin->get("active") == "false") {
                     # array fuehlen mit deactivierte Plugin Platzhalter
                     $deactiv_plugins[] = $currentelement;
@@ -1089,7 +1054,6 @@ $_POST = cleanREQUEST($_POST);
 
 #!!!!!! nur noch in Plugins
     function menuLink($link,$css) {
-        global $EXT_LINK;
         global $specialchars;
         global $syntax;
         global $language;
@@ -1106,7 +1070,7 @@ $_POST = cleanREQUEST($_POST);
             $target = "_self";
         }
 
-        $tmp_link[1] = substr($tmp_link[1],0,-(strlen($EXT_LINK)));
+        $tmp_link[1] = substr($tmp_link[1],0,-(strlen(EXT_LINK)));
         $titel = $syntax->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1",$specialchars->rebuildSpecialChars($tmp_link[1], true, true)));
         return '<a href="'.$specialchars->rebuildSpecialChars($tmp_link[1], true, true).'"'.$css.' target="'.$target.'"'.$titel.'>'.$specialchars->rebuildSpecialChars(substr($tmp_link[0],3), true, true).'</a> ';
     }

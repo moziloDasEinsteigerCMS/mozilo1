@@ -15,10 +15,13 @@ else
 $BASE_DIR = str_replace("\\\\", "\\",$BASE_DIR);
 # zum schluss noch den teil denn wir nicht brauchen abschneiden
 $BASE_DIR = substr($BASE_DIR,0,-(strlen($ADMIN_DIR_NAME."/index.php")));
+define("BASE_DIR",$BASE_DIR);
 
 $BASE_DIR_CMS = $BASE_DIR.$CMS_DIR_NAME."/";
+define("BASE_DIR_CMS",$BASE_DIR_CMS);
 $BASE_DIR_ADMIN = $BASE_DIR.$ADMIN_DIR_NAME."/";
 $URL_BASE = substr($_SERVER['PHP_SELF'],0,strpos($_SERVER['PHP_SELF'],$ADMIN_DIR_NAME."/index.php"));
+define("URL_BASE",$URL_BASE);
 
 if(is_file($BASE_DIR_CMS."DefaultConf.php")) {
     require_once($BASE_DIR_CMS."DefaultConf.php");
@@ -160,14 +163,10 @@ $CONTENT_DIR_REL        = $BASE_DIR.$CONTENT_DIR_NAME."/";
 $GALLERIES_DIR_REL    = $BASE_DIR.$GALLERIES_DIR_NAME."/";
 #$PREVIEW_DIR_NAME        = "vorschau";
 $PLUGIN_DIR_REL = $BASE_DIR.$PLUGIN_DIR_NAME."/";
+define("CONTENT_DIR_REL",$CONTENT_DIR_REL);
+define("PLUGIN_DIR_REL",$PLUGIN_DIR_REL);
 
 $ALLOWED_SPECIALCHARS_REGEX = $specialchars->getSpecialCharsRegex();
-
-// Dateiendungen fuer Inhaltsseiten 
-$EXT_PAGE    = ".txt";
-$EXT_HIDDEN  = ".hid";
-$EXT_DRAFT   = ".tmp";
-$EXT_LINK    = ".lnk";
 
 $icon_size = "24x24"; # 16x16 22x22 24x24 32x32 48x48
 $icon_size_tabs = "16x16"; # 16x16 22x22 24x24 32x32 48x48
@@ -3603,6 +3602,9 @@ function plugins($post) {
     global $BASE_DIR_CMS;
 
     require_once($BASE_DIR_CMS."Plugin.php");
+    require_once($BASE_DIR_CMS."CatPageClass.php");
+    global $CatPage;
+    $CatPage         = new CatPageClass();
 
     $pagecontent = '<input type="hidden" name="action_activ" value="'.getLanguageValue("plugins_button").'">';
 

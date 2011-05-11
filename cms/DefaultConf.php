@@ -7,6 +7,23 @@ $CONTENT_FILES_DIR_NAME = "dateien";
 $PLUGIN_DIR_NAME        = "plugins";
 $GALLERIES_DIR_NAME     = "galerien";
 $PREVIEW_DIR_NAME       = "vorschau";
+// Dateiendungen fuer Inhaltsseiten
+# Achtung die endungen muessen alle gleich lang sein
+$EXT_PAGE       = ".txt";
+$EXT_HIDDEN     = ".hid";
+$EXT_DRAFT      = ".tmp";
+$EXT_LINK       = ".lnk";
+
+define("CHARSET",$CHARSET);
+define("CONTENT_DIR_NAME",$CONTENT_DIR_NAME);
+define("CONTENT_FILES_DIR_NAME",$CONTENT_FILES_DIR_NAME);
+define("PLUGIN_DIR_NAME",$PLUGIN_DIR_NAME);
+define("GALLERIES_DIR_NAME",$GALLERIES_DIR_NAME);
+define("PREVIEW_DIR_NAME",$PREVIEW_DIR_NAME);
+define("EXT_PAGE",$EXT_PAGE);
+define("EXT_HIDDEN",$EXT_HIDDEN);
+define("EXT_DRAFT",$EXT_DRAFT);
+define("EXT_LINK",$EXT_LINK);
 
 function cleanREQUEST($post_return) {
     foreach($post_return as $key => $value) {
@@ -268,8 +285,5 @@ function getDirAsArray($dir,$filetype = false) {
     }
     return $dateien;
 }
-
-
-
 
 ?>

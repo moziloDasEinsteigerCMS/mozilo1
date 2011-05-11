@@ -17,7 +17,6 @@ class SpecialChars {
     }
 
     function getHtmlEntityDecode($string) {
-        global $CHARSET;
 
         if((version_compare( phpversion(), '5.0' ) < 0)) {
             $replace = array_keys(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES));
@@ -26,14 +25,14 @@ class SpecialChars {
             if(function_exists("utf8_encode")) {
                 $replace = utf8_encode($replace);
             } elseif(function_exists("mb_convert_encoding")) {
-                $replace = mb_convert_encoding($replace, $CHARSET);
+                $replace = mb_convert_encoding($replace, CHARSET);
             } elseif(function_exists("iconv")) {
-                $replace = iconv('ISO-8859-1', $CHARSET.'//IGNORE',$replace);
+                $replace = iconv('ISO-8859-1', CHARSET.'//IGNORE',$replace);
             }
             $replace = explode(",",$replace);
             $string = str_replace(array_values(get_html_translation_table(HTML_ENTITIES, ENT_QUOTES)), $replace, $string);
         } else {
-            $string = html_entity_decode($string,ENT_QUOTES,$CHARSET);
+            $string = html_entity_decode($string,ENT_QUOTES,CHARSET);
         }
         return $string;
     }
@@ -42,7 +41,6 @@ class SpecialChars {
 // Erlaubte Sonderzeichen als RegEx zurückgeben
 // ------------------------------------------------------------------------------
     function getSpecialCharsRegex() {
-        global $CHARSET;
 
         $regex = "/^[a-zA-Z0-9_\%\-\s\?\!\@\.€".addslashes($this->getHtmlEntityDecode(implode("", get_html_translation_table(HTML_ENTITIES, ENT_QUOTES))))."]+$/";
         $regex = str_replace("&#39;", "'", $regex);
@@ -67,15 +65,14 @@ class SpecialChars {
 // Umlaute in Inhaltsseiten/Kategorien für Anzeige 
 // ------------------------------------------------------------------------------
     function rebuildSpecialChars($text, $rebuildnbsp, $html) {
-        global $CHARSET;
         $text = rawurldecode($text);
         if($html) {
-            $test = htmlentities($text,ENT_COMPAT,$CHARSET);
+            $test = htmlentities($text,ENT_COMPAT,CHARSET);
 # hier muss noch geschraubt werden iconv gibts auf manchen systemen nicht!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             if(empty($test) and function_exists("iconv")) {
                 # htmlentities gibt einen leeren sring zurück wenn im string ein unbekantes zeichen ist
                 # iconv entfernt es einfach
-                $test = htmlentities(@iconv($CHARSET,$CHARSET.'//IGNORE',$text),ENT_COMPAT,$CHARSET);
+                $test = htmlentities(@iconv(CHARSET,CHARSET.'//IGNORE',$text),ENT_COMPAT,CHARSET);
             }
             $text = $test;
             $text = str_replace('&amp;#','&#',$text);
@@ -101,7 +98,6 @@ class SpecialChars {
 // Für Datei-Uploads erlaubte Sonderzeichen userlesbar als String zurückgeben
 // ------------------------------------------------------------------------------
     function getFileCharsString($sep, $charsperline) {
-        global $CHARSET;
         $filecharsstring = "";
         $filecharshtml = "";
         for ($i=65; $i<=90;$i++)
@@ -112,7 +108,7 @@ class SpecialChars {
             $filecharsstring .= chr($i);
         $filecharsstring .= "_-.";
         for ($i=0; $i<=strlen($filecharsstring); $i+=$charsperline) {
-            $filecharshtml .= htmlentities(substr($filecharsstring, $i, $charsperline),ENT_COMPAT,$CHARSET)."<br />";
+            $filecharshtml .= htmlentities(substr($filecharsstring, $i, $charsperline),ENT_COMPAT,CHARSET)."<br />";
         }
         return $filecharshtml;
     }

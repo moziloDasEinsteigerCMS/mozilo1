@@ -24,16 +24,14 @@ function searchInPages() {
     global $QUERY_REQUEST;
     global $specialchars;
     global $language;
-    global $EXT_HIDDEN;
-    global $EXT_PAGE;
     global $CatPage;
 
     if(!$highlightparameter = getSearchString($QUERY_REQUEST,false))
         return false;
 
-    $include_pages = array($EXT_PAGE);
+    $include_pages = array(EXT_PAGE);
     if($CMS_CONF->get("showhiddenpagesinsearch") == "true")
-        $include_pages = array($EXT_PAGE,$EXT_HIDDEN);
+        $include_pages = array(EXT_PAGE,EXT_HIDDEN);
 
     // Kategorien-Verzeichnis einlesen
     $categoriesarray = $CatPage->get_CatArray(false, false, $include_pages);
