@@ -26,14 +26,13 @@ function makePostCatPageReturnVariable($pages = false) {
 
     $max_cat_page = 100;
 
-    $cat_array = getDirAsArray(CONTENT_DIR_REL,"dir","none");
+    $cat_array = getDirAsArray(CONTENT_DIR_REL,"dir","sort");
 
     if(count($cat_array) > $max_cat_page) {
         $post['error_messages']['check_too_many_categories'][] = NULL;
     }
     # wenn es nur cat ist wird $cat_array = cat $page_array = $cat_array
     if($pages === false) {
-        sort($cat_array);
         # Wichtig wegen new Kategorie
         $cat_array[$max_cat_page] = NULL;
         $page_array = $cat_array;
