@@ -26,7 +26,7 @@ function makePostCatPageReturnVariable($pages = false) {
 
     $max_cat_page = 100;
 
-    $cat_array = getDirs(CONTENT_DIR_REL,true);
+    $cat_array = getDirAsArray(CONTENT_DIR_REL,"dir","none");
 
     if(count($cat_array) > $max_cat_page) {
         $post['error_messages']['check_too_many_categories'][] = NULL;
@@ -66,7 +66,7 @@ function makePostCatPageReturnVariable($pages = false) {
             if(substr($cat,-(strlen(EXT_LINK))) == EXT_LINK) {
                 continue;
             }
-            $page_array = getFiles(CONTENT_DIR_REL.$cat, "");
+            $page_array = getDirAsArray(CONTENT_DIR_REL.$cat,array(EXT_PAGE,EXT_HIDDEN,EXT_DRAFT,EXT_LINK),"sort");
             if(!isset($post[$cat]['error_html']['cat_name'])) {
                 $post[$cat]['error_html']['cat_name'] = NULL;
             }
@@ -74,7 +74,6 @@ function makePostCatPageReturnVariable($pages = false) {
                 $post['error_messages']['check_too_many_pages']['color'] = $error_color['check_too_many_pages'];
                 $post[$cat]['error_html']['cat_name'] = 'style="background-color:'.$error_color['check_too_many_pages'].';" ';
             }
-            sort($page_array);
             # Wichtig wegen new Inhaltseite
             $page_array[$max_cat_page] = NULL;
             # die möglichkeit nach action die sachen aufzucklapen (editsite)

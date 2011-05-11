@@ -37,6 +37,8 @@ function getLanguageValue($confpara,$title = false)
  @author: Oliver Lorenz
  Gibt alle enthaltenen Ordner in ein Array aus
  --------------------------------------------------------------------------------*/
+# ACHTUNG DIE function solte nicht mehr benutzt werden nimm getDirAsArray()
+# ist nur noch wegen einigen Plugins drin
 function getDirs($dir,$complet = false,$exclude_link = false)
 {
 
@@ -67,6 +69,8 @@ function getDirs($dir,$complet = false,$exclude_link = false)
  @author: Arvid Zimmermann
  Gibt alle enthaltenen Dateien in ein Array aus
  --------------------------------------------------------------------------------*/
+# ACHTUNG DIE function solte nicht mehr benutzt werden nimm getDirAsArray()
+# ist nur noch wegen einigen Plugins drin
 function getFiles($dir, $excludeextension)
 {
     //$dir = stripslashes($dir);
@@ -177,7 +181,9 @@ function getGalleriesAsSelect($selectedgallery) {
 }
 
 // gibt Verzeichnisinhalte als Array zurück (ignoriert dabei Dateien, wenn $includefiles == true)
-#function getDirContentAsArray($dir, $includefiles, $position = true) {
+
+# ACHTUNG DIE function solte nicht mehr benutzt werden nimm getDirAsArray()
+# ist nur noch wegen einigen Plugins drin
 function getDirContentAsArray($dir, $hiddeposition = true) {
     $dircontent = array();
     if (is_dir($dir)) {

@@ -257,7 +257,8 @@ function isValidDirOrFile($file) {
 # $filetype = array(".txt",".hid",...) nur die mit dieser ext
 #               Achtung Punkt nicht vergessen Gross/Kleinschreibung ist egal
 # $filetype = false alle dateien
-function getDirAsArray($dir,$filetype = false) {
+# $sort_type = "sort" (Default) oder "natcasesort" oder "none"
+function getDirAsArray($dir,$filetype = false,$sort_type = "sort") {
     $dateien = array();
     if(is_dir($dir) and false !== ($currentdir = opendir($dir))) {
         while(false !== ($file = readdir($currentdir))) {
@@ -281,7 +282,10 @@ function getDirAsArray($dir,$filetype = false) {
             }
         }
         closedir($currentdir);
-        sort($dateien);
+        if($sort_type == "sort")
+            sort($dateien);
+        elseif($sort_type == "natcasesort")
+            natcasesort($dateien);
     }
     return $dateien;
 }

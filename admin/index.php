@@ -868,7 +868,8 @@ function deleteCategory($post) {
             $post['messages']['category_message_delete'][] = $_POST['del_cat'];
             $post['makepara'] = "yes";
             if($CMS_CONF->get('defaultcat') == $_POST['del_cat']) {
-                $tmp_array = getDirs(CONTENT_DIR_REL,true,true);
+                $tmp_array = getDirAsArray(CONTENT_DIR_REL,"dir","none");
+ 
                 $CMS_CONF->set('defaultcat',$tmp_array[0]);
                 $post['messages']['category_message_defaultcat'][] = $tmp_array[0];
             }
@@ -1681,7 +1682,7 @@ function gallery($post) {
         $post = newGallery($post);
     }
 
-    $dircontent = getDirs(GALLERIES_DIR_REL, true);
+    $dircontent = getDirAsArray(GALLERIES_DIR_REL,"dir","sort");
     # Galerien array bilden mit den dazugehörigen Bilder
     # wenn die Galerie oder die Bilder mit FTP Hochgeladen wurden Automatisch umbennen
     foreach ($dircontent as $pos => $currentgalerien) {
@@ -1751,7 +1752,7 @@ function gallery($post) {
                 $post['error_messages'][key($error)][] = $error[key($error)];
             }
         }*/
-        $gallerypics[$currentgalerien] = getFiles(GALLERIES_DIR_REL.$currentgalerien,"");
+        $gallerypics[$currentgalerien] = getDirAsArray(GALLERIES_DIR_REL.$currentgalerien,"file","none");
         $count_preview_pic = 0;
         foreach($gallerypics[$currentgalerien] as $pos => $file) {
             # nur Bilder zulassen
@@ -1998,7 +1999,7 @@ function gallery($post) {
             $lastsavedanchor = "";#$lastsavedanchor = " id=\"lastsavedimage\"";
             $size = getimagesize(GALLERIES_DIR_REL.$currentgalerien."/".$file);
             // Vorschaubild anzeigen, wenn vorhanden; sonst Text
-            if (file_exists(GALLERIES_DIR_REL.$currentgalerien."/PREVIEW_DIR_NAME/".$file)) {
+            if (file_exists(GALLERIES_DIR_REL.$currentgalerien."/".PREVIEW_DIR_NAME."/".$file)) {
                 $preview = '<a href="'.$specialchars->replaceSpecialChars(URL_BASE.GALLERIES_DIR_NAME."/".$currentgalerien."/".$file,true).'" target="_blank"'.$tooltip_gallery_help_picture.'>'
                 .'<img src="'.$specialchars->replaceSpecialChars(URL_BASE.GALLERIES_DIR_NAME."/".$currentgalerien."/".PREVIEW_DIR_NAME."/".$file,true).'" alt="'.$specialchars->rebuildSpecialChars($file, true, true).'" style="height:60px;border:none;" /></a>';
             } else {
@@ -2281,14 +2282,11 @@ function editGallery($post) {
         #make_thumbs
         if(isset($post['gallery'][$gallery]['make_thumbs'])) {
             require_once(BASE_DIR_CMS."Image.php");
-            $gallerypics = getFiles(GALLERIES_DIR_REL.$gallery,"");
+            $gallerypics = getDirAsArray(GALLERIES_DIR_REL.$gallery,"file","none");
             foreach($gallerypics as $pos => $file) {
-                # nur Dateien zulassen
-                if(!is_dir(GALLERIES_DIR_REL.$gallery.'/'.$file)) {
-                    scaleImage($file, GALLERIES_DIR_REL.$gallery.'/', GALLERIES_DIR_REL.$gallery.'/'.PREVIEW_DIR_NAME.'/', $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'),true);
-                    $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
-                    $post['messages']['gallery_messages_make_thumbs'][$gallery] = $gallery;
-                }
+                scaleImage($file, GALLERIES_DIR_REL.$gallery.'/', GALLERIES_DIR_REL.$gallery.'/'.PREVIEW_DIR_NAME.'/', $GALLERY_CONF->get('maxthumbwidth'), $GALLERY_CONF->get('maxthumbheight'),true);
+                $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
+                $post['messages']['gallery_messages_make_thumbs'][$gallery] = $gallery;
             }
         }
         #scale_max
@@ -2298,11 +2296,11 @@ function editGallery($post) {
                 $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
             } else {
                 require_once(BASE_DIR_CMS."Image.php");
-                $gallerypics = getFiles(GALLERIES_DIR_REL.$gallery,"");
+                $gallerypics = getDirAsArray(GALLERIES_DIR_REL.$gallery,"file","none");
                 foreach($gallerypics as $pos => $file) {
                     $test_img = @getimagesize(GALLERIES_DIR_REL.$gallery.'/'.$file);
                     # nur Bilder zulassen
-                    if(!is_dir($file) and count($test_img) > 2) {
+                    if(count($test_img) > 2) {
                         if($test_img[0] > $GALLERY_CONF->get('maxwidth') or $test_img[1] > $GALLERY_CONF->get('maxheight')) {
                             scaleImage($file, GALLERIES_DIR_REL.$gallery.'/', GALLERIES_DIR_REL.$gallery.'/', $GALLERY_CONF->get('maxwidth'), $GALLERY_CONF->get('maxheight'));
                             $post['gallery']['error_html']['display'][$gallery] = ' style="display:block;"';
@@ -2702,9 +2700,9 @@ function config($post) {
         $error_color['titel_'.$syntax_name] = NULL;
     }
 */
-    $language_array = getFiles(BASE_DIR_CMS.'sprachen',true);
-    $cat_array = getDirs(CONTENT_DIR_REL,true,true);
-    $layout_array = getDirs(BASE_DIR."layouts",true);
+    $language_array = getDirAsArray(BASE_DIR_CMS.'sprachen',"file","natcasesort");
+    $cat_array = getDirAsArray(CONTENT_DIR_REL,"dir","natcasesort");
+    $layout_array = getDirAsArray(BASE_DIR."layouts","dir","natcasesort");
 
     $pagecontent = '<input type="hidden" name="action_activ" value="'.getLanguageValue("config_button").'">';
 
@@ -3014,7 +3012,7 @@ function config($post) {
     $pagecontent .= "<td class=\"td_cms_left\">";
     $pagecontent .= "<select name=\"defaultcat\" class=\"input_cms_select\"".$error_color['defaultcat'].">";
     foreach($cat_array as $element) {
-        if (count(getFiles(CONTENT_DIR_REL.$element, "")) == 0) {
+        if (count(getDirAsArray(CONTENT_DIR_REL.$element,array(EXT_PAGE),"none")) == 0) {
             continue;
         }
         $selected = NULL;
@@ -3193,7 +3191,7 @@ function admin($post) {
     $pagecontent = '<input type="hidden" name="action_activ" value="'.getLanguageValue("admin_button").'">';
 
     $error_color['language'] = NULL;
-    $language_array = getFiles(BASE_DIR_ADMIN.'sprachen',true);
+    $language_array = getDirAsArray(BASE_DIR_ADMIN.'sprachen',"file","natcasesort");
     if(count($language_array) <= 0) {
         $post['error_messages']['admin_error_language_emty'][] = NULL;
         $error_color['language'] = ' style="background-color:#FF7029;"';
@@ -3568,8 +3566,7 @@ function plugins($post) {
     $pagecontent .= '<table summary="" width="100%" class="table_toggle" cellspacing="0" border="0" cellpadding="0">';
     $pagecontent .= '<tr><td width="100%" class="td_toggle"><input type="submit" class="input_submit" name="apply" value="'.getLanguageValue("plugins_submit").'"/></td></tr>';
 
-    $dircontent = getDirs(PLUGIN_DIR_REL, true);
-    natcasesort($dircontent);
+    $dircontent = getDirAsArray(PLUGIN_DIR_REL,"dir","natcasesort");
     $toggle_pos = 0;
     foreach ($dircontent as $currentelement) {
         if (file_exists(PLUGIN_DIR_REL.$currentelement."/index.php")) {
@@ -4045,7 +4042,7 @@ function returnPluginSelectbox() {
     global $specialchars;
 
     require_once(BASE_DIR_CMS."Plugin.php");
-    $plugins = getDirContentAsArray(PLUGIN_DIR_REL, false);
+    $plugins = getDirAsArray(PLUGIN_DIR_REL,"dir","natcasesort");
     $selectbox = '<select class="overviewselect" name="plugins" onchange="insertPluginAndResetSelectbox(this);">'
     .'<option class="noaction" value="">'.getLanguageValue("toolbar_plugins").'</option>';
     foreach ($plugins as $currentplugin) {
@@ -4217,13 +4214,12 @@ function returnOverviewSelectbox($type, $currentcat) {
 
         // Inhaltsseiten und Kategorien
         case ($type == 1 or $type == 4):
-            $categories = getDirContentAsArray(CONTENT_DIR_REL, false);
+            $categories = getDirAsArray(CONTENT_DIR_REL,"dir","natcasesort");
             foreach ($categories as $catdir) {
                 if(substr($catdir,-(strlen(EXT_LINK))) == EXT_LINK) continue;
                 $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
                 $elements[] = array($cleancatname, ":".$cleancatname);
-                $files = getFiles(CONTENT_DIR_REL.$catdir, EXT_LINK);
-                natcasesort($files);
+                $files = getDirAsArray(CONTENT_DIR_REL.$catdir,array(EXT_PAGE,EXT_HIDDEN,EXT_DRAFT),"natcasesort");
                 foreach($files as $file) {
                     if ((substr($file, strlen($file)-4, 4) == EXT_PAGE) || (substr($file, strlen($file)-4, 4) == EXT_HIDDEN)) {
                         $cleanpagename = $specialchars->rebuildSpecialChars(substr($file, 3, strlen($file) - 3 - strlen(EXT_PAGE)), true, true);
@@ -4249,13 +4245,12 @@ function returnOverviewSelectbox($type, $currentcat) {
         // Dateien
         case 2:
             // alle Kategorien durchgehen
-            $categories = getDirContentAsArray(CONTENT_DIR_REL, false);
+            $categories = getDirAsArray(CONTENT_DIR_REL,"dir","natcasesort");
             foreach ($categories as $catdir) {
                 if(substr($catdir,-(strlen(EXT_LINK))) == EXT_LINK) continue;
                 $cleancatname = $specialchars->rebuildSpecialChars(substr($catdir, 3, strlen($catdir)), true, true);
                 $elements[] = array($cleancatname, ":".$cleancatname);
-                $currentcat_filearray = getFiles(CONTENT_DIR_REL.$catdir."/".CONTENT_FILES_DIR_NAME,"");
-                natcasesort($currentcat_filearray);
+                $currentcat_filearray = getDirAsArray(CONTENT_DIR_REL.$catdir."/".CONTENT_FILES_DIR_NAME,"file","natcasesort");
                 foreach ($currentcat_filearray as $current_file) {
                     if ($catdir == $currentcat)
                         $elements[] = array($spacer.$specialchars->rebuildSpecialChars($current_file, true, true), $specialchars->rebuildSpecialChars($current_file, true, true));
@@ -4268,7 +4263,7 @@ function returnOverviewSelectbox($type, $currentcat) {
 
         // Galerien
         case 3:
-            $galleries = getDirContentAsArray(GALLERIES_DIR_REL, false);
+            $galleries = getDirAsArray(GALLERIES_DIR_REL,"dir","natcasesort");
             foreach ($galleries as $currentgallery) {
                 $elements[] = array($specialchars->rebuildSpecialChars($currentgallery, false, true), $specialchars->rebuildSpecialChars($currentgallery, false, false));
             }
