@@ -81,8 +81,8 @@ $PLUGIN_DIR_REL = BASE_DIR.PLUGIN_DIR_NAME."/";
 define("PLUGIN_DIR_REL",$PLUGIN_DIR_REL);
 
 
-    require_once(BASE_DIR_CMS."CatPageClass.php");
-    $CatPage         = new CatPageClass();
+require_once(BASE_DIR_CMS."CatPageClass.php");
+$CatPage         = new CatPageClass();
 
 require_once(BASE_DIR_ADMIN."filesystem.php");
 require_once(BASE_DIR_ADMIN."string.php");
