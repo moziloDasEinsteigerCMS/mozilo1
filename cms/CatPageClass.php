@@ -65,7 +65,7 @@ class CatPageClass {
      }
 
     # Erzeugt ein durchnummeriertes array mit cats in richtiger Reihenfolge
-    # $any = true # alle cats auch links ins array $showlink und $containspage werden übergangen
+    # $any = true # alle cats $containspage werden übergangen
     # $showlink = false # keine catlinks ins array
     # $containspage = array(ext.) # mit page ext. die enthalten sein müssen damit cat ins array geht
     # Default = array mit catlinks und cat mit midestens einer normalen page oder link
@@ -75,11 +75,15 @@ class CatPageClass {
         if(!$containspage or !is_array($containspage))
             $containspage = array(EXT_PAGE, EXT_LINK);
         foreach($this->CatPageArray as $cat => $info) {
+            # wenn cat ein Link ist und $showlink = true ist
+            if($showlink and $info['_type-'] == EXT_LINK) {
+                $return[] = $cat;
+                continue;
+            # wenn cat ein Link ist und $showlink = false ist
+            } elseif(!$showlink and $info['_type-'] == EXT_LINK)
+                continue;
             # alle cat
             if($any)
-                $return[] = $cat;
-            # wenn cat ein Link ist und $showlink = true ist
-            elseif($showlink and $info['_type-'] == EXT_LINK)
                 $return[] = $cat;
             else {
                 # nur cat zulassen wenn auch pages mit array($containspage) vorhanden sind
@@ -99,9 +103,8 @@ class CatPageClass {
     # wird benutzt
     function get_PageArray($cat,$showext = false,$hidecatnamedpages = false) {
         global $CMS_CONF;
-        $hidenamedpages = false;
         if(!$hidecatnamedpages and $CMS_CONF->get("hidecatnamedpages") == "true")
-            $hidenamedpages = true;
+            $hidecatnamedpages = true;
         $cat = $this->get_AsKeyName($cat);
         $return = array();
         # Default page arten erzeugen
@@ -113,7 +116,7 @@ class CatPageClass {
                 if(!in_array($info['_type-'],$showext))
                     continue;
                 # wenn catname gleich pagename nächste page
-                if($hidenamedpages and $cat == $page)
+                if($hidecatnamedpages and $cat == $page)
                     continue;
                 $return[] = $page;
             }
