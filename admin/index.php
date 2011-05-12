@@ -38,7 +38,7 @@ $_POST = cleanREQUEST($_POST);
 if(isset($_FILE)) $_FILE = cleanREQUEST($_FILE);
 
 
-$debug = "ja"; # ja oder nein
+$debug = "nein"; # ja oder nein
  // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 if($debug != "ja")
     @ini_set("display_errors", 0);
