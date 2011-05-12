@@ -4227,9 +4227,8 @@ function returnOverviewSelectbox($type, $currentcat) {
 
         // Inhaltsseiten und Kategorien
         case ($type == 1 or $type == 4):
-            $categories = $CatPage->get_CatArray(true);
+            $categories = $CatPage->get_CatArray(true,false);
             foreach ($categories as $catdir) {
-                if($CatPage->get_Type($catdir,false) == EXT_LINK) continue;
                 $cleancatname = $CatPage->get_HrefText($catdir,false);
                 $elements[] = array($cleancatname, ":".$cleancatname);
                 $files = $CatPage->get_PageArray($catdir, array(EXT_PAGE,EXT_HIDDEN), true);
@@ -4257,9 +4256,8 @@ function returnOverviewSelectbox($type, $currentcat) {
         // Dateien
         case 2:
             // alle Kategorien durchgehen
-            $categories = $CatPage->get_CatArray(true);
+            $categories = $CatPage->get_CatArray(true,false);
             foreach ($categories as $catdir) {
-                if($CatPage->get_Type($catdir,false) == EXT_LINK) continue;
                 $cleancatname = $CatPage->get_HrefText($catdir,false);
                 $elements[] = array($cleancatname, ":".$cleancatname);
                 $currentcat_filearray = $CatPage->get_FileArray($catdir);
