@@ -3556,7 +3556,7 @@ function plugins($post) {
     require_once(BASE_DIR_CMS."Plugin.php");
     require_once(BASE_DIR_CMS."CatPageClass.php");
     global $CatPage;
-    $CatPage         = new CatPageClass();
+#    $CatPage         = new CatPageClass();
 
     $pagecontent = '<input type="hidden" name="action_activ" value="'.getLanguageValue("plugins_button").'">';
 
