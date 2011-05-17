@@ -58,7 +58,7 @@ class CatPageClass {
         }
         $firstpage = $this->get_PageArray($cat,$pages,true);
         #$firstpage = current($firstpage);
-        $firstpage = prev($firstpage);
+        $firstpage = current($firstpage);
         if($firstpage) {
             return $firstpage;
         }
