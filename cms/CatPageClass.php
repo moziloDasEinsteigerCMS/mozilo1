@@ -57,7 +57,8 @@ class CatPageClass {
             $pages = array(EXT_PAGE,EXT_HIDDEN);
         }
         $firstpage = $this->get_PageArray($cat,$pages,true);
-        $firstpage = current($firstpage);
+        #$firstpage = current($firstpage);
+        $firstpage = prev($firstpage);
         if($firstpage) {
             return $firstpage;
         }
