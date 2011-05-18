@@ -40,9 +40,11 @@ class CatPageClass {
             $pages = array(EXT_PAGE,EXT_HIDDEN);
         }
         $firstcat = $this->get_CatArray(false,false,$pages);
+        reset($firstcat);
         $firstcat = current($firstcat);
         if($firstcat) {
             $firstpage = $this->get_PageArray($firstcat,$pages,true);
+            reset($firstpage);
             $firstpage = current($firstpage);
             return array($firstcat,$firstpage);
         }
@@ -57,7 +59,7 @@ class CatPageClass {
             $pages = array(EXT_PAGE,EXT_HIDDEN);
         }
         $firstpage = $this->get_PageArray($cat,$pages,true);
-        #$firstpage = current($firstpage);
+        reset($firstpage);
         $firstpage = current($firstpage);
         if($firstpage) {
             return $firstpage;
