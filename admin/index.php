@@ -3583,7 +3583,7 @@ function plugins($post) {
     foreach ($dircontent as $currentelement) {
         if (file_exists(PLUGIN_DIR_REL.$currentelement."/index.php")) {
             require_once(PLUGIN_DIR_REL.$currentelement."/index.php");
-            if(class_exists( $currentelement ) and in_array($currentelement, get_declared_classes()))
+            if(class_exists( $currentelement ) and (in_array(strtolower($currentelement), get_declared_classes()) or in_array($currentelement, get_declared_classes())))
                 $plugin = new $currentelement();
             else
                 # Plugin Dirname stimt nicht mit Plugin Classnamen überein
