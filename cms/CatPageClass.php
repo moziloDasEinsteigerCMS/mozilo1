@@ -106,8 +106,9 @@ class CatPageClass {
     # wird benutzt
     function get_PageArray($cat,$showext = false,$hidecatnamedpages = false) {
         global $CMS_CONF;
+        $hidenamedpage = false;
         if(!$hidecatnamedpages and $CMS_CONF->get("hidecatnamedpages") == "true")
-            $hidecatnamedpages = true;
+            $hidenamedpage = true;
         $cat = $this->get_AsKeyName($cat);
         $return = array();
         # Default page arten erzeugen
@@ -119,7 +120,7 @@ class CatPageClass {
                 if(!in_array($info['_type-'],$showext))
                     continue;
                 # wenn catname gleich pagename nächste page
-                if($hidecatnamedpages and $cat == $page)
+                if($hidenamedpage and $cat == $page)
                     continue;
                 $return[] = $page;
             }
