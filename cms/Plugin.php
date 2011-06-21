@@ -1,14 +1,5 @@
 <?php
 /* 
-* 
-* $Revision$
-* $LastChangedDate$
-* $Author$
-*
-*/
-
-
-/* 
 * Abstrakte Basisklasse für moziloCMS-Plugins.
 *
 * PHP4 kennt das Prinzip der Abstraktion noch nicht,
@@ -110,6 +101,57 @@ class Plugin {
             $this->error = $syntax->createDeadlink("{".get_class($this)."}", $language->getLanguageValue2("plugin_error_missing_method_2", get_class($this), $method));
         }
     }
-    
+
+# {PLUGIN| (PARAMETER) $separation (KEY $separation_key_value VALUE) }
+    # damit kann man sich die $value die in getContent() übergeben wird serlegen lassen
+    # $value = die übergebenen $value
+    # $userparamarray = ein array mit den werten die man haben möchte und auch gleich vorbelegung mit default werten
+    # $separation = trennung der einzelnen Parameter
+    # $separation_key_value = trennung des Parameters in Key=Value
+    # Ablauf:
+    # 1. $value wird erst mit $separation zerlegt
+    # 2. die zerlegten teile werden mit $separation_key_value zerlegt
+    # Beispiel wir gehen von den Default $separation und $separation_key_value aus:
+    # $value = eins^,zwei^,key1^=value1^,drei
+    # ergebnis = array( eins, zwei, key1 => value1, drei )
+    # bei userparamarray = array( def1, def2, key1 => def, def3, def4 )
+    # ergebnis = array( eins, zwei, key1 => value1, drei, def4 )
+    # bei userparamarray = array( def1, def2, key1 => def )
+    # ergebnis = array( eins, zwei, key1 => value1 )
+    function makeUserParaArray($value,$userparamarray = false,$separation = "^,",$separation_key_value = "^=") {
+        global $specialchars;
+        # wenn im Trenn zeichen ein ^ ist müssen wir das decoden da die Syntax.php das encodet hat
+        # siehe preparePageContent()
+        $separation = $specialchars->encodeProtectedChr($separation);
+        $separation_key_value = $specialchars->encodeProtectedChr($separation_key_value);
+
+        $user_array = array();
+        $para_array = array();
+
+        # alle werte die gefunden werden in ein $para_array einsetzen
+        $tmp = explode($separation,$value);
+        foreach($tmp as $pos => $values) {
+            if(strstr($values,$separation_key_value)) {
+                $tmp = explode($separation_key_value,$values);
+                # wenn zwischen $separation und $separation_key_value ein -html_br~ wegmachen
+                $tmp[0] = str_replace("-html_br~","",$tmp[0]);
+                # und ein trim wegen Zeilenumbruch und Lehrzeichen
+                $tmp[0] = trim($tmp[0]);
+                $para_array[$tmp[0]] = $tmp[1];
+            } else {
+                $para_array[$pos] = $values;
+            }
+        }
+        # wenn $userparaarray ein array wird $user_array nur mit den Vorgegebene Werten erzeugt
+        if(is_array($userparamarray)) {
+            foreach($userparamarray as $key => $values) {
+                $user_array[$key] = $values;
+                if(isset($para_array[$key]))
+                    $user_array[$key] = $para_array[$key];
+            }
+            return $user_array;
+        }
+        return $para_array;
+    }
 }
 ?>
