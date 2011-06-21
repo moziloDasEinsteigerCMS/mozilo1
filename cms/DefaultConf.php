@@ -185,9 +185,10 @@ function makeDefaultConf($conf_datei) {
 
     $downloads = array('_downloadcounterstarttime' => time());
 
+// $Rev$ $Id$
     $version = array('cmsversion' => '1.12.beta4',
                         'cmsname' => 'Amalia',
-                        'revision' => '$Rev$');
+                        'revision' => '866');
 
     $gallery = array('digit' => array(
                         'maxheight' => '',
