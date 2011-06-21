@@ -1,5 +1,4 @@
 <?php
-
 class GalleryClass {
 
     var $allowed_pics = array(".jpg", ".jpeg", ".jpe", ".gif", ".png");
