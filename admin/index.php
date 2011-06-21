@@ -274,7 +274,13 @@ $html = '<!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN">'."\n";
 $html .= "<html>\n";
 $html .= "<head>";
 $html .= '<meta http-equiv="Content-Type" content="text/html; charset='.CHARSET.'">';
-$html .= '<script type="text/javascript" src="buttons.js"></script>';
+#!!!!!!!!! solte noch als schalter eingebaut werden
+$EDIT_AREA = true;
+if($EDIT_AREA and isset($post['action_data']['editsite'])) {
+    require_once(BASE_DIR_ADMIN."edit_area/mozilo_edit_area.php");
+    $html .= $editor_area_html;
+} else
+    $html .= '<script type="text/javascript" src="buttons.js"></script>';
 $html .= '<script type="text/javascript" src="multifileupload.js"></script>';
 $html .= "<title>$ADMIN_TITLE - $pagetitle</title>";
 $html .= '<link type="text/css" rel="stylesheet" href="adminstyle.css">';
