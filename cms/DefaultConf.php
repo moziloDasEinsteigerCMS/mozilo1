@@ -81,10 +81,9 @@ function makePlatzhalter($all = false) {
                         '{MAINMENU}',
                         '{DETAILMENU}'
     );
+
     if($all) {
-        foreach($platzhalter_rest as $platz) {
-            $platzhalter[] = $platz;
-        }
+        $platzhalter = array_merge($platzhalter,$platzhalter_rest);
     }
     return $platzhalter;
 }

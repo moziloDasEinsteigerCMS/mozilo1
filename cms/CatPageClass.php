@@ -585,6 +585,16 @@ class CatPageClass {
         return false;
     }
 
+    # erzeugt einen Datei Link text
+    function get_FileText($cat,$file) {
+        $cat = $this->get_AsKeyName($cat);
+        if($cat !== false and $this->exists_File($cat,$file)) {
+            global $specialchars;
+            return $specialchars->rebuildSpecialChars($file, true, true);
+        }
+        return NULL;
+    }
+
     # gibt wenns ein link ist den target zurück ansonsten false
     function get_HrefTarget($cat,$page) {
         $cat = $this->get_AsKeyName($cat);
@@ -737,7 +747,7 @@ class CatPageClass {
         return $undelete;
     }
 
-    function get_PageContent($cat,$page,$for_syntax = false) {
+    function get_PageContent($cat,$page,$for_syntax = false,$convert_content = false) {
         $cat = $this->get_AsKeyName($cat);
         $page = $this->get_AsKeyName($page);
         if($this->CatPageArray[$cat]['_protect-']) {
@@ -752,9 +762,13 @@ class CatPageClass {
         if($this->get_Type($cat,$page) != EXT_LINK) {
             if(file_exists(CONTENT_DIR_REL.$cat.'/'.$page)) {
                 $page_content = file_get_contents(CONTENT_DIR_REL.$cat.'/'.$page);
-                if($for_syntax) {
+                if($for_syntax and !$convert_content) {
                     global $syntax;
                     $page_content = $syntax->preparePageContent($page_content);
+                }
+                if($convert_content) {
+                    $mysyntax = new Syntax();
+                    $page_content = $mysyntax->convertContent($page_content, $this->get_FileSystemName($cat,false), $for_syntax);
                 }
                 return $page_content;
            }

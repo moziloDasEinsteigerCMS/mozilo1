@@ -71,7 +71,7 @@ function searchInPages() {
     if ($matchesoverall == 0)
         $searchresults .= $language->getLanguageValue0("message_nodatafound_0", trim($QUERY_REQUEST));
     // Rueckgabe des Menues
-    return array($searchresults, $language->getLanguageValue0("message_search_0"), $language->getLanguageValue1("message_searchresult_1", (trim($QUERY_REQUEST))));
+    return $searchresults;
 }
 
 function searchPage($cat,$page) {
