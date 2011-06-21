@@ -50,7 +50,7 @@ $_POST = cleanREQUEST($_POST);
     require_once(BASE_DIR_CMS."Properties.php");
     
     // Initial: Fehlerausgabe unterdruecken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
-#    @ini_set("display_errors", 0);
+    @ini_set("display_errors", 0);
 
     $specialchars   = new SpecialChars();
     $CMS_CONF     = new Properties(BASE_DIR_CMS."conf/main.conf",true);
