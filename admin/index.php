@@ -116,10 +116,6 @@ if(!is_dir(BASE_DIR."layouts")) {
 if(!is_dir(BASE_DIR_CMS."sprachen")) {
     die(getLanguageValue("error_dir")." ".BASE_DIR_CMS."sprachen/");
 }
-/*
-if(!is_dir(BASE_DIR_CMS."formular")) {
-    die(getLanguageValue("error_dir")." ".BASE_DIR_CMS."formular/");
-}*/
 if(!is_dir(BASE_DIR."galerien")) {
     die(getLanguageValue("error_dir")." ".BASE_DIR.GALLERIES_DIR_NAME."/");
 }
@@ -162,22 +158,11 @@ if($CMS_CONF->properties['usecmssyntax'] == "true" and !isset($USER_SYNTAX->prop
     die($USER_SYNTAX->properties['error']);
 }
 /*
-$CONTACT_CONF = new Properties(BASE_DIR_CMS."formular/formular.conf",true);
-if(!isset($CONTACT_CONF->properties['readonly'])) {
-    die($CONTACT_CONF->properties['error']);
-}*/
 
 // Abwärtskompatibilität: Downloadcounter initalisieren
 if ($DOWNLOAD_COUNTS->get("_downloadcounterstarttime") == "" and !isset($DOWNLOAD_COUNTS->properties['error']))
     $DOWNLOAD_COUNTS->set("_downloadcounterstarttime", time());
-/*
-// Pfade
-$CONTENT_DIR_REL        = BASE_DIR.CONTENT_DIR_NAME."/";
-define("CONTENT_DIR_REL",$CONTENT_DIR_REL);
-$GALLERIES_DIR_REL    = BASE_DIR.GALLERIES_DIR_NAME."/";
-define("GALLERIES_DIR_REL",$GALLERIES_DIR_REL);
-$PLUGIN_DIR_REL = BASE_DIR.PLUGIN_DIR_NAME."/";
-define("PLUGIN_DIR_REL",$PLUGIN_DIR_REL);*/
+*/
 
 $ALLOWED_SPECIALCHARS_REGEX = $specialchars->getSpecialCharsRegex();
 define("ALLOWED_SPECIALCHARS_REGEX",$ALLOWED_SPECIALCHARS_REGEX);
@@ -288,7 +273,7 @@ $pagecontent = $functionreturn[1];
 $html = '<!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN">'."\n";
 $html .= "<html>\n";
 $html .= "<head>";
-$html .= '<meta http-equiv="Content-Type" content="text/html;charset='.CHARSET.'">';
+$html .= '<meta http-equiv="Content-Type" content="text/html; charset='.CHARSET.'">';
 $html .= '<script type="text/javascript" src="buttons.js"></script>';
 $html .= '<script type="text/javascript" src="multifileupload.js"></script>';
 $html .= "<title>$ADMIN_TITLE - $pagetitle</title>";
@@ -3552,11 +3537,9 @@ function admin($post) {
 function plugins($post) {
     global $ADMIN_CONF;
     global $icon_size;
+    global $CatPage;
 
     require_once(BASE_DIR_CMS."Plugin.php");
-    require_once(BASE_DIR_CMS."CatPageClass.php");
-    global $CatPage;
-#    $CatPage         = new CatPageClass();
 
     $pagecontent = '<input type="hidden" name="action_activ" value="'.getLanguageValue("plugins_button").'">';
 
@@ -3614,7 +3597,7 @@ function plugins($post) {
                 if(isset($plugin_info) and count($plugin_info) > 0) {
                     $plugin_name = strip_tags($plugin_info[0],'<b>');
                     $plugin_name = htmlentities($plugin_name,ENT_COMPAT,CHARSET);
-                    $plugin_name = str_replace(array("&lt;","&gt;"),array("<",">"),$plugin_name);
+                    $plugin_name = str_replace(array("&lt;","&gt;","$"),array("<",">",""),$plugin_name);
                 } else {
                     $plugin_name = getLanguageValue('plugins_error').' <span style="color:#ff0000">'.$currentelement.'</span>';
                     $plugin_error = true;
