@@ -75,9 +75,13 @@ if(isset($_POST['meditor_toggle_status']) and $_POST['meditor_toggle_status'] ==
     $editor_toggle_status = "later";
 }
 
+# das mit edit_area_compressor.php hergestelte file was benutzt wird
+$editor_area_script = '<script language="Javascript" type="text/javascript" src="edit_area/edit_area_full_mozilo.js"></script>';
+# zum entwikeln es wird der inhalt von src/ benutzt
+#$editor_area_script = '<script language="Javascript" type="text/javascript" src="edit_area/src/edit_area_loader.js"></script>';
+
 $editor_area_html = '<script type="text/javascript" src="edit_area/mozilo_buttons.js"></script>
-<script language="Javascript" type="text/javascript" src="edit_area/edit_area_full_mozilo.js"></script>
-<!-- <script language="Javascript" type="text/javascript" src="edit_area/src/edit_area_loader.js"></script> -->
+'.$editor_area_script.'
 <script language="Javascript" type="text/javascript">
 '.$var_PluginsActiv.'
 '.$var_PluginsDeactiv.'
