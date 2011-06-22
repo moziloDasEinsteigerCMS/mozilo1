@@ -79,7 +79,7 @@ if(isset($_POST['meditor_toggle_status']) and $_POST['meditor_toggle_status'] ==
 $editor_area_script = '<script language="Javascript" type="text/javascript" src="edit_area/edit_area_full_mozilo.js"></script>';
 # zum entwikeln es wird der inhalt von src/ benutzt
 #$editor_area_script = '<script language="Javascript" type="text/javascript" src="edit_area/src/edit_area_loader.js"></script>';
-
+#DD0000#8800FF
 $editor_area_html = '<script type="text/javascript" src="edit_area/mozilo_buttons.js"></script>
 '.$editor_area_script.'
 <script language="Javascript" type="text/javascript">
@@ -101,7 +101,8 @@ editAreaLoader.init({
     ,cursor_position: "auto"
     ,word_wrap: true
     ,language: "'.substr($ADMIN_CONF->get("language"),0,2).'"
-    ,font_size: 12
+    ,font_size: 10
+    ,block_cursor: true // moziloCMS anpassung gibts im orginalen nicht
     ,replace_tab_by_spaces: 4
     ,syntax: "mozilo"
     ,toolbar: "search, | , undo, redo, | , select_font, | , change_smooth_selection, highlight, reset_highlight , | ,syntax_selection,help"

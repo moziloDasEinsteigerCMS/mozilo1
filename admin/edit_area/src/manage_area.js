@@ -53,7 +53,13 @@
 					// add special chars arround selected characters
 					selLength	= infos['selectionEnd'] - infos['selectionStart'];
 					content		= content.substr( 0, infos["curr_pos"] - 1 ) + "\r\r" + content.substr( infos["curr_pos"] - 1, selLength ) + "\r\r" + content.substr( infos["curr_pos"] - 1 + selLength );
-					content		= '<span>'+ content.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace("\r\r", '</span><strong style="opacity: 0.3;filter:alpha(opacity=30);background-color:#FFCC00;margin-right:-'+Math.round(this.settings['font_size']*0.82)+'px;">&nbsp;').replace("\r\r", '</strong><span>') +'</span>';
+                    var cursor_nb = "";
+                    var cursor_style = "";
+                    if(this.settings['block_cursor']) {
+                        cursor_nb = "&nbsp;";
+                        cursor_style = ' style="margin-right:-'+Math.round(this.settings['font_size']*0.82)+'px;"';
+                    }
+					content		= '<span>'+ content.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace("\r\r", '</span><strong'+cursor_style+'>'+cursor_nb).replace("\r\r", '</strong><span>') +'</span>';
 					 
 					if( this.isIE || ( this.isOpera && this.isOpera < 9.6 ) ) {
 						this.selection_field.innerHTML= "<pre>" + content.replace(/^\r?\n/, "<br>") + "</pre>";

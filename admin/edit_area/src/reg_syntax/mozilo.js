@@ -33,12 +33,12 @@ editAreaLoader.load_syntax["mozilo"] = {
         ,'QUOTESMARKS': ''
         ,'KEYWORDS' : {
             }
-        ,'OPERATORS' : 'color: #f00;'
-        // Achtung bei kein Bold benutzen gibt probleme im Chrome
-        ,'DELIMITERS' : 'color: #f00;'
+        // Achtung bei Bold gibts probleme im Chrome deshalb vertical-align:top;
+        ,'OPERATORS' : 'color: #dd0000;font-weight:bold;vertical-align:top;'
+        ,'DELIMITERS' : 'color: #dd0000;font-weight:bold;vertical-align:top;'
         ,'REGEXPS' : {
-            'msyntax': 'color: #00f;'
-            ,'mpluginsdeactiv': 'color: #00f;text-decoration:line-through'
+            'msyntax': 'color: #8800FF;'
+            ,'mpluginsdeactiv': 'color: #8800FF;text-decoration:line-through'
             ,'mgeschuetzt': 'color: #000;'
         }
     }

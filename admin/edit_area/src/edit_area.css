@@ -67,7 +67,6 @@ body, html, table, form, textarea{
 	overflow: visible;
 }
 
-
 #selection_field, #selection_field_text{
 	margin: 0; 
 	background-color: #E1F2F9; 
@@ -100,9 +99,14 @@ body, html, table, form, textarea{
 
 #selection_field_text strong{
 	font-weight:normal;
-	background-color:#3399FE;
 	color: #FFF;
 	visibility:visible;
+}
+/*Hintergrund farbe für Cursor*/
+#selection_field strong, #selection_field_text strong{
+    opacity: 0.3;
+    filter:alpha(opacity=30);
+    background-color:#FFCC00;/*#FFCC00 */
 }
 
 #container.word_wrap #content_highlight,
@@ -163,7 +167,7 @@ pre{
 /* area popup */
 .editarea_popup{
 	border: solid 1px #888888;
-	background-color: #ECE9D8; 
+	background-color: #C9D7EB; 
 	width: 250px; 
 	padding: 4px; 
 	position: absolute;
@@ -264,7 +268,7 @@ div#area_search_replace  #area_search_msg{
 	/*height: 21px; */
 	margin: 0; 
 	padding: 0;
-	background-color: #ECE9D8;
+	background-color: #C9D7EB;/*  #ECE9D8 */
 	text-align: center;
 }
 
@@ -347,13 +351,13 @@ table.statusbar{
 .editAreaButtonDown {
 	cursor: pointer;
 	border: 1px solid #0A246A !important;
-	background-color: #8592B5;
+	background-color: #F8F8F8;
 }
 
 .editAreaButtonSelected {
 	border: 1px solid #C0C0BB !important;
 	cursor: pointer;
-	background-color: #F4F2E8;
+	background-color: #F8F8F8;
 }
 
 .editAreaButtonDisabled {
