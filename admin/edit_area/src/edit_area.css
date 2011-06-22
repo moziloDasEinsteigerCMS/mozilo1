@@ -206,7 +206,11 @@ div#area_search_replace{
 	/*width: 250px;*/
 }
 
-div#area_search_replace input{
+input#area_search {
+    width: 150px;
+}
+
+input#area_replace {
     width: 150px;
 }
 
