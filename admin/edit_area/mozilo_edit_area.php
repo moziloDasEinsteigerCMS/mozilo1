@@ -78,7 +78,7 @@ if(isset($_POST['meditor_toggle_status']) and $_POST['meditor_toggle_status'] ==
 # das mit edit_area_compressor.php hergestelte file was benutzt wird
 $editor_area_script = '<script language="Javascript" type="text/javascript" src="edit_area/edit_area_full_mozilo.js"></script>';
 # zum entwikeln es wird der inhalt von src/ benutzt
-#$editor_area_script = '<script language="Javascript" type="text/javascript" src="edit_area/src/edit_area_loader.js"></script>';
+$editor_area_script = '<script language="Javascript" type="text/javascript" src="edit_area/src/edit_area_loader.js"></script>';
 #DD0000#8800FF
 $editor_area_html = '<script type="text/javascript" src="edit_area/mozilo_buttons.js"></script>
 '.$editor_area_script.'
@@ -117,6 +117,7 @@ function meditor_init_callback(id) {
     minput.setAttribute("value", "onload");
     minput.setAttribute("id", "meditor_toggle_status_id");
     document.getElementsByName("form")[0].appendChild(minput);
+//alert(t.isFirefox);
 };
 function meditor_toggle_status_on(id) {
     document.getElementById("meditor_toggle_status_id").value = "onload";
