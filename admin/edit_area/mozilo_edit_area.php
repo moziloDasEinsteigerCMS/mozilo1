@@ -91,6 +91,8 @@ $editor_area_html = '<script type="text/javascript" src="edit_area/mozilo_button
 var moziloSyntax = "link|mail|kategorie|seite|absatz|datei|galerie|bildlinks|bildrechts|bild|----|links|zentriert|block|rechts|fett|kursiv|fettkursiv|unter|durch|ueber1|ueber2|ueber3|liste|numliste|liste1|liste2|liste3|html|tabelle|include|farbe";
 
 var meditorID = "pagecontent";
+// ie9 hack
+var mset_w = "1";
 
 editAreaLoader.init({
     id: meditorID // id of the textarea to transform      
@@ -109,7 +111,11 @@ editAreaLoader.init({
     ,EA_toggle_on_callback: "meditor_toggle_status_on"
     ,EA_toggle_off_callback: "meditor_toggle_status_off"
     ,EA_init_callback: "meditor_init_callback"
+    ,EA_load_callback: "meditor_load_callback"
 });
+function meditor_load_callback(id) {
+    document.getElementById("frame_"+meditorID).style.width = mset_w+"px";
+};
 function meditor_init_callback(id) {
     var minput = document.createElement("input");
     minput.setAttribute("type", "hidden");
@@ -117,7 +123,9 @@ function meditor_init_callback(id) {
     minput.setAttribute("value", "onload");
     minput.setAttribute("id", "meditor_toggle_status_id");
     document.getElementsByName("form")[0].appendChild(minput);
-//alert(t.isFirefox);
+
+    mset_w = document.getElementById(meditorID).offsetWidth;
+    document.getElementById(meditorID).style.width = mset_w+"px";
 };
 function meditor_toggle_status_on(id) {
     document.getElementById("meditor_toggle_status_id").value = "onload";
