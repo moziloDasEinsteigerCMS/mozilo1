@@ -115,6 +115,8 @@
 				t.container.removeChild( text1 );
 				nbTry--;
 			}while( changed && nbTry > 0 );
+            // damit die erste zeile im Firefox selectiert wird
+            a.selectionStart= a.selectionEnd= 0;
 		}
 		
 		

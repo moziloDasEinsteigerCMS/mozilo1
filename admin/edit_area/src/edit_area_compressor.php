@@ -268,7 +268,7 @@
 			// load the template
 			$this->datas.= sprintf("editAreaLoader.template= \"%s\";\n", $this->get_html_content("template.html"));
 			// load the css
-			$this->datas.= sprintf("editAreaLoader.iframe_css= \"<style>%s</style>\";\n", $this->get_css_content("edit_area.css"));
+#			$this->datas.= sprintf("editAreaLoader.iframe_css= \"<style>%s</style>\";\n", $this->get_css_content("edit_area.css"));
 					
 		//	$this->datas= "function editArea(){};editArea.prototype.loader= function(){alert('bouhbouh');} var a= new editArea();a.loader();";
 					

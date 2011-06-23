@@ -53,19 +53,18 @@
 					// add special chars arround selected characters
 					selLength	= infos['selectionEnd'] - infos['selectionStart'];
 					content		= content.substr( 0, infos["curr_pos"] - 1 ) + "\r\r" + content.substr( infos["curr_pos"] - 1, selLength ) + "\r\r" + content.substr( infos["curr_pos"] - 1 + selLength );
-                    var cursor_nb = "";
-                    var cursor_style = "";
-                    if(this.settings['block_cursor']) {
-                        cursor_nb = "&nbsp;";
-                        cursor_style = ' style="margin-right:-'+Math.round(this.settings['font_size']*0.82)+'px;"';
-                    }
-					content		= '<span>'+ content.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace("\r\r", '</span><strong'+cursor_style+'>'+cursor_nb).replace("\r\r", '</strong><span>') +'</span>';
+					content		= '<span>'+ content.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace("\r\r", '</span><strong>').replace("\r\r", '</strong><span>') +'</span>';
 					 
 					if( this.isIE || ( this.isOpera && this.isOpera < 9.6 ) ) {
 						this.selection_field.innerHTML= "<pre>" + content.replace(/^\r?\n/, "<br>") + "</pre>";
 					} else {
 						this.selection_field.innerHTML= content;
 					}
+                    if(this.settings['block_cursor']) {
+                        var cursor_opt = parent.getChildren(this.selection_field, "strong", "", "", "single", 0);
+                        cursor_opt.innerHTML = "&nbsp;";
+                        cursor_opt.style.marginRight = '-'+cursor_opt.offsetWidth+'px';
+                    }
 					this.selection_field_text.innerHTML = this.selection_field.innerHTML;
 					t2_1 = new Date().getTime();
 					// check if we need to update the highlighted background 

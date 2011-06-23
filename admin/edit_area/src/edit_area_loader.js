@@ -95,7 +95,7 @@ function EditAreaLoader(){
 	// navigator identification
 	t.set_browser_infos(t);
 
-	if(t.isIE>=6 || t.isGecko || ( t.isWebKit && !t.isSafari<3 ) || t.isOpera>=9  || t.isCamino )
+	if( t.isIE>=6 || t.isGecko || ( t.isWebKit && !t.isSafari<3 ) || t.isOpera>=9  || t.isCamino )
 		t.isValidBrowser=true;
 	else
 		t.isValidBrowser=false;
@@ -132,6 +132,8 @@ EditAreaLoader.prototype ={
 			o.isIE = ua.replace(/^.*?MSIE\s+([0-9\.]+).*$/, "$1");
 			if(o.isIE<6)
 				o.has_error();
+            if( o.isIE > 7 )
+                o.isIE = 7;
 		}
 
 		if(o.isOpera = (ua.indexOf('Opera') != -1)){	
@@ -485,7 +487,6 @@ EditAreaLoader.prototype ={
 			document.getElementById("frame_"+id).style.display='none';
 		
 			t.style.display="inline";
-
 			try{	// IE will give an error when trying to focus an invisible or disabled textarea
 				t.focus();
 			} catch(e){};

@@ -42,7 +42,7 @@
 		depth: depth of search (-1 or no set => unlimited)
 	*/
 	function getChildren(elem, elem_type, elem_attribute, elem_attribute_match, option, depth)
-	{           
+	{
 		if(!option)
 			var option="single";
 		if(!depth)
