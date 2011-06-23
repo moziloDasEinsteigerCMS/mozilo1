@@ -88,6 +88,7 @@ function searchPage($cat,$page) {
         if(empty($pagecontent))
             return false;
         $pagecontent = $syntax->convertContent($pagecontent, $cat, true);
+
         # alle Komentare raus
         $pagecontent = preg_replace("/\<!--(.*)-->/Umsi"," ", $pagecontent);
         # alle script, select, object, embed sachen raus
@@ -103,7 +104,7 @@ function searchPage($cat,$page) {
         foreach($queryarray as $query) {
             if ($query == "")
                 continue;
-            $query = $specialchars->rebuildSpecialChars($query, false, true);
+#            $query = $specialchars->rebuildSpecialChars($query, false, true);
             // Wenn...
             if (
                 // ...der aktuelle Suchbegriff im Seitennamen...
@@ -133,7 +134,7 @@ function highlightSearch($content, $phrasestring) {
     $phrasearray = explode(",", $phrasestring);
     // jeden Begriff highlighten
     foreach($phrasearray as $phrase) {
-        $phrase = $specialchars->rebuildSpecialChars($phrase, false, true);
+#        $phrase = $specialchars->rebuildSpecialChars($phrase, false, true);
         // Regex-Zeichen im zu highlightenden Text escapen (.\+*?[^]$(){}=!<>|:)
         $phrase = preg_quote($phrase);
         // Slashes im zu highlightenden Text escapen
