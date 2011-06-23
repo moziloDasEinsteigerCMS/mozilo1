@@ -146,6 +146,10 @@
 			parNod.insertBefore(a, nxtSib);
 			t.area_select(start, end-start);
 		}
+        if( t.isOpera && t.isOpera > 9.6 ) {
+            t.area_select(a.selectionStart, a.selectionEnd);
+            t.area_select(0, 0);
+        }
 		
 		// force update of selection field
 		this.focus();
@@ -828,13 +832,6 @@
 		this.textarea.previous_scrollHeight = '';
 		
 		a.wrap= wrap_mode;
-
-		if ((this.isChrome || this.isSafari) && wrap_mode === 'off')
-		{
-			a.style.whiteSpace='pre';
-			a.style.wordWrap='normal';
-		}
-
 		a.setAttribute('wrap', wrap_mode);
 		// only IE can change wrap mode on the fly without element reloading
 		if(!this.isIE)

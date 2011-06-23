@@ -140,7 +140,7 @@ EditAreaLoader.prototype ={
 			o.isOpera= ua.replace(/^.*?Opera.*?([0-9\.]+).*$/i, "$1");
 			if(o.isOpera<9)
 				o.has_error();
-			o.isIE=false;			
+			o.isIE=false;
 		}
 
 		if(o.isFirefox =(ua.indexOf('Firefox') != -1))
@@ -419,7 +419,6 @@ EditAreaLoader.prototype ={
 		setAttribute(content, "frameBorder", "0"); // IE
 		content.style.overflow="hidden";
 		content.style.display="none";
-
 		
 		next= area.textarea.nextSibling;
 		if(next==null)
