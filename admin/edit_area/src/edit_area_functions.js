@@ -146,6 +146,8 @@
 			parNod.insertBefore(a, nxtSib);
 			t.area_select(start, end-start);
 		}
+
+        // damit die erste zeile im Opera selectiert wird
         if( t.isOpera && t.isOpera > 9.6 ) {
             t.area_select(a.selectionStart, a.selectionEnd);
             t.area_select(0, 0);
