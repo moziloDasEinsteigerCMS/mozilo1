@@ -60,12 +60,11 @@
 					} else {
 						this.selection_field.innerHTML= content;
 					}
+                    this.selection_field_text.innerHTML = this.selection_field.innerHTML;
                     if(this.settings['block_cursor']) {
-                        var cursor_opt = parent.getChildren(this.selection_field, "strong", "", "", "single", 0);
-                        cursor_opt.innerHTML = "&nbsp;";
-                        cursor_opt.style.marginRight = '-'+cursor_opt.offsetWidth+'px';
+                        this.selection_field.innerHTML = this.selection_field.innerHTML.replace("</span><strong>","</span><span id=\"block_cursor\">&nbsp;</span><strong>");
+                        document.getElementById("block_cursor").style.marginRight = '-'+document.getElementById("block_cursor").offsetWidth+'px';
                     }
-					this.selection_field_text.innerHTML = this.selection_field.innerHTML;
 					t2_1 = new Date().getTime();
 					// check if we need to update the highlighted background 
 					if(this.reload_highlight || (infos["full_text"] != this.last_text_to_highlight && (this.last_selection["line_start"]!=infos["line_start"] || this.show_line_colors || this.settings['word_wrap'] || this.last_selection["line_nb"]!=infos["line_nb"] || this.last_selection["nb_line"]!=infos["nb_line"]) ) )
