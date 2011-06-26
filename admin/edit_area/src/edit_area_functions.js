@@ -717,6 +717,14 @@
 		if(new_syntax==this.settings['syntax'])
 			return true;
 		
+        if(new_syntax == "mozilo" && typeof this.assocBracket["("] != "undefined") {
+            delete this.assocBracket["("];
+            delete this.revertAssocBracket[")"];
+        }
+        if(new_syntax != "mozilo" && typeof this.assocBracket["("] == "undefined") {
+            this.assocBracket["("]=")";
+            this.revertAssocBracket[")"]="(";
+        }
 		// check that the syntax is one allowed
 		var founded= false;
 		for(var i=0; i<this.syntax_list.length; i++)

@@ -36,8 +36,9 @@
 		//t.loaded= false;
 		t.assocBracket={};
 		t.revertAssocBracket= {};		
-		// bracket selection init 
-		t.assocBracket["("]=")";
+		// bracket selection init
+        if(editAreas[area_id]['settings']['syntax'] != "mozilo")
+		    t.assocBracket["("]=")";
 		t.assocBracket["{"]="}";
 		t.assocBracket["["]="]";		
 		for(var index in t.assocBracket){
