@@ -39,7 +39,7 @@
 				$this->gzip_cache_file= $this->path."edit_area_full_with_plugins.gz";
 			}else{
 				$this->load_all_plugins= false;
-				$this->full_cache_file= $this->path."edit_area_full_mozilo.js";
+				$this->full_cache_file= $this->path."../edit_area_full_mozilo.js";
 				$this->gzip_cache_file= $this->path."edit_area_full.gz";
 			}
 			
@@ -268,7 +268,7 @@
 			// load the template
 			$this->datas.= sprintf("editAreaLoader.template= \"%s\";\n", $this->get_html_content("template.html"));
 			// load the css
-#			$this->datas.= sprintf("editAreaLoader.iframe_css= \"<style>%s</style>\";\n", $this->get_css_content("edit_area.css"));
+			$this->datas.= sprintf("editAreaLoader.iframe_css= \"<style>%s</style>\";\n", $this->get_css_content("edit_area.css"));
 					
 		//	$this->datas= "function editArea(){};editArea.prototype.loader= function(){alert('bouhbouh');} var a= new editArea();a.loader();";
 					
