@@ -132,6 +132,8 @@ EditAreaLoader.prototype ={
 			o.isIE = ua.replace(/^.*?MSIE\s+([0-9\.]+).*$/, "$1");
 			if(o.isIE<6)
 				o.has_error();
+            if( o.isIE > 7 )
+                o.isIE = 7;
 		}
 
 		if(o.isOpera = (ua.indexOf('Opera') != -1)){	
