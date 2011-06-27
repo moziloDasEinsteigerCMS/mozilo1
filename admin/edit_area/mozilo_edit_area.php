@@ -105,6 +105,7 @@ editAreaLoader.init({
     ,language: "'.substr($ADMIN_CONF->get("language"),0,2).'"
     ,font_size: 10
     ,block_cursor: true // moziloCMS anpassung gibts im orginalen nicht
+    ,show_line_colors: true // true braucht mehr CPU
     ,replace_tab_by_spaces: 4
     ,syntax: "mozilo"
     ,toolbar: "search, | , undo, redo, | , select_font, | , change_smooth_selection, highlight, reset_highlight , | ,syntax_selection,help"

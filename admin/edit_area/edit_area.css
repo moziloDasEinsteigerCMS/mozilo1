@@ -100,11 +100,12 @@ body, html, table, form, textarea{
 
 #selection_field_text strong{
 	font-weight:normal;
-	color: #FFF;
+	color: #000;
 	visibility:visible;
 }
 /*Hintergrund farbe für Cursor*/
 #block_cursor{
+    visibility:visible;
     opacity: 0.3;
     filter:alpha(opacity=30);
     background-color:#FFCC00;/*#FFCC00 */

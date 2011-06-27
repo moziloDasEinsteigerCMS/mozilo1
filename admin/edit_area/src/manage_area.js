@@ -56,15 +56,15 @@
 					content		= '<span>'+ content.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace("\r\r", '</span><strong>').replace("\r\r", '</strong><span>') +'</span>';
 					 
 					if( this.isIE || ( this.isOpera && this.isOpera < 9.6 ) ) {
-						this.selection_field.innerHTML= "<pre>" + content.replace(/^\r?\n/, "<br>") + "</pre>";
-					} else {
-						this.selection_field.innerHTML= content;
+                        content= "<pre>" + content.replace(/^\r?\n/, "<br>") + "</pre>";
 					}
-                    this.selection_field_text.innerHTML = this.selection_field.innerHTML;
+                    this.selection_field.innerHTML = content;
                     if(this.settings['block_cursor']) {
-                        this.selection_field.innerHTML = this.selection_field.innerHTML.replace("</span><strong>","</span><span id=\"block_cursor\">&nbsp;</span><strong>");
+                        content = content.replace("</span><strong>","</span><strong id=\"block_cursor\" style=\"margin-right:0px;\">&nbsp;</strong><strong>");
+                        this.selection_field_text.innerHTML = content;
                         document.getElementById("block_cursor").style.marginRight = '-'+document.getElementById("block_cursor").offsetWidth+'px';
-                    }
+                    } else
+                        this.selection_field_text.innerHTML = this.selection_field.innerHTML;
 					t2_1 = new Date().getTime();
 					// check if we need to update the highlighted background 
 					if(this.reload_highlight || (infos["full_text"] != this.last_text_to_highlight && (this.last_selection["line_start"]!=infos["line_start"] || this.show_line_colors || this.settings['word_wrap'] || this.last_selection["line_nb"]!=infos["line_nb"] || this.last_selection["nb_line"]!=infos["nb_line"]) ) )
