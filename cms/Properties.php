@@ -104,6 +104,16 @@ class Properties {
             return $this->properties['error'] = $error_input;
         $this->file = $file;
         $this->loadProperties();
+
+        # version.conf anpassen wenn die Revision sich geändert hat
+        if(strstr($file,"version")) {
+            $version = makeDefaultConf($file);
+            if($this->get('revision') != $version['revision']) {
+                foreach ($version as $key => $value) {
+                    $this->set($key,$value);
+                }
+            }
+        }
     }
 
     /**
