@@ -146,7 +146,8 @@ function makeDefaultConf($conf_datei) {
                         'showsyntaxtooltips' => 'true',
                         'targetblank_download' => 'true',
                         'targetblank_link' => 'true',
-                        'usecmssyntax' => 'true'),
+                        'usecmssyntax' => 'true',
+                        'usecmseditarea' => 'true'),
                     # das sind die Expert Parameter von main
                     'expert' => array(
                         'hidecatnamedpages',
@@ -162,7 +163,8 @@ function makeDefaultConf($conf_datei) {
                         'replaceemoticons',
                         'shortenlinks',
                         'usecmssyntax',
-                        'usesubmenu')
+                        'usesubmenu',
+                        'usecmseditarea')
                     );
 
     $syntax = array('wikipedia' => '[link={DESCRIPTION}|http://de.wikipedia.org/wiki/{VALUE}]');
