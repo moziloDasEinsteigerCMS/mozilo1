@@ -1,40 +1,5 @@
-
 <?php
-/*
-zeile 292
-$EDIT_AREA = true;
-if($EDIT_AREA and isset($post['action_data']['editsite'])) {
-    require_once(BASE_DIR_ADMIN."edit_area/mozilo_edit_area.php");
-    $html .= $editor_area_html;
-} else
-    $html .= '<script type="text/javascript" src="buttons.js"></script>';
-*/
 
-
-
-
-/*
-<div id="content_highlight" style="height: 108px; visibility: visible; font-family: monospace; font-size: 12pt; line-height: 18px; width: 831px; ">
-    <span class="mozilo">
-        <span class="delimiters">[</span>
-        <span class="msyntax">ueber1</span>
-        <span class="operators">|</span>
-        <span class="delimiters">]</span>
-        <span class="delimiters">[</span>
-        <span class="msyntax">ueber1</span>
-        <span class="operators">|</span>
-        <span class="delimiters">]</span>
-
-</span></div>
-
-<select id="area_font_size" onchange="javascript:editArea.execCommand(&quot;change_font_size&quot;)" filespecific="yes"><option value="-1">--Schriftgröße--</option><option value="8">8 pt</option><option value="9">9 pt</option><option value="10">10 pt</option><option value="11">11 pt</option><option value="12">12 pt</option><option value="14">14 pt</option></select>
-
-
-<select id="syntax_selection" onchange="javascript:editArea.execCommand(&quot;change_syntax&quot;, this.value)" filespecific="yes"><option value="-1">--Syntax--</option><option value="mozilo">Mozilo</option><option value="css">Css</option><option value="html">Html</option><option value="js">Js</option><option value="php">Php</option><option value="robotstxt">Robotstxt</option><option value="xml">Xml</option></select>
-alert(o.isWebKit+"=isWebKit "+o.isGecko+"=isGecko "+o.isMac+"=isMac "+o.isIE+"=isIE "+o.isOpera+"=isOpera "+o.isFirefox+"=isFirefox "+o.isCamino+"=isCamino "+o.isSafari+"=isSafari "+o.isChrome+"=isChromes ");
-span.wmozilo{line-height:14px;}
-alert(o);
-*/
 list($activ_plugins,$deactiv_plugins) = meditor_findPlugins();
 $var_PluginsActiv = 'var moziloPluginsActiv = "";';
 if(isset($activ_plugins) and count($activ_plugins) > 0) {
@@ -77,8 +42,9 @@ if(isset($_POST['meditor_toggle_status']) and $_POST['meditor_toggle_status'] ==
 
 # das mit edit_area_compressor.php hergestelte file was benutzt wird
 $editor_area_script = '<script language="Javascript" type="text/javascript" src="edit_area/edit_area_full_mozilo.js"></script>';
-# zum entwikeln es wird der inhalt von src/ benutzt
-#$editor_area_script = '<script language="Javascript" type="text/javascript" src="edit_area/src/edit_area_loader.js"></script>';
+$entwikeln = false; # true = zum entwikeln es wird der inhalt von src/ benutzt
+if($entwikeln)
+    $editor_area_script = '<script language="Javascript" type="text/javascript" src="edit_area/src/edit_area_loader.js"></script>';
 
 $editor_area_html = '<script type="text/javascript" src="edit_area/mozilo_buttons.js"></script>
 '.$editor_area_script.'
