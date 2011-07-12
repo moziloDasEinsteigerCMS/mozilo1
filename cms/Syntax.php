@@ -903,9 +903,6 @@ echo "</pre><br>\n";*/
             case '{WEBSITE_TITLE}':
                 # Da der cat und page name geändert werden kann setzen wir einen Verstägten Platzhalter
                 $replace = '<!-- WEBSITE_TITLE REPLACE-->';
-/*                global $specialchars, $CMS_CONF, $cattitle ,$pagetitle;
-                $WEBSITE_NAME = $specialchars->rebuildSpecialChars($CMS_CONF->get("websitetitle"),false,true);
-                $replace = getWebsiteTitle($WEBSITE_NAME, $cattitle, $pagetitle);*/
                 break;
             case '{WEBSITE_KEYWORDS}':
                 global $specialchars, $CMS_CONF;
@@ -944,65 +941,36 @@ echo "</pre><br>\n";*/
                 $replace = $specialchars->rebuildSpecialChars($CMS_CONF->get("websitetitle"),false,true);
                 break;
            case '{CATEGORY}':
-                if(CAT_REQUEST != "")
-                    $replace = CAT_REQUEST;
-                else {
-                    global $cattitle;
-                    $replace = $cattitle;
-                }
+                $replace = CAT_REQUEST;
                 break;
             case '{CATEGORY_URL}':
                 global $specialchars;
-                if(CAT_REQUEST != "")
-                    $replace = $specialchars->replaceSpecialChars(CAT_REQUEST,true);
-                else {
-                    global $cattitle;
-                    $replace = $specialchars->replaceSpecialChars($cattitle,true);
-                }
+                $replace = $specialchars->replaceSpecialChars(CAT_REQUEST,true);
                 break;
             case '{CATEGORY_NAME}':
-                if(CAT_REQUEST != "") {
-                    global $CatPage;
-                    $replace = $CatPage->get_HrefText(CAT_REQUEST,false);
-                } else {
-                    global $cattitle;
-                    $replace = $cattitle;
-                }
+                global $CatPage;
+                $replace = $CatPage->get_HrefText(CAT_REQUEST,false);
                 break;
             case '{PAGE}':
-                if(PAGE_REQUEST != "")
-                    $replace = PAGE_REQUEST;
-                else {
-                    global $pagetitle;
-                    $replace = $pagetitle;
-                }
+                $replace = PAGE_REQUEST;
                 break;
             case '{PAGE_URL}':
                 global $specialchars;
-                if(PAGE_REQUEST != "")
-                    $replace = $specialchars->replaceSpecialChars(PAGE_REQUEST,true);
-                else {
-                    global $pagetitle;
-                    $replace = $specialchars->replaceSpecialChars($pagetitle,true);
-                }
+                $replace = $specialchars->replaceSpecialChars(PAGE_REQUEST,true);
                 break;
             case '{PAGE_NAME}':
-                if(PAGE_REQUEST != "") {
-                    global $CatPage;
-                    $replace = $CatPage->get_HrefText(CAT_REQUEST,PAGE_REQUEST);
-                } else {
-                    global $pagetitle;
-                    $replace = $pagetitle;
-                }
+                global $CatPage;
+                $replace = $CatPage->get_HrefText(CAT_REQUEST,PAGE_REQUEST);
                 break;
             case '{PAGE_FILE}':
-                if(PAGE_REQUEST != "") {
-                    global $PAGE_FILE;
-                    $replace = $PAGE_FILE;
-                } else {
-                    global $pagetitle;
-                    $replace = $pagetitle;
-                }
+                global $PAGE_FILE;
+                $replace = $PAGE_FILE;
+                break;
+            case '{USEMEMORY}':
+                $replace = '&#94;&#123;USEMEMORY&#94;&#125;';
+                break;
+            case '{EXECUTTIME}':
+                $replace = '&#94;&#123;EXECUTTIME&#94;&#125;';
                 break;
             default:
                 $replace = NULL;
@@ -1102,7 +1070,12 @@ $content = preg_replace('/&(?!#?[a-z0-9]+;)/i', '-html_amp~', $content);
 // Hilfsfunktion: Deadlink erstellen
 // ------------------------------------------------------------------------------
     function createDeadlink($content, $title) {
-        return "<span class=\"deadlink\"".$this->getTitleAttribute($title).">$content</span>";
+/*
+Solen wir den $content Anzeigen?????????
+        $special_search = array('[',']','{','}','|');
+        $special_replace = array('&#091;','&#093;','&#123;','&#125;','&#124;');
+        $content = str_replace($special_search,$special_replace,$content);*/
+        return '<span class="deadlink">'.$title.'</span>';
     }
 
     function replaceAnchorAbsatz() {
