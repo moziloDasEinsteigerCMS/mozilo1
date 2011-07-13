@@ -46,6 +46,12 @@ $entwikeln = false; # true = zum entwikeln es wird der inhalt von src/ benutzt
 if($entwikeln)
     $editor_area_script = '<script language="Javascript" type="text/javascript" src="edit_area/src/edit_area_loader.js"></script>';
 
+$lang = substr($ADMIN_CONF->get("language"),0,2);
+if($lang == "da")
+    $lang = 'dk';
+if(!file_exists(BASE_DIR_ADMIN.'edit_area/langs/'.$lang.'.js'))
+    $lang = 'de';
+
 $editor_area_html = '<script type="text/javascript" src="edit_area/mozilo_buttons.js"></script>
 '.$editor_area_script.'
 <script language="Javascript" type="text/javascript">
@@ -68,7 +74,7 @@ editAreaLoader.init({
     ,allow_toggle: true
     ,cursor_position: "auto"
     ,word_wrap: true
-    ,language: "'.substr($ADMIN_CONF->get("language"),0,2).'"
+    ,language: "'.$lang.'"
     ,font_size: 10
     ,block_cursor: true // moziloCMS anpassung gibts im orginalen nicht
     ,show_line_colors: true // true braucht mehr CPU
