@@ -2735,6 +2735,7 @@ function config($post) {
 
         # usecmssyntax wurde eingeschaltet also posts füllen
         if(isset($post['usecmssyntax']) and $post['usecmssyntax'] == "true" and $CMS_CONF->get('usecmssyntax') == "false") {
+            $post['usecmseditarea'] = $CMS_CONF->get('usecmseditarea');
             $post['replaceemoticons'] = $CMS_CONF->get('replaceemoticons');
             $post['shortenlinks'] = $CMS_CONF->get('shortenlinks');
         }
@@ -3062,6 +3063,10 @@ function config($post) {
     // Die folgenden Einstellungen werden nur angezeigt, wenn die CMS-Syntax aktiv ist
     if ($CMS_CONF->get("usecmssyntax") == "true") {
         if($ADMIN_CONF->get('showexpert') == "true") {
+            $pagecontent .= "<tr><td class=\"td_cms_left\">".getLanguageValue("config_text_editarea")."</td>";
+            $pagecontent .= "<td class=\"td_cms_left\">"
+            .buildCheckBox("usecmseditarea", $CMS_CONF->get("usecmseditarea"));
+            $pagecontent .= "</td></tr>";
             // Zeile "LINKS KÜRZEN"
             $checked0 = "";
             $checked1 = "";
