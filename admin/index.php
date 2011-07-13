@@ -274,7 +274,7 @@ $html = '<!doctype html public "-//W3C//DTD HTML 4.01 Transitional//EN">'."\n";
 $html .= "<html>\n";
 $html .= "<head>";
 $html .= '<meta http-equiv="Content-Type" content="text/html; charset='.CHARSET.'">';
-# usecmseditarea ist erstmal ein verstägter schalter
+# usecmseditarea
 if($CMS_CONF->get('usecmseditarea') == "true" and isset($post['action_data']['editsite'])) {
     require_once(BASE_DIR_ADMIN."edit_area/mozilo_edit_area.php");
     $html .= $editor_area_html;
