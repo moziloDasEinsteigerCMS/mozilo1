@@ -123,6 +123,7 @@ class Properties {
      */
     function loadProperties() {
         global $BASIC_LANGUAGE;
+        global $specialchars;
 
         $error_nofile = "Die Datei existiert nicht: ";
         if(isset($BASIC_LANGUAGE->properties['properties_nofile']))
@@ -160,6 +161,8 @@ class Properties {
                     continue;
                 }
                 if (preg_match("/^([^=]*)=(.*)/",$line,$matches)) {
+                    # Wichtig für z.B. syntax.conf da müssen alle Zeichen mit einem ^ dafor geschützt werden
+                    $matches[2] = $specialchars->encodeProtectedChr($matches[2]);
                     $this->properties[trim($matches[1])] = trim($matches[2]);
                 }
             }
