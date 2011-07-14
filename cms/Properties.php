@@ -106,7 +106,7 @@ class Properties {
         $this->loadProperties();
 
         # version.conf anpassen wenn die Revision sich geändert hat
-        if(strstr($file,"version")) {
+        if(strstr($file,"version.conf")) {
             $version = makeDefaultConf($file);
             if($this->get('revision') != $version['revision']) {
                 foreach ($version as $key => $value) {
@@ -161,8 +161,9 @@ class Properties {
                     continue;
                 }
                 if (preg_match("/^([^=]*)=(.*)/",$line,$matches)) {
-                    # Wichtig für z.B. syntax.conf da müssen alle Zeichen mit einem ^ dafor geschützt werden
-                    $matches[2] = $specialchars->encodeProtectedChr($matches[2]);
+                    # Wichtig für die syntax.conf da müssen alle Zeichen mit einem ^ dafor geschützt werden
+                    if(strstr($this->file,"syntax.conf"))
+                        $matches[2] = $specialchars->encodeProtectedChr($matches[2]);
                     $this->properties[trim($matches[1])] = trim($matches[2]);
                 }
             }
