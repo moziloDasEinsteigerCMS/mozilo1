@@ -1,2 +1,2 @@
-[ueber1|Kontakt]
+<h1>Kontakt</h1>
 {CONTACT}

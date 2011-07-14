@@ -317,8 +317,12 @@ $_POST = cleanREQUEST($_POST);
     if(!strstr($template,"{CONTENT}"))
         $is_Page = false;
 
-    $HTML = str_replace('{CONTENT}','---content~~~'.$pagecontent.'~~~content---',$template);
-    $HTML = $syntax->convertContent($HTML, $CAT_REQUEST, $is_Page);
+    if ($USE_CMS_SYNTAX) { // TinyMCE-Anpassung
+      $HTML = str_replace('{CONTENT}','---content~~~'.$pagecontent.'~~~content---',$template);
+      $HTML = $syntax->convertContent($HTML, $CAT_REQUEST, $is_Page);
+    } else { // TinyMCE
+      $HTML = str_replace('{CONTENT}',$pagecontent,$template);
+    }
     unset($pagecontent);
 
     // Smileys ersetzen

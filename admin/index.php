@@ -1585,7 +1585,7 @@ function copymoveSite($post) {
         foreach($new_page as $cat => $tmp) {
             $page_inhalt = "Das ist ein Link";#$EXT_LINK $EXT_PAGE
             if(substr($new_page[$cat],-4) == $EXT_DRAFT) {
-                $page_inhalt = "[ueber1|".str_replace(array("[","]"),array("^[","^]"),$specialchars->rebuildSpecialChars(substr($new_page[$cat], 3,strlen($new_page[$cat])-7), false, false))."]";
+                $page_inhalt = str_replace(array("[","]"),array("^[","^]"),$specialchars->rebuildSpecialChars(substr($new_page[$cat], 3,strlen($new_page[$cat])-7), false, false)); // TinyMCE: CMS-Syntax aus Überschrift entfernt
             }
             $error = saveContentToPage($page_inhalt,$CONTENT_DIR_REL.$cat."/".$new_page[$cat]);
             # Fehler beim anlegen also return
@@ -3912,6 +3912,9 @@ function showEditPageForm($cat, $page, $newsite)    {
     // Anzeige der Formatsymbolleiste, wenn die CMS-Syntax aktiviert ist
     if ($CMS_CONF->get("usecmssyntax") == "true") {
         $content .= returnFormatToolbar($cat);
+    } else { //TinyMCE
+      require ("tinymce.php");
+      $content .= returnTinyMCEScripts($cat,"layouts/".$CMS_CONF->get("cmslayout")."/css/style.css");
     }
 
     // Seiteninhalt

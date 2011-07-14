@@ -1,2 +1,2 @@
-[ueber1|Eine Galerie]
-{Galerie|moziloCMS}
+<h1>Eine Galerie</h1>
+<p>{Galerie|moziloCMS}</p>

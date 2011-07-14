@@ -1,13 +1,11 @@
-[ueber1|Willkommen]
-...in Ihrem moziloCMS! Passen Sie alles an Ihre Bedürfnisse und Ziele an: Loggen Sie sich dafür in die moziloCMS-Konfigurationsoberfläche [html|<a href="admin/" target="_blank">moziloAdmin</a>] ein. Der initiale Benutzer heißt "admin" und hat das Paßwort "install" - bitte vergessen Sie nicht, als erstes diese Zugangsdaten zu ändern!
-
-Wie alles hier im moziloCMS funktioniert, ist auf [link|http://cms.mozilo.de] beschrieben; für Fragen und Anregungen steht Ihnen das [link=mozilo-Supportforum|http://forum.mozilo.de/] zur Verfügung.
-
-[fett|Viel Spaß mit moziloCMS!]
-Ihr [link=mozilo-Team|http://www.mozilo.de]
-
-[----]
-Hier noch als kleine Demonstration ein Bild, eine Datei und der Link zu einer Galerie:
-[bild|mozilo.jpg]
-[liste|eine [datei=Datei|text.txt] zum Herunterladen]
-[liste|ein [seite=Link zu einer Galerie|Eine Galerie]]
+<h1>Willkommen</h1>
+<p>...in Ihrem moziloCMS! Passen Sie alles an Ihre Bed&uuml;rfnisse und Ziele an: Loggen Sie sich daf&uuml;r in die moziloCMS-Konfigurationsoberfl&auml;che <a href="admin/" target="_blank">moziloAdmin</a> ein. Der initiale Benutzer hei&szlig;t "admin" und hat das Pa&szlig;wort "install" - bitte vergessen Sie nicht, als erstes diese Zugangsdaten zu &auml;ndern! Wie alles hier im moziloCMS funktioniert, ist auf <a href="http://cms.mozilo.de">http://cms.mozilo.de</a> beschrieben; f&uuml;r Fragen und Anregungen steht Ihnen das <a href="http://forum.mozilo.de/" target="_blank">mozilo-Supportforum</a> zur Verf&uuml;gung. <strong></strong></p>
+<p><strong>Viel Spa&szlig; mit moziloCMS!</strong></p>
+<p><a href="http://www.mozilo.de">Ihr mozilo-Team</a></p>
+<hr />
+<p>Hier noch als kleine Demonstration ein Bild, eine Datei und der Link zu einer Galerie:</p>
+<p><img title="mozilo.jpg" src="kategorien/10_Willkommen/dateien/mozilo.jpg" alt="mozilo.jpg" width="241" height="150" /></p>
+<ul>
+<li>eine <a href="kategorien/10_Willkommen/dateien/text.txt">Datei</a> zum Herunterladen</li>
+<li>ein <a href="index.php?cat=10_Willkommen&amp;page=30_Eine%20Galerie">Link zu einer Galerie</a></li>
+</ul>
