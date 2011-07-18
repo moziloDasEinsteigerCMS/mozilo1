@@ -32,6 +32,9 @@ if(is_file(BASE_DIR_CMS."DefaultConf.php")) {
     die("Fatal Error ".BASE_DIR_CMS."DefaultConf.php Datei existiert nicht");
 }
 
+require_once(BASE_DIR_CMS.'idna_convert.class.php');
+$Punycode = new idna_convert();
+
 $_GET = cleanREQUEST($_GET);
 $_REQUEST = cleanREQUEST($_REQUEST);
 $_POST = cleanREQUEST($_POST);
@@ -282,6 +285,7 @@ if($CMS_CONF->get('usecmseditarea') == "true" and isset($post['action_data']['ed
     $html .= '<script type="text/javascript" src="buttons.js"></script>';
 $html .= '<script type="text/javascript" src="multifileupload.js"></script>';
 $html .= "<title>$ADMIN_TITLE - $pagetitle</title>";
+$html .= '<link rel="SHORTCUT ICON" href="favicon.ico" />';
 $html .= '<link type="text/css" rel="stylesheet" href="adminstyle.css">';
 $html .= '<link type="text/css" rel="stylesheet" href="editsite.css">';
 $html .= '<link type="text/css" rel="stylesheet" media="screen" href="js_color_picker_v2/js_color_picker_v2.css">';

@@ -373,8 +373,11 @@ class Syntax {
         global $CMS_CONF;
         global $language;
         global $specialchars;
+        global $Punycode;
         // überprüfung auf korrekten Link
         if(preg_match($this->LINK_REGEX, $value)) {
+            $link = $value;
+            $value = $Punycode->decode($value);
             if(empty($desciption)) {
                 $desciption = $value;
                 switch ($CMS_CONF->get("shortenlinks")) {
@@ -398,20 +401,21 @@ class Syntax {
                 }
             }
             # erstmal alle HTML Zeichen wandeln
-            $link = $specialchars->getHtmlEntityDecode($value);
+            $link = $specialchars->getHtmlEntityDecode($link);
             # alle url encodete Zeichen wandeln
             $link = $specialchars->rebuildSpecialChars($link,false,false);
-            # alles url encodeten
+            $link = $Punycode->encode($link);
+            # alles url encoden
             $link = $specialchars->replaceSpecialChars($link,false);
-            # alle :,?,&,;,= zurück wandeln
-            $link = str_replace(array('%3A','%3F','%26','%3B','%3D'),array(':','?','&amp;',';','='),$link);
+            # alle :,?,&,;,=,@ zurück wandeln
+            $link = str_replace(array('%3A','%3F','%26','%3B','%3D','%40'),array(':','?','&amp;',';','=','@'),$link);
             // Externe Links in neuem Fenster öffnen?
             $target = "";
             global $CMS_CONF;
             if ($CMS_CONF->get("targetblank_link") == "true") {
                 $target = ' target="_blank"';
             }
-            return '<a class="link" href="'.$link.'"'.$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", $value)).$target.'>'.$desciption.'</a>';
+            return '<a class="link" href="'.$link.'"'.$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", $specialchars->rebuildSpecialChars($value, true, true))).$target.'>'.$specialchars->rebuildSpecialChars($desciption, true, true).'</a>';
         } else {
             if(empty($desciption))
                 $desciption = $value;
@@ -423,16 +427,23 @@ class Syntax {
         // Mail-Link mit eigenem Text
         global $language;
         global $specialchars;
-        $dead = $desciption;
-        if(empty($desciption)) {
-            $desciption = obfuscateAdress("$value", 3);
-            $dead = $value;
-        }
         // überprüfung auf korrekten Link
         if (preg_match($this->MAIL_REGEX, $value)) {
-            return '<a class="mail" href="'.obfuscateAdress('mailto:'.$value, 3).'"'.$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", obfuscateAdress("$value", 3))).'>'.$desciption.'</a>';
+            global $Punycode;
+            $mailto = $Punycode->encode($value);
+            $value = $Punycode->decode($value);
+            if(empty($desciption))
+                $desciption = $value;
+            $desciption = $specialchars->replaceSpecialChars($desciption,false);
+            $mailto = $specialchars->replaceSpecialChars($mailto,false);
+            $mailto = str_replace(array('%3A','%3F','%26','%3B','%3D','%40'),array(':','?','&amp;',';','=','@'),$mailto);
+            $mailto = obfuscateAdress('mailto:'.$mailto, 3);
+            $value = $specialchars->replaceSpecialChars($value,false);
+            return '<a class="mail" href="'.$mailto.'"'.$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", $specialchars->rebuildSpecialChars(obfuscateAdress($value, 3), true, true))).'>'.$specialchars->rebuildSpecialChars(obfuscateAdress($desciption, 3), true, true).'</a>';
         } else {
-            return $this->createDeadlink($dead, $language->getLanguageValue1("tooltip_link_mail_error_1", $value));
+            if(empty($desciption))
+                $desciption = $value;
+            return $this->createDeadlink($desciption, $language->getLanguageValue1("tooltip_link_mail_error_1", $value));
         }
 
     }
@@ -967,10 +978,10 @@ echo "</pre><br>\n";*/
                 $replace = $PAGE_FILE;
                 break;
             case '{USEMEMORY}':
-                $replace = '&#94;&#123;USEMEMORY&#94;&#125;';
+                $replace = '<!--&#94;&#123;USEMEMORY&#94;&#125;-->';
                 break;
             case '{EXECUTTIME}':
-                $replace = '&#94;&#123;EXECUTTIME&#94;&#125;';
+                $replace = '<!--&#94;&#123;EXECUTTIME&#94;&#125;-->';
                 break;
             default:
                 $replace = NULL;

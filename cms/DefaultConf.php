@@ -65,7 +65,6 @@ function makePlatzhalter($all = false) {
                         '{SEARCH}',
                         '{SITEMAPLINK}',
                         '{CMSINFO}',
-#                        '{CONTACT}',
                         '{TABLEOFCONTENTS}'
     );
     # Die Rstlichen Platzhalter

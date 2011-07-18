@@ -32,6 +32,9 @@ $_GET = cleanREQUEST($_GET);
 $_REQUEST = cleanREQUEST($_REQUEST);
 $_POST = cleanREQUEST($_POST);
 
+require_once(BASE_DIR_CMS.'idna_convert.class.php');
+$Punycode = new idna_convert();
+
 require_once(BASE_DIR_ADMIN."Crypt.php");
 require_once(BASE_DIR_CMS."Mail.php");
 require_once(BASE_DIR_ADMIN."filesystem.php");

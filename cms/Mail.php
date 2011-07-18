@@ -18,6 +18,12 @@ function sendMailToAdmin($subject, $content) {
 // Sendet eine Mail an die konfigurierte Kontakt-Adresse oder eine Kopie an die Usermail-Adresse
 function sendMail($subject, $content, $from, $to, $replyto) {
     global $specialchars;
+    if(class_exists('idna_convert')) {
+        global $Punycode;
+        $from = $Punycode->encode($from);
+        $to = $Punycode->encode($to);
+        $replyto = $Punycode->encode($replyto);
+    }
     @mail(
            $specialchars->getHtmlEntityDecode($to),
            "=?".CHARSET."?B?".base64_encode($specialchars->getHtmlEntityDecode($subject))."?=",

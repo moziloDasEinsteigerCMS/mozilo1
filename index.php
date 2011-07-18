@@ -64,6 +64,9 @@ $_POST = cleanREQUEST($_POST);
     define("CONTENT_DIR_REL",$CONTENT_DIR_REL);
     define("PLUGIN_DIR_REL",$PLUGIN_DIR_REL);
 
+    require_once(BASE_DIR_CMS.'idna_convert.class.php');
+    $Punycode = new idna_convert();
+
     require_once(BASE_DIR_CMS."Language.php");
     $language       = new Language();
 
@@ -83,7 +86,7 @@ $_POST = cleanREQUEST($_POST);
     $TEMPLATE_FILE  = $LAYOUT_DIR."/template.html";
 
     # wenn ein Plugin die gallerytemplate.html benutzten möchte
-    # recht es wenn in der URL galtemplate=??? enthalten ist ??? können Galerien sein
+    # reicht es wenn in der URL galtemplate=??? enthalten ist ??? können Galerien sein
     if (getRequestParam("galtemplate", false)) {
         $TEMPLATE_FILE  = $LAYOUT_DIR."/gallerytemplate.html";
     }
@@ -130,11 +133,11 @@ $_POST = cleanREQUEST($_POST);
     # manche Provider sind auf iso eingestelt
     header('content-type: text/html; charset='.CHARSET.'');
 
-    if(strpos($HTML,"{USEMEMORY}") > 1)
-        $HTML = str_replace("{USEMEMORY}",get_memory(),$HTML);
+    if(strpos($HTML,"<!--{USEMEMORY}-->") > 1)
+        $HTML = str_replace("<!--{USEMEMORY}-->",get_memory(),$HTML);
 
-    if(strpos($HTML,"{EXECUTTIME}") > 1)
-        $HTML = str_replace("{EXECUTTIME}",get_executTime($start_time),$HTML);
+    if(strpos($HTML,"<!--{EXECUTTIME}-->") > 1)
+        $HTML = str_replace("<!--{EXECUTTIME}-->",get_executTime($start_time),$HTML);
     // Zum Schluß: Ausgabe des fertigen HTML-Dokuments
     echo $HTML;
 
@@ -232,23 +235,15 @@ $_POST = cleanREQUEST($_POST);
 // HTML-Template einlesen und verarbeiten
 // ------------------------------------------------------------------------------
     function readTemplate() {
-        global $CSS_FILE;
         global $HTML;
-        global $FAVICON_FILE;
-        global $LAYOUT_DIR_URL;
         global $TEMPLATE_FILE;
         global $USE_CMS_SYNTAX;
-        global $WEBSITE_NAME;
         global $ACTION_REQUEST;
         global $HIGHLIGHT_REQUEST;
         global $language;
         global $syntax;
         global $CMS_CONF;
         global $smileys;
-        global $specialchars;
-        global $activ_plugins;
-        global $deactiv_plugins;
-        global $CatPage;
         global $passwordok;
 
     if (!$file = @fopen($TEMPLATE_FILE, "r"))
@@ -626,18 +621,23 @@ $_POST = cleanREQUEST($_POST);
 // ------------------------------------------------------------------------------
 // Dank fuer spam-me-not.php an Rolf Offermanns!
 // Spam-me-not in JavaScript: http://www.zapyon.de
+# Achtung muss url encoded sein
     function obfuscateAdress($originalString, $mode) {
         // $mode == 1            dezimales ASCII
         // $mode == 2            hexadezimales ASCII
         // $mode == 3            zufaellig gemischt
         $encodedString = "";
         $nowCodeString = "";
-        $randomNumber = -1;
 
         $originalLength = strlen($originalString);
         $encodeMode = $mode;
 
         for ( $i = 0; $i < $originalLength; $i++) {
+            if($originalString[$i] == "%") {
+                $encodedString .= $originalString[$i].$originalString[$i+1].$originalString[$i+2];
+                $i = $i + 2;
+                continue;
+            }
             if ($mode == 3) $encodeMode = rand(1,2);
             switch ($encodeMode) {
                 case 1: // Decimal code
