@@ -79,8 +79,8 @@ function makePlatzhalter($all = false) {
                         '{WEBSITE_NAME}',
                         '{MAINMENU}',
                         '{DETAILMENU}',
-                        '{USEMEMORY}',
-                        '{EXECUTTIME}'
+                        '{MEMORYUSAGE}',
+                        '{EXECUTETIME}'
     );
 
     if($all) {

@@ -133,11 +133,11 @@ $_POST = cleanREQUEST($_POST);
     # manche Provider sind auf iso eingestelt
     header('content-type: text/html; charset='.CHARSET.'');
 
-    if(strpos($HTML,"<!--{USEMEMORY}-->") > 1)
-        $HTML = str_replace("<!--{USEMEMORY}-->",get_memory(),$HTML);
+    if(strpos($HTML,"<!--{MEMORYUSAGE}-->") > 1)
+        $HTML = str_replace("<!--{MEMORYUSAGE}-->",get_memory(),$HTML);
 
-    if(strpos($HTML,"<!--{EXECUTTIME}-->") > 1)
-        $HTML = str_replace("<!--{EXECUTTIME}-->",get_executTime($start_time),$HTML);
+    if(strpos($HTML,"<!--{EXECUTETIME}-->") > 1)
+        $HTML = str_replace("<!--{EXECUTETIME}-->",get_executTime($start_time),$HTML);
     // Zum Schluß: Ausgabe des fertigen HTML-Dokuments
     echo $HTML;
 

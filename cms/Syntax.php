@@ -977,11 +977,11 @@ echo "</pre><br>\n";*/
                 global $PAGE_FILE;
                 $replace = $PAGE_FILE;
                 break;
-            case '{USEMEMORY}':
-                $replace = '<!--&#94;&#123;USEMEMORY&#94;&#125;-->';
+            case '{MEMORYUSAGE}':
+                $replace = '<!--&#94;&#123;MEMORYUSAGE&#94;&#125;-->';
                 break;
-            case '{EXECUTTIME}':
-                $replace = '<!--&#94;&#123;EXECUTTIME&#94;&#125;-->';
+            case '{EXECUTETIME}':
+                $replace = '<!--&#94;&#123;EXECUTETIME&#94;&#125;-->';
                 break;
             default:
                 $replace = NULL;
