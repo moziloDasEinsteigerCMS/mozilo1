@@ -1,18 +1,6 @@
 <?php
 session_start();
 
-// Debugschalter: true oder false
-$debug = false;
-
-// Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
-@ini_set("display_errors", 0);
-
-// wenn im debug-modus dann err. sofort wieder anzeigen
-if ($debug) {
-    @error_reporting(E_ALL);
-    @ini_set("display_errors", 1);
-}
-
 $ADMIN_TITLE = "moziloAdmin";
 $CMS_DIR_NAME = "cms";
 define("CMS_DIR_NAME",$CMS_DIR_NAME);
@@ -54,6 +42,24 @@ if(isset($_FILE)) $_FILE = cleanREQUEST($_FILE);
 // CHARSET erzwingen - experimentell!
 // @ini_set("default_charset", CHARSET);
 
+// Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
+@ini_set("display_errors", 0);
+
+// debug modus im url aufgerufen?
+if (isset($_GET["debug"])) {
+    // mal aktivieren
+    $_SESSION["debug"] = true;
+    // aber wenn "0" dann de-aktivieren
+    if ($_GET["debug"] === "0") {
+        $_SESSION["debug"] = false;
+    }
+}
+// im debug-modus errors anzeigen
+if ($_SESSION["debug"]) {
+    @error_reporting(E_ALL);
+    @ini_set("display_errors", 1);
+}
+
 // Session Fixation durch Vergabe einer neuen Session-ID beim ersten Login verhindern
  if (!isset($_SESSION['PHPSESSID'])) {
     session_regenerate_id(true);
@@ -66,11 +72,7 @@ if (!isset($_SESSION['login_okay']) or !$_SESSION['login_okay']) {
     die("");
 }
 
-// Da nun im Admin angemeldet, etwaige err. auch ohne debug true wieder ausgeben zwecks Fehlersuche beim User
-@error_reporting(E_ALL);
-@ini_set("display_errors", 1);
-
-if ($debug) {
+if ($_SESSION["debug"]) {
     ob_start();
     echo "SESSION -------------------\n";
     print_r($_SESSION);
@@ -85,9 +87,9 @@ if ($debug) {
 }
 
 // Pfade
-$CONTENT_DIR_REL        = BASE_DIR.CONTENT_DIR_NAME."/";
+$CONTENT_DIR_REL = BASE_DIR.CONTENT_DIR_NAME."/";
 define("CONTENT_DIR_REL",$CONTENT_DIR_REL);
-$GALLERIES_DIR_REL    = BASE_DIR.GALLERIES_DIR_NAME."/";
+$GALLERIES_DIR_REL = BASE_DIR.GALLERIES_DIR_NAME."/";
 define("GALLERIES_DIR_REL",$GALLERIES_DIR_REL);
 $PLUGIN_DIR_REL = BASE_DIR.PLUGIN_DIR_NAME."/";
 define("PLUGIN_DIR_REL",$PLUGIN_DIR_REL);
@@ -400,7 +402,7 @@ $html .= $pagecontent;
 $html .= '</form>';
 $html .= "</td></tr>";
 
-if ($debug) {
+if ($_SESSION["debug"]) {
     ob_start();
     echo "<div style=\"overflow:auto;width:920px;height:400px;margin:0;margin-top:20px;padding:0;\"><pre style=\"background-color:#000;color:#0f0;padding:5px;margin:0;font-family:monospace;border:2px solid #777;\">";
     if (function_exists("error_get_last")) {
