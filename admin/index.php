@@ -420,7 +420,7 @@ if ($debug) {
 $html .= '<tr><td width="100%"><img src="gfx/clear.gif" alt=" " width="930" height="1" hspace="0" vspace="0" align="left" border="0"></td></tr></table>';
 $html .= "</body></html>";
 
-// Ausgabe gem. CHARSET
+// Ausgabe gem. CHARSET deklarieren
 header('content-type: text/html; charset='.CHARSET);
 
 // Ausgabe der kompletten Seite
