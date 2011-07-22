@@ -1,8 +1,19 @@
 <?php
 session_start();
 
-$ADMIN_TITLE = "moziloAdmin";
+// Debugschalter: true oder false
+$debug = false;
 
+// Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
+@ini_set("display_errors", 0);
+
+// wenn im debug-modus dann err. sofort wieder anzeigen
+if ($debug) {
+    @error_reporting(E_ALL);
+    @ini_set("display_errors", 1);
+}
+
+$ADMIN_TITLE = "moziloAdmin";
 $CMS_DIR_NAME = "cms";
 define("CMS_DIR_NAME",$CMS_DIR_NAME);
 $ADMIN_DIR_NAME = "admin";
@@ -13,7 +24,7 @@ if(isset($_SERVER["SCRIPT_FILENAME"]))
     $BASE_DIR = $_SERVER["SCRIPT_FILENAME"];
 else
     $BASE_DIR = __FILE__;
-# fals da bei winsystemen \\ drin sind in \ wandeln
+# falls da bei winsystemen \\ drin sind in \ wandeln
 $BASE_DIR = str_replace("\\\\", "\\",$BASE_DIR);
 # zum schluss noch den teil denn wir nicht brauchen abschneiden
 $BASE_DIR = substr($BASE_DIR,0,-(strlen(ADMIN_DIR_NAME."/index.php")));
@@ -40,16 +51,10 @@ $_REQUEST = cleanREQUEST($_REQUEST);
 $_POST = cleanREQUEST($_POST);
 if(isset($_FILE)) $_FILE = cleanREQUEST($_FILE);
 
+// CHARSET erzwingen - experimentell!
+// @ini_set("default_charset", CHARSET);
 
-$debug = "nein"; # ja oder nein
- // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
-if($debug != "ja")
-    @ini_set("display_errors", 0);
-
- // ISO 8859-1 erzwingen - experimentell!
- // @ini_set("default_charset", CHARSET);
-
- // Session Fixation durch Vergabe einer neuen Session-ID beim ersten Login verhindern
+// Session Fixation durch Vergabe einer neuen Session-ID beim ersten Login verhindern
  if (!isset($_SESSION['PHPSESSID'])) {
     session_regenerate_id(true);
     $_SESSION['PHPSESSID'] = true;
@@ -61,7 +66,11 @@ if (!isset($_SESSION['login_okay']) or !$_SESSION['login_okay']) {
     die("");
 }
 
-if($debug == "ja") {
+// Da nun im Admin angemeldet, etwaige err. auch ohne debug true wieder ausgeben zwecks Fehlersuche beim User
+@error_reporting(E_ALL);
+@ini_set("display_errors", 1);
+
+if ($debug) {
     ob_start();
     echo "SESSION -------------------\n";
     print_r($_SESSION);
@@ -85,7 +94,7 @@ define("PLUGIN_DIR_REL",$PLUGIN_DIR_REL);
 
 
 require_once(BASE_DIR_CMS."CatPageClass.php");
-$CatPage         = new CatPageClass();
+$CatPage = new CatPageClass();
 
 require_once(BASE_DIR_ADMIN."filesystem.php");
 require_once(BASE_DIR_ADMIN."string.php");
@@ -174,16 +183,16 @@ $icon_size = "24x24"; # 16x16 22x22 24x24 32x32 48x48
 $icon_size_tabs = "16x16"; # 16x16 22x22 24x24 32x32 48x48
 
 $post = NULL;
-# getRequestParam() ferarbeitet nur $_POST sachen deshalb hier eine ausname
+# getRequestParam() verarbeitet nur $_POST sachen deshalb hier eine ausnahme
 if(isset($_REQUEST['javascript']) and $_REQUEST['javascript'] == "ja") $_POST['javascript'] = "ja";
-
 
 # hier das tabs array
 $array_tabs = array("home","category","page","files","gallery","config","admin","plugins");
 
 # Plugin-Tab nur anzeigen wenn plugin Ordner mit mind. einem plugin vorhanden ist
-if (count(getDirAsArray(PLUGIN_DIR_REL, "dir")) < 1 )
+if (count(getDirAsArray(PLUGIN_DIR_REL, "dir")) < 1 ) {
     $array_tabs = array("home","category","page","files","gallery","config","admin");
+}
 
 $action = 'home';
 foreach($array_tabs as $pos => $tab) {
@@ -388,36 +397,33 @@ if (($intervallsetting != "") && preg_match("/^[0-9]+$/", $intervallsetting) && 
     }
 }
 $html .= $pagecontent;
-
 $html .= '</form>';
-
 $html .= "</td></tr>";
 
-if($debug == "ja") {
+if ($debug) {
     ob_start();
     echo "<div style=\"overflow:auto;width:920px;height:400px;margin:0;margin-top:20px;padding:0;\"><pre style=\"background-color:#000;color:#0f0;padding:5px;margin:0;font-family:monospace;border:2px solid #777;\">";
-    if(function_exists("error_get_last")) {
+    if (function_exists("error_get_last")) {
         print_r(@error_get_last());
     }
-if(isset($debug_test))  print_r($debug_test);
     echo $debug_txt;
-    echo "post ------------------------\n";
-if(isset($post)) print_r($post);
+    echo '$post ------------------------'."\n";
+    if (isset($post)) {
+        print_r($post);
+    }
     echo "</pre></div>";
     $debug_txt = ob_get_contents();
     ob_end_clean();
+    $html .= "<tr><td>".$debug_txt."</td></tr>";
 }
-
-if($debug == "ja") $html .= "<tr><td>".$debug_txt."</td></tr>";
 
 $html .= '<tr><td width="100%"><img src="gfx/clear.gif" alt=" " width="930" height="1" hspace="0" vspace="0" align="left" border="0"></td></tr></table>';
 $html .= "</body></html>";
 
+// Ausgabe gem. CHARSET
+header('content-type: text/html; charset='.CHARSET);
 
-
-// Ausgabe als ISO 8859-1 deklarieren
-header('content-type: text/html; charset='.CHARSET.'');
-/* Ausgabe der kompletten Seite */
+// Ausgabe der kompletten Seite
 echo $html;
 
 /*------------------------------
