@@ -45,19 +45,22 @@ if(isset($_FILE)) $_FILE = cleanREQUEST($_FILE);
 // Initial: Fehlerausgabe unterdrücken, um Path-Disclosure-Attacken ins Leere laufen zu lassen
 @ini_set("display_errors", 0);
 
-// debug modus im url aufgerufen?
-if (isset($_GET["debug"])) {
-    // mal aktivieren
-    $_SESSION["debug"] = true;
-    // aber wenn "0" dann de-aktivieren
-    if ($_GET["debug"] === "0") {
-        $_SESSION["debug"] = false;
-    }
+// debug session-var initial mit false anlegen wenn nicht vorhanden
+if (!isset($_SESSION["debug"])) {
+    $_SESSION["debug"] = false;
 }
-// im debug-modus errors anzeigen
-if ($_SESSION["debug"]) {
-    @error_reporting(E_ALL);
-    @ini_set("display_errors", 1);
+
+// wenn debug als url parameter angegeben...
+if (isset($_GET["debug"])) {
+    if ($_GET["debug"] === "0") {
+        // debug=0 -> ausschalten
+        $_SESSION["debug"] = false;
+    } else {
+        // debug=[irgendwas] -> einschalten
+        $_SESSION["debug"] = true;    
+        @error_reporting(E_ALL);
+        @ini_set("display_errors", 1);
+    }
 }
 
 // Session Fixation durch Vergabe einer neuen Session-ID beim ersten Login verhindern
