@@ -58,8 +58,8 @@ if (isset($_GET["debug"])) {
     } else {
         // debug=[irgendwas] -> einschalten
         $_SESSION["debug"] = true;    
-        @error_reporting(E_ALL);
-        @ini_set("display_errors", 1);
+        error_reporting(-1);
+        ini_set("display_errors", 1);
     }
 }
 
