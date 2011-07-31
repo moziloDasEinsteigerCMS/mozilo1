@@ -1,19 +1,5 @@
 <?php
 
-/*
-    Die mussen noch in die lang dateien vom cms/sprachen
-    müssen auch noch überarbeitet werden
-    
-    password                        = Passwort
-    username                        = Username
-    incorrect_login                 = Sie haben sich nicht korrekt angemeldet. Bitte versuchen Sie es noch einmal.
-    warning_false_logins            = Fehlgeschlagene Loginversuche seit dem letzten Login:
-    loginlocked_mailcontent         = Der Zugang zu moziloAdmin ist vorübergehend gesperrt, da zu oft falsche Zugangsdaten angegeben wurden. Details zum letzten Login-Versuch:
-    loginlocked_mailsubject         = Zugang zu moziloAdmin gesperrt
-    loginplease                     = Login - bitte anmelden
-    logout_button                   = Logout
-    login_button                    = Login
-*/
 class AccessControlClass {
 
 	// --------------------------------------------------------------------
