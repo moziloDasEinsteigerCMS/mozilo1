@@ -2634,11 +2634,10 @@ function newFile($post) {
         $forceoverwrite = $_POST['overwrite'];
     }
 
-
     foreach($_FILES as $array_name => $tmp) {
         if($_FILES[$array_name]['error'] == 0) {
             $cat_pos= explode("_",$array_name);
-            $cat = sprintf("%02d",$cat_pos[1])."_".specialNrDir("CONTENT_DIR_REL", sprintf("%02d",$cat_pos[1]));
+            $cat = sprintf("%02d",$cat_pos[1])."_".specialNrDir(CONTENT_DIR_REL, sprintf("%02d",$cat_pos[1]));
             $error = uploadFile($_FILES[$array_name], CONTENT_DIR_REL.$cat."/".CONTENT_FILES_DIR_NAME."/", $forceoverwrite,$ADMIN_CONF->get("maximagewidth"),$ADMIN_CONF->get("maximageheight"));
             if(!empty($error)) {
                 $post['error_messages'][key($error)][] = $cat."/".$error[key($error)];
@@ -4246,7 +4245,7 @@ function returnOverviewSelectbox($type, $currentcat) {
                     if ($CatPage->get_Type($catdir,$file) == EXT_HIDDEN)
                             $completepagename = $cleanpagename." (".getLanguageValue("page_saveashidden").")";
                     if($type == 4) {
-                        $elements[] = array($spacer.$completepagename, $catdir."/".$file);
+                        $elements[] = array($spacer.$completepagename, $CatPage->get_CatPageWithPos($catdir,false)."/".$CatPage->get_CatPageWithPos($catdir,$file).$CatPage->get_Type($catdir,$file));
                     } else {
                         if ($catdir == $currentcat)
                             $elements[] = array($spacer.$completepagename, $cleanpagename);
