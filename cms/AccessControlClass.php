@@ -19,14 +19,14 @@ class AccessControlClass {
         $this->timestamp = time();
            
         global $BASE_DIR_CMS;
-        # aus conf user array erstellen
+        // aus conf user array erstellen
         $tmp = new Properties($BASE_DIR_CMS."conf/user.conf",true);
         foreach($tmp->toArray() as $user => $pass_salt) {
             list($this->acUser[$user]['_pw-'],$this->acUser[$user]['_salt-']) = explode(",",$pass_salt);
         }
         unset($tmp);
 
-        # aus conf zu schützende cat pages erstellen
+        // aus conf zu schützende cat pages erstellen
         $tmp = new Properties($BASE_DIR_CMS."conf/catpage.conf",true);
         foreach($tmp->toArray() as $catpage => $user) {
             $catpagekey = explode(":",$catpage);
@@ -43,12 +43,12 @@ class AccessControlClass {
             session_regenerate_id(true);
             $_SESSION['acData']['acPHPSESSID'] = true;
         }
-        # es gibt noch keinen user
+        // es gibt noch keinen user
         if(!isset($_SESSION['acData']['acUserName']))
             $_SESSION['acData']['acUserName'] = array();
 
-        # will sich ein user anmelden
-        # Achtung beim Anmelden muss der User, Password und Logon im POST sein
+        // will sich ein user anmelden
+        // Achtung beim Anmelden muss der User, Password und Logon im POST sein
         if(isset($_SESSION['acData']['acForm'])
                 and is_array($_SESSION['acData']['acForm'])
                 and isset($_SESSION['acData']['acForm']['acLogon'])
@@ -74,7 +74,7 @@ class AccessControlClass {
                     $_SESSION['acData']['acUserName'][] = $user;
                 } else {
                     # wenn nicht angemeldet nicht nochmals eintragen
-                    #$_SESSION['acData']['acUserName'][] = $user;
+                    # $_SESSION['acData']['acUserName'][] = $user;
                 }
             } else {
                 echo "FEHLER Anmelden<br>\n";
@@ -137,7 +137,7 @@ class AccessControlClass {
 
 
     // --------------------------------------------------------------------
-    // HTML Form
+    // HTML Form-Gerüst
     // --------------------------------------------------------------------
     function getForm($inForm = "", $css = "acform") {
         global $CatPage;
@@ -148,6 +148,9 @@ class AccessControlClass {
         return $html;
     }
 
+    // --------------------------------------------------------------------
+    // Gibt den kodierten Formularfeldname zurück
+    // --------------------------------------------------------------------
     function getCodedInputName($type = false) {
         if($type and isset($_SESSION['acData']['acForm'][$type])) {
             return $_SESSION['acData']['acForm'][$type];
@@ -162,18 +165,19 @@ class AccessControlClass {
         $_SESSION['acData']['acForm'][$type] = $valName;
         return $valName;
     }
-    // ------------------------------------------------------------------------------------------
+
+	// --------------------------------------------------------------------
     // HTML Form Textfeld Username
-    // ------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------
     function getInputUsername($css = "acuser", $size = "10", $maxlength = "30") {
         $name = $this->getCodedInputName('acUser');
         $html  = '<input type="text" name="'.$name.'" class="'.$css.'" size="'.$size.'" maxlength="'.$maxlength.'" />';
         return $html;
     }
 
-    // ------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------
     // HTML Form Selectbox Username
-    // ------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------
     function getSelectBoxUsername($user = array(), $css = "acselect", $size = "1") {
         $name = $this->getCodedInputName('acUser');
         if(count($user) < 1)
@@ -186,10 +190,10 @@ class AccessControlClass {
         return $html;
     }
 
-    // ------------------------------------------------------------------------------------------
-    // HTML Form Selectbox Username
-    // ------------------------------------------------------------------------------------------
-    function getSelectBoxLogetInUsername($css = "acselect", $size = "1") {
+	// --------------------------------------------------------------------
+    // HTML Form Selectbox mit eingeloggten Usernamen
+	// --------------------------------------------------------------------
+    function getSelectBoxLoggedInUsername($css = "acselect", $size = "1") {
         $name = $this->getCodedInputName('acUser');
         if(count($_SESSION['acData']['acUserName']) < 1)
             return NULL;
@@ -201,36 +205,37 @@ class AccessControlClass {
         return $html;
     }
 
-    // ------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------
     // HTML Form Input Password
-    // ------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------
     function getInputPassword($css = "acpass", $size = "10", $maxlength = "30") {
         $name = $this->getCodedInputName('acPassword');
         $html  = '<input type="password" name="'.$name.'" class="'.$css.'" size="'.$size.'" maxlength="'.$maxlength.'" />';
         return $html;
     }
 
-    // ------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------
     // HTML Form Logon Button
-    // ------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------
     function getLogonButton($title, $css = "aclogon") {
         $name = $this->getCodedInputName('acLogon');
         $html  = '<input type="hidden" name="'.$name.'" value="Logon" /><input type="submit" value="'.$title.'" class="'.$css.'" />';
         return $html;
     }
 
-    // ------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------
     // HTML Form Logoff Button
-    // ------------------------------------------------------------------------------------------
+	// --------------------------------------------------------------------
     function getLogoffButton($title, $css = "aclogoff") {
         $name = $this->getCodedInputName('acLogoff');
         $html  = '<input type="hidden" name="'.$name.'" value="Logoff" /><input type="submit" value="'.$title.'" class="'.$css.'" />';
         return $html;
     }
 
-    // --------------------------------------------------------------------
+	// --------------------------------------------------------------------
     // Default Login-Form erstellen
-    // --------------------------------------------------------------------
+    // (Wrapper-Funktion über einige der obige Methoden)
+	// --------------------------------------------------------------------
     function getDefaultLogonForm() {
         $html = $this->getForm(
                     "User<br>"
@@ -248,7 +253,7 @@ class AccessControlClass {
     function getDefaultLogoffForm() {
         $html = $this->getForm(
                     "User<br>"
-                    .$this->getSelectBoxLogetInUsername()."<br>"
+                    .$this->getSelectBoxLoggedInUsername()."<br>"
                     .$this->getLogoffButton("Logoff")
                 );
         return $html;
