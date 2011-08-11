@@ -40,7 +40,7 @@
 		."<h1>moziloCMS-Sonderzeichenkonverter / moziloCMS special character converter</h1>\n"
 		."<div class=\"content\">\n";
 	$htmlend = "</div>\n"
-	."<a href=\"http://cms.mozilo.de\" target=\"_blank\">cms.mozilo.de</a>\n"
+	."<a href=\"http://mozilo.de\" target=\"_blank\">mozilo.de</a>\n"
 	."</body>\n"
 	."</html>\n";
 	

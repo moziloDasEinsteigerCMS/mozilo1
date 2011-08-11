@@ -703,7 +703,7 @@ $_POST = cleanREQUEST($_POST);
         global $CMS_CONF;
         global $language;
         global $VERSION_CONF;
-        return "<a href=\"http://cms.mozilo.de/\" target=\"_blank\" id=\"cmsinfolink\"".getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", "http://cms.mozilo.de")).">moziloCMS ".$VERSION_CONF->get("cmsversion")."</a>";
+        return "<a href=\"http://mozilo.de/\" target=\"_blank\" id=\"cmsinfolink\"".getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", "http://mozilo.de")).">moziloCMS ".$VERSION_CONF->get("cmsversion")."</a>";
     }
 
 

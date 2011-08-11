@@ -4487,7 +4487,7 @@ function checkBoxChecked($checkboxrequest) {
 // ------------------------------------------------------------------------------
     function getHelpUrlForSubject($subject) {
         // Das könnte später noch mehrsprachig erweitert werden, wenn anderssprachige Dokus existieren
-        return "http://cms.mozilo.de/hilfe/?thema=".$subject;
+        return "http://mozilo.de/hilfe/?thema=".$subject;
     }
 
 ?>

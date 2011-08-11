@@ -1,7 +1,7 @@
 Danke, daß Sie sich für moziloCMS entschieden haben!
 
 Wie moziloCMS funktioniert, wie man es einrichtet und wie man 
-damit arbeitet, ist detailliert auf http://cms.mozilo.de 
+damit arbeitet, ist detailliert auf http://mozilo.de 
 beschrieben. 
 
 moziloCMS steht unter der General Public License (GPL). Das 
@@ -10,7 +10,7 @@ werden, unterliegt in veränderten Versionen aber wieder der
 GPL.
 moziloCMS nutzt andere, ebenfalls freie Software und Grafiken, 
 die unter verschiendenen Lizenzen stehen. Sie sind unter 
-http://cms.mozilo.de/hilfe/?thema=lizenz aufgelistet.
+http://mozilo.de/hilfe/?thema=lizenz aufgelistet.
 Der Wortlaut der GPL bzw. LGPL liegt als gpl.txt bzw. lgpl.txt 
 im moziloCMS-Hauptverzeichnis.
 
