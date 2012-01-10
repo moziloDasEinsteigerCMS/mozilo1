@@ -448,12 +448,12 @@ function changeChmod($file) {
     if(is_dir($file)) {
         $dir = true;
     }
-    # nicht zu tuhn
+    # nicht zu tun
     if(getChmod() === false) {
         return $error_new;
     }
     @chmod($file, getChmod($dir));
-    $line_error = __LINE__ - 1; # wichtig direckt nach Befehl
+    $line_error = __LINE__ - 1; # wichtig direkt nach Befehl
     $last_error['line'] = NULL;
     if(function_exists("error_get_last")) {
         $last_error = @error_get_last();
