@@ -13,4 +13,4 @@ GPL and LGPL in their exact wording can be found in the
 moziloCMS root directory.
 
 But now: Have fun with your moziloCMS!
-The mozilo team
+The mozilo team 
