@@ -12,16 +12,20 @@ body, html, table, form, textarea{
 }
 
 #editor{
-	border: solid #888 1px;
+	border: 1px solid #c0c0c0;
 	overflow: hidden;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -khtml-border-radius: 3px;
+    border-radius: 3px;
 }
 
 #result{
 	z-index: 4; 
 	overflow-x: auto;
 	overflow-y: scroll;
-	border-top: solid #888 1px;
-	border-bottom: solid #888 1px;
+	border-top: solid #c0c0c0 1px;
+	border-bottom: solid #c0c0c0 1px;
 	position: relative;
 	clear: both;
 }
@@ -160,7 +164,9 @@ pre{
 	top: -100px;
 	margin: 0;
 }
-
+#result div#cursor_pos{
+    background-color: transparent;
+}
 #result .edit_area_selection_field .overline{
 	background-color: #996600;
 }
@@ -168,7 +174,7 @@ pre{
 
 /* area popup */
 .editarea_popup{
-	border: solid 1px #888888;
+	border: solid 1px #c0c0c0;
 	background-color: #C9D7EB; 
 	width: 250px; 
 	padding: 4px; 
@@ -223,7 +229,7 @@ div#area_search_replace div.button{
 
 div#area_search_replace .button a{
 	cursor: pointer;
-	border: solid 1px #888888;
+	border: solid 1px #c0c0c0;
 	background-color: #DEDEDE;
 	text-decoration: none;
 	padding: 0 2px;
@@ -232,13 +238,13 @@ div#area_search_replace .button a{
 }
 
 div#area_search_replace a:hover{	
-	/*border: solid 1px #888888;*/
+	/*border: solid 1px #c0c0c0;*/
 	background-color: #EDEDED;
 }
 
 div#area_search_replace  #move_area_search_replace{
 	cursor: move; 
-	border: solid 1px #888;
+	border: solid 1px #c0c0c0;
 }
 
 div#area_search_replace  #close_area_search_replace{
@@ -250,7 +256,7 @@ div#area_search_replace  #close_area_search_replace{
 div#area_search_replace  #area_search_msg{
 	height: 18px; 
 	overflow: hidden; 
-	border-top: solid 1px #888; 
+	border-top: solid 1px #c0c0c0; 
 	margin-top: 3px;
 }
 
@@ -305,7 +311,7 @@ table.statusbar{
 .area_toolbar td.infos{
 	text-align: center;
 	width: 130px;
-	border-right: solid 1px #888;
+	border-right: solid 1px #c0c0c0;
 	border-width: 0 1px 0 0;
 	padding: 0;
 }
@@ -381,7 +387,7 @@ table.statusbar{
 #processing{
 	display: none; 
 	background-color:#ECE9D8; 
-	border: solid #888 1px;
+	border: solid #c0c0c0 1px;
 	position: absolute; 
 	top: 0; 
 	left: 0;
@@ -408,7 +414,7 @@ table.statusbar{
 #tab_browsing_area{
 	display: none;
 	background-color: #CCC9A8;
-	border-top: 1px solid #888;
+	border-top: 1px solid #c0c0c0;
 	text-align: left;
 	margin: 0;
 }
@@ -436,7 +442,7 @@ table.statusbar{
 	display: block; 
 	color: #000; 
 	background: #ECE9D8; 
-	border:	1px solid #888; 
+	border:	1px solid #c0c0c0; 
 	border-width: 1px 1px 0; 
 	text-align: center; 
 	padding: 2px 2px 1px 4px; 
@@ -500,7 +506,7 @@ table.statusbar{
 #auto_completion_area
 {
 	background:	#FFF;
-	border:		solid 1px #888;
+	border:		solid 1px #c0c0c0;
 	position:	absolute;
 	z-index:	15;
 	width:	280px;

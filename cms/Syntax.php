@@ -228,13 +228,13 @@ class Syntax {
                 # Plugin
                 if(in_array($function,$this->activ_plugins) or in_array($function,$this->deactiv_plugins)) {
                     $replace = $this->plugin_replace($function,$matches[3][$pos]);
+                # User Syntax
+                } elseif($USE_CMS_SYNTAX and isset($this->syntax_user[$function])) {
+                    $replace = $this->syntax_user($matches[2][$pos],$matches[3][$pos],$function);
                 # Syntax
                 } elseif($USE_CMS_SYNTAX and method_exists($this, "syntax_".$function)) {
                     $tmp_syntax = "syntax_".$function;
                     $replace = $this->$tmp_syntax($matches[2][$pos],$matches[3][$pos]);
-                # User Syntax
-                } elseif($USE_CMS_SYNTAX and isset($this->syntax_user[$function])) {
-                    $replace = $this->syntax_user($matches[2][$pos],$matches[3][$pos],$function);
                 # mozilo Platzhalter
                 } elseif(in_array($function,$this->placeholder)) {
                     $replace = $this->placeholder_replace($function,$matches[0][$pos]);
@@ -399,6 +399,7 @@ class Syntax {
                     default: {
                     }
                 }
+		$desciption = $specialchars->rebuildSpecialChars($desciption, true, true);
             }
             # erstmal alle HTML Zeichen wandeln
             $link = $specialchars->getHtmlEntityDecode($link);
@@ -415,7 +416,7 @@ class Syntax {
             if ($CMS_CONF->get("targetblank_link") == "true") {
                 $target = ' target="_blank"';
             }
-            return '<a class="link" href="'.$link.'"'.$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", $specialchars->rebuildSpecialChars($value, true, true))).$target.'>'.$specialchars->rebuildSpecialChars($desciption, true, true).'</a>';
+            return '<a class="link" href="'.$link.'"'.$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_extern_1", $specialchars->rebuildSpecialChars($value, true, true))).$target.'>'.$desciption.'</a>';
         } else {
             if(empty($desciption))
                 $desciption = $value;
@@ -432,14 +433,14 @@ class Syntax {
             global $Punycode;
             $mailto = $Punycode->encode($value);
             $value = $Punycode->decode($value);
-            if(empty($desciption))
-                $desciption = $value;
             $desciption = $specialchars->replaceSpecialChars($desciption,false);
+            if(empty($desciption))
+		          $desciption = $specialchars->rebuildSpecialChars($value, true, true);
             $mailto = $specialchars->replaceSpecialChars($mailto,false);
             $mailto = str_replace(array('%3A','%3F','%26','%3B','%3D','%40'),array(':','?','&amp;',';','=','@'),$mailto);
             $mailto = obfuscateAdress('mailto:'.$mailto, 3);
             $value = $specialchars->replaceSpecialChars($value,false);
-            return '<a class="mail" href="'.$mailto.'"'.$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", $specialchars->rebuildSpecialChars(obfuscateAdress($value, 3), true, true))).'>'.$specialchars->rebuildSpecialChars(obfuscateAdress($desciption, 3), true, true).'</a>';
+            return '<a class="mail" href="'.$mailto.'"'.$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", $specialchars->rebuildSpecialChars(obfuscateAdress($value, 3), true, true))).'>'.obfuscateAdress($desciption, 3).'</a>';
         } else {
             if(empty($desciption))
                 $desciption = $value;
