@@ -109,6 +109,7 @@ elseif  (isset($_POST['login'])) {
     $icon_size = "24x24";
     $HTML .= "<head>"
         ."<link rel=\"stylesheet\" href=\"adminstyle.css\" type=\"text/css\" />"
+        .'<meta http-equiv="Content-Type" content="text/html; charset='.CHARSET.'">'
         ."<title>".getLanguageValue("incorrect_login")."</title>"
         ."</head>"
         ."<body onLoad=\"document.loginform.username.focus();document.loginform.username.select()\" >"
@@ -143,6 +144,7 @@ elseif  (isset($_POST['login'])) {
 else {
     $HTML .= "<head>"
         ."<link rel=\"stylesheet\" href=\"adminstyle.css\" type=\"text/css\">"
+        .'<meta http-equiv="Content-Type" content="text/html; charset='.CHARSET.'">'
         ."<title>".getLanguageValue("loginplease")."</title>"
         ."</head>"
         ."<body onLoad=\"document.loginform.username.focus();document.loginform.username.select()\">";
@@ -166,6 +168,15 @@ echo $HTML;
 // Aufbau des Login-Formulars
 function login_formular($enabled) {
     $form = "";
+// Den Websitentitel anzeigen
+$CMS_MAIN_CONF = new Properties(BASE_DIR_CMS."conf/main.conf",true);
+if(!isset($CMS_MAIN_CONF->properties['readonly'])) {
+    die($CMS_MAIN_CONF->properties['error']);
+}
+$adminTitle = rawurldecode($CMS_MAIN_CONF->get("websitetitle"));
+if(strlen($adminTitle) > 1)
+    $form .= '<div style="margin-top:-90px;top:50%;position: absolute;width: 100%;"><b>'.$adminTitle.'</b></div>';
+// ENDE Websitentitel anzeigen
     if ($enabled)
         $form .= "<div id=\"loginform_maindiv\">";
     else
