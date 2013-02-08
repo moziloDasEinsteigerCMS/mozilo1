@@ -2,9 +2,9 @@
 
 /*
 *
-* $Revision$
-* $LastChangedDate$
-* $Author$
+* $Revision: 951 $
+* $LastChangedDate: 2012-08-22 12:44:00 +0200 (Mi, 22. Aug 2012) $
+* $Author: stefanbe $
 *
 */
 
@@ -409,7 +409,7 @@ class Syntax {
             # alles url encoden
             $link = $specialchars->replaceSpecialChars($link,false);
             # alle :,?,&,;,=,@ zurück wandeln
-            $link = str_replace(array('%3A','%3F','%26','%3B','%3D','%40'),array(':','?','&amp;',';','=','@'),$link);
+            $link = str_replace(array('%3A','%3F','%26','%3B','%3D','%40','%2C','%23','%7E'),array(':','?','&amp;',';','=','@',',','#','~'),$link);
             // Externe Links in neuem Fenster öffnen?
             $target = "";
             global $CMS_CONF;
@@ -433,14 +433,19 @@ class Syntax {
             global $Punycode;
             $mailto = $Punycode->encode($value);
             $value = $Punycode->decode($value);
-            $desciption = $specialchars->replaceSpecialChars($desciption,false);
             if(empty($desciption))
-		          $desciption = $specialchars->rebuildSpecialChars($value, true, true);
+                $desciption = $value;
+#            $desciption = $specialchars->replaceSpecialChars($desciption,false);
+#            if(empty($desciption))
+#		          $desciption = $specialchars->rebuildSpecialChars($value, true, true);
+            if(strip_tags($desciption) == $desciption)
+                $desciption = $specialchars->rebuildSpecialChars(obfuscateAdress($desciption, 3), true, true);
             $mailto = $specialchars->replaceSpecialChars($mailto,false);
             $mailto = str_replace(array('%3A','%3F','%26','%3B','%3D','%40'),array(':','?','&amp;',';','=','@'),$mailto);
             $mailto = obfuscateAdress('mailto:'.$mailto, 3);
             $value = $specialchars->replaceSpecialChars($value,false);
-            return '<a class="mail" href="'.$mailto.'"'.$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", $specialchars->rebuildSpecialChars(obfuscateAdress($value, 3), true, true))).'>'.obfuscateAdress($desciption, 3).'</a>';
+            return '<a class="mail" href="'.$mailto.'"'.$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", $specialchars->rebuildSpecialChars(obfuscateAdress($value, 3), true, true))).'>'.$desciption.'</a>';
+#            return '<a class="mail" href="'.$mailto.'"'.$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", $specialchars->rebuildSpecialChars(obfuscateAdress($value, 3), true, true))).'>'.obfuscateAdress($desciption, 3).'</a>';
         } else {
             if(empty($desciption))
                 $desciption = $value;
