@@ -1,0 +1,69 @@
+# Die einträge konnen aus den Sprachdateien raus
+# admin sprachen
+toolbar_platzhalter_CONTACT
+config_error_formularmail
+config_titel_contact
+config_text_formularmail
+config_text_contactformwaittime
+config_text_contactformusespamprotection
+config_text_contact
+config_titel_contact_help
+config_titel_contact_input
+config_titel_contact_show
+config_titel_contact_mandatory
+config_input_contact_name
+config_input_contact_mail
+config_input_contact_website
+config_input_contact_textarea
+
+# cms sprachen
+tooltip_no_mail_error_0
+contactform_senttoofast_1
+contactform_wrongresult_0
+contactform_fieldnotset_0
+contactform_name_0
+contactform_mail_0
+contactform_website_0
+contactform_message_0
+contactform_mailsubject_1
+contactform_mailsubject_confirm_1
+contactform_confirmation_0
+contactform_spamprotection_text_0
+contactform_mandatory_fields_0
+contactform_submit_0
+
+
+# optional eigendlich nicht nötig da die plugin.css als letzte geladen wird
+# templates css
+form#contact_form {
+}
+
+table#contact_table {
+}
+
+table#contact_table td {
+    vertical-align:top;
+    padding:5px;
+}
+
+span#contact_errormessage{
+    color:#880000;
+    font-weight:bold;
+}
+
+span#contact_successmessage{
+    color:#008800;
+    font-weight:bold;
+}
+
+input#contact_name, input#contact_mail, input#contact_website {
+    width:200px;
+}
+
+textarea#contact_message {
+    width:200px;
+}
+
+input#contact_submit {
+    width:200px;
+}
