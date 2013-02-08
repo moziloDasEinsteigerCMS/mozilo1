@@ -330,6 +330,7 @@ class CatPageClass {
     # $file = optinal und muss true sein wenn page eine datei ist
     # bei nur page wird wenn vorhanden $default_cat genommen ansonsten $CAT_REQUEST
     function split_CatPage_fromSyntax($syntax_catpage,$default_cat = false, $file = false) {
+        $syntax_catpage = str_replace('-html_amp~','&',$syntax_catpage);
         $valuearray = explode(":", $syntax_catpage);
         # cat:page wurde übergeben
         if(count($valuearray) > 1) {
