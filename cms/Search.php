@@ -142,7 +142,7 @@ function highlightSearch($content, $phrasestring) {
         # die such worte hervorheben
 #!!!!!! wir brauchen eine regex die nicht in script style tags text hervorhebt
 # dann kann auch das find_script_style() wieder raus
-        $syntax->content = preg_replace("/((<[^>]*)|$phrase)/ie", '"\2"=="\1"? "\1":"<span class=\"highlight\">\1</span>"', $syntax->content); 
+        $syntax->content = preg_replace("/((<[^>]*)|$phrase)/iue", '"\2"=="\1"? "\1":"<span class=\"highlight\">\1</span>"', $syntax->content); 
     }
     # alle script style sachen wieder einsetzen
     $syntax->find_script_style(false);

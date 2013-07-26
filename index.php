@@ -569,7 +569,7 @@ $_POST = cleanREQUEST($_POST);
         if($CMS_CONF->get("modrewrite") == "true") {
             $modrewrite_dumy = ".html";
         }
-        $form = "<form accept-charset=\"CHARSET\" method=\"get\" action=\"index.php$modrewrite_dumy\" class=\"searchform\"><fieldset id=\"searchfieldset\">"
+        $form = "<form accept-charset=\"".CHARSET."\" method=\"get\" action=\"index.php$modrewrite_dumy\" class=\"searchform\"><fieldset id=\"searchfieldset\">"
         ."<input type=\"hidden\" name=\"action\" value=\"search\" />"
         ."<input type=\"text\" name=\"query\" value=\"\" class=\"searchtextfield\" />"
         ."<input type=\"image\" name=\"action\" value=\"search\" src=\"".$LAYOUT_DIR_URL."/grafiken/searchicon.gif\" alt=\"".$language->getLanguageValue0("message_search_0")."\" class=\"searchbutton\"".getTitleAttribute($language->getLanguageValue0("message_search_0"))." />"
@@ -771,6 +771,8 @@ $_POST = cleanREQUEST($_POST);
                 if(count($url_para) > 1) {
                     $request = $url_para[0];
                 } else {
+#echo $url_get."<br />\n";
+#                    if($url_get != "index.php")
                     $request = substr($url_get,0,-5);
                 }
             } elseif($param == "page") {

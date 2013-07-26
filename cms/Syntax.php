@@ -435,9 +435,6 @@ class Syntax {
             $value = $Punycode->decode($value);
             if(empty($desciption))
                 $desciption = $value;
-#            $desciption = $specialchars->replaceSpecialChars($desciption,false);
-#            if(empty($desciption))
-#		          $desciption = $specialchars->rebuildSpecialChars($value, true, true);
             if(strip_tags($desciption) == $desciption)
                 $desciption = $specialchars->rebuildSpecialChars(obfuscateAdress($desciption, 3), true, true);
             $mailto = $specialchars->replaceSpecialChars($mailto,false);
@@ -445,7 +442,6 @@ class Syntax {
             $mailto = obfuscateAdress('mailto:'.$mailto, 3);
             $value = $specialchars->replaceSpecialChars($value,false);
             return '<a class="mail" href="'.$mailto.'"'.$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", $specialchars->rebuildSpecialChars(obfuscateAdress($value, 3), true, true))).'>'.$desciption.'</a>';
-#            return '<a class="mail" href="'.$mailto.'"'.$this->getTitleAttribute($language->getLanguageValue1("tooltip_link_mail_1", $specialchars->rebuildSpecialChars(obfuscateAdress($value, 3), true, true))).'>'.obfuscateAdress($desciption, 3).'</a>';
         } else {
             if(empty($desciption))
                 $desciption = $value;
