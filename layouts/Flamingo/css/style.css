@@ -315,7 +315,7 @@ a.gallerymenuactive, a.gallerynumbermenuactive {
 	color:#FF7994;
 	font-weight:bold;
 }
-a.gallerymenuactive:hover, , a.gallerynumbermenuactivehover {
+a.gallerymenuactive:hover, a.gallerynumbermenuactivehover {
 	text-decoration:none;
 }
 
