@@ -1,2 +1,2 @@
 [ueber1|Kontakt]
-{KontaktFormular}
+{CONTACT}
