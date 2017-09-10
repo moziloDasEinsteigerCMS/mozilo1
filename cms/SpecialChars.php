@@ -10,12 +10,6 @@
 
 class SpecialChars {
     
-// ------------------------------------------------------------------------------    
-// Konstruktor
-// ------------------------------------------------------------------------------
-    function SpecialChars(){
-    }
-
     function getHtmlEntityDecode($string) {
 
         if((version_compare( phpversion(), '5.0' ) < 0)) {
@@ -125,7 +119,7 @@ class SpecialChars {
 // ------------------------------------------------------------------------------
     function encodeProtectedChr($text) {# protected
         # alle geschützten zeichen suchen und in html code wandeln auch das ^
-        $text = preg_replace("/\^(.)/Umsie", "'&#94;&#'.ord('\\1').';'", $text);
+        $text = preg_replace("/\^(.)/Umsi", "'&#94;&#'.ord('\\1').';'", $text);
         return $text;
     }
 
@@ -134,7 +128,7 @@ class SpecialChars {
 // ------------------------------------------------------------------------------
     function decodeProtectedChr($text) {
         # alle &#94;&#?????; suchen und als zeichen ohne &#94; (^) ersetzen
-        $text = preg_replace("/&#94;&#(\d{2,5});/e", "chr('\\1')", $text);
+        $text = preg_replace("/&#94;&#(\d{2,5});/", "chr('\\1')", $text);
         return $text;
     }
 
