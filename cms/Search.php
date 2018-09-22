@@ -2,7 +2,7 @@
 
 function getSearchString($searchstring,$array = true) {
     if(trim($searchstring) != "") {
-        $string = preg_replace("/[\"|\'](.*)[\"|\']/Umsie", "str_replace(\" \",\"%20\",'\\1')", $searchstring);
+        $string = preg_replace("/[\"|\'](.*)[\"|\']/Umsi", "str_replace(\" \",\"%20\",'\\1')", $searchstring);
         $return_array = array();
         $matches = explode(" ",$string);
         foreach($matches as $string) {
