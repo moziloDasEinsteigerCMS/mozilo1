@@ -275,6 +275,7 @@ function getDirAsArray($dir,$filetype = false,$sort_type = "sort") {
                 if(in_array($ext,$filetype)) {
                     $dateien[] = $file;
                 }
+				 # nur dir oder file
 			// AZI 2017-09-17: Auch Symlinks müssen beachtet werden
             //} elseif(filetype($dir."/".$file) == $filetype) {
 			} elseif(filetype($dir."/".$file) == $filetype || filetype($dir."/".$file) == 'link') {
