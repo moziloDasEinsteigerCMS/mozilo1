@@ -124,6 +124,19 @@ function searchPage($cat,$page) {
 // Phrasen in Inhalt hervorheben
 // ------------------------------------------------------------------------------
 function highlightSearch($content, $phrasestring) {
+	
+	// AZI: Suche war kaputt :(
+	$result = $content;
+    // Zu highlightende Begriffe kommen kommasepariert ("begriff1,begriff2")-> in Array wandeln
+    $phrasearray = explode(",", $phrasestring);
+    // jeden Begriff highlighten
+    foreach($phrasearray as $phrase) {
+		$result = preg_replace('/(<.+?>[^<>]*?)('.preg_quote($phrase).')([^<>]*?<.+?>)/iu', '\1<span class="highlight">\2</span>\3', $result); 
+	}
+	return $result;
+	// /AZI
+	
+	//return preg_replace("/($phrasestring)/iu", '<span class="highlight">\1</span>', $content); 
     global $specialchars;
     global $syntax;
     # in $syntax den content setzen
