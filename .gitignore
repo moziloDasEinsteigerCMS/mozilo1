@@ -1,0 +1,11 @@
+/.settings
+/.buildpath
+/.project
+/admin/conf/basic.conf
+/admin/conf/logindata.conf
+/cms/conf/downloads.conf
+/cms/conf/gallery.conf
+/cms/conf/main.conf
+/cms/conf/passwords.conf
+/cms/conf/syntax.conf
+/cms/conf/version.conf

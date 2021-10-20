@@ -10,12 +10,6 @@
 
 class SpecialChars {
     
-// ------------------------------------------------------------------------------    
-// Konstruktor
-// ------------------------------------------------------------------------------
-    function SpecialChars(){
-    }
-
     function getHtmlEntityDecode($string) {
 
         if((version_compare( phpversion(), '5.0' ) < 0)) {
@@ -53,7 +47,7 @@ class SpecialChars {
     function replaceSpecialChars($text,$nochmal_erlauben) {
         # $nochmal_erlauben = für Tags mit src z.B. img dann muss das % auch gewandelt werden
         $text = str_replace('/','ssslashhh',$text);
-        if(preg_match('#\%([0-9a-f]{2})#ie',$text) < 1)
+        if(preg_match('#\%([0-9a-f]{2})#i',$text) < 1)
             $text = rawurlencode(stripslashes($text));
         if($nochmal_erlauben)
             $text = rawurlencode(stripslashes($text));
@@ -125,7 +119,10 @@ class SpecialChars {
 // ------------------------------------------------------------------------------
     function encodeProtectedChr($text) {# protected
         # alle geschützten zeichen suchen und in html code wandeln auch das ^
-        $text = preg_replace("/\^(.)/Umsie", "'&#94;&#'.ord('\\1').';'", $text);
+        //$text = preg_replace("/\^(.)/Umsie", "'&#94;&#'.ord('\\1').';'", $text);
+        $text = preg_replace_callback("/\^(.)/Umsi", function ($treffer) { 
+			return '&#94;&#'.ord($treffer[1]).';'; 
+		}, $text);
         return $text;
     }
 
@@ -134,7 +131,10 @@ class SpecialChars {
 // ------------------------------------------------------------------------------
     function decodeProtectedChr($text) {
         # alle &#94;&#?????; suchen und als zeichen ohne &#94; (^) ersetzen
-        $text = preg_replace("/&#94;&#(\d{2,5});/e", "chr('\\1')", $text);
+        //$text = preg_replace("/&#94;&#(\d{2,5});/e", "chr('\\1')", $text);
+        $text = preg_replace_callback("/&#94;&#(\d{2,5});/", function ($treffer) { 
+			return chr($treffer[1]); 
+		}, $text);
         return $text;
     }
 

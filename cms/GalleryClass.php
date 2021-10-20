@@ -12,7 +12,7 @@ class GalleryClass {
     var $Cols = false;
     var $Rows = false;
     var $GalleryTemplate = false;
-    function GalleryClass() {
+    function __construct() {
         if(isset($_REQUEST['galtemplate']))
             $this->GalleryTemplate = true;
 

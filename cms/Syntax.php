@@ -18,7 +18,7 @@ class Syntax {
 // ------------------------------------------------------------------------------    
 // Konstruktor
 // ------------------------------------------------------------------------------
-    function Syntax(){
+    function __construct(){
         global $CMS_CONF;
         global $USER_SYNTAX;
         global $activ_plugins;
@@ -753,7 +753,7 @@ class Syntax {
         $tablecontent = "";
         // Tabellenzeilen
 
-        preg_match_all("/(&lt;|&lt;&lt;)(.*)(&gt;|&gt;&gt;)/Umsie", $value, $tablelines);
+        preg_match_all("/(&lt;|&lt;&lt;)(.*)(&gt;|&gt;&gt;)/Umsi", $value, $tablelines);
 /*
 echo $value."<br>\n###################################<br>\n";
 echo "<pre>";

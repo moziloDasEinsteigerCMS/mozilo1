@@ -72,7 +72,7 @@ class Properties {
      *
      * @param string $file The file name to load the properties from
      */
-    function Properties($file = null, $is_admin = false) {
+    function __construct($file = null, $is_admin = false) {
         global $BASIC_LANGUAGE;
         if(isset($BASIC_LANGUAGE->properties['_translator'])) {
             if(isset($BASIC_LANGUAGE->properties['properties_noinput']))

@@ -13,7 +13,7 @@ class AccessControlClass {
     // --------------------------------------------------------------------
     // Konstruktor
     // --------------------------------------------------------------------
-    function AccessControlClass($protect_art = "catpage") {
+    function __construct($protect_art = "catpage") {
 
         // Timestamp füllen
         $this->timestamp = time();

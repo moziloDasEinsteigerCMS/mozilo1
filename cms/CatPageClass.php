@@ -25,7 +25,7 @@ class CatPageClass {
     # wird im ["_link-"] benutzt
     var $link_search = array("%3A","%2F","%3F","%26","%3D","%23");
     var $link_replace = array(":","/","?","&amp;","=","#");
-    function CatPageClass() {
+    function __construct() {
         if(defined("isCatPage"))
             die("die class CatPage darf nur einmal initaliesiert werden");
         $this->CatPageArray = $this->make_DirCatPageArray(CONTENT_DIR_REL);
